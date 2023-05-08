@@ -1,17 +1,13 @@
 import http from "./services.js";
 class UserRoleDataService {
-  baseUrl = "/performance-t7/userRole/";
+  baseUrl = "/performanceapi/userRole/";
 
   create(data) {
     return http.post(this.baseUrl, data);
   }
 
-  getUniqueRoles() {
-    return http.get(this.baseUrl + "roles/unique");
-  }
-
   getRolesForUser(userId) {
-    return http.get(this.baseUrl + "roles/userId/" + userId);
+    return http.get(this.baseUrl + "userId/" + userId);
   }
 
   remove(id) {

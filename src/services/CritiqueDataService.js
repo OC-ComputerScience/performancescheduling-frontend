@@ -1,6 +1,6 @@
 import http from "./services.js";
 class CritiqueDataService {
-  baseUrl = "/performance-t7/critique/";
+  baseUrl = "/performanceapi/critique/";
 
   getAll() {
     return http.get(this.baseUrl);
@@ -9,6 +9,16 @@ class CritiqueDataService {
   getCritiquesByTimeslotAndFaculty(timeslotId, facultyId) {
     return http.get(
       this.baseUrl + "timeslotId/" + timeslotId + "/facultyId/" + facultyId
+    );
+  }
+
+  getSemesterCritiques(semesterId) {
+    return http.get(this.baseUrl + "semesterId/" + semesterId);
+  }
+
+  getStudentSemesterCritiques(semesterId, userId) {
+    return http.get(
+      this.baseUrl + "semesterId/" + semesterId + "/userId/" + userId
     );
   }
 

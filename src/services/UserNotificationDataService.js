@@ -1,6 +1,6 @@
 import http from "./services.js";
-class StudentTimeslotDataService {
-  baseUrl = "/performance-t7/studentTimeslot/";
+class UserNotificationDataService {
+  baseUrl = "/performanceapi/userNotification/";
 
   getAll() {
     return http.get(this.baseUrl);
@@ -18,4 +18,4 @@ class StudentTimeslotDataService {
     return http.put(this.baseUrl + data.id, data);
   }
 }
-export default new StudentTimeslotDataService();
+export default new UserNotificationDataService();

@@ -1,6 +1,6 @@
 import http from "./services.js";
-class EventTimeDataService {
-  baseUrl = "/performance-t7/eventTimeslot/";
+class EventSignupDataService {
+  baseUrl = "/performanceapi/eventSignup/";
 
   create(data) {
     return http.post(this.baseUrl, data);
@@ -26,4 +26,4 @@ class EventTimeDataService {
     return http.get(this.baseUrl + `event/${id}`);
   }
 }
-export default new EventTimeDataService();
+export default new EventSignupDataService();

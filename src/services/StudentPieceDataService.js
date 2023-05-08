@@ -1,6 +1,6 @@
 import http from "./services.js";
-class RepertoireDataService {
-  baseUrl = "/performance-t7/repertoire/";
+class StudentPieceDataService {
+  baseUrl = "/performanceapi/studentPiece/";
 
   create(data) {
     return http.post(this.baseUrl, data);
@@ -22,4 +22,4 @@ class RepertoireDataService {
     return http.put(this.baseUrl + data.id, data);
   }
 }
-export default new RepertoireDataService();
+export default new StudentPieceDataService();

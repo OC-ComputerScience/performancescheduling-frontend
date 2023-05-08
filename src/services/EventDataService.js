@@ -1,6 +1,6 @@
 import http from "./services.js";
 class EventDataService {
-  baseUrl = "/performance-t7/event/";
+  baseUrl = "/performanceapi/event/";
 
   getAll() {
     return http.get(this.baseUrl);
@@ -31,25 +31,11 @@ class EventDataService {
   }
 
   getStudentTimeslotsForEvent(eventId) {
-    return http.get(this.baseUrl + "critiqueTimeslots/" + eventId);
-  }
-
-  getSemesterCritiques(semesterId) {
-    return http.get(this.baseUrl + "semesterCritiques/" + semesterId);
-  }
-
-  getStudentSemesterCritiques(semesterId, userId) {
-    return http.get(
-      this.baseUrl + "semesterCritiques/" + semesterId + "/user/" + userId
-    );
+    return http.get(this.baseUrl + "studentInstrumentSignups/" + eventId);
   }
 
   getBySemester(semesterId) {
     return http.get(this.baseUrl + `semesterId/${semesterId}`);
-  }
-
-  getEventTypes() {
-    return http.get(this.baseUrl + "types/unique");
   }
 }
 export default new EventDataService();

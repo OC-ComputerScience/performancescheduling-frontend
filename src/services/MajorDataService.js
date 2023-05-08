@@ -1,6 +1,6 @@
 import http from "./services.js";
-class ComposerDataService {
-  baseUrl = "/performanceapi/composer/";
+class MajorDataService {
+  baseUrl = "/performanceapi/major/";
 
   getAll() {
     return http.get(this.baseUrl);
@@ -18,4 +18,4 @@ class ComposerDataService {
     return http.put(this.baseUrl + data.id, data);
   }
 }
-export default new ComposerDataService();
+export default new MajorDataService();

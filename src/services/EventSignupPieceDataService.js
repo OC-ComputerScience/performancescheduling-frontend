@@ -1,13 +1,13 @@
 import http from "./services.js";
-class TimeslotSongDataService {
-  baseUrl = "/performance-t7/timeslotSong/";
+class EventSignupPieceDataService {
+  baseUrl = "/performanceapi/eventSignupPiece/";
 
   getAll() {
     return http.get(this.baseUrl);
   }
 
-  getByTimeslotId(timeslotId) {
-    return http.get(this.baseUrl + "timeslotId/" + timeslotId);
+  getByEventSignupId(eventSignupId) {
+    return http.get(this.baseUrl + "eventSignupId/" + eventSignupId);
   }
 
   create(data) {
@@ -22,4 +22,4 @@ class TimeslotSongDataService {
     return http.put(this.baseUrl + data.id, data);
   }
 }
-export default new TimeslotSongDataService();
+export default new EventSignupPieceDataService();

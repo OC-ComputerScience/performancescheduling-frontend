@@ -1,6 +1,6 @@
 import http from "./services.js";
-class SongDataService {
-  baseUrl = "/performance-t7/song/";
+class PieceDataService {
+  baseUrl = "/performanceapi/song/";
 
   create(data) {
     return http.post(this.baseUrl, data);
@@ -18,4 +18,4 @@ class SongDataService {
     return http.get(this.baseUrl + "composer/" + composerId);
   }
 }
-export default new SongDataService();
+export default new PieceDataService();

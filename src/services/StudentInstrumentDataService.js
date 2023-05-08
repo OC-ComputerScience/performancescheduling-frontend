@@ -1,6 +1,6 @@
 import http from "./services.js";
 class StudentInstrumentDataService {
-  baseUrl = "/performance-t7/studentInstrument/";
+  baseUrl = "/performanceapi/studentInstrument/";
 
   getAll() {
     return http.get(this.baseUrl);
@@ -10,8 +10,8 @@ class StudentInstrumentDataService {
     return http.get(this.baseUrl + "userId/" + userId);
   }
 
-  getStudentsForInstructorId(id) {
-    return http.get(this.baseUrl + "students/instructorId/" + id);
+  getStudentsForInstructorId(instructorId) {
+    return http.get(this.baseUrl + "instructorId/" + instructorId);
   }
 
   create(data) {

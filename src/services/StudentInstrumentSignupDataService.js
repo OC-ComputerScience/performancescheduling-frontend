@@ -1,6 +1,10 @@
 import http from "./services.js";
-class JurorTimeslotDataService {
-  baseUrl = "/performance-t7/jurorTimeslot/";
+class StudentInstrumentSignupDataService {
+  baseUrl = "/performanceapi/studentInstrumentSignup/";
+
+  getAll() {
+    return http.get(this.baseUrl);
+  }
 
   create(data) {
     return http.post(this.baseUrl, data);
@@ -14,4 +18,4 @@ class JurorTimeslotDataService {
     return http.put(this.baseUrl + data.id, data);
   }
 }
-export default new JurorTimeslotDataService();
+export default new StudentInstrumentSignupDataService();

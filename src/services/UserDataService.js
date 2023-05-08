@@ -1,6 +1,6 @@
 import http from "./services.js";
 class UserDataService {
-  baseUrl = "/performance-t7/user/";
+  baseUrl = "/performanceapi/user/";
 
   create(data) {
     return http.post(this.baseUrl, data);
