@@ -250,14 +250,12 @@ import { reactive } from "vue";
 import AvailabilityDataService from "../../services/AvailabilityDataService";
 import ComposerDataService from "../../services/ComposerDataService";
 import EventDataService from "../../services/EventDataService";
-import EventTimeDataService from "../../services/EventTimeDataService";
-import SongDataService from "../../services/SongDataService";
-import SemesterDataService from "../../services/SemesterDataService";
-import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
-import StudentTimeslotDataService from "../../services/StudentTimeslotDataService";
-import TimeslotSongDataService from "../../services/TimeslotSongDataService";
-import SongTranslationDataService from "../../services/SongTranslationDataService";
-import RepertoireDataService from "../../services/RepertoireDataService";
+// import EventTimeDataService from "../../services/EventTimeDataService";
+// import SongDataService from "../../services/SongDataService";
+// import StudentTimeslotDataService from "../../services/StudentTimeslotDataService";
+// import TimeslotSongDataService from "../../services/TimeslotSongDataService";
+// import SongTranslationDataService from "../../services/SongTranslationDataService";
+// import RepertoireDataService from "../../services/RepertoireDataService";
 export default {
   name: "studentSignUpPopUp",
   data: () => ({
