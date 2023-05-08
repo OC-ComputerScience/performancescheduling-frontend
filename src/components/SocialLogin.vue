@@ -8,7 +8,8 @@
 
 <script>
 import AuthServices from "../services/authServices.js";
-import Utils from "../config/utils.js";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../stores/LoginStore.js";
 
 export default {
   name: "login_signup_social",
@@ -21,6 +22,9 @@ export default {
   async created() {},
   mounted() {
     this.loginWithGoogle();
+  },
+  computed: {
+    ...mapStores(useLoginStore),
   },
   methods: {
     async loginWithGoogle() {
@@ -51,8 +55,7 @@ export default {
       await AuthServices.loginUser(token)
         .then((response) => {
           this.user = response.data;
-          Utils.setStore("user", this.user);
-          Utils.setStore("userRole", { role: this.user.lastRole });
+          this.loginStore.setUser(this.user);
           if (this.user.lastRole == "Faculty") {
             this.$router.push({ path: "facultyHome" });
           } else if (this.user.lastRole == "Student") {

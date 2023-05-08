@@ -138,10 +138,11 @@
 </template>
 <script>
 import ocLogo from "../../public/oc_logo_social.png";
-import Utils from "../config/utils.js";
 import UserRoleDataService from "../services/UserRoleDataService";
 import UserDataService from "../services/UserDataService";
 import AuthServices from "../services/authServices.js";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../stores/LoginStore.js";
 export default {
   name: "MainNav",
   components: {
@@ -215,10 +216,13 @@ export default {
     await this.getUserRoles();
     this.resetMenu();
   },
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     async getUserRoles() {
-      this.user = Utils.getStore("user");
-      var previousRole = Utils.getStore("userRole").role;
+      this.user = this.loginStore.user;
+      var previousRole = this.loginStore.userRole.role;
       if (this.user != null) {
         await UserRoleDataService.getRolesForUser(this.user.userId)
           .then((response) => {
@@ -249,7 +253,7 @@ export default {
       }
     },
     updateLastRole(newRole) {
-      Utils.setStore("userRole", { role: newRole });
+      this.loginStore.setUserRole({ role: newRole });
       const data = {
         id: this.user.userId,
         lastRole: newRole,
@@ -259,13 +263,13 @@ export default {
       });
     },
     goToHome() {
-      if (Utils.getStore("userRole").role == "Faculty") {
+      if (this.loginStore.userRole.role == "Faculty") {
         this.$router.push({ path: "facultyHome" });
-      } else if (Utils.getStore("userRole").role == "Student") {
+      } else if (this.loginStore.userRole.role == "Student") {
         this.$router.push({ path: "studentHome" });
-      } else if (Utils.getStore("userRole").role == "Admin") {
+      } else if (this.loginStore.userRole.role == "Admin") {
         this.$router.push({ path: "adminHome" });
-      } else if (Utils.getStore("userRole").role == "Accompanist") {
+      } else if (this.loginStore.userRole.role == "Accompanist") {
         this.$router.push({ path: "createAvailability" });
       } else {
         this.$router.push({ path: "base" });
@@ -274,7 +278,7 @@ export default {
     resetMenu() {
       this.user = null;
       // ensures that their name gets set properly from store
-      this.user = Utils.getStore("user");
+      this.user = this.loginStore.user;
       if (this.user != null) {
         this.initials = this.user.fName[0] + this.user.lName[0];
         this.name = this.user.fName + " " + this.user.lName;
@@ -290,7 +294,7 @@ export default {
       AuthServices.logoutUser(this.user)
         .then((response) => {
           console.log(response);
-          Utils.removeItem("user");
+          this.loginStore.clearLoginUser();
           this.$router.push({ name: "loginPage" });
           location.reload();
         })
@@ -305,7 +309,7 @@ export default {
   watch: {
     currentRole() {
       this.resetMenu();
-      if (Utils.getStore("userRole").role !== this.currentRole.role) {
+      if (this.loginStore.userRole.role !== this.currentRole.role) {
         this.updateLastRole(this.currentRole.role);
         this.goToHome();
       }

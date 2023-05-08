@@ -36,7 +36,8 @@
 import EventDataService from "../../services/EventDataService";
 import SemesterDataService from "../../services/SemesterDataService";
 import UserRoleDataService from "../../services/UserRoleDataService";
-import Utils from "../../config/utils";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
 export default {
   name: "AdminHome",
   components: {},
@@ -49,6 +50,9 @@ export default {
     userRole: {},
   }),
   async created() {},
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     editEvent() {
       this.$router.push({ path: "adminViewEvents" });
@@ -80,11 +84,11 @@ export default {
         });
     },
     async getUserRole() {
-      this.user = Utils.getStore("user");
+      this.user = this.loginStore.user;
       await UserRoleDataService.getRolesForUser(this.user.userId)
         .then((response) => {
           this.userRole = response.data.find((obj) => {
-            return obj.role === Utils.getStore("userRole").role;
+            return obj.role === this.loginStore.userRole.role;
           });
         })
         .catch((e) => {
