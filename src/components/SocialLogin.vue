@@ -58,19 +58,18 @@ export default {
           this.user = response.data;
           console.log(this.user);
           this.loginStore.setUser(this.user);
-          this.$router.push({ path: "studentHome" });
 
-          // if (this.user.lastRole == "Faculty") {
-          //   this.$router.push({ path: "facultyHome" });
-          // } else if (this.user.lastRole == "Student") {
-          //   this.$router.push({ path: "studentHome" });
-          // } else if (this.user.lastRole == "Admin") {
-          //   this.$router.push({ path: "adminHome" });
-          // } else if (this.user.lastRole == "Accompanist") {
-          //   this.$router.push({ path: "createAvailability" });
-          // } else {
-          //   this.$router.push({ path: "base" });
-          // }
+          if (this.loginStore.currentRole.role === "Faculty") {
+            this.$router.push({ path: "facultyHome" });
+          } else if (this.loginStore.currentRole.role === "Student") {
+            this.$router.push({ path: "studentHome" });
+          } else if (this.loginStore.currentRole.role === "Admin") {
+            this.$router.push({ path: "adminHome" });
+          } else if (this.loginStore.currentRole.role === "Accompanist") {
+            this.$router.push({ path: "createAvailability" });
+          } else {
+            this.$router.push({ path: "base" });
+          }
         })
         .catch((error) => {
           console.log("error", error);

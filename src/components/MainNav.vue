@@ -212,8 +212,6 @@ export default {
       this.userRoles = this.userRoles.concat(
         this.loginStore.user.roles.additional
       );
-      console.log(this.userRoles);
-      this.loginStore.currentRole = this.loginStore.user.roles.default;
     },
     goToHome() {
       if (this.loginStore.currentRole.role === "Faculty") {
@@ -261,6 +259,7 @@ export default {
   },
   watch: {
     "loginStore.currentRole": function () {
+      console.log(this.loginStore.currentRole);
       this.resetMenu();
       this.goToHome();
     },
