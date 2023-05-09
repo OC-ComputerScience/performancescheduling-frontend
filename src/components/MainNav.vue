@@ -1,3 +1,120 @@
+<script setup>
+import ocLogo from "../../public/oc_logo_social.png";
+import AuthServices from "../services/authServices.js";
+import { useLoginStore } from "../stores/LoginStore.js";
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const loginStore = useLoginStore();
+let user = {};
+const drawer = false;
+const title = "OC Music Department";
+let initials = "";
+let name = "";
+const activeMenus = ref([]);
+const menus = [
+  {
+    link: "studentRepertoire",
+    text: "Repertoire",
+    roles: [1],
+  },
+  {
+    link: "studentEventSignUps",
+    text: "Event Sign-Ups",
+    roles: [1],
+  },
+  {
+    link: "studentCritiques",
+    text: "Critiques",
+    roles: [1],
+  },
+  {
+    link: "facultyViewCritiques",
+    text: "View Student Critiques",
+    roles: [2],
+  },
+  {
+    link: "createAvailability",
+    text: "Event Availability",
+    roles: [2, 5],
+  },
+  {
+    link: "adminViewUsers",
+    text: "Users",
+    roles: [4],
+  },
+  {
+    link: "adminViewEvents",
+    text: "Events",
+    roles: [4],
+  },
+];
+const userRoles = [];
+
+function getUserRoles() {
+  userRoles = [];
+  userRoles.push(loginStore.user.roles.default);
+  userRoles = userRoles.concat(loginStore.user.roles.additional);
+}
+function goToHome() {
+  if (loginStore.currentRole.role === "Faculty") {
+    router.push({ path: "facultyHome" });
+  } else if (loginStore.currentRole.role == "Student") {
+    router.push({ path: "studentHome" });
+  } else if (loginStore.currentRole.role == "Admin") {
+    router.push({ path: "adminHome" });
+  } else if (loginStore.currentRole.role == "Accompanist") {
+    router.push({ path: "createAvailability" });
+  } else {
+    router.push({ path: "base" });
+  }
+}
+function resetMenu() {
+  user = null;
+  // ensures that their name gets set properly from store
+  user = loginStore.user;
+  if (user != null) {
+    initials = user.firstName[0] + user.lastName[0];
+    name = user.firstName + " " + user.lastName;
+
+    if (loginStore.currentRole.role !== "") {
+      activeMenus.value = menus.filter((menu) =>
+        menu.roles.includes(loginStore.currentRole.roleId)
+      );
+    }
+  }
+}
+function logout() {
+  AuthServices.logoutUser(user)
+    .then((response) => {
+      console.log(response);
+      loginStore.clearLoginUser();
+      router.push({ name: "loginPage" });
+      location.reload();
+    })
+    .catch((error) => {
+      console.log("error", error);
+    });
+}
+function changeComp(route) {
+  router.push({ path: route });
+}
+
+loginStore.$subscribe((mutation, state) => {
+  console.log("a change happened");
+  console.log(mutation);
+});
+
+onMounted(async () => {
+  console.log(loginStore);
+  // user = loginStore.user;
+  // await this.getUserRoles();
+  // this.resetMenu();
+});
+
+resetMenu();
+</script>
 <template>
   <v-app-bar color="maroon" prominent class="elevation-0">
     <template v-slot:prepend>
@@ -5,7 +122,7 @@
       <v-btn icon plain @click="goToHome">
         <v-img
           class="mx-2"
-          :src="logoURL"
+          :src="ocLogo"
           height="50"
           width="50"
           contain
@@ -136,136 +253,6 @@
     </v-list>
   </v-navigation-drawer>
 </template>
-<script>
-import ocLogo from "../../public/oc_logo_social.png";
-import AuthServices from "../services/authServices.js";
-import { mapStores } from "pinia";
-import { useLoginStore } from "../stores/LoginStore.js";
-export default {
-  name: "MainNav",
-  components: {
-    ocLogo,
-  },
-  data: () => ({
-    user: {},
-    drawer: false,
-    title: "OC Music Department",
-    initials: "",
-    name: "",
-    logoURL: null,
-    activeMenus: [],
-    menus: [
-      {
-        link: "studentRepertoire",
-        text: "Repertoire",
-        roles: [1],
-      },
-      {
-        link: "studentEventSignUps",
-        text: "Event Sign-Ups",
-        roles: [1],
-      },
-      {
-        link: "studentCritiques",
-        text: "Critiques",
-        roles: [1],
-      },
-      {
-        link: "facultyViewCritiques",
-        text: "View Student Critiques",
-        roles: [2],
-      },
-      {
-        link: "createAvailability",
-        text: "Event Availability",
-        roles: [2, 5],
-      },
-      {
-        link: "adminViewUsers",
-        text: "Users",
-        roles: [4],
-      },
-      {
-        link: "adminViewEvents",
-        text: "Events",
-        roles: [4],
-      },
-    ],
-    userRoles: [],
-  }),
-  async created() {
-    this.logoURL = ocLogo;
-    this.resetMenu();
-  },
-  async mounted() {
-    await this.getUserRoles();
-    this.resetMenu();
-  },
-  computed: {
-    ...mapStores(useLoginStore),
-  },
-  methods: {
-    async getUserRoles() {
-      this.user = this.loginStore.user;
-      this.userRoles = [];
-      this.userRoles.push(this.loginStore.user.roles.default);
-      this.userRoles = this.userRoles.concat(
-        this.loginStore.user.roles.additional
-      );
-    },
-    goToHome() {
-      if (this.loginStore.currentRole.role === "Faculty") {
-        this.$router.push({ path: "facultyHome" });
-      } else if (this.loginStore.currentRole.role == "Student") {
-        this.$router.push({ path: "studentHome" });
-      } else if (this.loginStore.currentRole.role == "Admin") {
-        this.$router.push({ path: "adminHome" });
-      } else if (this.loginStore.currentRole.role == "Accompanist") {
-        this.$router.push({ path: "createAvailability" });
-      } else {
-        this.$router.push({ path: "base" });
-      }
-    },
-    resetMenu() {
-      this.user = null;
-      // ensures that their name gets set properly from store
-      this.user = this.loginStore.user;
-      if (this.user != null) {
-        this.initials = this.user.firstName[0] + this.user.lastName[0];
-        this.name = this.user.firstName + " " + this.user.lastName;
-
-        if (this.loginStore.currentRole.role !== "") {
-          this.activeMenus = this.menus.filter((menu) =>
-            menu.roles.includes(this.loginStore.currentRole.roleId)
-          );
-        }
-      }
-    },
-    logout() {
-      AuthServices.logoutUser(this.user)
-        .then((response) => {
-          console.log(response);
-          this.loginStore.clearLoginUser();
-          this.$router.push({ name: "loginPage" });
-          location.reload();
-        })
-        .catch((error) => {
-          console.log("error", error);
-        });
-    },
-    changeComp(route) {
-      this.$router.push({ path: route });
-    },
-  },
-  watch: {
-    "loginStore.currentRole": function () {
-      console.log(this.loginStore.currentRole);
-      this.resetMenu();
-      this.goToHome();
-    },
-  },
-};
-</script>
 <style>
 .text-center {
   text-align: center;
