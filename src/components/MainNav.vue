@@ -2,16 +2,16 @@
 import ocLogo from "../../public/oc_logo_social.png";
 import AuthServices from "../services/authServices.js";
 import { useLoginStore } from "../stores/LoginStore.js";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const loginStore = useLoginStore();
-let user = {};
-const drawer = false;
+const drawer = ref(false);
 const title = "OC Music Department";
-let initials = "";
-let name = "";
+const initials = ref("");
+const name = ref("");
 const activeMenus = ref([]);
 const menus = [
   {
@@ -50,12 +50,13 @@ const menus = [
     roles: [4],
   },
 ];
-const userRoles = [];
+const userRoles = ref([]);
+const { currentRole } = storeToRefs(loginStore);
 
 function getUserRoles() {
-  userRoles = [];
-  userRoles.push(loginStore.user.roles.default);
-  userRoles = userRoles.concat(loginStore.user.roles.additional);
+  userRoles.value = [];
+  userRoles.value.push(loginStore.user.roles.default);
+  userRoles.value = userRoles.value.concat(loginStore.user.roles.additional);
 }
 function goToHome() {
   if (loginStore.currentRole.role === "Faculty") {
@@ -71,12 +72,9 @@ function goToHome() {
   }
 }
 function resetMenu() {
-  user = null;
-  // ensures that their name gets set properly from store
-  user = loginStore.user;
-  if (user != null) {
-    initials = user.firstName[0] + user.lastName[0];
-    name = user.firstName + " " + user.lastName;
+  if (loginStore.user != null) {
+    initials.value = loginStore.user.firstName[0] + loginStore.user.lastName[0];
+    name.value = loginStore.user.firstName + " " + loginStore.user.lastName;
 
     if (loginStore.currentRole.role !== "") {
       activeMenus.value = menus.filter((menu) =>
@@ -86,7 +84,7 @@ function resetMenu() {
   }
 }
 function logout() {
-  AuthServices.logoutUser(user)
+  AuthServices.logoutUser(loginStore.user)
     .then((response) => {
       console.log(response);
       loginStore.clearLoginUser();
@@ -101,19 +99,15 @@ function changeComp(route) {
   router.push({ path: route });
 }
 
-loginStore.$subscribe((mutation, state) => {
-  console.log("a change happened");
-  console.log(mutation);
+watch(currentRole, () => {
+  goToHome();
+  resetMenu();
 });
 
-onMounted(async () => {
-  console.log(loginStore);
-  // user = loginStore.user;
-  // await this.getUserRoles();
-  // this.resetMenu();
+onMounted(() => {
+  getUserRoles();
+  resetMenu();
 });
-
-resetMenu();
 </script>
 <template>
   <v-app-bar color="maroon" prominent class="elevation-0">
@@ -132,7 +126,7 @@ resetMenu();
     </template>
     <!-- OC Music Dept title in top bar -->
     <v-toolbar-title class="title">
-      {{ this.title }}
+      {{ title }}
     </v-toolbar-title>
     <!-- <v-spacer></v-spacer> -->
     <div v-if="userRoles.length > 1" class="align-right justify-right d-flex">
@@ -192,11 +186,20 @@ resetMenu();
       </v-btn>
     </div>
 
-    <v-menu bottom min-width="250px" rounded offset-y v-if="user != null">
+    <v-menu
+      bottom
+      min-width="250px"
+      rounded
+      offset-y
+      v-if="loginStore.user != null"
+    >
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props" icon x-large>
-          <v-avatar v-if="user != null" color="secondary">
-            <v-img v-if="user.picture" :src="user.picture"></v-img>
+          <v-avatar v-if="loginStore.user != null" color="secondary">
+            <v-img
+              v-if="loginStore.user.picture"
+              :src="loginStore.user.picture"
+            ></v-img>
             <span v-else class="accent--text font-weight-bold">{{
               initials
             }}</span>
@@ -207,14 +210,18 @@ resetMenu();
         <v-card-text>
           <div class="mx-auto text-center">
             <v-avatar color="secondary" class="mt-2 mb-2">
-              <v-img v-if="user.picture" :src="user.picture"></v-img>
+              <img
+                v-if="loginStore.user.picture"
+                :src="loginStore.user.picture"
+                referrerpolicy="no-referrer"
+              />
               <span v-else class="accent--text font-weight-bold">{{
                 initials
               }}</span>
             </v-avatar>
             <h3>{{ name }}</h3>
             <p class="text-caption mt-1">
-              {{ user.email }}
+              {{ loginStore.user.email }}
             </p>
             <v-divider class="my-3"></v-divider>
             <v-btn variant="text" @click="changeComp('studentSettings')">

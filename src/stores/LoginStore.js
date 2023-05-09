@@ -7,8 +7,8 @@ export const useLoginStore = defineStore(
     const user = ref({});
     const currentRole = ref({});
 
-    function setUser(user) {
-      user.value = user;
+    function setUser(newUser) {
+      user.value = newUser;
       if (user.value.roles.length > 0) {
         let roles = {
           default: user.value.roles[0],
@@ -23,7 +23,7 @@ export const useLoginStore = defineStore(
       }
       currentRole.value = user.value.roles.default;
 
-      console.log(user);
+      console.log("user", user);
     }
 
     function clearLoginUser() {
