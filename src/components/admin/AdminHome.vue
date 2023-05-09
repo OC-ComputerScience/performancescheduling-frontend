@@ -83,18 +83,6 @@ export default {
           console.log(e);
         });
     },
-    async getUserRole() {
-      this.user = this.loginStore.user;
-      await UserRoleDataService.getRolesForUser(this.user.userId)
-        .then((response) => {
-          this.userRole = response.data.find((obj) => {
-            return obj.role === this.loginStore.userRole.role;
-          });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
     compareDates(input) {
       const today = new Date();
       const todayString = `${today.getFullYear()}-${(today.getMonth() + 1)
@@ -132,7 +120,8 @@ export default {
     },
   },
   async mounted() {
-    await this.getUserRole();
+    this.userRole = this.loginStore.currentRole;
+
     await this.getCurrentSemester();
     await this.getEvents();
     await this.getCurrentSemester();

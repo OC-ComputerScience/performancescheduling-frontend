@@ -153,18 +153,6 @@ export default {
           console.log(err);
         });
     },
-    async getUserRole() {
-      this.user = this.loginStore.user;
-      await UserRoleDataService.getRolesForUser(this.user.userId)
-        .then((response) => {
-          this.userRole = response.data.find((obj) => {
-            return obj.role === this.loginStore.userRole.role;
-          });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
     async retrieveAllEvents() {
       await EventDataService.getAll()
         .then((response) => {
@@ -230,10 +218,11 @@ export default {
   async mounted() {
     await this.getCurrentSemester();
     await this.getEvents();
-    await this.getUserRole();
-    if (this.userRole.isInstructor) {
-      await this.getStudents();
-    }
+    this.userRole = this.loginStore.currentRole;
+
+    // if (this.userRole.isInstructor) {
+    //   await this.getStudents();
+    // }
   },
   components: { AvailabilityPopUp },
 };

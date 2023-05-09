@@ -52,21 +52,25 @@ export default {
       let token = {
         credential: response.credential,
       };
+      console.log(token);
       await AuthServices.loginUser(token)
         .then((response) => {
           this.user = response.data;
+          console.log(this.user);
           this.loginStore.setUser(this.user);
-          if (this.user.lastRole == "Faculty") {
-            this.$router.push({ path: "facultyHome" });
-          } else if (this.user.lastRole == "Student") {
-            this.$router.push({ path: "studentHome" });
-          } else if (this.user.lastRole == "Admin") {
-            this.$router.push({ path: "adminHome" });
-          } else if (this.user.lastRole == "Accompanist") {
-            this.$router.push({ path: "createAvailability" });
-          } else {
-            this.$router.push({ path: "base" });
-          }
+          this.$router.push({ path: "studentHome" });
+
+          // if (this.user.lastRole == "Faculty") {
+          //   this.$router.push({ path: "facultyHome" });
+          // } else if (this.user.lastRole == "Student") {
+          //   this.$router.push({ path: "studentHome" });
+          // } else if (this.user.lastRole == "Admin") {
+          //   this.$router.push({ path: "adminHome" });
+          // } else if (this.user.lastRole == "Accompanist") {
+          //   this.$router.push({ path: "createAvailability" });
+          // } else {
+          //   this.$router.push({ path: "base" });
+          // }
         })
         .catch((error) => {
           console.log("error", error);

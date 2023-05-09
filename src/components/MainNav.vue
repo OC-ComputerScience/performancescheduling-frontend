@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="primary" prominent class="elevation-0">
+  <v-app-bar color="maroon" prominent class="elevation-0">
     <template v-slot:prepend>
       <!-- OC logo image -->
       <v-btn icon plain @click="goToHome">
@@ -34,7 +34,7 @@
         </v-btn>
       </v-toolbar-items>
       <v-btn
-        v-if="this.currentRole.role === ''"
+        v-if="loginStore.currentRole.role === ''"
         variant="text"
         @click="logout()"
       >
@@ -43,7 +43,7 @@
       <v-select
         :items="userRoles"
         item-title="role"
-        v-model="currentRole"
+        v-model="loginStore.currentRole"
         variant="underlined"
         class="ma-2"
         return-object
@@ -67,7 +67,7 @@
         </v-btn>
       </v-toolbar-items>
       <v-btn
-        v-if="this.currentRole.role === ''"
+        v-if="loginStore.currentRole.role === ''"
         variant="text"
         @click="logout()"
       >
@@ -138,8 +138,6 @@
 </template>
 <script>
 import ocLogo from "../../public/oc_logo_social.png";
-import UserRoleDataService from "../services/UserRoleDataService";
-import UserDataService from "../services/UserDataService";
 import AuthServices from "../services/authServices.js";
 import { mapStores } from "pinia";
 import { useLoginStore } from "../stores/LoginStore.js";
@@ -160,53 +158,40 @@ export default {
       {
         link: "studentRepertoire",
         text: "Repertoire",
-        roles: "Student",
+        roles: [1],
       },
-      // {
-      //   link: "studentUpcomingEvents",
-      //   text: "Upcoming Events",
-      //   roles: "Student",
-      // },
       {
         link: "studentEventSignUps",
         text: "Event Sign-Ups",
-        roles: "Student",
+        roles: [1],
       },
       {
         link: "studentCritiques",
         text: "Critiques",
-        roles: "Student",
+        roles: [1],
       },
       {
         link: "facultyViewCritiques",
         text: "View Student Critiques",
-        roles: "Faculty",
+        roles: [2],
       },
-      // {
-      //   link: "facultyCreateCritiques",
-      //   text: "Create Event Critique",
-      //   roles: "Faculty",
-      // },
       {
         link: "createAvailability",
         text: "Event Availability",
-        roles: "Faculty, Accompanist",
+        roles: [2, 5],
       },
       {
         link: "adminViewUsers",
         text: "Users",
-        roles: "Admin",
+        roles: [4],
       },
       {
         link: "adminViewEvents",
         text: "Events",
-        roles: "Admin",
+        roles: [4],
       },
     ],
     userRoles: [],
-    currentRole: {
-      role: "",
-    },
   }),
   async created() {
     this.logoURL = ocLogo;
@@ -222,54 +207,22 @@ export default {
   methods: {
     async getUserRoles() {
       this.user = this.loginStore.user;
-      var previousRole = this.loginStore.userRole.role;
-      if (this.user != null) {
-        await UserRoleDataService.getRolesForUser(this.user.userId)
-          .then((response) => {
-            this.userRoles = response.data;
-
-            if (previousRole !== null && previousRole !== undefined) {
-              const roleIndex = this.userRoles.findIndex(
-                (role) => role.role === previousRole
-              );
-              if (roleIndex === -1) {
-                if (this.userRoles.length > 0) {
-                  this.currentRole = this.userRoles[0];
-                  this.updateLastRole(this.currentRole.role);
-                }
-              } else {
-                this.currentRole = this.userRoles[roleIndex];
-              }
-            } else {
-              if (this.userRoles.length > 0) {
-                this.currentRole = this.userRoles[0];
-                this.updateLastRole(this.currentRole.role);
-              }
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    },
-    updateLastRole(newRole) {
-      this.loginStore.setUserRole({ role: newRole });
-      const data = {
-        id: this.user.userId,
-        lastRole: newRole,
-      };
-      UserDataService.update(data).catch((err) => {
-        console.log(err);
-      });
+      this.userRoles = [];
+      this.userRoles.push(this.loginStore.user.roles.default);
+      this.userRoles = this.userRoles.concat(
+        this.loginStore.user.roles.additional
+      );
+      console.log(this.userRoles);
+      this.loginStore.currentRole = this.loginStore.user.roles.default;
     },
     goToHome() {
-      if (this.loginStore.userRole.role == "Faculty") {
+      if (this.loginStore.currentRole.role === "Faculty") {
         this.$router.push({ path: "facultyHome" });
-      } else if (this.loginStore.userRole.role == "Student") {
+      } else if (this.loginStore.currentRole.role == "Student") {
         this.$router.push({ path: "studentHome" });
-      } else if (this.loginStore.userRole.role == "Admin") {
+      } else if (this.loginStore.currentRole.role == "Admin") {
         this.$router.push({ path: "adminHome" });
-      } else if (this.loginStore.userRole.role == "Accompanist") {
+      } else if (this.loginStore.currentRole.role == "Accompanist") {
         this.$router.push({ path: "createAvailability" });
       } else {
         this.$router.push({ path: "base" });
@@ -280,12 +233,12 @@ export default {
       // ensures that their name gets set properly from store
       this.user = this.loginStore.user;
       if (this.user != null) {
-        this.initials = this.user.fName[0] + this.user.lName[0];
-        this.name = this.user.fName + " " + this.user.lName;
+        this.initials = this.user.firstName[0] + this.user.lastName[0];
+        this.name = this.user.firstName + " " + this.user.lastName;
 
-        if (this.currentRole.role !== "") {
+        if (this.loginStore.currentRole.role !== "") {
           this.activeMenus = this.menus.filter((menu) =>
-            menu.roles.includes(this.currentRole.role)
+            menu.roles.includes(this.loginStore.currentRole.roleId)
           );
         }
       }
@@ -307,12 +260,9 @@ export default {
     },
   },
   watch: {
-    currentRole() {
+    "loginStore.currentRole": function () {
       this.resetMenu();
-      if (this.loginStore.userRole.role !== this.currentRole.role) {
-        this.updateLastRole(this.currentRole.role);
-        this.goToHome();
-      }
+      this.goToHome();
     },
   },
 };

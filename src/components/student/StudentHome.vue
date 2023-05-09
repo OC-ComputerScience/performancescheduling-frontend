@@ -225,21 +225,12 @@ export default {
     },
     async getUserRole() {
       this.user = this.loginStore.user;
-      await UserRoleDataService.getRolesForUser(this.user.userId)
-        .then((response) => {
-          this.userRole = response.data.find((obj) => {
-            return obj.role === this.loginStore.userRole.role;
-          });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
     },
   },
   async mounted() {
     await this.getCurrentSemester();
     await this.getEvents();
-    await this.getUserRole();
+    this.userRole = this.loginStore.currentRole;
     await this.getInstrumnentData();
   },
   components: { StudentSignUpPopUp },
