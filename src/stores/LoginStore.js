@@ -22,15 +22,9 @@ export const useLoginStore = defineStore(
         user.value.roles = roles;
       }
       currentRole.value = user.value.roles.default;
-
-      console.log("user", user);
     }
 
-    function clearLoginUser() {
-      user.value = {};
-    }
-
-    return { user, currentRole, setUser, clearLoginUser };
+    return { user, currentRole, setUser };
   },
   { persist: true }
 );

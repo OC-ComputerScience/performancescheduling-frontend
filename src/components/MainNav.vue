@@ -37,17 +37,17 @@ const menus = [
   {
     link: "createAvailability",
     text: "Event Availability",
-    roles: [2, 5],
+    roles: [2, 4],
   },
   {
     link: "adminViewUsers",
     text: "Users",
-    roles: [4],
+    roles: [3],
   },
   {
     link: "adminViewEvents",
     text: "Events",
-    roles: [4],
+    roles: [3],
   },
 ];
 const userRoles = ref([]);
@@ -86,10 +86,11 @@ function resetMenu() {
 function logout() {
   AuthServices.logoutUser(loginStore.user)
     .then((response) => {
-      console.log(response);
-      loginStore.clearLoginUser();
+      loginStore.$patch({
+        user: {},
+        currentRole: {},
+      });
       router.push({ name: "loginPage" });
-      location.reload();
     })
     .catch((error) => {
       console.log("error", error);
@@ -100,8 +101,10 @@ function changeComp(route) {
 }
 
 watch(currentRole, () => {
-  goToHome();
-  resetMenu();
+  if (currentRole != {}) {
+    goToHome();
+    resetMenu();
+  }
 });
 
 onMounted(() => {
