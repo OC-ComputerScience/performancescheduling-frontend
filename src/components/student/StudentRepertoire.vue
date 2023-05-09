@@ -169,7 +169,8 @@
   </v-dialog>
 </template>
 <script>
-import Utils from "../../config/utils.js";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
 // import RepertoireDataService from "../../services/RepertoireDataService";
 import ComposerDataService from "../../services/ComposerDataService";
 // import SongDataService from "../../services/SongDataService";
@@ -198,6 +199,9 @@ export default {
     dialogDelete: false,
     isEdit: false,
   }),
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     async fillSemesters() {
       RepertoireDataService.getSemesterByUser(this.user.userId)
@@ -485,7 +489,7 @@ export default {
     },
   },
   async mounted() {
-    this.user = Utils.getStore("user");
+    this.user = this.loginStore.user;
     await this.fillSemesters();
     this.fillComposers();
     this.retrieveAllSemesters();

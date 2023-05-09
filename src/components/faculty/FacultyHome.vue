@@ -114,7 +114,8 @@ import SemesterDataService from "../../services/SemesterDataService";
 import UserRoleDataService from "../../services/UserRoleDataService";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
 import AvailabilityPopUp from "./AvailabilityPopUp.vue";
-import Utils from "../../config/utils";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
 export default {
   name: "facultyHome",
   data: () => ({
@@ -128,6 +129,9 @@ export default {
     userRole: {},
   }),
   async created() {},
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     viewCrit() {
       this.$router.push({ path: "facultyViewCritiques" });
@@ -136,6 +140,7 @@ export default {
       this.$router.push({ path: "facultyViewRepertoire" });
     },
     createCrit(id) {
+      // FIX?
       Utils.setStore("eventId", id);
       this.$router.push({ path: "facultyCreateCritiques" });
     },
@@ -146,18 +151,6 @@ export default {
         })
         .catch((err) => {
           console.log(err);
-        });
-    },
-    async getUserRole() {
-      this.user = Utils.getStore("user");
-      await UserRoleDataService.getRolesForUser(this.user.userId)
-        .then((response) => {
-          this.userRole = response.data.find((obj) => {
-            return obj.role === Utils.getStore("userRole").role;
-          });
-        })
-        .catch((e) => {
-          console.log(e);
         });
     },
     async retrieveAllEvents() {
@@ -225,10 +218,11 @@ export default {
   async mounted() {
     await this.getCurrentSemester();
     await this.getEvents();
-    await this.getUserRole();
-    if (this.userRole.isInstructor) {
-      await this.getStudents();
-    }
+    this.userRole = this.loginStore.currentRole;
+
+    // if (this.userRole.isInstructor) {
+    //   await this.getStudents();
+    // }
   },
   components: { AvailabilityPopUp },
 };

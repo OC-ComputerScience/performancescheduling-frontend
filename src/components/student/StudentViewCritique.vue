@@ -88,7 +88,8 @@
 <script>
 import SemesterDataService from "../../services/SemesterDataService";
 import EventDataService from "../../services/EventDataService";
-import Utils from "../../config/utils.js";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
 export default {
   name: "StudentViewCritique",
   data: () => ({
@@ -109,7 +110,9 @@ export default {
     dialog: false,
     selectedJurorCritiques: {},
   }),
-
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     async retrieveAllSemesters() {
       await SemesterDataService.getAll()
@@ -149,7 +152,7 @@ export default {
   async mounted() {
     await this.retrieveAllSemesters();
     this.semesters.forEach((obj) => (obj.title = obj.year + " - " + obj.code));
-    this.user = Utils.getStore("user");
+    this.user = this.loginStore.user;
     await this.getCurrentSemester();
     await this.semesterSearchUpdate(this.selectedSemester);
   },

@@ -8,7 +8,8 @@
 
 <script>
 import AuthServices from "../services/authServices.js";
-import Utils from "../config/utils.js";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../stores/LoginStore.js";
 
 export default {
   name: "login_signup_social",
@@ -21,6 +22,9 @@ export default {
   async created() {},
   mounted() {
     this.loginWithGoogle();
+  },
+  computed: {
+    ...mapStores(useLoginStore),
   },
   methods: {
     async loginWithGoogle() {
@@ -48,18 +52,20 @@ export default {
       let token = {
         credential: response.credential,
       };
+      console.log(token);
       await AuthServices.loginUser(token)
         .then((response) => {
           this.user = response.data;
-          Utils.setStore("user", this.user);
-          Utils.setStore("userRole", { role: this.user.lastRole });
-          if (this.user.lastRole == "Faculty") {
+          console.log(this.user);
+          this.loginStore.setUser(this.user);
+
+          if (this.loginStore.currentRole.role === "Faculty") {
             this.$router.push({ path: "facultyHome" });
-          } else if (this.user.lastRole == "Student") {
+          } else if (this.loginStore.currentRole.role === "Student") {
             this.$router.push({ path: "studentHome" });
-          } else if (this.user.lastRole == "Admin") {
+          } else if (this.loginStore.currentRole.role === "Admin") {
             this.$router.push({ path: "adminHome" });
-          } else if (this.user.lastRole == "Accompanist") {
+          } else if (this.loginStore.currentRole.role === "Accompanist") {
             this.$router.push({ path: "createAvailability" });
           } else {
             this.$router.push({ path: "base" });

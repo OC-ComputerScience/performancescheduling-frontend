@@ -1,31 +1,45 @@
-// Styles
 import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
 
-const myCustomTheme = {
-  dark: false,
-  colors: {
-    primary: "#80162B",
-    cream: "#DADADA",
-    darkB: "#00ACC1",
-    fav: "d2f0ee", //light blue
-    secondary: "#262626", //grey
-  },
-};
-
-// Vuetify
 import { createVuetify } from "vuetify";
 import { VDataTable } from "vuetify/labs/VDataTable";
 
+import "@fortawesome/fontawesome-free/css/all.css";
+import { aliases, fa } from "vuetify/iconsets/fa";
+
 export default createVuetify({
-  // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
-  theme: {
-    defaultTheme: "myCustomTheme",
-    themes: {
-      myCustomTheme,
-    },
-  },
   components: {
     VDataTable,
+  },
+  theme: {
+    defaultTheme: "lightTheme",
+    themes: {
+      lightTheme: {
+        dark: false,
+        colors: {
+          maroon: "#77202B",
+          lightMaroon: "#F2DFE1",
+          teal: "#78C1B6",
+          lightTeal: "#CEE4E1",
+          blue: "#3272AA",
+          lightBlue: "#D7E1E9",
+          darkBlue: "#1A465F",
+          lightDarkBlue: "#D5DCDF",
+          orange: "#DF5B48",
+          lightOrange: "#EEC8C2",
+          yellow: "#F2C754",
+          lightYellow: "#F4E9CC",
+          mediumGray: "#C5C5C5",
+          lightGray: "#F4F4F4",
+        },
+      },
+    },
+    icons: {
+      defaultSet: "fa",
+      aliases,
+      sets: {
+        fa,
+      },
+    },
   },
 });

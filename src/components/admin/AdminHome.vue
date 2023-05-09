@@ -36,7 +36,8 @@
 import EventDataService from "../../services/EventDataService";
 import SemesterDataService from "../../services/SemesterDataService";
 import UserRoleDataService from "../../services/UserRoleDataService";
-import Utils from "../../config/utils";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
 export default {
   name: "AdminHome",
   components: {},
@@ -49,6 +50,9 @@ export default {
     userRole: {},
   }),
   async created() {},
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     editEvent() {
       this.$router.push({ path: "adminViewEvents" });
@@ -74,18 +78,6 @@ export default {
         .then((response) => {
           this.events = response.data;
           this.events.forEach((obj) => (obj.title = obj.date));
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    async getUserRole() {
-      this.user = Utils.getStore("user");
-      await UserRoleDataService.getRolesForUser(this.user.userId)
-        .then((response) => {
-          this.userRole = response.data.find((obj) => {
-            return obj.role === Utils.getStore("userRole").role;
-          });
         })
         .catch((e) => {
           console.log(e);
@@ -128,7 +120,8 @@ export default {
     },
   },
   async mounted() {
-    await this.getUserRole();
+    this.userRole = this.loginStore.currentRole;
+
     await this.getCurrentSemester();
     await this.getEvents();
     await this.getCurrentSemester();

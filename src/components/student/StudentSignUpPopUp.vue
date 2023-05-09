@@ -245,7 +245,8 @@
   </v-dialog>
 </template>
 <script>
-import Utils from "../../config/utils.js";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
 import { reactive } from "vue";
 import AvailabilityDataService from "../../services/AvailabilityDataService";
 import ComposerDataService from "../../services/ComposerDataService";
@@ -300,6 +301,9 @@ export default {
     user: {},
     userChosenSlot: [],
   }),
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     async getEvent() {
       await EventDataService.getById(this.eventId)
@@ -706,7 +710,7 @@ export default {
     },
     async reset() {
       await this.getEvent();
-      this.user = Utils.getStore("user");
+      this.user = this.loginStore.user;
       await this.retrieveStudentInstruments();
       this.fillComposers();
       let currentDate = new Date();

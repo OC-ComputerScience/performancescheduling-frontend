@@ -53,7 +53,9 @@
 <script>
 import EventDataService from "../../services/EventDataService";
 import AvailabilityPopUp from "./AvailabilityPopUp.vue";
-import Utils from "../../config/utils";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
+
 export default {
   name: "createAvailability",
   data: () => ({
@@ -69,6 +71,9 @@ export default {
     eventId: null,
     user: {},
   }),
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     async retrieveEventsDateAndAfter(date) {
       await EventDataService.getGTEDate(date)
@@ -87,7 +92,7 @@ export default {
     },
   },
   async mounted() {
-    this.user = Utils.getStore("user");
+    this.user = this.loginStore.user;
     this.currentDate = new Date();
     let dateString = this.currentDate.toISOString().substring(0, 10);
     await this.retrieveEventsDateAndAfter(dateString);

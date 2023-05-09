@@ -238,8 +238,9 @@
   </v-dialog>
 </template>
 <script>
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
 // import EventDataService from "../../services/EventDataService";
-import Utils from "../../config/utils";
 import UserRoleDataService from "../../services/UserRoleDataService";
 // import JurorTimeslotDataService from "../../services/JurorTimeslotDataService";
 import CritiqueDataService from "../../services/CritiqueDataService";
@@ -274,6 +275,9 @@ export default {
     filterBool: null,
     eventId: null,
   }),
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     async fillTimeslots() {
       this.timeslots = [];
@@ -313,7 +317,7 @@ export default {
       }
     },
     getFacultyId() {
-      const user = Utils.getStore("user");
+      const user = this.loginStore.user;
       UserRoleDataService.getRolesForUser(user.userId)
         .then((response) => {
           this.facultyId = response.data.find((role) => {
@@ -674,6 +678,7 @@ export default {
     },
   },
   async mounted() {
+    // FIX?
     this.eventId = Utils.getStore("eventId");
     this.getFacultyId();
     await this.fillTimeslots();

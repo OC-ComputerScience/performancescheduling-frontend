@@ -126,7 +126,8 @@ import SemesterDataService from "../../services/SemesterDataService";
 import UserRoleDataService from "../../services/UserRoleDataService";
 import StudentSignUpPopUp from "./StudentSignUpPopUp.vue";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
-import Utils from "../../config/utils";
+import { mapStores } from "pinia";
+import { useLoginStore } from "../../stores/LoginStore.js";
 export default {
   name: "StudentHome",
   components: {},
@@ -142,6 +143,9 @@ export default {
     studentInstruments: [],
   }),
   async created() {},
+  computed: {
+    ...mapStores(useLoginStore),
+  },
   methods: {
     async getInstrumnentData() {
       StudentInstrumentDataService.getByUser(this.user.userId)
@@ -180,7 +184,6 @@ export default {
       this.$router.push({ path: "studentRepertoire" });
     },
     viewCrit() {
-      // Utils.setStore("eventId", id);
       this.$router.push({ path: "studentCritiques" });
     },
     async getEvents() {
@@ -221,22 +224,13 @@ export default {
         });
     },
     async getUserRole() {
-      this.user = Utils.getStore("user");
-      await UserRoleDataService.getRolesForUser(this.user.userId)
-        .then((response) => {
-          this.userRole = response.data.find((obj) => {
-            return obj.role === Utils.getStore("userRole").role;
-          });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      this.user = this.loginStore.user;
     },
   },
   async mounted() {
     await this.getCurrentSemester();
     await this.getEvents();
-    await this.getUserRole();
+    this.userRole = this.loginStore.currentRole;
     await this.getInstrumnentData();
   },
   components: { StudentSignUpPopUp },
