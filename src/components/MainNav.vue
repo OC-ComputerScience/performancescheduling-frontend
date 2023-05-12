@@ -25,29 +25,24 @@ const menus = [
     roles: [1],
   },
   {
-    link: "studentEventSignUps",
-    text: "Event Sign-Ups",
-    roles: [1],
-  },
-  {
-    link: "studentCritiques",
-    text: "Critiques",
+    link: "studentPerformances",
+    text: "Performances",
     roles: [1],
   },
   {
     link: "facultyHome",
     text: "Home",
-    roles: [2, 4],
-  },
-  {
-    link: "facultyViewCritiques",
-    text: "View Student Critiques",
     roles: [2],
   },
   {
-    link: "createAvailability",
-    text: "Event Availability",
-    roles: [2, 4],
+    link: "facultyPieces",
+    text: "Pieces",
+    roles: [2],
+  },
+  {
+    link: "facultyStudents",
+    text: "Students",
+    roles: [2],
   },
   {
     link: "adminHome",
@@ -55,14 +50,45 @@ const menus = [
     roles: [3],
   },
   {
-    link: "adminViewUsers",
-    text: "Users",
-    roles: [3],
+    link: "accompanistHome",
+    text: "Home",
+    roles: [4],
   },
   {
-    link: "adminViewEvents",
+    link: "accompanistPieces",
+    text: "Pieces",
+    roles: [4],
+  },
+  {
+    link: "accompanistStudents",
+    text: "Students",
+    roles: [4],
+  },
+];
+const adminMenus = [
+  {
+    link: "adminUsers",
+    text: "Users",
+  },
+  {
+    link: "adminEvents",
     text: "Events",
-    roles: [3],
+  },
+  {
+    link: "adminInstruments",
+    text: "Instruments",
+  },
+  {
+    link: "adminComposers",
+    text: "Composers",
+  },
+  {
+    link: "adminPieces",
+    text: "Pieces",
+  },
+  {
+    link: "adminEvaluations",
+    text: "Evaluations",
   },
 ];
 const userRoles = ref([]);
@@ -105,7 +131,7 @@ function goToHome() {
   } else if (loginStore.currentRole.role == "Admin") {
     router.push({ path: "adminHome" });
   } else if (loginStore.currentRole.role == "Accompanist") {
-    router.push({ path: "createAvailability" });
+    router.push({ path: "accompanistHome" });
   } else {
     router.push({ path: "base" });
   }
@@ -146,7 +172,11 @@ function updateActiveLink() {
     console.log(activeLink.value);
   }, 1);
 }
-function changeRole() {}
+function changeRole(newRole) {
+  loginStore.currentRole = userRoles.value.find((obj) => {
+    return obj.roleId === newRole;
+  });
+}
 
 watch(currentRole, () => {
   if (currentRole != {}) {
@@ -201,6 +231,36 @@ onMounted(() => {
             {{ menu.text }}
           </v-btn>
         </v-toolbar-items>
+        <v-toolbar-items v-if="loginStore.currentRole.roleId == 3">
+          <v-menu bottom rounded offset-y open-on-hover>
+            <template v-slot:activator="{ props }">
+              <v-btn
+                :class="'hidden-md-and-down mx-1 menu-link font-weight-bold text-ourMaroon'"
+                height="50"
+                v-bind="props"
+                x-large
+                elevation="0"
+              >
+                Maintain
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-text>
+                <div class="mx-auto" v-for="menu in adminMenus">
+                  <v-btn
+                    :class="'mt-2 font-weight-bold'"
+                    density="comfortable"
+                    elevation="0"
+                    @click="changeComp(menu.link)"
+                  >
+                    {{ menu.text }}
+                  </v-btn>
+                  <br />
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-menu>
+        </v-toolbar-items>
         <v-btn
           v-if="loginStore.currentRole.role === ''"
           variant="text"
@@ -251,50 +311,82 @@ onMounted(() => {
               <p class="text-caption text-grey">
                 {{ loginStore.user.email }}
               </p>
-              <v-btn
-                color="ourLightMaroon"
-                :class="'font-weight-bold text-ourMaroon mt-2'"
-                density="comfortable"
-                elevation="0"
-                width="250px"
-                @click="changeComp('studentSettings')"
+              <div
+                v-if="
+                  userRoles.findIndex((obj) => {
+                    return obj.roleId == 1;
+                  }) != -1 && loginStore.currentRole.roleId != 1
+                "
               >
-                Switch to Student View
-              </v-btn>
-              <br />
-              <v-btn
-                color="ourLightDarkBlue"
-                :class="'font-weight-bold text-ourDarkBlue mt-2'"
-                density="comfortable"
-                elevation="0"
-                width="250px"
-                @click="changeComp('studentSettings')"
+                <v-btn
+                  color="ourLightMaroon"
+                  :class="'mt-2 menu-button font-weight-bold text-ourMaroon'"
+                  density="comfortable"
+                  elevation="0"
+                  width="250px"
+                  @click="changeRole(1)"
+                >
+                  Switch to Student View
+                </v-btn>
+                <br />
+              </div>
+              <div
+                v-if="
+                  userRoles.findIndex((obj) => {
+                    return obj.roleId == 2;
+                  }) != -1 && loginStore.currentRole.roleId != 2
+                "
               >
-                Switch to Faculty View
-              </v-btn>
-              <br />
-              <v-btn
-                color="ourLightOrange"
-                :class="'font-weight-bold text-ourOrange mt-2'"
-                density="comfortable"
-                elevation="0"
-                width="250px"
-                @click="changeComp('studentSettings')"
+                <v-btn
+                  color="ourLightDarkBlue"
+                  :class="'mt-2 menu-button font-weight-bold text-ourDarkBlue'"
+                  density="comfortable"
+                  elevation="0"
+                  width="250px"
+                  @click="changeRole(2)"
+                >
+                  Switch to Faculty View
+                </v-btn>
+                <br />
+              </div>
+              <div
+                v-if="
+                  userRoles.findIndex((obj) => {
+                    return obj.roleId == 3;
+                  }) != -1 && loginStore.currentRole.roleId != 3
+                "
               >
-                Switch to Admin View
-              </v-btn>
-              <br />
-              <v-btn
-                color="ourLightTeal"
-                :class="'font-weight-bold text-ourTeal mt-2'"
-                density="comfortable"
-                elevation="0"
-                width="250px"
-                @click="changeComp('studentSettings')"
+                <v-btn
+                  color="ourLightOrange"
+                  :class="'mt-2 menu-button font-weight-bold text-ourOrange'"
+                  density="comfortable"
+                  elevation="0"
+                  width="250px"
+                  @click="changeRole(3)"
+                >
+                  Switch to Admin View
+                </v-btn>
+                <br />
+              </div>
+              <div
+                v-if="
+                  userRoles.findIndex((obj) => {
+                    return obj.roleId == 4;
+                  }) != -1 && loginStore.currentRole.roleId != 4
+                "
               >
-                Switch to Accompanist View
-              </v-btn>
-              <br />
+                <v-btn
+                  color="ourLightTeal"
+                  :class="'mt-2 menu-button font-weight-bold text-ourTeal'"
+                  density="comfortable"
+                  elevation="0"
+                  width="250px"
+                  @click="changeRole(4)"
+                >
+                  Switch to Accompanist View
+                </v-btn>
+                <br />
+              </div>
               <v-btn
                 prepend-icon="mdi-cog"
                 color="ourLightBlue"
@@ -350,11 +442,19 @@ onMounted(() => {
         :key="menu.text"
         exact
         @click="changeComp(menu.link)"
-        :class="activeLink === menu.link ? 'text-ourBlue' : 'text-maroon'"
+        :class="activeLink === menu.link ? 'text-ourBlue' : 'text-ourMaroon'"
       >
-        <v-list-item-title class="white--text"
-          >{{ menu.text }}
-        </v-list-item-title>
+        <v-list-item-title>{{ menu.text }} </v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        v-if="loginStore.currentRole.roleId == 3"
+        v-for="menu in adminMenus"
+        :key="menu.text"
+        exact
+        @click="changeComp(menu.link)"
+        :class="activeLink === menu.link ? 'text-ourBlue' : 'text-ourMaroon'"
+      >
+        <v-list-item-title>{{ menu.text }} </v-list-item-title>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -372,5 +472,6 @@ onMounted(() => {
 .menu-button {
   justify-content: flex-start;
   text-align: left;
+  font-size: 12px;
 }
 </style>

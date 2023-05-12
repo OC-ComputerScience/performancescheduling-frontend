@@ -66,7 +66,7 @@ export default {
           } else if (this.loginStore.currentRole.role === "Admin") {
             this.$router.push({ path: "adminHome" });
           } else if (this.loginStore.currentRole.role === "Accompanist") {
-            this.$router.push({ path: "createAvailability" });
+            this.$router.push({ path: "accompanistHome" });
           } else {
             this.$router.push({ path: "base" });
           }
