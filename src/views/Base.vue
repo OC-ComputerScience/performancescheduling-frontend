@@ -1,9 +1,9 @@
 <template>
-  <MainNav></MainNav>
-
   <v-container fluid class="fill-height">
     <v-row class="fill-height">
       <v-col>
+        <MainNav></MainNav>
+
         <!-- Your components go here -->
         <!-- Student Section -->
         <StudentHome

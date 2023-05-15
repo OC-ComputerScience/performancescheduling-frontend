@@ -245,18 +245,20 @@ onMounted(() => {
               </v-btn>
             </template>
             <v-card>
-              <v-card-text>
-                <div class="mx-auto" v-for="menu in adminMenus">
-                  <v-btn
-                    :class="'mt-2 font-weight-bold'"
-                    density="comfortable"
-                    elevation="0"
-                    @click="changeComp(menu.link)"
-                  >
-                    {{ menu.text }}
-                  </v-btn>
-                  <br />
-                </div>
+              <v-card-text
+                class="mx-auto"
+                v-for="menu in adminMenus"
+                :key="menu.link"
+              >
+                <v-btn
+                  :class="'mt-2 font-weight-bold'"
+                  density="comfortable"
+                  elevation="0"
+                  @click="changeComp(menu.link)"
+                >
+                  {{ menu.text }}
+                </v-btn>
+                <br />
               </v-card-text>
             </v-card>
           </v-menu>
@@ -459,7 +461,7 @@ onMounted(() => {
     </v-list>
   </v-navigation-drawer>
 </template>
-<style>
+<style scoped>
 .text-center {
   text-align: center;
 }
