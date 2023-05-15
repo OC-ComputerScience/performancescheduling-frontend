@@ -97,23 +97,23 @@ const activeLink = ref("");
 const roleColors = [
   {
     roleId: 1,
-    backgroundColor: "ourLightMaroon",
-    textColor: "ourMaroon",
+    backgroundColor: "lightMaroon",
+    textColor: "maroon",
   },
   {
     roleId: 2,
-    backgroundColor: "ourLightDarkBlue",
-    textColor: "ourDarkBlue",
+    backgroundColor: "lightDarkBlue",
+    textColor: "darkBlue",
   },
   {
     roleId: 3,
-    backgroundColor: "ourLightOrange",
-    textColor: "ourOrange",
+    backgroundColor: "lightOrange",
+    textColor: "orange",
   },
   {
     roleId: 4,
-    backgroundColor: "ourLightTeal",
-    textColor: "ourTeal",
+    backgroundColor: "lightTeal",
+    textColor: "teal",
   },
 ];
 const roleColor = ref({});
@@ -219,7 +219,7 @@ onMounted(() => {
           v-for="menu in activeMenus"
           :key="menu.link"
           class="hidden-md-and-down"
-          :class="activeLink === menu.link ? 'text-ourBlue' : 'text-ourMaroon'"
+          :class="activeLink === menu.link ? 'text-blue' : 'text-maroon'"
         >
           <v-btn
             class="hidden-md-and-down mx-1 menu-link font-weight-bold"
@@ -235,7 +235,7 @@ onMounted(() => {
           <v-menu bottom rounded offset-y open-on-hover>
             <template v-slot:activator="{ props }">
               <v-btn
-                :class="'hidden-md-and-down mx-1 menu-link font-weight-bold text-ourMaroon'"
+                :class="'hidden-md-and-down mx-1 menu-link font-weight-bold text-maroon'"
                 height="50"
                 v-bind="props"
                 x-large
@@ -269,7 +269,7 @@ onMounted(() => {
           Log back in
         </v-btn>
       </div>
-      <v-icon class="mt-3 mr-5" color="ourMaroon" icon="mdi-bell"></v-icon>
+      <v-icon class="mt-3 mr-5" color="maroon" icon="mdi-bell"></v-icon>
       <v-menu
         bottom
         min-width="250px"
@@ -319,8 +319,8 @@ onMounted(() => {
                 "
               >
                 <v-btn
-                  color="ourLightMaroon"
-                  :class="'mt-2 menu-button font-weight-bold text-ourMaroon'"
+                  color="lightMaroon"
+                  :class="'mt-2 menu-button font-weight-bold text-maroon'"
                   density="comfortable"
                   elevation="0"
                   width="250px"
@@ -338,8 +338,8 @@ onMounted(() => {
                 "
               >
                 <v-btn
-                  color="ourLightDarkBlue"
-                  :class="'mt-2 menu-button font-weight-bold text-ourDarkBlue'"
+                  color="lightDarkBlue"
+                  :class="'mt-2 menu-button font-weight-bold text-darkBlue'"
                   density="comfortable"
                   elevation="0"
                   width="250px"
@@ -357,8 +357,8 @@ onMounted(() => {
                 "
               >
                 <v-btn
-                  color="ourLightOrange"
-                  :class="'mt-2 menu-button font-weight-bold text-ourOrange'"
+                  color="lightOrange"
+                  :class="'mt-2 menu-button font-weight-bold text-orange'"
                   density="comfortable"
                   elevation="0"
                   width="250px"
@@ -376,8 +376,8 @@ onMounted(() => {
                 "
               >
                 <v-btn
-                  color="ourLightTeal"
-                  :class="'mt-2 menu-button font-weight-bold text-ourTeal'"
+                  color="lightTeal"
+                  :class="'mt-2 menu-button font-weight-bold text-teal'"
                   density="comfortable"
                   elevation="0"
                   width="250px"
@@ -389,8 +389,8 @@ onMounted(() => {
               </div>
               <v-btn
                 prepend-icon="mdi-cog"
-                color="ourLightBlue"
-                :class="'mt-2 menu-button font-weight-bold text-ourBlue'"
+                color="lightBlue"
+                :class="'mt-2 menu-button font-weight-bold text-blue'"
                 density="comfortable"
                 elevation="0"
                 width="250px"
@@ -404,8 +404,8 @@ onMounted(() => {
               <br />
               <v-btn
                 prepend-icon="mdi-logout"
-                color="ourMediumGray"
-                :class="'mt-2 menu-button font-weight-bold text-ourLightGray'"
+                color="mediumGray"
+                :class="'mt-2 menu-button font-weight-bold text-lightGray'"
                 density="comfortable"
                 elevation="0"
                 width="250px"
@@ -423,7 +423,7 @@ onMounted(() => {
       <v-icon
         class="hidden-lg-and-up mt-3 ml-2"
         icon="mdi-menu"
-        color="ourMaroon"
+        color="maroon"
         @click="drawer = !drawer"
       >
       </v-icon>
@@ -442,7 +442,7 @@ onMounted(() => {
         :key="menu.text"
         exact
         @click="changeComp(menu.link)"
-        :class="activeLink === menu.link ? 'text-ourBlue' : 'text-ourMaroon'"
+        :class="activeLink === menu.link ? 'text-blue' : 'text-maroon'"
       >
         <v-list-item-title>{{ menu.text }} </v-list-item-title>
       </v-list-item>
@@ -452,7 +452,7 @@ onMounted(() => {
         :key="menu.text"
         exact
         @click="changeComp(menu.link)"
-        :class="activeLink === menu.link ? 'text-ourBlue' : 'text-ourMaroon'"
+        :class="activeLink === menu.link ? 'text-blue' : 'text-maroon'"
       >
         <v-list-item-title>{{ menu.text }} </v-list-item-title>
       </v-list-item>
