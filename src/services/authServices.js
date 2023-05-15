@@ -7,7 +7,7 @@ export default {
   authorizeUser(code) {
     return apiClient.post("performanceapi/authorize", code);
   },
-  logoutUser(token) {
-    return apiClient.post("performanceapi/logout", token);
+  logoutUser(user) {
+    return apiClient.post("performanceapi/logout", user);
   },
 };

@@ -39,26 +39,8 @@ const router = createRouter({
     {
       path: "/base",
       component: Base,
-      name: "studentViewEvents",
-      alias: "/studentViewEvents",
-    },
-    {
-      path: "/base",
-      component: Base,
-      name: "studentEventSignUps",
-      alias: "/studentEventSignUps",
-    },
-    {
-      path: "/base",
-      component: Base,
-      name: "studentCritiques",
-      alias: "/studentCritiques",
-    },
-    {
-      path: "/base",
-      component: Base,
-      name: "studentRecordings",
-      alias: "/studentRecordings",
+      name: "studentPerformances",
+      alias: "/studentPerformances",
     },
     // Faculty Routes
     {
@@ -70,21 +52,33 @@ const router = createRouter({
     {
       path: "/base",
       component: Base,
-      name: "facultyViewCritiques",
-      alias: "/facultyViewCritiques",
+      name: "facultyPieces",
+      alias: "/facultyPieces",
     },
     {
       path: "/base",
       component: Base,
-      name: "facultyCreateCritiques",
-      alias: "/facultyCreateCritiques",
+      name: "facultyStudents",
+      alias: "/facultyStudents",
     },
-    // Accompanist and Faculty Availability
+    // Accompanist Routes
     {
       path: "/base",
       component: Base,
-      name: "createAvailability",
-      alias: "/createAvailability",
+      name: "accompanistHome",
+      alias: "/accompanistHome",
+    },
+    {
+      path: "/base",
+      component: Base,
+      name: "accompanistPieces",
+      alias: "/accompanistPieces",
+    },
+    {
+      path: "/base",
+      component: Base,
+      name: "accompanistStudents",
+      alias: "/accompanistStudents",
     },
     // Admin Routes
     {
@@ -96,20 +90,38 @@ const router = createRouter({
     {
       path: "/base",
       component: Base,
-      name: "adminCreateEvents",
-      alias: "/adminCreateEvents",
+      name: "adminInstruments",
+      alias: "/adminInstruments",
     },
     {
       path: "/base",
       component: Base,
-      name: "adminViewEvents",
-      alias: "/adminViewEvents",
+      name: "adminEvents",
+      alias: "/adminEvents",
     },
     {
       path: "/base",
       component: Base,
-      name: "adminViewUsers",
-      alias: "/adminViewUsers",
+      name: "adminUsers",
+      alias: "/adminUsers",
+    },
+    {
+      path: "/base",
+      component: Base,
+      name: "adminComposers",
+      alias: "/adminComposers",
+    },
+    {
+      path: "/base",
+      component: Base,
+      name: "adminPieces",
+      alias: "/adminPieces",
+    },
+    {
+      path: "/base",
+      component: Base,
+      name: "adminEvaluations",
+      alias: "/adminEvaluations",
     },
   ],
 });
