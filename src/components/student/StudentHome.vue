@@ -1,240 +1,115 @@
-<template>
-  <v-card>
-    <v-card-title>
-      {{ "Welcome " + user.fName + " " + user.lName + "!" }}
-    </v-card-title>
-  </v-card>
-  <v-container>
-    <v-row>
-      <v-col cols="3">
-        <v-row class="pb-6 pr-8 pt-3">
-          <v-card>
-            <v-card-title>
-              <v-avatar v-if="user.picture">
-                <v-img :src="user.picture"></v-img
-              ></v-avatar>
-              <span v-else class="accent--text font-weight-bold">
-                {{ initials }}
-              </span>
-              Details:
-            </v-card-title>
-            <v-divider></v-divider>
-            <!-- How get major -->
-            <!-- <v-card-text v-if="user.stuMajor">
-              {{ "Major: " + studentInstruments.student.stuMajor }}
-            </v-card-text> -->
-            <!-- How get student classificartion -->
-            <!-- <v-card-text v-if="">
-              {{ "Student Classification: " + studentInstruments.student.stuClassification }}
-            </v-card-text> -->
-            <v-card-text>
-              {{ "Email: " + user.email }}
-            </v-card-text>
-          </v-card>
-        </v-row>
-        <v-row>
-          <v-card>
-            <v-card-title align="center"> Your Instruments </v-card-title>
-            <v-divider></v-divider>
-            <v-card-title
-              align="center"
-              v-for="(studentInstrument, index) in studentInstruments"
-              :key="index"
-            >
-              <v-menu open-on-hover>
-                <template v-slot:activator="{ props }">
-                  <v-btn variant="text" @click="viewStuRep()" v-bind="props">
-                    {{ studentInstrument.instrument.name }}
-                  </v-btn>
-                </template>
-                <v-card>
-                  <v-card-title>
-                    {{ studentInstrument.instrument.name }}
-                  </v-card-title>
-                  <v-divider></v-divider>
-                  <v-card-text v-if="studentInstrument.level">
-                    {{ "Vocal level: " + studentInstrument.level }}
-                  </v-card-text>
-                  <v-card-text v-if="studentInstrument.faculty.user">
-                    {{
-                      "Instructor: " +
-                      studentInstrument.faculty.user.fName +
-                      " " +
-                      studentInstrument.faculty.user.lName
-                    }}
-                  </v-card-text>
-                </v-card>
-              </v-menu>
+<script setup>
+import { ref, onMounted } from "vue";
+import { useLoginStore } from "../../stores/LoginStore.js";
 
-              <v-divider
-                v-if="index < studentInstruments.length - 1"
-              ></v-divider>
-            </v-card-title>
-          </v-card>
+import UserNotificationDataService from "../../services/UserNotificationDataService.js";
+import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
+import EventDataService from "../../services/EventDataService.js";
+import EventSignupAndAvailabilityItem from "../EventSignupAndAvailabilityItem.vue";
+
+const loginStore = useLoginStore();
+
+const notifications = ref([]);
+const instruments = ref([]);
+const signups = ref([]);
+const upcomingEvents = ref([]);
+
+async function retrieveData() {
+  await UserNotificationDataService.getByUserRole(loginStore.currentRole.id)
+    .then((response) => {
+      notifications.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await StudentInstrumentDataService.getByUser(loginStore.user.userId)
+    .then((response) => {
+      instruments.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await StudentInstrumentDataService.getStudentInstrumentSignupsByUserRoleId(
+    loginStore.currentRole.id
+  )
+    .then((response) => {
+      signups.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await EventDataService.getAll()
+    .then((response) => {
+      upcomingEvents.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
+onMounted(async () => {
+  await retrieveData();
+});
+</script>
+
+<template>
+  <v-container fluid class="fill-height bg-lightGray pa-4">
+    <v-row class="fill-height pa-0 ma-0">
+      <v-col cols="3" class="ma-0 pa-4">
+        <v-row class="fill-height ma-0">
+          <v-col cols="12" class="pa-0 ma-0 pb-4">
+            <v-card class="fill-height mainCardBorder pa-2">
+              <v-card-title class="font-weight-semi-bold text-blue text-h5">
+                Notifications
+              </v-card-title>
+            </v-card>
+          </v-col>
+          <v-col cols="12" class="pa-0 ma-0 pt-4">
+            <v-card class="fill-height mainCardBorder pa-2">
+              <v-card-title class="font-weight-semi-bold text-darkBlue text-h5">
+                My Instruments
+              </v-card-title>
+            </v-card>
+          </v-col>
         </v-row>
       </v-col>
-      <v-col>
-        <v-card>
-          <v-card-title> Event Tasks: </v-card-title>
-          <v-divider></v-divider>
-          <div v-for="(event, index) in events" :key="index">
-            <v-card-title>
-              <div class="d-flex justify-space-between">
-                {{ this.formatDate(event.date) }} | {{ event.type }}
-                <v-banner-text
-                  color="darkB"
-                  v-if="this.compareDates(event.date) == 0"
-                >
-                  TODAY!
-                </v-banner-text>
-                <v-btn
-                  color="primary"
-                  @click="viewCrit()"
-                  v-if="compareDates(event.date) < 0"
-                >
-                  View Critiques
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  @click="
-                    eventId = event.id;
-                    showDialog = true;
-                  "
-                  v-else-if="compareDates(event.date) > 0"
-                >
-                  Sign Up
-                </v-btn>
-              </div>
-            </v-card-title>
-            <v-divider inset></v-divider>
-          </div>
+      <v-col cols="5" class="pa-0 ma-0 pa-4">
+        <v-card class="fill-height mainCardBorder pa-2">
+          <v-card-title class="font-weight-semi-bold text-maroon text-h5">
+            Events I'm Signed up For
+          </v-card-title>
+          <v-card-text>
+            <EventSignupAndAvailabilityItem
+              v-for="signup of signups"
+              :key="signup.id"
+              :event-data="signup.studentInstrumentSignups[0].eventSignup.event"
+              :event-signup-data="
+                signup.studentInstrumentSignups[0].eventSignup
+              "
+              :student-instrument-signup-data="
+                signup.studentInstrumentSignups[0]
+              "
+              :is-signup="true"
+            ></EventSignupAndAvailabilityItem>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="4" class="pa-0 ma-0 pa-4">
+        <v-card class="fill-height mainCardBorder pa-2">
+          <v-card-title class="font-weight-semi-bold text-orange text-h5">
+            Upcoming Events
+          </v-card-title>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog v-model="showDialog" :style="{ width: '875px' }" class="mx-auto">
-    <StudentSignUpPopUp
-      :event-id="eventId"
-      @closeDialog="showDialog = false"
-    ></StudentSignUpPopUp>
-  </v-dialog>
 </template>
 
-<script>
-import EventDataService from "../../services/EventDataService";
-import SemesterDataService from "../../services/SemesterDataService";
-import UserRoleDataService from "../../services/UserRoleDataService";
-import StudentSignUpPopUp from "./StudentSignUpPopUp.vue";
-import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
-import { mapStores } from "pinia";
-import { useLoginStore } from "../../stores/LoginStore.js";
-export default {
-  name: "StudentHome",
-  components: {},
-  data: () => ({
-    events: [],
-    eventId: null,
-    id: {},
-    initials: "",
-    semester: {},
-    showDialog: false,
-    user: {},
-    userRole: {},
-    studentInstruments: [],
-  }),
-  async created() {},
-  computed: {
-    ...mapStores(useLoginStore),
-  },
-  methods: {
-    async getInstrumnentData() {
-      StudentInstrumentDataService.getByUser(this.user.userId)
-        .then((response) => {
-          this.studentInstruments = response.data;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    compareDates(input) {
-      const today = new Date();
-      const todayString = `${today.getFullYear()}-${(today.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}`;
-
-      if (input > todayString) {
-        return 1;
-      } else if (input == todayString) {
-        return 0;
-      } else {
-        return -1;
-      }
-    },
-    formatDate(date) {
-      if (date === null || date === undefined) {
-        return date;
-      }
-      return new Date(date).toLocaleDateString("us-US", {
-        month: "long",
-        day: "numeric",
-        timeZone: "UTC",
-      });
-    },
-    viewStuRep() {
-      this.$router.push({ path: "studentRepertoire" });
-    },
-    viewCrit() {
-      this.$router.push({ path: "studentCritiques" });
-    },
-    async getEvents() {
-      await EventDataService.getBySemester(this.semester.id)
-        .then((response) => {
-          this.events = response.data;
-          this.events.sort(function (a, b) {
-            if (a.date > b.date) {
-              return -1;
-            } else {
-              return 1;
-            }
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    async retrieveAllEvents() {
-      await EventDataService.getAll()
-        .then((response) => {
-          this.events = response.data;
-          this.events.forEach((obj) => (obj.title = obj.date));
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    async getCurrentSemester() {
-      this.currentDate = new Date();
-      let dateString = this.currentDate.toISOString().substring(0, 10);
-      await SemesterDataService.getCurrent(dateString)
-        .then((response) => {
-          this.semester = response.data[0];
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    async getUserRole() {
-      this.user = this.loginStore.user;
-    },
-  },
-  async mounted() {
-    await this.getCurrentSemester();
-    await this.getEvents();
-    this.userRole = this.loginStore.currentRole;
-    await this.getInstrumnentData();
-  },
-  components: { StudentSignUpPopUp },
-};
-</script>
-
-<style scoped></style>
+<style scoped>
+* {
+  font-family: Poppins, sans-serif !important;
+}
+</style>

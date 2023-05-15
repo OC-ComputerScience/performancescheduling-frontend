@@ -1,50 +1,47 @@
 <template>
+  <MainNav></MainNav>
+
   <v-container fluid class="fill-height">
-    <MainNav></MainNav>
     <v-row class="fill-height">
-      <v-col class="bg-white">
+      <v-col>
         <!-- Your components go here -->
-        <div class="grid-container">
-          <!-- Student Section -->
-          <StudentHome
-            v-if="this.$route.fullPath === '/studentHome'"
-          ></StudentHome>
-          <StudentSettings
-            v-if="this.$route.fullPath === '/studentSettings'"
-          ></StudentSettings>
-          <FacultyCreateCritique
-            v-if="this.$route.fullPath === '/facultyCreateCritiques'"
-          ></FacultyCreateCritique>
-          <StudentEventList
-            v-if="this.$route.fullPath === '/studentEventSignUps'"
-          ></StudentEventList>
-          <StudentViewCritique
-            v-if="this.$route.fullPath === '/studentCritiques'"
-          ></StudentViewCritique>
-          <!-- Faculty Section -->
-          <FacultyHome v-if="this.$route.fullPath === '/facultyHome'">
-          </FacultyHome>
-          <FacultyCritiqueView
-            v-if="this.$route.fullPath === '/facultyViewCritiques'"
-          ></FacultyCritiqueView>
-          <!-- Admin Section -->
-          <AdminHome v-if="this.$route.fullPath === '/adminHome'"> </AdminHome>
-          <AdminMaintainEvent
-            v-if="this.$route.fullPath === '/adminViewEvents'"
-          >
-          </AdminMaintainEvent>
-          <AdminMaintainUserVue
-            v-if="this.$route.fullPath === '/adminViewUsers'"
-          ></AdminMaintainUserVue>
-          <!-- Availability -->
-          <CreateAvailability
-            v-if="this.$route.fullPath === '/createAvailability'"
-          >
-          </CreateAvailability>
-          <StudentRepertoire
-            v-if="this.$route.fullPath === '/studentRepertoire'"
-          ></StudentRepertoire>
-        </div>
+        <!-- Student Section -->
+        <StudentHome
+          v-if="this.$route.fullPath === '/studentHome'"
+        ></StudentHome>
+        <!-- <StudentSettings
+          v-if="this.$route.fullPath === '/studentSettings'"
+        ></StudentSettings>
+        <FacultyCreateCritique
+          v-if="this.$route.fullPath === '/facultyCreateCritiques'"
+        ></FacultyCreateCritique>
+        <StudentEventList
+          v-if="this.$route.fullPath === '/studentEventSignUps'"
+        ></StudentEventList>
+        <StudentViewCritique
+          v-if="this.$route.fullPath === '/studentCritiques'"
+        ></StudentViewCritique>
+
+        <FacultyHome v-if="this.$route.fullPath === '/facultyHome'">
+        </FacultyHome>
+        <FacultyCritiqueView
+          v-if="this.$route.fullPath === '/facultyViewCritiques'"
+        ></FacultyCritiqueView>
+
+        <AdminHome v-if="this.$route.fullPath === '/adminHome'"> </AdminHome>
+        <AdminMaintainEvent v-if="this.$route.fullPath === '/adminViewEvents'">
+        </AdminMaintainEvent>
+        <AdminMaintainUserVue
+          v-if="this.$route.fullPath === '/adminViewUsers'"
+        ></AdminMaintainUserVue>
+
+        <CreateAvailability
+          v-if="this.$route.fullPath === '/createAvailability'"
+        >
+        </CreateAvailability>
+        <StudentRepertoire
+          v-if="this.$route.fullPath === '/studentRepertoire'"
+        ></StudentRepertoire> -->
       </v-col>
     </v-row>
   </v-container>
