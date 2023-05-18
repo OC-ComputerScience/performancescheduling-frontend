@@ -57,23 +57,96 @@ onMounted(() => {
           </v-row>
         </v-col>
         <!-- instrument/people -->
-        <v-col>
+        <v-col cols="3">
           <v-row align="center">
             <v-col cols="3">
               <v-icon icon="mdi-music-box-multiple" color="darkBlue"></v-icon>
             </v-col>
             <v-col>
-              <p class="text-darkBlue mb-0">
+              <p class="text-darkBlue mb-0" :style="{ fontSize: '18px' }">
                 {{
                   props.performance.studentInstrumentSignups[0]
                     .studentInstrument.instrument.name
                 }}
               </p>
-              <p class="text-blue mt-0">Instrument</p>
+              <p class="text-blue mt-0" :style="{ fontSize: '12px' }">
+                Instrument
+              </p>
             </v-col>
           </v-row>
-          <v-row></v-row>
-          <v-row></v-row>
+          <v-row align="center">
+            <v-col cols="3">
+              <v-avatar
+                color="maroon"
+                class="with-outline"
+                size="x-small"
+                v-if="
+                  props.performance.studentInstrumentSignups[0]
+                    .instructorRoleSignup.user.picture
+                "
+              >
+                <v-img
+                  :src="
+                    props.performance.studentInstrumentSignups[0]
+                      .instructorRoleSignup.user.picture
+                  "
+                ></v-img>
+              </v-avatar>
+            </v-col>
+            <v-col>
+              <p class="text-darkBlue mb-0" :style="{ fontSize: '18px' }">
+                {{
+                  props.performance.studentInstrumentSignups[0]
+                    .instructorRoleSignup.user.firstName +
+                  " " +
+                  props.performance.studentInstrumentSignups[0]
+                    .instructorRoleSignup.user.lastName
+                }}
+              </p>
+              <p class="text-blue mt-0" :style="{ fontSize: '9px' }">
+                Private Instructor
+              </p>
+            </v-col>
+          </v-row>
+          <v-row
+            align="center"
+            v-if="
+              props.performance.studentInstrumentSignups[0].accompanistRoleId
+            "
+          >
+            <v-col cols="3">
+              <v-avatar
+                color="maroon"
+                class="with-outline"
+                size="x-small"
+                v-if="
+                  props.performance.studentInstrumentSignups[0]
+                    .instructorRoleSignup.user.picture
+                "
+              >
+                <v-img
+                  :src="
+                    props.performance.studentInstrumentSignups[0]
+                      .instructorRoleSignup.user.picture
+                  "
+                ></v-img>
+              </v-avatar>
+            </v-col>
+            <v-col>
+              <p class="text-darkBlue mb-0" :style="{ fontSize: '18px' }">
+                {{
+                  props.performance.studentInstrumentSignups[0]
+                    .accompanistRoleSignup.user.firstName +
+                  " " +
+                  props.performance.studentInstrumentSignups[0]
+                    .accompanistRoleSignup.user.lastName
+                }}
+              </p>
+              <p class="text-blue mt-0" :style="{ fontSize: '9px' }">
+                Private Instructor
+              </p>
+            </v-col>
+          </v-row>
         </v-col>
         <!-- pieces -->
         <v-col> 3</v-col>
@@ -85,4 +158,8 @@ onMounted(() => {
     </v-card-text>
   </v-card>
 </template>
-<style></style>
+<style>
+.with-outline {
+  border: 2px solid white;
+}
+</style>
