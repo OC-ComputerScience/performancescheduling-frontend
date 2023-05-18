@@ -58,7 +58,7 @@ onMounted(() => {
         </v-col>
         <!-- instrument/people -->
         <v-col cols="3">
-          <v-row align="center">
+          <v-row align="center" no-gutters>
             <v-col cols="3">
               <v-icon icon="mdi-music-box-multiple" color="darkBlue"></v-icon>
             </v-col>
@@ -74,7 +74,7 @@ onMounted(() => {
               </p>
             </v-col>
           </v-row>
-          <v-row align="center">
+          <v-row align="center" no-gutters>
             <v-col cols="3">
               <v-avatar
                 color="maroon"
@@ -85,12 +85,13 @@ onMounted(() => {
                     .instructorRoleSignup.user.picture
                 "
               >
-                <v-img
+                <img
+                  referrerpolicy="no-referrer"
                   :src="
                     props.performance.studentInstrumentSignups[0]
                       .instructorRoleSignup.user.picture
                   "
-                ></v-img>
+                />
               </v-avatar>
             </v-col>
             <v-col>
@@ -110,6 +111,7 @@ onMounted(() => {
           </v-row>
           <v-row
             align="center"
+            no-gutters
             v-if="
               props.performance.studentInstrumentSignups[0].accompanistRoleId
             "
@@ -124,12 +126,13 @@ onMounted(() => {
                     .instructorRoleSignup.user.picture
                 "
               >
-                <v-img
+                <img
+                  referrerpolicy="no-referrer"
                   :src="
                     props.performance.studentInstrumentSignups[0]
                       .instructorRoleSignup.user.picture
                   "
-                ></v-img>
+                />
               </v-avatar>
             </v-col>
             <v-col>
@@ -143,13 +146,39 @@ onMounted(() => {
                 }}
               </p>
               <p class="text-blue mt-0" :style="{ fontSize: '9px' }">
-                Private Instructor
+                Accompanist
               </p>
             </v-col>
           </v-row>
         </v-col>
         <!-- pieces -->
-        <v-col> 3</v-col>
+        <v-col>
+          <p class="font-weight-bold text-maroon" :style="{ fontSize: '18px' }">
+            Musical Selection
+          </p>
+          <div v-for="piece in props.performance.eventSignupPieces">
+            <p
+              class="font-weight-bold text-darkBlue"
+              :style="{ fontSize: '18px' }"
+            >
+              {{ piece.piece.title }}
+            </p>
+            <p
+              class="text-blue"
+              :style="{ fontSize: '10px' }"
+              v-if="piece.piece.composer.lastName"
+            >
+              {{
+                piece.piece.composer.lastName +
+                ", " +
+                piece.piece.composer.firstName
+              }}
+            </p>
+            <p class="text-blue" :style="{ fontSize: '10px' }" v-else>
+              {{ piece.piece.composer.firstName }}
+            </p>
+          </div>
+        </v-col>
         <!-- jurors -->
         <v-col> 4</v-col>
         <!-- buttons -->

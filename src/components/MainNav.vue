@@ -292,10 +292,11 @@ onMounted(() => {
                 color="secondary"
                 class="with-outline"
               >
-                <v-img
+                <img
                   v-if="loginStore.user.picture"
                   :src="loginStore.user.picture"
-                ></v-img>
+                  referrerpolicy="no-referrer"
+                />
                 <span v-else class="accent--text font-weight-bold">{{
                   initials
                 }}</span>
