@@ -3,15 +3,16 @@ import { useLoginStore } from "../../stores/LoginStore.js";
 import { ref, onMounted } from "vue";
 
 import StudentPerformanceCard from "./StudentPerformanceCard.vue";
-import EventDataService from "../../services/EventDataService";
+import EventSignupDataService from "./../../services/EventSignupDataService";
 
 const loginStore = useLoginStore();
-const events = ref([]);
+const performances = ref([]);
 
 async function getStudentEvents() {
-  await EventDataService.getByStudent(loginStore.user.userId)
+  await EventSignupDataService.getByStudent(loginStore.user.userId)
     .then((response) => {
-      events.value = response.data;
+      performances.value = response.data;
+      console.log(response.data);
     })
     .catch((err) => {
       console.log(err);
@@ -20,7 +21,6 @@ async function getStudentEvents() {
 
 onMounted(async () => {
   await getStudentEvents();
-  console.log("events", events.value);
 });
 </script>
 <template>
@@ -34,8 +34,10 @@ onMounted(async () => {
       <v-col>
         <v-card class="pa-5">
           <v-row>
-            <v-col cols="6">
-              <StudentPerformanceCard></StudentPerformanceCard>
+            <v-col cols="6" v-for="performance in performances">
+              <StudentPerformanceCard
+                :performance="performance"
+              ></StudentPerformanceCard>
             </v-col>
           </v-row>
         </v-card>

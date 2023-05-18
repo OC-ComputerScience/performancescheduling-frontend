@@ -25,5 +25,9 @@ class EventSignupDataService {
   getByEvent(id) {
     return http.get(this.baseUrl + `event/${id}`);
   }
+
+  getByStudent(userId) {
+    return http.get(this.baseUrl + `userId/${userId}`);
+  }
 }
 export default new EventSignupDataService();
