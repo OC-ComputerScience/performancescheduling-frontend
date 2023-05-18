@@ -2,29 +2,27 @@
   <v-container fluid class="fill-height">
     <MainNav></MainNav>
     <v-row class="fill-height">
-      <v-col class="bg-white">
-        <div class="grid-container">
-          <!-- Student pages -->
-          <StudentHome
-            v-if="this.$route.fullPath === '/studentHome'"
-          ></StudentHome>
-          <StudentSettings
-            v-if="this.$route.fullPath === '/studentSettings'"
-          ></StudentSettings>
-          <StudentPerformances
-            v-if="this.$route.fullPath === '/studentPerformances'"
-          ></StudentPerformances>
-          <!-- Faculty/Accompanist pages -->
-          <FacultyHome
-            v-if="
-              this.$route.fullPath === '/facultyHome' ||
-              this.$route.fullPath === '/accompanistHome'
-            "
-          >
-          </FacultyHome>
-          <!-- Admin pages -->
-          <AdminHome v-if="this.$route.fullPath === '/adminHome'"> </AdminHome>
-        </div>
+      <v-col class="bg-lightGray">
+        <!-- Student pages -->
+        <StudentHome
+          v-if="this.$route.fullPath === '/studentHome'"
+        ></StudentHome>
+        <StudentSettings
+          v-if="this.$route.fullPath === '/studentSettings'"
+        ></StudentSettings>
+        <StudentPerformances
+          v-if="this.$route.fullPath === '/studentPerformances'"
+        ></StudentPerformances>
+        <!-- Faculty/Accompanist pages -->
+        <FacultyHome
+          v-if="
+            this.$route.fullPath === '/facultyHome' ||
+            this.$route.fullPath === '/accompanistHome'
+          "
+        >
+        </FacultyHome>
+        <!-- Admin pages -->
+        <AdminHome v-if="this.$route.fullPath === '/adminHome'"> </AdminHome>
       </v-col>
     </v-row>
   </v-container>

@@ -169,7 +169,6 @@ function changeComp(route) {
 function updateActiveLink() {
   setTimeout(function () {
     activeLink.value = router.currentRoute.value.name;
-    console.log(activeLink.value);
   }, 1);
 }
 function changeRole(newRole) {

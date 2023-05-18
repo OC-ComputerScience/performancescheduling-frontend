@@ -37,5 +37,9 @@ class EventDataService {
   getBySemester(semesterId) {
     return http.get(this.baseUrl + `semesterId/${semesterId}`);
   }
+
+  getByStudent(userId) {
+    return http.get(this.baseUrl + `userId/${userId}`);
+  }
 }
 export default new EventDataService();
