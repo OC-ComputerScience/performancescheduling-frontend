@@ -46,13 +46,13 @@ onMounted(() => {
           <v-card-subtitle class="font-weight-semi-bold text-maroon">
             {{ eventData.location.roomName }}
           </v-card-subtitle>
+          <!-- Edit Signup/Availability Button -->
           <v-btn
-            v-if="isSignup"
             flat
             size="small"
             class="font-weight-semi-bold ml-4 bg-darkBlue text-none mt-1"
           >
-            Edit signup
+            Edit {{ isSignup ? "signup" : "availability" }}
           </v-btn>
         </v-col>
         <!-- Signup Data -->
