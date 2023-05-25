@@ -50,7 +50,7 @@ onMounted(() => {
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold ml-4 bg-darkBlue text-none mt-1"
+            class="font-weight-semi-bold ml-4 bg-darkBlue text-none mt-2"
           >
             Edit {{ isSignup ? "signup" : "availability" }}
           </v-btn>
