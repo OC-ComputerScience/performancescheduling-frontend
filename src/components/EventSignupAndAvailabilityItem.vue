@@ -27,25 +27,33 @@ onMounted(() => {
         <v-col class="pl-0">
           <!-- Event Name -->
           <v-card-title class="font-weight-bold text-maroon text-h5 py-0">
-            {{ props.eventData.name }}
+            {{ eventData.name }}
           </v-card-title>
           <!-- Event Date (formatted to mm/dd/yyyy) -->
           <v-card-subtitle class="font-weight-semi-bold text-maroon">
-            {{ formatDate(props.eventData.date) }}
+            {{ formatDate(eventData.date) }}
           </v-card-subtitle>
           <!-- Signup Time Data -->
           <v-card-subtitle
-            v-if="props.isSignup"
+            v-if="isSignup"
             class="font-weight-semi-bold text-maroon"
           >
-            {{ get12HourTimeStringFromString(props.eventSignupData.startTime) }}
+            {{ get12HourTimeStringFromString(eventSignupData.startTime) }}
           </v-card-subtitle>
           <!-- Event Times (for availability version) -->
-          <v-card-subtitle v-if="!props.isSignup"></v-card-subtitle>
+          <v-card-subtitle v-if="!isSignup"></v-card-subtitle>
           <!-- Event Location -->
           <v-card-subtitle class="font-weight-semi-bold text-maroon">
-            {{ props.eventData.location.roomName }}
+            {{ eventData.location.roomName }}
           </v-card-subtitle>
+          <v-btn
+            v-if="isSignup"
+            flat
+            size="small"
+            class="font-weight-semi-bold ml-4 bg-darkBlue text-none mt-1"
+          >
+            Edit signup
+          </v-btn>
         </v-col>
         <!-- Signup Data -->
         <v-col v-if="props.isSignup">

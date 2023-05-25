@@ -6,6 +6,8 @@ import UserNotificationDataService from "../../services/UserNotificationDataServ
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
 import EventDataService from "../../services/EventDataService.js";
 import EventSignupAndAvailabilityItem from "../EventSignupAndAvailabilityItem.vue";
+import InstrumentItem from "./InstrumentItem.vue";
+import NotificationItem from "../NotificationItem.vue";
 
 const loginStore = useLoginStore();
 
@@ -22,6 +24,16 @@ async function retrieveData() {
     .catch((e) => {
       console.log(e);
     });
+
+  // Only for test. @ethanimooney Remove once real data is added.
+  notifications.value = [
+    {
+      title: "New Event Open!",
+      body: "A new event is open for signup.",
+      type: "event",
+      action: "link",
+    },
+  ];
 
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
@@ -62,9 +74,25 @@ onMounted(async () => {
         <v-row class="fill-height ma-0">
           <v-col cols="12" class="pa-0 ma-0 pb-4">
             <v-card class="fill-height mainCardBorder pa-2">
-              <v-card-title class="font-weight-semi-bold text-blue text-h5">
-                Notifications
+              <v-card-title
+                class="font-weight-semi-bold text-blue text-h5 pb-0"
+              >
+                {{ notifications.length }} Notification
+                {{
+                  notifications.length > 0
+                    ? notifications.length > 1
+                      ? "s"
+                      : ""
+                    : "s"
+                }}
               </v-card-title>
+              <v-card-text class="pt-0">
+                <NotificationItem
+                  v-for="notification of notifications"
+                  :key="notification.id"
+                  :notification-data="notification"
+                ></NotificationItem>
+              </v-card-text>
             </v-card>
           </v-col>
           <v-col cols="12" class="pa-0 ma-0 pt-4">
@@ -72,6 +100,13 @@ onMounted(async () => {
               <v-card-title class="font-weight-semi-bold text-darkBlue text-h5">
                 My Instruments
               </v-card-title>
+              <v-card-text>
+                <InstrumentItem
+                  v-for="instrument of instruments"
+                  :key="instrument.id"
+                  :instrument-data="instrument.instrument"
+                ></InstrumentItem>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
