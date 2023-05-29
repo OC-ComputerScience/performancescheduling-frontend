@@ -1,81 +1,71 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
+import { useDisplay } from "vuetify";
+
+const { lg, smAndUp, mdAndUp } = useDisplay();
 
 const props = defineProps(["performance"]);
 
 onMounted(() => {
-  console.log("sub-event", props.performance);
+  console.log("event", props.performance);
 });
 </script>
 <template>
-  <v-card color="lightMaroon" class="pa-2">
+  <v-card color="lightMaroon" class="pa-2" elevation="0">
     <v-card-text>
-      <v-row>
+      <v-row class="pa-2">
         <!-- event details -->
-        <v-col cols="3">
+        <v-col>
           <v-row>
-            <p
-              class="font-weight-bold text-maroon"
-              :style="{ fontSize: '20px' }"
-            >
+            <p class="font-weight-bold text-maroon" style="font-size: 160%">
               {{ props.performance.event.eventType.description }}
             </p>
           </v-row>
-          <v-row class="mt-4">
-            <p
-              class="font-weight-bold text-maroon"
-              :style="{ fontSize: '14px' }"
-            >
+          <v-row class="mt-7">
+            <p class="font-weight-bold text-maroon" style="font-size: 110%">
               {{ props.performance.event.date }}
             </p>
           </v-row>
-          <v-row class="mt-2">
-            <p
-              class="font-weight-bold text-maroon"
-              :style="{ fontSize: '14px' }"
-            >
+          <v-row class="mt-4">
+            <p class="font-weight-bold text-maroon" style="font-size: 110%">
               {{ props.performance.event.eventSignups[0].startTime }}
             </p>
           </v-row>
-          <v-row class="mt-2">
-            <p
-              class="font-weight-bold text-maroon"
-              :style="{ fontSize: '14px' }"
-            >
+          <v-row class="mt-4">
+            <p class="font-weight-bold text-maroon" style="font-size: 110%">
               {{ props.performance.event.location.roomName }}
             </p>
           </v-row>
-          <v-row class="mt-4">
+          <v-row class="mt-7">
             <v-btn
               class="font-weight-bold"
-              density="compact"
               size="small"
               color="darkBlue"
-              :style="{ width: '85px', fontSize: '9px' }"
-              >view details</v-btn
+              style="font-size: 80%"
+              width="40%"
             >
+              view details
+            </v-btn>
           </v-row>
         </v-col>
         <!-- instrument/people -->
-        <v-col cols="3">
+        <v-col>
           <v-row align="center" no-gutters>
-            <v-col cols="3">
+            <v-col cols="2">
               <v-icon icon="mdi-music-box-multiple" color="darkBlue"></v-icon>
             </v-col>
             <v-col>
-              <p class="text-darkBlue mb-0" :style="{ fontSize: '18px' }">
+              <p class="text-darkBlue mb-0" style="font-size: 140%">
                 {{
                   props.performance.studentInstrumentSignups[0]
                     .studentInstrument.instrument.name
                 }}
               </p>
-              <p class="text-blue mt-0" :style="{ fontSize: '12px' }">
-                Instrument
-              </p>
+              <p class="text-blue mt-0" style="font-size: 90%">Instrument</p>
             </v-col>
           </v-row>
-          <v-row align="center" no-gutters>
-            <v-col cols="3">
+          <v-row align="center" no-gutters class="mt-2">
+            <v-col cols="2">
               <v-avatar
                 color="maroon"
                 class="with-outline"
@@ -95,7 +85,7 @@ onMounted(() => {
               </v-avatar>
             </v-col>
             <v-col>
-              <p class="text-darkBlue mb-0" :style="{ fontSize: '18px' }">
+              <p class="text-darkBlue mb-0" style="font-size: 140%">
                 {{
                   props.performance.studentInstrumentSignups[0]
                     .instructorRoleSignup.user.firstName +
@@ -104,7 +94,7 @@ onMounted(() => {
                     .instructorRoleSignup.user.lastName
                 }}
               </p>
-              <p class="text-blue mt-0" :style="{ fontSize: '9px' }">
+              <p class="text-blue mt-0" style="font-size: 90%">
                 Private Instructor
               </p>
             </v-col>
@@ -112,11 +102,12 @@ onMounted(() => {
           <v-row
             align="center"
             no-gutters
+            class="mt-2"
             v-if="
               props.performance.studentInstrumentSignups[0].accompanistRoleId
             "
           >
-            <v-col cols="3">
+            <v-col cols="2">
               <v-avatar
                 color="maroon"
                 class="with-outline"
@@ -136,7 +127,7 @@ onMounted(() => {
               </v-avatar>
             </v-col>
             <v-col>
-              <p class="text-darkBlue mb-0" :style="{ fontSize: '18px' }">
+              <p class="text-darkBlue mb-0" style="font-size: 140%">
                 {{
                   props.performance.studentInstrumentSignups[0]
                     .accompanistRoleSignup.user.firstName +
@@ -145,27 +136,25 @@ onMounted(() => {
                     .accompanistRoleSignup.user.lastName
                 }}
               </p>
-              <p class="text-blue mt-0" :style="{ fontSize: '9px' }">
-                Accompanist
-              </p>
+              <p class="text-blue mt-0" style="font-size: 90%">Accompanist</p>
             </v-col>
           </v-row>
         </v-col>
         <!-- pieces -->
-        <v-col>
-          <p class="font-weight-bold text-maroon" :style="{ fontSize: '18px' }">
+        <v-col v-if="smAndUp">
+          <p class="font-weight-bold text-maroon" style="font-size: 150%">
             Musical Selection
           </p>
-          <div v-for="piece in props.performance.eventSignupPieces">
-            <p
-              class="font-weight-bold text-darkBlue"
-              :style="{ fontSize: '18px' }"
-            >
+          <div
+            v-for="piece in props.performance.eventSignupPieces"
+            class="mt-2"
+          >
+            <p class="font-weight-bold text-darkBlue" style="font-size: 110%">
               {{ piece.piece.title }}
             </p>
             <p
               class="text-blue"
-              :style="{ fontSize: '10px' }"
+              style="font-size: 90%"
               v-if="piece.piece.composer.lastName"
             >
               {{
@@ -174,15 +163,75 @@ onMounted(() => {
                 piece.piece.composer.firstName
               }}
             </p>
-            <p class="text-blue" :style="{ fontSize: '10px' }" v-else>
+            <p class="text-blue" style="font-size: 90%" v-else>
               {{ piece.piece.composer.firstName }}
             </p>
           </div>
         </v-col>
         <!-- jurors -->
-        <v-col> 4</v-col>
+        <v-col v-if="mdAndUp">
+          <p class="font-weight-bold text-maroon" style="font-size: 150%">
+            Jurors
+          </p>
+          <v-row
+            align="center"
+            class="mt-2"
+            no-gutters
+            v-for="critique in props.performance.critiques"
+          >
+            <v-col cols="2">
+              <v-avatar
+                color="maroon"
+                class="with-outline"
+                size="x-small"
+                v-if="critique.userRole.user.picture"
+              >
+                <img
+                  referrerpolicy="no-referrer"
+                  :src="critique.userRole.user.picture"
+                />
+              </v-avatar>
+            </v-col>
+            <v-col>
+              <p class="text-darkBlue" style="font-size: 110%">
+                {{
+                  critique.userRole.user.firstName +
+                  " " +
+                  critique.userRole.user.lastName
+                }}
+              </p>
+            </v-col>
+          </v-row>
+        </v-col>
         <!-- buttons -->
-        <v-col> 5</v-col>
+        <v-col cols="2">
+          <v-row v-if="props.performance.pass != null" justify="end">
+            <v-btn v-if="props.performance.pass" color="teal" :ripple="false">
+              Passed
+            </v-btn>
+            <v-btn v-else color="maroon" :ripple="false"> Failed </v-btn>
+          </v-row>
+          <v-row justify="end">
+            <v-btn
+              v-if="props.performance.critiques.length == 0"
+              color="maroon"
+              :ripple="false"
+            >
+              Feedback Pending
+            </v-btn>
+            <v-btn
+              v-else
+              color="maroon"
+              :ripple="false"
+              class="font-weight-bold"
+              size="small"
+              width="65%"
+              style="font-size: 80%"
+            >
+              Critiques Available
+            </v-btn>
+          </v-row>
+        </v-col>
       </v-row>
     </v-card-text>
   </v-card>
