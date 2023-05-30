@@ -66,22 +66,19 @@ onMounted(() => {
           </v-row>
           <v-row align="center" no-gutters class="mt-2">
             <v-col cols="2">
-              <v-avatar
-                color="maroon"
-                class="with-outline"
-                size="x-small"
-                v-if="
-                  props.performance.studentInstrumentSignups[0]
-                    .instructorRoleSignup.user.picture
-                "
-              >
+              <v-avatar color="darkBlue" size="x-small">
                 <img
+                  v-if="
+                    props.performance.studentInstrumentSignups[0]
+                      .instructorRoleSignup.user.picture
+                  "
                   referrerpolicy="no-referrer"
                   :src="
                     props.performance.studentInstrumentSignups[0]
                       .instructorRoleSignup.user.picture
                   "
                 />
+                <v-icon v-else icon="mdi-account"></v-icon>
               </v-avatar>
             </v-col>
             <v-col>
@@ -108,22 +105,19 @@ onMounted(() => {
             "
           >
             <v-col cols="2">
-              <v-avatar
-                color="maroon"
-                class="with-outline"
-                size="x-small"
-                v-if="
-                  props.performance.studentInstrumentSignups[0]
-                    .instructorRoleSignup.user.picture
-                "
-              >
+              <v-avatar color="darkBlue" size="x-small">
                 <img
+                  v-if="
+                    props.performance.studentInstrumentSignups[0]
+                      .instructorRoleSignup.user.picture
+                  "
                   referrerpolicy="no-referrer"
                   :src="
                     props.performance.studentInstrumentSignups[0]
                       .instructorRoleSignup.user.picture
                   "
                 />
+                <v-icon v-else icon="mdi-account"></v-icon>
               </v-avatar>
             </v-col>
             <v-col>
@@ -180,16 +174,13 @@ onMounted(() => {
             v-for="critique in props.performance.critiques"
           >
             <v-col cols="2">
-              <v-avatar
-                color="maroon"
-                class="with-outline"
-                size="x-small"
-                v-if="critique.userRole.user.picture"
-              >
+              <v-avatar color="darkBlue" size="x-small">
                 <img
+                  v-if="critique.userRole.user.picture"
                   referrerpolicy="no-referrer"
                   :src="critique.userRole.user.picture"
                 />
+                <v-icon v-else icon="mdi-account"></v-icon>
               </v-avatar>
             </v-col>
             <v-col>
