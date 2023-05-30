@@ -58,3 +58,7 @@ a,
 .flatCardBorder {
   border-radius: 9px !important;
 }
+
+.text-h7 {
+  font-size: 18px !important;
+}

@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useLoginStore } from "../stores/LoginStore.js";
 import { formatDate } from "../composables/formatDate";
 import { get12HourTimeStringFromString } from "../composables/get12HourTimeStringFromString";
+import { getHourWordFromNumber } from "../composables/get12HourTimeStringFromString";
 
 const loginStore = useLoginStore();
 
@@ -20,46 +21,83 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-card flat class="flatCardBorder bg-lightBlue mt-4">
-    <v-container>
+  <V-card flat class="flatCardBorder bg-lightBlue mt-4">
+    <v-card-title>
       <v-row>
-        <!-- Event Data -->
         <v-col class="pl-0">
-          <!-- Event Name -->
-          <v-card-title class="font-weight-bold text-maroon text-h5 py-0">
-            {{ eventData.name }}
-          </v-card-title>
-          <!-- Event Date (formatted to mm/dd/yyyy) -->
-          <v-card-subtitle class="font-weight-semi-bold text-maroon">
-            {{ formatDate(eventData.date) }}
-          </v-card-subtitle>
-          <!-- Signup Time Data -->
-          <v-card-subtitle
-            v-if="isSignup"
-            class="font-weight-semi-bold text-maroon"
-          >
-            {{ get12HourTimeStringFromString(eventSignupData.startTime) }}
-          </v-card-subtitle>
-          <!-- Event Times (for availability version) -->
-          <v-card-subtitle v-if="!isSignup"></v-card-subtitle>
-          <!-- Event Location -->
-          <v-card-subtitle class="font-weight-semi-bold text-maroon">
-            {{ eventData.location.roomName }}
-          </v-card-subtitle>
-          <!-- Edit Signup/Availability Button -->
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-semi-bold ml-4 bg-darkBlue text-none mt-2"
-          >
-            Edit {{ isSignup ? "signup" : "availability" }}
-          </v-btn>
+          <v-row class="pa-0 ma-0">
+            <v-col cols="6" class="pa-0 ma-0">
+              <v-card-title class="font-weight-bold text-maroon text-h4">
+                {{ eventData.name }}
+              </v-card-title>
+              <!-- Event Location -->
+              <v-card-subtitle class="font-weight-semi-bold text-maroon">
+                {{ eventData.location.roomName }}
+              </v-card-subtitle>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="auto" class="mt-0 pt-2 mr-0 pr-0">
+              <v-card
+                flat
+                rounded="md"
+                class="bg-darkBlue py-2 px-0 text-white mt-0"
+              >
+                <v-row>
+                  <v-spacer></v-spacer>
+
+                  <v-col cols="auto">
+                    <!-- Event Date -->
+                    <v-card-subtitle class="font-weight-semi-bold pr-0">
+                      <v-icon class="pr-1" icon="mdi-calendar"></v-icon>
+                      {{ formatDate(eventData.date) }}
+                    </v-card-subtitle>
+                  </v-col>
+                  <v-col cols="auto" align-self="end" v-if="isSignup">
+                    <!-- Signup Time Data -->
+                    <v-card-subtitle class="font-weight-semi-bold pl-0">
+                      <v-icon
+                        class="pr-1"
+                        :icon="
+                          'mdi-clock-time-' +
+                          getHourWordFromNumber(
+                            eventSignupData.startTime.split(':')[0]
+                          )
+                        "
+                      ></v-icon>
+
+                      {{
+                        get12HourTimeStringFromString(eventSignupData.startTime)
+                      }}
+                    </v-card-subtitle>
+                  </v-col>
+                  <v-col cols="auto" align-self="end" v-if="!isSignup">
+                    <!-- Event Times (for availability version) -->
+                    <v-card-subtitle></v-card-subtitle>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+          </v-row>
         </v-col>
-        <!-- Signup Data -->
-        <v-col v-if="props.isSignup">
+      </v-row>
+    </v-card-title>
+    <v-card-text class="pt-4 pb-0">
+      <v-row class="pb-0 mb-0">
+        <v-col cols="6" v-if="props.isSignup" class="mb-0 pb-0">
           <v-row>
-            <v-col cols="2" align-self="center">
-              <v-avatar size="30" color="darkBlue"></v-avatar>
+            <v-card-title class="font-weight-semi-bold text-maroon">
+              Signup Information
+            </v-card-title>
+          </v-row>
+          <v-row class="pl-2 pt-0 mt-0">
+            <v-col cols="1" align-self="center">
+              <v-avatar size="30" color="lightBlue">
+                <v-icon
+                  size="35"
+                  class="text-darkBlue"
+                  icon="mdi-music-circle"
+                ></v-icon>
+              </v-avatar>
             </v-col>
             <v-col cols="10">
               <v-card-subtitle
@@ -72,30 +110,62 @@ onMounted(() => {
               </v-card-text>
             </v-col>
           </v-row>
-          <v-row class="pt-0 mt-0">
-            <v-col cols="2" align-self="center">
-              <v-avatar size="30" color="darkBlue"></v-avatar>
+          <v-row class="pt-0 mt-0 pl-2">
+            <v-col cols="1" align-self="center">
+              <v-avatar size="30" color="darkBlue">
+                <img
+                  referrerpolicy="no-referrer"
+                  :src="
+                    studentInstrumentSignupData.instructorRoleSignup.user
+                      .picture
+                  "
+                />
+              </v-avatar>
             </v-col>
             <v-col cols="10">
               <v-card-subtitle
-                class="font-weight-semi-bold text-h6 text-darkBlue"
+                class="font-weight-semi-bold text-h7 text-darkBlue"
               >
-                John Doe
+                {{
+                  studentInstrumentSignupData.instructorRoleSignup.user
+                    .firstName
+                }}
+                {{
+                  studentInstrumentSignupData.instructorRoleSignup.user.lastName
+                }}
               </v-card-subtitle>
               <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
                 Private Instructor
               </v-card-text>
             </v-col>
           </v-row>
-          <v-row class="pt-0 mt-0">
-            <v-col cols="2" align-self="center">
-              <v-avatar size="30" color="darkBlue"></v-avatar>
+          <v-row
+            class="pt-0 mt-0 pl-2"
+            v-if="studentInstrumentSignupData.accompanistRoleSignup"
+          >
+            <v-col cols="1" align-self="center">
+              <v-avatar size="30" color="darkBlue">
+                <img
+                  referrerpolicy="no-referrer"
+                  :src="
+                    studentInstrumentSignupData.accompanistRoleSignup.user
+                      .picture
+                  "
+                />
+              </v-avatar>
             </v-col>
             <v-col cols="10">
               <v-card-subtitle
-                class="font-weight-semi-bold text-h6 text-darkBlue"
+                class="font-weight-semi-bold text-h7 text-darkBlue"
               >
-                James Doe
+                {{
+                  studentInstrumentSignupData.accompanistRoleSignup.user
+                    .firstName
+                }}
+                {{
+                  studentInstrumentSignupData.accompanistRoleSignup.user
+                    .lastName
+                }}
               </v-card-subtitle>
               <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
                 Accompanist
@@ -103,34 +173,50 @@ onMounted(() => {
             </v-col>
           </v-row>
         </v-col>
-        <!-- Availability Data -->
-        <v-col v-if="!props.isSignup"></v-col>
         <!-- Musical Selection Data -->
-        <v-col v-if="props.isSignup">
+        <v-col cols="6" v-if="props.isSignup">
           <v-row>
             <v-card-title class="font-weight-semi-bold text-maroon">
               Musical Selection
             </v-card-title>
           </v-row>
-          <v-row class="pt-0 mt-0">
-            <v-col cols="2" align-self="center">
-              <v-avatar size="30" color="darkBlue"></v-avatar>
+          <v-row
+            v-for="eventSignupPiece of studentInstrumentSignupData.eventSignup
+              .eventSignupPieces"
+            :key="eventSignupPiece.id"
+            class="pt-0 mt-0 pl-2"
+          >
+            <v-col cols="1" align-self="center">
+              <v-avatar size="30" color="darkBlue">
+                <img referrerpolicy="no-referrer" />
+              </v-avatar>
             </v-col>
             <v-col cols="10">
               <v-card-subtitle
-                class="font-weight-semi-bold text-h6 text-darkBlue"
+                class="font-weight-semi-bold text-h7 text-darkBlue"
               >
-                James Doe
+                {{ eventSignupPiece.piece.title }}
               </v-card-subtitle>
               <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
-                Accompanist
+                {{ eventSignupPiece.piece.composer.firstName }}
+                {{ eventSignupPiece.piece.composer.lastName }}
               </v-card-text>
             </v-col>
           </v-row>
         </v-col>
       </v-row>
-    </v-container>
-  </v-card>
+    </v-card-text>
+    <v-card-actions class="pt-0 mt-0">
+      <!-- Edit Signup/Availability Button -->
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+      >
+        Edit {{ isSignup ? "signup" : "availability" }}
+      </v-btn>
+    </v-card-actions>
+  </V-card>
 </template>
 
 <style scoped>
