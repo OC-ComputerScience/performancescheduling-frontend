@@ -1,11 +1,8 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { useLoginStore } from "../stores/LoginStore.js";
-import { formatDate } from "../composables/formatDate";
-import { get12HourTimeStringFromString } from "../composables/get12HourTimeStringFromString";
-import { getHourWordFromNumber } from "../composables/get12HourTimeStringFromString";
-
-const loginStore = useLoginStore();
+import { onMounted } from "vue";
+import { formatDate } from "../composables/dateFormatter";
+import { get12HourTimeStringFromString } from "../composables/timeFormatter";
+import { getHourWordFromNumber } from "../composables/timeFormatter";
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
@@ -21,12 +18,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <V-card flat class="flatCardBorder bg-lightBlue mt-4">
+  <v-card flat class="flatCardBorder bg-lightBlue mt-4">
     <v-card-title>
       <v-row>
         <v-col class="pl-0">
           <v-row class="pa-0 ma-0">
-            <v-col cols="6" class="pa-0 ma-0">
+            <v-col cols="auto" class="pa-0 ma-0">
+              <!-- Event Name -->
               <v-card-title class="font-weight-bold text-maroon text-h4">
                 {{ eventData.name }}
               </v-card-title>
@@ -48,7 +46,7 @@ onMounted(() => {
                   <v-col cols="auto">
                     <!-- Event Date -->
                     <v-card-subtitle class="font-weight-semi-bold pr-0">
-                      <v-icon class="pr-1" icon="mdi-calendar"></v-icon>
+                      <v-icon class="mr-1" icon="mdi-calendar"></v-icon>
                       {{ formatDate(eventData.date) }}
                     </v-card-subtitle>
                   </v-col>
@@ -56,7 +54,7 @@ onMounted(() => {
                     <!-- Signup Time Data -->
                     <v-card-subtitle class="font-weight-semi-bold pl-0">
                       <v-icon
-                        class="pr-1"
+                        class="mr-1"
                         :icon="
                           'mdi-clock-time-' +
                           getHourWordFromNumber(
@@ -72,7 +70,10 @@ onMounted(() => {
                   </v-col>
                   <v-col cols="auto" align-self="end" v-if="!isSignup">
                     <!-- Event Times (for availability version) -->
-                    <v-card-subtitle></v-card-subtitle>
+                    <v-card-subtitle>
+                      {{ get12HourTimeStringFromString(eventData.startTime) }} -
+                      {{ get12HourTimeStringFromString(eventData.endTime) }}
+                    </v-card-subtitle>
                   </v-col>
                 </v-row>
               </v-card>
@@ -216,7 +217,7 @@ onMounted(() => {
         Edit {{ isSignup ? "signup" : "availability" }}
       </v-btn>
     </v-card-actions>
-  </V-card>
+  </v-card>
 </template>
 
 <style scoped>

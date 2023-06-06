@@ -6,6 +6,7 @@ import UserNotificationDataService from "../../services/UserNotificationDataServ
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
 import EventDataService from "../../services/EventDataService.js";
 import EventSignupAndAvailabilityItem from "../EventSignupAndAvailabilityItem.vue";
+import UpcomingEventItem from "../UpcomingEventItem.vue";
 import InstrumentItem from "./InstrumentItem.vue";
 import NotificationItem from "../NotificationItem.vue";
 
@@ -15,6 +16,7 @@ const notifications = ref([]);
 const instruments = ref([]);
 const signups = ref([]);
 const upcomingEvents = ref([]);
+const relevantUpcomingEvents = ref([]);
 
 async function retrieveData() {
   await UserNotificationDataService.getByUserRole(loginStore.currentRole.id)
@@ -53,9 +55,12 @@ async function retrieveData() {
       console.log(e);
     });
 
-  await EventDataService.getAll()
+  await EventDataService.getGTEDate(new Date())
     .then((response) => {
       upcomingEvents.value = response.data;
+      relevantUpcomingEvents.value.concat(
+        upcomingEvents.value.filter((e) => e.eventTypeId === 2)
+      );
     })
     .catch((e) => {
       console.log(e);
@@ -137,6 +142,14 @@ onMounted(async () => {
           <v-card-title class="font-weight-semi-bold text-orange text-h5">
             Upcoming Events
           </v-card-title>
+          <v-card-text>
+            <UpcomingEventItem
+              v-for="event of upcomingEvents"
+              :key="event.id"
+              :event-data="event"
+              :is-signup="true"
+            ></UpcomingEventItem>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
