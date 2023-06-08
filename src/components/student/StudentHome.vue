@@ -58,6 +58,7 @@ async function retrieveData() {
   await EventDataService.getGTEDate(new Date())
     .then((response) => {
       upcomingEvents.value = response.data;
+      // TODO(@ethanimooney): Make it check the actual event types that the student needs once that is implemented.
       relevantUpcomingEvents.value.concat(
         upcomingEvents.value.filter((e) => e.eventTypeId === 2)
       );

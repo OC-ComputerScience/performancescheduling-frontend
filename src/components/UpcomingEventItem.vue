@@ -59,10 +59,7 @@ onMounted(() => {
       {{ get12HourTimeStringFromString(eventData.endTime) }}
     </v-card-subtitle>
     <!-- Event Location (room name) -->
-    <v-card-subtitle
-      v-if="eventData.location"
-      class="ml-1 mb-0 pb-0 font-weight-semi-bold text-orange"
-    >
+    <v-card-subtitle class="ml-1 mb-0 pb-0 font-weight-semi-bold text-orange">
       {{ eventData.location.roomName }}
     </v-card-subtitle>
     <v-card-actions class="pt-0 mt-0">
