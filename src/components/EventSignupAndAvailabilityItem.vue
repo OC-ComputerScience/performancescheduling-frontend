@@ -84,7 +84,7 @@ onMounted(() => {
     </v-card-title>
     <v-card-text class="pt-4 pb-0">
       <v-row class="pb-0 mb-0">
-        <v-col cols="6" v-if="props.isSignup" class="mb-0 pb-0">
+        <v-col cols="12" lg="6" v-if="props.isSignup" class="mb-0 pb-0">
           <v-row>
             <v-card-title class="font-weight-semi-bold text-maroon">
               Signup Information
@@ -175,7 +175,7 @@ onMounted(() => {
           </v-row>
         </v-col>
         <!-- Musical Selection Data -->
-        <v-col cols="6" v-if="props.isSignup">
+        <v-col cols="12" lg="6" v-if="props.isSignup">
           <v-row>
             <v-card-title class="font-weight-semi-bold text-maroon">
               Musical Selection
