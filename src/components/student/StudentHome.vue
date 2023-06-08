@@ -103,9 +103,23 @@ onMounted(async () => {
           </v-col>
           <v-col cols="12" class="pa-0 ma-0 pt-4">
             <v-card class="fill-height mainCardBorder pa-2">
-              <v-card-title class="font-weight-semi-bold text-darkBlue text-h5">
-                My Instruments
-              </v-card-title>
+              <v-row>
+                <v-col cols="auto">
+                  <v-card-title
+                    class="font-weight-semi-bold text-darkBlue text-h5"
+                  >
+                    My Instruments
+                  </v-card-title>
+                </v-col>
+                <v-spacer></v-spacer>
+                <v-col cols="auto">
+                  <v-btn flat icon>
+                    <v-icon class="text-darkBlue" icon="mdi-plus-circle">
+                    </v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
+
               <v-card-text>
                 <InstrumentItem
                   v-for="instrument of instruments"
