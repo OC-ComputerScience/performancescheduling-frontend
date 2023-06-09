@@ -33,5 +33,4 @@ jobs:
           recursive: true
           host: "performancedev.oc.edu"
           username: "david.north"
-          password: ${{ secrets.PASSWORD }}
           privateKey: ${{ secrets.DEV_WIN_SERVER_SSH_KEY  }}
