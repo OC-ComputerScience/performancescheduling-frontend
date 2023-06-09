@@ -29,7 +29,7 @@ jobs:
         uses: garygrossgarten/github-action-scp@release
         with:
           local: dist/
-          remote: c:/Apache24/htdocs/peformance
+          remote: c:/Apache24/htdocs/performance
           recursive: true
           host: "performancedev.oc.edu"
           username: "david.north"

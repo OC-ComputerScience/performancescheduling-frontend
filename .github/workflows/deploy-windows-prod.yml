@@ -29,8 +29,8 @@ jobs:
         uses: garygrossgarten/github-action-scp@release
         with:
           local: dist/
-          remote: c:/Apache24/htdocs/peformance
+          remote: c:/Apache24/htdocs/performance
           recursive: true
           host: "performance.oc.edu"
           username: "david.north"
-          privateKey: ${{ secrets.DEV_WIN_SERVER_SSH_KEY  }}
+          privateKey: ${{ secrets.PROD_WIN_SERVER_SSH_KEY  }}
