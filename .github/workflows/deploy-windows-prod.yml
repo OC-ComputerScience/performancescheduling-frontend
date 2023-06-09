@@ -1,29 +1,23 @@
-name: Deploy to Windows Dev
+name: Deploy to Windows Main
 
 on:
   pull_request:
     types: [closed]
     branches:
-      - dev
+      - main
 
 jobs:
   windows-deploy:
     runs-on: ubuntu-latest
     env:
-      DB_HOST: ${{ secrets.DEV_DB_HOST }}
-      DB_PW: ${{ secrets.DEV_DB_PW}}
-      DB_USER: ${{ secrets.DEV_DB_USER }}
-      DB_NAME: ${{ secrets.DEV_DB_NAME }}
-      VUE_APP_CLIENT_ID: ${{secrets.VUE_APP_CLIENT_ID}}
       VITE_APP_CLIENT_ID: ${{secrets.VITE_APP_CLIENT_ID}}
       VITE_APP_API_URL: ${{secrets.VITE_APP_API_URL}}
       VITE_APP_CLIENT_URL: ${{secrets.VITE_APP_CLIENT_URL}}
-      GOOGLE_AUDIENCE: ${{secrets.GOOGLE_AUDIENCE}}
-      CLIENT_SECRET: ${{secrets.CLIENT_SECRET}}
+
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: dev
+          ref: main
       - uses: actions/setup-node@v3
         with:
           node-version: 18
