@@ -28,7 +28,7 @@ onMounted(() => {
           </v-row>
           <v-row class="mt-4">
             <p class="font-weight-bold text-maroon" style="font-size: 110%">
-              {{ props.performance.event.eventSignups[0].startTime }}
+              {{ props.performance.startTime }}
             </p>
           </v-row>
           <v-row class="mt-4">
