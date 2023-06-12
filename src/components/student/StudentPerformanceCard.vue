@@ -231,4 +231,7 @@ onMounted(() => {
 .with-outline {
   border: 2px solid white;
 }
+* {
+  font-family: Poppins, sans-serif !important;
+}
 </style>
