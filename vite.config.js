@@ -12,8 +12,7 @@ import vuetify from "vite-plugin-vuetify";
 // });
 
 export default () => {
-  const baseURL =
-    process.env.APP_ENV === "development" ? "/" : "performance/perform/";
+  const baseURL = process.env.APP_ENV === "development" ? "/" : "/";
 
   return defineConfig({
     transpileDependencies: ["vuetify"],
