@@ -109,12 +109,12 @@ onMounted(() => {
                 <img
                   v-if="
                     props.performance.studentInstrumentSignups[0]
-                      .instructorRoleSignup.user.picture
+                      .accompanistRoleSignup.user.picture
                   "
                   referrerpolicy="no-referrer"
                   :src="
                     props.performance.studentInstrumentSignups[0]
-                      .instructorRoleSignup.user.picture
+                      .accompanistRoleSignup.user.picture
                   "
                 />
                 <v-icon v-else icon="mdi-account"></v-icon>
