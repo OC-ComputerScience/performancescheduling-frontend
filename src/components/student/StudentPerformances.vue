@@ -71,6 +71,7 @@ function clearFilters() {
   semesterFilter.value = semesterFilterArray[0];
   instrumentFilter.value = instrumentFilterArray[0];
   eventTypeFilter.value = eventTypeFilterArray[0];
+  updateFilter();
 }
 
 function updateFilter() {
