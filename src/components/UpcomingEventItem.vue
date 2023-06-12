@@ -29,7 +29,14 @@ onMounted(() => {
               <v-card-subtitle
                 class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
               >
-                Vocal Event
+                {{
+                  eventData.eventType.instrumentType === "Both"
+                    ? "Vocal & Instrumental"
+                    : eventData.eventType.instrumentType === "Vocal"
+                    ? "Vocal"
+                    : "Instrumental"
+                }}
+                Event
               </v-card-subtitle>
             </v-col>
             <v-spacer></v-spacer>
