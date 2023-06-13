@@ -22,20 +22,11 @@ async function retrieveData() {
   await UserNotificationDataService.getByUserRole(loginStore.currentRole.id)
     .then((response) => {
       notifications.value = response.data;
+      console.log(notifications.value);
     })
     .catch((e) => {
       console.log(e);
     });
-
-  // Only for test. Remove once real data is added.
-  notifications.value = [
-    {
-      title: "New Event Open!",
-      body: "A new event is open for signup.",
-      type: "event",
-      action: "link",
-    },
-  ];
 
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
