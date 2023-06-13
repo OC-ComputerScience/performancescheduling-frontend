@@ -22,7 +22,6 @@ async function retrieveData() {
   await UserNotificationDataService.getByUserRole(loginStore.currentRole.id)
     .then((response) => {
       notifications.value = response.data;
-      console.log(notifications.value);
     })
     .catch((e) => {
       console.log(e);

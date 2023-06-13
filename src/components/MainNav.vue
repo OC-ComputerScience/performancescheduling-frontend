@@ -281,7 +281,8 @@ onMounted(() => {
         <template v-slot:activator="{ props }">
           <v-btn
             :color="roleColor.backgroundColor"
-            :class="'font-weight-bold text-' + roleColor.textColor"
+            class="flatCardBorder text-none text-h7 font-weight-bold"
+            :class="' text-' + roleColor.textColor"
             height="50"
             v-bind="props"
             x-large
@@ -306,7 +307,7 @@ onMounted(() => {
             </template>
           </v-btn>
         </template>
-        <v-card>
+        <v-card class="mainCardBorder rounded-te-0">
           <v-card-text>
             <div class="mx-auto">
               <h3>{{ name }}</h3>
