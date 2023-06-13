@@ -74,8 +74,7 @@ onMounted(async () => {
               <v-card-title
                 class="font-weight-semi-bold text-blue text-h5 pb-0"
               >
-                {{ notifications.length }} Notification
-                {{
+                {{ notifications.length }} Notification{{
                   notifications.length > 0
                     ? notifications.length > 1
                       ? "s"
