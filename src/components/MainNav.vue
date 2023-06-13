@@ -169,7 +169,6 @@ function changeComp(route) {
 function updateActiveLink() {
   setTimeout(function () {
     activeLink.value = router.currentRoute.value.name;
-    console.log(activeLink.value);
   }, 1);
 }
 function changeRole(newRole) {
@@ -198,7 +197,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <v-container fluid class="mx-3 my-1">
+  <v-container fluid class="pa-6 bg-white">
     <v-row>
       <v-btn icon plain elevation="0" @click="goToHome">
         <v-img
@@ -296,9 +295,9 @@ onMounted(() => {
                 class="with-outline"
               >
                 <img
-                  referrerpolicy="no-referrer"
                   v-if="loginStore.user.picture"
                   :src="loginStore.user.picture"
+                  referrerpolicy="no-referrer"
                 />
                 <span v-else class="accent--text font-weight-bold">{{
                   initials
