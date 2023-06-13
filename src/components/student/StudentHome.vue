@@ -27,7 +27,7 @@ async function retrieveData() {
       console.log(e);
     });
 
-  // Only for test. @ethanimooney Remove once real data is added.
+  // Only for test. Remove once real data is added.
   notifications.value = [
     {
       title: "New Event Open!",
