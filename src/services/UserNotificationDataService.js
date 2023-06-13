@@ -6,6 +6,10 @@ class UserNotificationDataService {
     return http.get(this.baseUrl);
   }
 
+  getByUserRole(userRoleId) {
+    return http.get(this.baseUrl + "userRoleId/" + userRoleId);
+  }
+
   create(data) {
     return http.post(this.baseUrl, data);
   }

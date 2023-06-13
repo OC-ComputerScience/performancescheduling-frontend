@@ -197,7 +197,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <v-container fluid class="mx-3 my-1">
+  <v-container fluid class="pa-6 bg-white">
     <v-row>
       <v-btn icon plain elevation="0" @click="goToHome">
         <v-img
@@ -244,18 +244,20 @@ onMounted(() => {
               </v-btn>
             </template>
             <v-card>
-              <v-card-text>
-                <div class="mx-auto" v-for="menu in adminMenus">
-                  <v-btn
-                    :class="'mt-2 font-weight-bold'"
-                    density="comfortable"
-                    elevation="0"
-                    @click="changeComp(menu.link)"
-                  >
-                    {{ menu.text }}
-                  </v-btn>
-                  <br />
-                </div>
+              <v-card-text
+                class="mx-auto"
+                v-for="menu in adminMenus"
+                :key="menu.link"
+              >
+                <v-btn
+                  :class="'mt-2 font-weight-bold'"
+                  density="comfortable"
+                  elevation="0"
+                  @click="changeComp(menu.link)"
+                >
+                  {{ menu.text }}
+                </v-btn>
+                <br />
               </v-card-text>
             </v-card>
           </v-menu>
@@ -279,7 +281,8 @@ onMounted(() => {
         <template v-slot:activator="{ props }">
           <v-btn
             :color="roleColor.backgroundColor"
-            :class="'font-weight-bold text-' + roleColor.textColor"
+            class="flatCardBorder text-none text-h7 font-weight-bold"
+            :class="' text-' + roleColor.textColor"
             height="50"
             v-bind="props"
             x-large
@@ -304,7 +307,7 @@ onMounted(() => {
             </template>
           </v-btn>
         </template>
-        <v-card>
+        <v-card class="mainCardBorder rounded-te-0">
           <v-card-text>
             <div class="mx-auto">
               <h3>{{ name }}</h3>
@@ -459,7 +462,7 @@ onMounted(() => {
     </v-list>
   </v-navigation-drawer>
 </template>
-<style>
+<style scoped>
 .text-center {
   text-align: center;
 }

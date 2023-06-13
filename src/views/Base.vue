@@ -1,8 +1,8 @@
 <template>
   <v-container fluid class="fill-height">
-    <MainNav></MainNav>
     <v-row class="fill-height">
       <v-col class="bg-lightGray">
+        <MainNav></MainNav>
         <!-- Student pages -->
         <StudentHome
           v-if="this.$route.fullPath === '/studentHome'"
