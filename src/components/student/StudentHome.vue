@@ -46,7 +46,8 @@ async function retrieveData() {
     });
 
   await StudentInstrumentDataService.getStudentInstrumentSignupsByUserRoleId(
-    loginStore.currentRole.id
+    loginStore.currentRole.id,
+    new Date()
   )
     .then((response) => {
       signups.value = response.data;

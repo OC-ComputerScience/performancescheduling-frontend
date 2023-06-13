@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted } from "vue";
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 import { getHourWordFromNumber } from "../composables/timeFormatter";
@@ -9,11 +8,6 @@ const props = defineProps({
   eventSignupData: { type: [Object], required: true },
   studentInstrumentSignupData: { type: [Object], required: true },
   isSignup: { type: [Boolean], required: true },
-});
-
-onMounted(() => {
-  console.log(props.eventData);
-  console.log(props.studentInstrumentSignupData);
 });
 </script>
 

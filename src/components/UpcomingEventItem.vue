@@ -1,15 +1,10 @@
 <script setup>
-import { onMounted } from "vue";
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
   isSignup: { type: [Boolean], required: true },
-});
-
-onMounted(() => {
-  console.log(props.eventData);
 });
 </script>
 
