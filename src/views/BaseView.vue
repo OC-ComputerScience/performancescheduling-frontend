@@ -1,3 +1,12 @@
+<script setup>
+import MainNav from "../components/MainNav.vue";
+import StudentHome from "../components/student/StudentHome.vue";
+import StudentPerformances from "../components/student/StudentPerformances.vue";
+import StudentSettings from "../components/student/StudentSettings.vue";
+import FacultyHome from "../components/faculty/FacultyHome.vue";
+import AdminHome from "../components/admin/AdminHome.vue";
+</script>
+
 <template>
   <v-container fluid class="fill-height">
     <v-row class="fill-height">
@@ -23,33 +32,11 @@
         </FacultyHome>
         <!-- Admin pages -->
         <AdminHome v-if="this.$route.fullPath === '/adminHome'"> </AdminHome>
+        <MaintainUsers></MaintainUsers>
       </v-col>
     </v-row>
   </v-container>
 </template>
-
-<script>
-import MainNav from "../components/MainNav.vue";
-import StudentHome from "../components/student/StudentHome.vue";
-import StudentPerformances from "../components/student/StudentPerformances.vue";
-import StudentSettings from "../components/student/StudentSettings.vue";
-import FacultyHome from "../components/faculty/FacultyHome.vue";
-import AdminHome from "../components/admin/AdminHome.vue";
-export default {
-  name: "Base",
-  components: {
-    MainNav,
-    //Student Component
-    StudentHome,
-    StudentPerformances,
-    StudentSettings,
-    //Faculty Component
-    FacultyHome,
-    //Admin Component
-    AdminHome,
-  },
-};
-</script>
 
 <style scoped>
 * {
