@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Base from "../views/BaseView.vue";
-import LoginPage from "../views/LoginView.vue";
+import LoginView from "../views/LoginView.vue";
 import { useLoginStore } from "../stores/LoginStore.js";
 
 const router = createRouter({
@@ -8,8 +8,8 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      alias: "/loginPage",
-      component: LoginPage,
+      alias: "/login",
+      component: LoginView,
       name: "loginPage",
     },
     {
