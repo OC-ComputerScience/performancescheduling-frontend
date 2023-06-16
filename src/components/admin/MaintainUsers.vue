@@ -9,7 +9,6 @@ const users = ref([]);
 async function getUsers() {
   await UserDataService.getAllWithRolesAndStudentInstruments()
     .then((response) => {
-      console.log(response.data);
       users.value = response.data;
       filteredUsers.value = users.value;
     })
