@@ -1,10 +1,14 @@
 <script setup>
 import MainNav from "../components/MainNav.vue";
+
 import StudentHome from "../components/student/StudentHome.vue";
 import StudentPerformances from "../components/student/StudentPerformances.vue";
 import StudentSettings from "../components/student/StudentSettings.vue";
+
 import FacultyHome from "../components/faculty/FacultyHome.vue";
+
 import AdminHome from "../components/admin/AdminHome.vue";
+import MaintainUsers from "../components/admin/MaintainUsers.vue";
 </script>
 
 <template>
@@ -32,7 +36,9 @@ import AdminHome from "../components/admin/AdminHome.vue";
         </FacultyHome>
         <!-- Admin pages -->
         <AdminHome v-if="this.$route.fullPath === '/adminHome'"> </AdminHome>
-        <MaintainUsers></MaintainUsers>
+        <MaintainUsers
+          v-if="this.$route.fullPath === '/adminUsers'"
+        ></MaintainUsers>
       </v-col>
     </v-row>
   </v-container>

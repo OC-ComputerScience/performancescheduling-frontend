@@ -14,6 +14,10 @@ class UserDataService {
     return http.get(this.baseUrl + "all/roles");
   }
 
+  getAllWithRolesAndStudentInstruments() {
+    return http.get(this.baseUrl + "all/roles/studentInstruments");
+  }
+
   remove(id) {
     return http.delete(this.baseUrl + id);
   }
