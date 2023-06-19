@@ -76,6 +76,7 @@ function clearFilters() {
   filteredUsers.value = users.value;
   statusFilterSelection.value = null;
   roleFilterSelection.value = [];
+  studentTypeFilterSelection.value = [];
 }
 
 // Pagination
@@ -93,6 +94,7 @@ onMounted(async () => {
   await getUsers();
 });
 </script>
+
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
@@ -137,7 +139,6 @@ onMounted(async () => {
                   v-model="roleFilterSelection"
                   :items="roleFilterOptions"
                   item-title="role"
-                  item-value="id"
                 ></v-select>
               </v-list-item>
               <v-list-item
@@ -232,6 +233,7 @@ onMounted(async () => {
     </v-row>
   </v-container>
 </template>
+
 <style scoped>
 * {
   font-family: Poppins, sans-serif !important;
