@@ -119,9 +119,7 @@ const roleColors = [
 const roleColor = ref({});
 
 function getUserRoles() {
-  userRoles.value = [];
-  userRoles.value.push(loginStore.user.roles.default);
-  userRoles.value = userRoles.value.concat(loginStore.user.roles.additional);
+  userRoles.value = loginStore.user.roles;
 }
 function goToHome() {
   if (loginStore.currentRole.role === "Faculty") {
@@ -288,7 +286,7 @@ onMounted(() => {
             x-large
             elevation="0"
           >
-            {{ loginStore.currentRole.role }}
+            {{ loginStore.currentRole.role.role }}
             <template v-slot:append>
               <v-avatar
                 v-if="loginStore.user != null"

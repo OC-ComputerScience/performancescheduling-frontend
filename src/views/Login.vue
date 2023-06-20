@@ -1,3 +1,15 @@
+<script setup>
+import OClogo from "/oc_logo_social.png";
+import SocialLogin from "../components/SocialLogin.vue";
+import { ref, onMounted } from "vue";
+
+const logoURL = ref("");
+
+onMounted(() => {
+  logoURL.value = OClogo;
+});
+</script>
+
 <template>
   <v-container fluid class="loginGrid">
     <v-card
@@ -25,22 +37,6 @@
     </v-card>
   </v-container>
 </template>
-
-<script>
-import OClogo from "/oc_logo_social.png";
-import SocialLogin from "../components/SocialLogin.vue";
-import { ref, onMounted } from "vue";
-const logoURL = ref("");
-export default {
-  name: "LoginPage",
-  components: {
-    SocialLogin,
-  },
-};
-onMounted(() => {
-  logoURL.value = OClogo;
-});
-</script>
 
 <style scoped>
 * {
