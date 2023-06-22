@@ -5,8 +5,14 @@ import MajorDataService from "./../../services/MajorDataService";
 import UserInstrumentCard from "./UserInstrumentCard.vue";
 import UserDataService from "./../../services/UserDataService";
 import UserRoleDataService from "./../../services/UserRoleDataService";
+import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
 
-const emits = defineEmits(["updateUserSuccessEvent", "closeUserDialogEvent"]);
+const emits = defineEmits([
+  "updateUserSuccessEvent",
+  "closeUserDialogEvent",
+  "disableUserEvent",
+  "enableUserEvent",
+]);
 
 const props = defineProps({
   userData: { type: [Object], required: true },
@@ -229,6 +235,18 @@ async function updateFacultyTitle() {
   }
 }
 
+async function refreshStudentInstruments() {
+  await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
+    studentRole.id
+  )
+    .then((response) => {
+      studentRole.studentRole = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 onMounted(async () => {
   await getAllRoles();
   await getAllMajors();
@@ -412,11 +430,10 @@ onMounted(async () => {
           </v-card-subtitle>
           <v-card class="bg-lightGray pa-4 pb-0 flatCardBorder">
             <UserInstrumentCard
-              v-for="studentInstrument of userRoles.filter(
-                (r) => r.roleId === 1
-              )[0].studentRole"
+              v-for="studentInstrument of studentRole.studentRole"
               :key="studentInstrument.id"
               :student-instrument-data="studentInstrument"
+              @refreshStudentInstrumentsEvent="refreshStudentInstruments"
             ></UserInstrumentCard>
           </v-card>
         </v-col>
@@ -439,9 +456,17 @@ onMounted(async () => {
       </v-btn>
       <v-btn
         flat
-        class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white bg-maroon flatChipBorder"
+        class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+        :class="
+          props.userData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
+        "
+        @click="
+          props.userData.status === 'Disabled'
+            ? emits('enableUserEvent')
+            : emits('disableUserEvent')
+        "
       >
-        Disable
+        {{ props.userData.status === "Disabled" ? "Enable" : "Disable" }}
       </v-btn>
     </v-card-actions>
   </v-card>

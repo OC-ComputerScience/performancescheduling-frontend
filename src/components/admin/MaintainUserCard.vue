@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import UserDialogBody from "./UserDialogBody.vue";
+import UserDataService from "../../services/UserDataService.js";
 
 const emits = defineEmits(["closeUserDialog", "refreshUsersEvent"]);
 
@@ -61,6 +62,26 @@ function fillInstrumentRoleLabels(instruments) {
       : isInstrumental && !isVocal
       ? ["Instrumental"]
       : ["Vocal"];
+}
+
+async function disableUser(userId) {
+  await UserDataService.disable(userId)
+    .then(() => {
+      emits("refreshUsersEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+async function enableUser(userId) {
+  await UserDataService.enable(userId)
+    .then(() => {
+      emits("refreshUsersEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 onMounted(async () => {
@@ -151,6 +172,8 @@ onMounted(async () => {
         :user-roles="props.userRoles"
         @closeUserDialogEvent="closeUserDialog"
         @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
+        @disableUserEvent="closeUserDialog(), disableUser(userData.id)"
+        @enableUserEvent="closeUserDialog(), enableUser(userData.id)"
       ></UserDialogBody>
     </v-dialog>
   </v-card>

@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import UserInstrumentDialogBody from "./UserInstrumentDialogBody.vue";
+import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
+
+const emits = defineEmits(["refreshStudentInstrumentsEvent"]);
 
 const addOrEditInstrumentDialog = ref(false);
 
@@ -10,6 +13,26 @@ const props = defineProps({
 
 function closeUserInstrumentDialog() {
   addOrEditInstrumentDialog.value = false;
+}
+
+async function disableStudentInstrument(studentInstrumentId) {
+  await StudentInstrumentDataService.disable(studentInstrumentId)
+    .then(() => {
+      emits("refreshStudentInstrumentsEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+async function enableStudentInstrument(studentInstrumentId) {
+  await StudentInstrumentDataService.enable(studentInstrumentId)
+    .then(() => {
+      emits("refreshStudentInstrumentsEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 onMounted(async () => {});
@@ -36,7 +59,12 @@ onMounted(async () => {});
             label
             flat
             size="small"
-            class="font-weight-semi-bold text-none text-white flatChipBorder bg-teal"
+            class="font-weight-semi-bold text-none text-white flatChipBorder"
+            :class="
+              studentInstrumentData.status === 'Active'
+                ? 'bg-teal'
+                : 'bg-maroon'
+            "
           >
             {{ studentInstrumentData.status }}
           </v-chip>
@@ -96,7 +124,18 @@ onMounted(async () => {});
     <UserInstrumentDialogBody
       :is-edit="true"
       :student-instrument-data="studentInstrumentData"
+      @updateInstrumentSuccessEvent="
+        closeUserInstrumentDialog(), emits('refreshStudentInstrumentsEvent')
+      "
       @closeUserInstrumentDialogEvent="closeUserInstrumentDialog"
+      @disableStudentInstrumentEvent="
+        closeUserInstrumentDialog(),
+          disableStudentInstrument(studentInstrumentData.id)
+      "
+      @enableStudentInstrumentEvent="
+        closeUserInstrumentDialog(),
+          enableStudentInstrument(studentInstrumentData.id)
+      "
     ></UserInstrumentDialogBody>
   </v-dialog>
 </template>

@@ -25,5 +25,13 @@ class UserDataService {
   update(data) {
     return http.put(this.baseUrl + data.id, data);
   }
+
+  disable(id) {
+    return http.put(this.baseUrl + "disable/" + id);
+  }
+
+  enable(id) {
+    return http.put(this.baseUrl + "enable/" + id);
+  }
 }
 export default new UserDataService();
