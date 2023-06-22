@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import RoleDataService from "./../../services/RoleDataService";
 import MajorDataService from "./../../services/MajorDataService";
 import UserInstrumentCard from "./UserInstrumentCard.vue";
+import UserInstrumentDialogBody from "./UserInstrumentDialogBody.vue";
 import UserDataService from "./../../services/UserDataService";
 import UserRoleDataService from "./../../services/UserRoleDataService";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
@@ -19,6 +20,16 @@ const props = defineProps({
   userRoles: { type: [Array], required: true },
   isEdit: { type: [Boolean], required: true },
 });
+
+const addInstrumentDialog = ref(false);
+
+function addInstrument() {
+  addInstrumentDialog.value = true;
+}
+
+function closeAddInstrumentDialog() {
+  addInstrumentDialog.value = false;
+}
 
 const isStudent = ref(
   props.userRoles.some((ur) => ur.roleId === 1 && ur.status === "Active")
@@ -442,11 +453,24 @@ onMounted(async () => {
           </v-row>
         </v-col>
         <v-col v-if="isStudent">
-          <v-card-subtitle
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Instruments
-          </v-card-subtitle>
+          <v-row class="pb-2">
+            <v-col cols="auto" align-self="center">
+              <v-card-subtitle class="pl-0 font-weight-semi-bold text-darkBlue">
+                Instruments
+              </v-card-subtitle>
+            </v-col>
+            <v-col cols="auto" align-self="center">
+              <v-btn
+                flat
+                size="small"
+                class="font-weight-semi-bold text-none text-white bg-darkBlue flatChipBorder"
+                @click="addInstrument"
+              >
+                Add Instrument
+              </v-btn>
+            </v-col>
+          </v-row>
+
           <v-card class="bg-lightGray pa-4 pb-0 flatCardBorder">
             <UserInstrumentCard
               v-for="studentInstrument of studentRole.studentRole"
@@ -489,6 +513,28 @@ onMounted(async () => {
       </v-btn>
     </v-card-actions>
   </v-card>
+  <v-dialog v-model="addInstrumentDialog" persistent max-width="600px">
+    <UserInstrumentDialogBody
+      :is-edit="false"
+      :student-instrument-data="{
+        id: null,
+        status: 'Active',
+        levelId: null,
+        studentRoleId: props.userRoles.find((ur) => ur.roleId === 1).id,
+        instructorRoleId: null,
+        accompanistRoleId: null,
+        instrumentId: null,
+        instructorRole: null,
+        accompanistRole: null,
+        instrument: null,
+        level: null,
+      }"
+      @addInstrumentSuccessEvent="
+        closeAddInstrumentDialog(), refreshStudentInstruments()
+      "
+      @closeUserInstrumentDialogEvent="closeAddInstrumentDialog"
+    ></UserInstrumentDialogBody>
+  </v-dialog>
 </template>
 
 <style scoped>
