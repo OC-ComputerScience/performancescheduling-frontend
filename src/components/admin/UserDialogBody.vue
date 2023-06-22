@@ -61,7 +61,6 @@ async function getAllRoles() {
 }
 
 const editedStudentMajor = ref(isStudent.value ? studentRole.major : null);
-console.log(props.userRoles);
 
 const majorOptions = ref([]);
 
@@ -163,8 +162,6 @@ async function updateUserRoles() {
 
   // Whatever is left in editedUserRoles is a new role, so create it
   for (let editedUserRole of editedUserRoles.value) {
-    console.log(editedUserRole);
-    console.log(props.userData);
     await UserRoleDataService.create({
       userId: props.userData.id,
       roleId: editedUserRole.id,

@@ -50,7 +50,7 @@ function filterUsers() {
   if (roleFilterSelection.value.length > 0) {
     for (let role of roleFilterSelection.value) {
       filteredUsers.value = filteredUsers.value.filter((u) =>
-        u.userRoles.some((ur) => ur.roleId === role && ur.status === "Active")
+        u.userRoles.some((ur) => ur.roleId === role.id)
       );
     }
   }
@@ -63,7 +63,7 @@ function filterUsers() {
     for (let type of studentTypeFilterSelection.value) {
       filteredUsers.value = filteredUsers.value.filter((su) =>
         su.userRoles
-          .find((sur) => sur.roleId === 1 && sur.status === "Active")
+          .find((sur) => sur.roleId === 1)
           .studentRole.some((sr) => sr.instrument.type === type)
       );
     }
@@ -146,10 +146,11 @@ onMounted(async () => {
                   v-model="roleFilterSelection"
                   :items="roleFilterOptions"
                   item-title="role"
+                  return-object
                 ></v-select>
               </v-list-item>
               <v-list-item
-                v-if="roleFilterSelection.some((r) => r === 1)"
+                v-if="roleFilterSelection.some((r) => r.id === 1)"
                 class="pa-0 font-weight-semi-bold text-darkBlue"
               >
                 Student Type
