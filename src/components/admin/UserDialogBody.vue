@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import RoleDataService from "./../../services/RoleDataService";
+import MajorDataService from "./../../services/MajorDataService";
 import UserInstrumentCard from "./UserInstrumentCard.vue";
 import UserDataService from "./../../services/UserDataService";
 import UserRoleDataService from "./../../services/UserRoleDataService";
@@ -12,6 +13,8 @@ const props = defineProps({
   userRoles: { type: [Array], required: true },
   isEdit: { type: [Boolean], required: true },
 });
+
+const isStudent = ref(props.userRoles.some((ur) => ur.roleId === 1));
 
 const editedUserData = ref(props.userData);
 // const editedUserRoles = ref(props.userRoles);
@@ -37,9 +40,42 @@ async function getAllRoles() {
     });
 }
 
+const editedUserMajor = ref(
+  props.userRoles.find((ur) => ur.roleId === 1).major
+);
+console.log(props.userRoles);
+
+const majorOptions = ref([]);
+
+async function getAllMajors() {
+  await MajorDataService.getAll()
+    .then((response) => {
+      majorOptions.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+const editedUserClassification = ref(
+  props.userRoles.find((ur) => ur.roleId === 1).studentClassification
+);
+
+const classificationOptions = ref([
+  "Freshman",
+  "Sophomore",
+  "Junior",
+  "Senior",
+  "Graduate",
+]);
+
 // Update the user's roles, then update the user's data
 async function updateUser() {
   await updateUserRoles();
+
+  await updateUserMajor();
+
+  await updateUserClassification();
 
   delete editedUserData.value["createdAt"];
   delete editedUserData.value["updatedAt"];
@@ -99,8 +135,40 @@ async function updateUserRoles() {
   }
 }
 
+// If the user's major has changed, update it
+async function updateUserMajor() {
+  // Find the student role
+  let studentRole = props.userRoles.find((ur) => ur.roleId === 1);
+
+  // If the editedUserMajor is different from the studentRole's major, update it
+  if (editedUserMajor.value.id !== studentRole.major.id) {
+    await UserRoleDataService.update({
+      id: studentRole.id,
+      majorId: editedUserMajor.value.id,
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
+async function updateUserClassification() {
+  // Find the student role
+  let studentRole = props.userRoles.find((ur) => ur.roleId === 1);
+
+  // If the editedUserClassification is different from the studentRole's classification, update it
+  if (editedUserClassification.value !== studentRole.studentClassification) {
+    await UserRoleDataService.update({
+      id: studentRole.id,
+      studentClassification: editedUserClassification.value,
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
 onMounted(async () => {
   await getAllRoles();
+  await getAllMajors();
 });
 </script>
 
@@ -187,6 +255,41 @@ onMounted(async () => {
                 {{ item.title }}
               </v-chip>
             </template>
+          </v-select>
+
+          <v-card-subtitle
+            v-if="isStudent"
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Classification
+          </v-card-subtitle>
+          <v-select
+            v-if="isStudent"
+            color="darkBlue"
+            variant="plain"
+            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            v-model="editedUserClassification"
+            :items="classificationOptions"
+          >
+          </v-select>
+
+          <v-card-subtitle
+            v-if="isStudent"
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Major
+          </v-card-subtitle>
+          <v-select
+            v-if="isStudent"
+            color="darkBlue"
+            variant="plain"
+            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            v-model="editedUserMajor"
+            :items="majorOptions"
+            :item-title="(item) => item.name"
+            item-value="id"
+            return-object
+          >
           </v-select>
         </v-col>
       </v-row>

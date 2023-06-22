@@ -12,9 +12,7 @@ function closeUserInstrumentDialog() {
   addOrEditInstrumentDialog.value = false;
 }
 
-onMounted(async () => {
-  console.log(props.studentInstrumentData);
-});
+onMounted(async () => {});
 </script>
 
 <template>
