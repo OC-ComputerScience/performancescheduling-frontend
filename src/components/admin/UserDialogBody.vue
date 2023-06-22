@@ -20,6 +20,12 @@ const studentRole = isStudent.value
   ? props.userRoles.find((ur) => ur.roleId === 1)
   : null;
 
+const isFaculty = ref(props.userRoles.some((ur) => ur.roleId === 2));
+
+const facultyRole = isFaculty.value
+  ? props.userRoles.find((ur) => ur.roleId === 2)
+  : null;
+
 const editedUserData = ref(props.userData);
 // const editedUserRoles = ref(props.userRoles);
 
@@ -44,7 +50,7 @@ async function getAllRoles() {
     });
 }
 
-const editedStudentMajor = ref(studentRole.major);
+const editedStudentMajor = ref(isStudent.value ? studentRole.major : null);
 console.log(props.userRoles);
 
 const majorOptions = ref([]);
@@ -59,7 +65,9 @@ async function getAllMajors() {
     });
 }
 
-const editedStudentClassification = ref(studentRole.studentClassification);
+const editedStudentClassification = ref(
+  isStudent.value ? studentRole.studentClassification : null
+);
 
 const classificationOptions = ref([
   "Freshman",
@@ -69,11 +77,18 @@ const classificationOptions = ref([
   "Graduate",
 ]);
 
-const editedStudentSemesters = ref(studentRole.studentSemesters);
-const editedStudentHours = ref(studentRole.studentLessonHours);
+const editedStudentSemesters = ref(
+  isStudent.value ? studentRole.studentSemesters : null
+);
+const editedStudentHours = ref(
+  isStudent.value ? studentRole.studentLessonHours : null
+);
+
+const editedFacultyTitle = ref(isFaculty.value ? facultyRole.title : null);
 
 // Update the user's roles, then
 // if isStudent, update the student's major, classification, semesters, and hours, then
+// if isFaculty, update the faculty's title, then
 // update the user's data
 async function updateUser() {
   await updateUserRoles();
@@ -83,6 +98,10 @@ async function updateUser() {
     await updateStudentClassification();
     await updateStudentSemesters();
     await updateStudentHours();
+  }
+
+  if (isFaculty.value) {
+    await updateFacultyTitle();
   }
 
   delete editedUserData.value["createdAt"];
@@ -197,6 +216,19 @@ async function updateStudentHours() {
   }
 }
 
+// If the user's title has changed, update it
+async function updateFacultyTitle() {
+  // If the editedFacultyTitle is different from the facultyRole's title, update it
+  if (editedFacultyTitle.value !== facultyRole.title) {
+    await UserRoleDataService.update({
+      id: facultyRole.id,
+      title: editedFacultyTitle.value,
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
 onMounted(async () => {
   await getAllRoles();
   await getAllMajors();
@@ -289,6 +321,21 @@ onMounted(async () => {
           </v-select>
 
           <v-card-subtitle
+            v-if="isFaculty"
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Title
+          </v-card-subtitle>
+          <v-text-field
+            v-if="isFaculty"
+            s
+            placeholder="Professor of Music"
+            v-model="editedFacultyTitle"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          ></v-text-field>
+
+          <v-card-subtitle
             v-if="isStudent"
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
@@ -357,9 +404,7 @@ onMounted(async () => {
             </v-col>
           </v-row>
         </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
+        <v-col v-if="isStudent">
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
