@@ -20,13 +20,17 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
 });
 
-const isStudent = ref(props.userRoles.some((ur) => ur.roleId === 1));
+const isStudent = ref(
+  props.userRoles.some((ur) => ur.roleId === 1 && ur.status === "Active")
+);
 
 const studentRole = isStudent.value
   ? props.userRoles.find((ur) => ur.roleId === 1)
   : null;
 
-const isFaculty = ref(props.userRoles.some((ur) => ur.roleId === 2));
+const isFaculty = ref(
+  props.userRoles.some((ur) => ur.roleId === 2 && ur.status === "Active")
+);
 
 const facultyRole = isFaculty.value
   ? props.userRoles.find((ur) => ur.roleId === 2)
@@ -159,10 +163,13 @@ async function updateUserRoles() {
 
   // Whatever is left in editedUserRoles is a new role, so create it
   for (let editedUserRole of editedUserRoles.value) {
-    await UserRoleDataService.create(
-      props.userData.id,
-      editedUserRole.id
-    ).catch((err) => {
+    console.log(editedUserRole);
+    console.log(props.userData);
+    await UserRoleDataService.create({
+      userId: props.userData.id,
+      roleId: editedUserRole.id,
+      status: "Active",
+    }).catch((err) => {
       console.log(err);
     });
   }
@@ -173,7 +180,10 @@ async function updateStudentMajor() {
   // Find the student role
 
   // If the editedStudentMajor is different from the studentRole's major, update it
-  if (editedStudentMajor.value.id !== studentRole.major.id) {
+  if (
+    studentRole.majorId === null ||
+    editedStudentMajor.value.id !== studentRole.majorId
+  ) {
     await UserRoleDataService.update({
       id: studentRole.id,
       majorId: editedStudentMajor.value.id,
@@ -186,7 +196,10 @@ async function updateStudentMajor() {
 // If the user's classification has changed, update it
 async function updateStudentClassification() {
   // If the editedStudentClassification is different from the studentRole's classification, update it
-  if (editedStudentClassification.value !== studentRole.studentClassification) {
+  if (
+    studentRole.studentClassification === null ||
+    editedStudentClassification.value !== studentRole.studentClassification
+  ) {
     await UserRoleDataService.update({
       id: studentRole.id,
       studentClassification: editedStudentClassification.value,
@@ -199,7 +212,10 @@ async function updateStudentClassification() {
 // If the user's semesters have changed, update it
 async function updateStudentSemesters() {
   // If the editedStudentSemesters is different from the studentRole's semesters, update it
-  if (editedStudentSemesters.value !== studentRole.studentSemesters) {
+  if (
+    studentRole.studentSemesters === null ||
+    editedStudentSemesters.value !== studentRole.studentSemesters
+  ) {
     await UserRoleDataService.update({
       id: studentRole.id,
       studentSemesters: editedStudentSemesters.value,
@@ -212,7 +228,10 @@ async function updateStudentSemesters() {
 // If the user's hours have changed, update it
 async function updateStudentHours() {
   // If the editedStudentHours is different from the studentRole's hours, update it
-  if (editedStudentHours.value !== studentRole.studentLessonHours) {
+  if (
+    studentRole.studentLessonHours === null ||
+    editedStudentHours.value !== studentRole.studentLessonHours
+  ) {
     await UserRoleDataService.update({
       id: studentRole.id,
       studentLessonHours: editedStudentHours.value,
@@ -225,7 +244,10 @@ async function updateStudentHours() {
 // If the user's title has changed, update it
 async function updateFacultyTitle() {
   // If the editedFacultyTitle is different from the facultyRole's title, update it
-  if (editedFacultyTitle.value !== facultyRole.title) {
+  if (
+    facultyRole.title === null ||
+    editedFacultyTitle.value !== facultyRole.title
+  ) {
     await UserRoleDataService.update({
       id: facultyRole.id,
       title: editedFacultyTitle.value,

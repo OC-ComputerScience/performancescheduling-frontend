@@ -66,7 +66,8 @@ async function updateInstrument() {
 
 async function updateSelectedInstructor() {
   if (
-    selectedInstructor.value.id != props.studentInstrumentData.instructorRole.id
+    props.studentInstrumentData.instructorRoleId === null ||
+    selectedInstructor.value.id != props.studentInstrumentData.instructorRoleId
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
@@ -79,8 +80,9 @@ async function updateSelectedInstructor() {
 
 async function updateSelectedAccompanist() {
   if (
+    props.studentInstrumentData.accompanistRoleId === null ||
     selectedAccompanist.value.id !=
-    props.studentInstrumentData.accompanistRole.id
+      props.studentInstrumentData.accompanistRoleId
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
