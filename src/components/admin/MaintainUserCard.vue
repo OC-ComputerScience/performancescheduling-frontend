@@ -1,11 +1,27 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import UserDialogBody from "./UserDialogBody.vue";
+
+const emits = defineEmits(["closeUserDialog", "refreshUsersEvent"]);
 
 const props = defineProps({
   userData: { type: [Object], required: true },
+  userRoles: { type: [Array], required: true },
 });
 
-const userRoles = ref(props.userData.userRoles);
+watch(
+  () => props.userRoles,
+  async () => {
+    await fillRoleData();
+  }
+);
+
+const createOrEditDialog = ref(false);
+
+function closeUserDialog() {
+  createOrEditDialog.value = false;
+}
+
 const userRoleLabels = ref([]);
 
 const studentInstrumentData = ref({});
@@ -13,7 +29,10 @@ const instrumentRoleLabels = ref({});
 
 // Creates role labels for each role, and if Student, gets StudentInstrument data.
 async function fillRoleData() {
-  for (let role of userRoles.value) {
+  userRoleLabels.value = [];
+  instrumentRoleLabels.value = [];
+  for (let role of props.userRoles) {
+    if (role.status === "Disabled") continue;
     const roleId = role.roleId;
     if (roleId === 1) {
       studentInstrumentData.value = role.studentRole;
@@ -22,7 +41,7 @@ async function fillRoleData() {
     } else {
       roleId === 2
         ? userRoleLabels.value.push("Faculty")
-        : roleId === "3"
+        : roleId === 3
         ? userRoleLabels.value.push("Admin")
         : userRoleLabels.value.push("Accompanist");
     }
@@ -84,6 +103,7 @@ onMounted(async () => {
             flat
             size="small"
             class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
+            @click="createOrEditDialog = true"
           >
             Edit
           </v-btn>
@@ -124,6 +144,15 @@ onMounted(async () => {
         </v-col>
       </v-row>
     </v-card-actions>
+    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+      <UserDialogBody
+        :is-edit="true"
+        :user-data="userData"
+        :user-roles="props.userRoles"
+        @closeUserDialogEvent="closeUserDialog"
+        @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
+      ></UserDialogBody>
+    </v-dialog>
   </v-card>
 </template>
 

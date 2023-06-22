@@ -50,7 +50,7 @@ function filterUsers() {
   if (roleFilterSelection.value.length > 0) {
     for (let role of roleFilterSelection.value) {
       filteredUsers.value = filteredUsers.value.filter((u) =>
-        u.userRoles.some((ur) => ur.roleId === role)
+        u.userRoles.some((ur) => ur.roleId === role && ur.status === "Active")
       );
     }
   }
@@ -63,7 +63,7 @@ function filterUsers() {
     for (let type of studentTypeFilterSelection.value) {
       filteredUsers.value = filteredUsers.value.filter((su) =>
         su.userRoles
-          .find((sur) => sur.roleId === 1)
+          .find((sur) => sur.roleId === 1 && sur.status === "Active")
           .studentRole.some((sr) => sr.instrument.type === type)
       );
     }
@@ -77,6 +77,13 @@ function clearFilters() {
   statusFilterSelection.value = null;
   roleFilterSelection.value = [];
   studentTypeFilterSelection.value = [];
+}
+
+// Omits a specific key from an object
+// Used when passing userData (sans userRoles) to MaintainUserCard
+function omit(key, obj) {
+  const { [key]: omitted, ...rest } = obj;
+  return rest;
 }
 
 // Pagination
@@ -212,7 +219,11 @@ onMounted(async () => {
               cols="12"
               lg="4"
             >
-              <MaintainUserCard :user-data="user"></MaintainUserCard>
+              <MaintainUserCard
+                :user-data="omit('userRoles', user)"
+                :user-roles="user.userRoles"
+                @refreshUsersEvent="getUsers()"
+              ></MaintainUserCard>
             </v-col>
           </v-row>
         </v-card>

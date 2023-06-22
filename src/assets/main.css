@@ -64,6 +64,11 @@ a,
   box-shadow: none !important;
 }
 
+.innerFlatCardBorder {
+  border-radius: 7px !important;
+  box-shadow: none !important;
+}
+
 .flatChipBorder {
   border-radius: 5px !important;
 }
