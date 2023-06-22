@@ -92,7 +92,10 @@ async function updateSelectedAccompanist() {
 }
 
 async function updateLevel() {
-  if (editedLevel.value.id != props.studentInstrumentData.level.id) {
+  if (
+    props.studentInstrumentData.levelId === null ||
+    editedLevel.value.id != props.studentInstrumentData.levelId
+  ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
       levelId: editedLevel.value.id,
