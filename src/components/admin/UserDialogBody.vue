@@ -16,6 +16,10 @@ const props = defineProps({
 
 const isStudent = ref(props.userRoles.some((ur) => ur.roleId === 1));
 
+const studentRole = isStudent.value
+  ? props.userRoles.find((ur) => ur.roleId === 1)
+  : null;
+
 const editedUserData = ref(props.userData);
 // const editedUserRoles = ref(props.userRoles);
 
@@ -40,9 +44,7 @@ async function getAllRoles() {
     });
 }
 
-const editedUserMajor = ref(
-  props.userRoles.find((ur) => ur.roleId === 1).major
-);
+const editedStudentMajor = ref(studentRole.major);
 console.log(props.userRoles);
 
 const majorOptions = ref([]);
@@ -57,9 +59,7 @@ async function getAllMajors() {
     });
 }
 
-const editedUserClassification = ref(
-  props.userRoles.find((ur) => ur.roleId === 1).studentClassification
-);
+const editedStudentClassification = ref(studentRole.studentClassification);
 
 const classificationOptions = ref([
   "Freshman",
@@ -69,13 +69,21 @@ const classificationOptions = ref([
   "Graduate",
 ]);
 
-// Update the user's roles, then update the user's data
+const editedStudentSemesters = ref(studentRole.studentSemesters);
+const editedStudentHours = ref(studentRole.studentLessonHours);
+
+// Update the user's roles, then
+// if isStudent, update the student's major, classification, semesters, and hours, then
+// update the user's data
 async function updateUser() {
   await updateUserRoles();
 
-  await updateUserMajor();
-
-  await updateUserClassification();
+  if (isStudent.value) {
+    await updateStudentMajor();
+    await updateStudentClassification();
+    await updateStudentSemesters();
+    await updateStudentHours();
+  }
 
   delete editedUserData.value["createdAt"];
   delete editedUserData.value["updatedAt"];
@@ -136,30 +144,53 @@ async function updateUserRoles() {
 }
 
 // If the user's major has changed, update it
-async function updateUserMajor() {
+async function updateStudentMajor() {
   // Find the student role
-  let studentRole = props.userRoles.find((ur) => ur.roleId === 1);
 
-  // If the editedUserMajor is different from the studentRole's major, update it
-  if (editedUserMajor.value.id !== studentRole.major.id) {
+  // If the editedStudentMajor is different from the studentRole's major, update it
+  if (editedStudentMajor.value.id !== studentRole.major.id) {
     await UserRoleDataService.update({
       id: studentRole.id,
-      majorId: editedUserMajor.value.id,
+      majorId: editedStudentMajor.value.id,
     }).catch((err) => {
       console.log(err);
     });
   }
 }
 
-async function updateUserClassification() {
-  // Find the student role
-  let studentRole = props.userRoles.find((ur) => ur.roleId === 1);
-
-  // If the editedUserClassification is different from the studentRole's classification, update it
-  if (editedUserClassification.value !== studentRole.studentClassification) {
+// If the user's classification has changed, update it
+async function updateStudentClassification() {
+  // If the editedStudentClassification is different from the studentRole's classification, update it
+  if (editedStudentClassification.value !== studentRole.studentClassification) {
     await UserRoleDataService.update({
       id: studentRole.id,
-      studentClassification: editedUserClassification.value,
+      studentClassification: editedStudentClassification.value,
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
+// If the user's semesters have changed, update it
+async function updateStudentSemesters() {
+  // If the editedStudentSemesters is different from the studentRole's semesters, update it
+  if (editedStudentSemesters.value !== studentRole.studentSemesters) {
+    await UserRoleDataService.update({
+      id: studentRole.id,
+      studentSemesters: editedStudentSemesters.value,
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
+// If the user's hours have changed, update it
+async function updateStudentHours() {
+  // If the editedStudentHours is different from the studentRole's hours, update it
+  if (editedStudentHours.value !== studentRole.studentLessonHours) {
+    await UserRoleDataService.update({
+      id: studentRole.id,
+      studentLessonHours: editedStudentHours.value,
     }).catch((err) => {
       console.log(err);
     });
@@ -268,7 +299,7 @@ onMounted(async () => {
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-            v-model="editedUserClassification"
+            v-model="editedStudentClassification"
             :items="classificationOptions"
           >
           </v-select>
@@ -284,13 +315,47 @@ onMounted(async () => {
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-            v-model="editedUserMajor"
+            v-model="editedStudentMajor"
             :items="majorOptions"
             :item-title="(item) => item.name"
             item-value="id"
             return-object
           >
           </v-select>
+
+          <v-row v-if="isStudent" class="pa-0 ma-0">
+            <v-col cols="12" lg="auto" class="pa-0 ma-0">
+              <v-card-subtitle
+                class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+              >
+                Semesters
+              </v-card-subtitle>
+              <v-text-field
+                type="number"
+                color="darkBlue"
+                variant="plain"
+                class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+                v-model="editedStudentSemesters"
+              >
+              </v-text-field>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="12" lg="auto" class="pa-0 ma-o">
+              <v-card-subtitle
+                class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+              >
+                Private Hours
+              </v-card-subtitle>
+              <v-text-field
+                type="number"
+                color="darkBlue"
+                variant="plain"
+                class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+                v-model="editedStudentHours"
+              >
+              </v-text-field>
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
       <v-row>
