@@ -94,7 +94,7 @@ onMounted(async () => {
       <v-col cols="12" lg="1" class="ma-0 pa-4">
         <h1 class="text-maroon">Home</h1>
       </v-col>
-      <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
+      <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
         <v-card class="fill-height mainCardBorder pa-2">
           <v-card-title>
             <v-row class="pa-2">
@@ -117,7 +117,7 @@ onMounted(async () => {
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" lg="7" class="pa-0 ma-0 pa-4">
+      <v-col cols="12" lg="6" class="pa-0 ma-0 pa-4">
         <v-card class="fill-height mainCardBorder pa-2">
           <v-card-title class="font-weight-semi-bold text-orange text-h5">
             Upcoming Events
@@ -127,7 +127,7 @@ onMounted(async () => {
               v-for="event of upcomingEvents"
               :key="event.id"
               :event-data="event"
-              :is-signup="true"
+              :role-id="loginStore.currentRole.id"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>

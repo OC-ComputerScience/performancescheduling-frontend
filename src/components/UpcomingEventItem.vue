@@ -4,7 +4,7 @@ import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
-  isSignup: { type: [Boolean], required: true },
+  roleId: { type: [Number], required: true },
 });
 </script>
 
@@ -42,7 +42,10 @@ const props = defineProps({
                 rounded="md"
                 class="bg-darkBlue py-2 px-0 text-white mt-0"
               >
-                <v-card-subtitle class="font-weight-semi-bold">
+                <v-card-subtitle
+                  v-if="roleId == 1"
+                  class="font-weight-semi-bold"
+                >
                   {{ eventData.eventSignups.length }} People Signed Up
                 </v-card-subtitle>
               </v-card>
@@ -71,7 +74,13 @@ const props = defineProps({
         size="small"
         class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
       >
-        {{ isSignup ? "Signup" : "Add availability" }}
+        {{
+          roleId == 1
+            ? "Signup"
+            : roleId == 3
+            ? "Edit Event"
+            : "Add Availability"
+        }}
       </v-btn>
     </v-card-actions>
   </v-card>

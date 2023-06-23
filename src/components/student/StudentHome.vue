@@ -152,7 +152,7 @@ onMounted(async () => {
               v-for="event of upcomingEvents"
               :key="event.id"
               :event-data="event"
-              :is-signup="true"
+              :role-id="loginStore.currentRole.id"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>
