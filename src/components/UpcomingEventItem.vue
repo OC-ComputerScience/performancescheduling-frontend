@@ -12,6 +12,7 @@ const props = defineProps({
 
 function handleClick() {
   if (props.roleId == 3) {
+    console.log(props.eventData);
     router.push({ path: "adminEvents" });
   }
 }
@@ -67,9 +68,9 @@ function handleClick() {
                   class="font-weight-semi-bold"
                 >
                   {{
-                    eventData.availability == null
+                    eventData.availabilities == null
                       ? "0"
-                      : eventData.availability.length
+                      : eventData.availabilities.length
                   }}
                   Availability Set
                 </v-card-subtitle>
