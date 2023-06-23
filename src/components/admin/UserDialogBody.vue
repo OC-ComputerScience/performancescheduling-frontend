@@ -318,18 +318,6 @@ onMounted(async () => {
         >
           {{ props.isEdit ? "Edit" : "Add" }} User
         </v-col>
-        <v-spacer></v-spacer>
-        <v-col v-if="props.isEdit" cols="auto" class="pt-0 mt-0 pr-2">
-          <v-chip
-            label
-            flat
-            size="small"
-            class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-            :class="userData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
-          >
-            {{ userData.status === "Active" ? "Active" : "Disabled" }}
-          </v-chip>
-        </v-col>
       </v-row>
     </v-card-title>
     <v-card-text class="pt-0">
@@ -349,6 +337,17 @@ onMounted(async () => {
               {{ userData.email }}</a
             >
           </v-card-subtitle>
+        </v-col>
+        <v-col v-if="props.isEdit" cols="auto" align-self="center">
+          <v-chip
+            label
+            flat
+            size="small"
+            class="font-weight-bold mt-0 text-none text-white flatChipBorder"
+            :class="userData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
+          >
+            {{ userData.status === "Active" ? "Active" : "Disabled" }}
+          </v-chip>
         </v-col>
       </v-row>
       <v-row :class="props.isEdit ? '' : 'mt-2'">
