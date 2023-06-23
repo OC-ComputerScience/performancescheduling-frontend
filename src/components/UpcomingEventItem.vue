@@ -1,11 +1,20 @@
 <script setup>
+import { useRouter } from "vue-router";
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
+
+const router = useRouter();
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
   roleId: { type: [Number], required: true },
 });
+
+function handleClick() {
+  if (props.roleId == 3) {
+    router.push({ path: "adminEvents" });
+  }
+}
 </script>
 
 <template>
@@ -46,7 +55,23 @@ const props = defineProps({
                   v-if="roleId == 1"
                   class="font-weight-semi-bold"
                 >
-                  {{ eventData.eventSignups.length }} People Signed Up
+                  {{
+                    eventData.eventSignups == null
+                      ? "0"
+                      : eventData.eventSignups.length
+                  }}
+                  People Signed Up
+                </v-card-subtitle>
+                <v-card-subtitle
+                  v-if="roleId == 3"
+                  class="font-weight-semi-bold"
+                >
+                  {{
+                    eventData.availability == null
+                      ? "0"
+                      : eventData.availability.length
+                  }}
+                  Availability Set
                 </v-card-subtitle>
               </v-card>
             </v-col>
@@ -73,6 +98,7 @@ const props = defineProps({
         flat
         size="small"
         class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
+        @click="handleClick"
       >
         {{
           roleId == 1

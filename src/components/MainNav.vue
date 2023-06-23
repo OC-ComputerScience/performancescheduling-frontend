@@ -126,13 +126,13 @@ function getUserRoles() {
   userRoles.value = loginStore.user.roles;
 }
 function goToHome() {
-  if (loginStore.currentRole.role === "Faculty") {
-    router.push({ path: "facultyHome" });
-  } else if (loginStore.currentRole.role == "Student") {
+  if (loginStore.currentRole.roleId == 1) {
     router.push({ path: "studentHome" });
-  } else if (loginStore.currentRole.role == "Admin") {
+  } else if (loginStore.currentRole.roleId == 2) {
+    router.push({ path: "facultyHome" });
+  } else if (loginStore.currentRole.roleId == 3) {
     router.push({ path: "adminHome" });
-  } else if (loginStore.currentRole.role == "Accompanist") {
+  } else if (loginStore.currentRole.roleId == 4) {
     router.push({ path: "accompanistHome" });
   } else {
     router.push({ path: "base" });

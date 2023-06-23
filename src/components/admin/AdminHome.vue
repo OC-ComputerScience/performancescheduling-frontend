@@ -1,7 +1,8 @@
 <script setup>
 import AdminPendingItemCard from "./AdminPendingItemCard.vue";
-
+import { useLoginStore } from "../../stores/LoginStore.js";
 import { ref, onMounted } from "vue";
+
 import EventDataService from "../../services/EventDataService.js";
 import ComposerDataService from "../../services/ComposerDataService";
 import InstrumentDataService from "../../services/InstrumentDataService";
@@ -9,12 +10,13 @@ import MajorDataService from "../../services/MajorDataService";
 import PieceDataService from "../../services/PieceDataService";
 import UpcomingEventItem from "../UpcomingEventItem.vue";
 
+const loginStore = useLoginStore();
 const pendingItemCount = ref(0);
 const pendingItems = ref([]);
 const upcomingEvents = ref([]);
 
 async function retrieveData() {
-  await EventDataService.getGTEDate(new Date())
+  await EventDataService.getGTEDateForAdmins(new Date())
     .then((response) => {
       upcomingEvents.value = response.data;
     })
@@ -127,7 +129,7 @@ onMounted(async () => {
               v-for="event of upcomingEvents"
               :key="event.id"
               :event-data="event"
-              :role-id="loginStore.currentRole.id"
+              :role-id="loginStore.currentRole.roleId"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>

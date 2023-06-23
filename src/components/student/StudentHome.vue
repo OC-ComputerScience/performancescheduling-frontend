@@ -46,7 +46,7 @@ async function retrieveData() {
       console.log(e);
     });
 
-  await EventDataService.getGTEDate(new Date())
+  await EventDataService.getGTEDateForStudents(new Date())
     .then((response) => {
       upcomingEvents.value = response.data;
       // TODO(@ethanimooney): Make it check the actual event types that the student needs once that is implemented.
@@ -152,7 +152,7 @@ onMounted(async () => {
               v-for="event of upcomingEvents"
               :key="event.id"
               :event-data="event"
-              :role-id="loginStore.currentRole.id"
+              :role-id="loginStore.currentRole.roleId"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>
