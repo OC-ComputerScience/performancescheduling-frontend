@@ -90,8 +90,12 @@ function clearFilters() {
 
 // Omits a specific key from an object
 // Used when passing userData (sans userRoles) to MaintainUserCard
+// _omitted is an unused variable where the destructured data lives,
+// and is ignored by eslint using the varsIgnorePattern addition
+// to the .eslintrc.js file. This is not an ideal solution, but it is efficient and works.
+// The only way to avoid the unused variable is to use 'delete', which is not immutable.
 function omit(key, obj) {
-  const { [key]: omitted, ...rest } = obj;
+  let { [key]: _omitted, ...rest } = obj;
   return rest;
 }
 
