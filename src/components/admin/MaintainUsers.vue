@@ -2,6 +2,9 @@
 import { ref, onMounted, computed } from "vue";
 import UserDataService from "./../../services/UserDataService";
 import MaintainUserCard from "./MaintainUserCard.vue";
+import UserDialogBody from "./UserDialogBody.vue";
+
+const addUserDialog = ref(false);
 
 // User Data
 const users = ref([]);
@@ -15,6 +18,11 @@ async function getUsers() {
     .catch((err) => {
       console.log(err);
     });
+}
+
+async function refreshUsers() {
+  await getUsers();
+  await filterUsers();
 }
 
 // Filtering
@@ -39,6 +47,7 @@ const studentTypeFilterOptions = [
 const studentTypeFilterSelection = ref([]);
 
 function filterUsers() {
+  filteredUsers.value = users.value;
   // Filter by status
   if (statusFilterSelection.value) {
     filteredUsers.value = users.value.filter(
@@ -205,7 +214,7 @@ onMounted(async () => {
         size="small"
         color="blue"
         class="font-weight-bold mt-3 ml-6 mainCardBorder"
-        @click="clearFilters"
+        @click="addUserDialog = true"
       >
         Add new user
       </v-btn>
@@ -223,7 +232,7 @@ onMounted(async () => {
               <MaintainUserCard
                 :user-data="omit('userRoles', user)"
                 :user-roles="user.userRoles"
-                @refreshUsersEvent="getUsers()"
+                @refreshUsersEvent="refreshUsers()"
               ></MaintainUserCard>
             </v-col>
           </v-row>
@@ -244,6 +253,29 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-container>
+  <v-dialog v-model="addUserDialog" persistent max-width="600px">
+    <UserDialogBody
+      :is-edit="false"
+      :user-data="{
+        id: null,
+        firstName: null,
+        lastName: null,
+        honorific: null,
+        email: null,
+        phoneNumber: null,
+        authenticationType: 'OC',
+        password: null,
+        picture: null,
+        emailStatus: true,
+        textStatus: true,
+        googleToken: null,
+        status: 'Active',
+      }"
+      :user-roles="null"
+      @closeAddUserDialogEvent="addUserDialog = false"
+      @addUserSuccessEvent="closeAddUserDialog(), refreshUsers()"
+    ></UserDialogBody>
+  </v-dialog>
 </template>
 
 <style scoped>

@@ -69,14 +69,6 @@ async function getAllAccompanists() {
 }
 
 async function addInstrument() {
-  console.log({
-    status: props.studentInstrumentData.status,
-    studentRoleId: props.studentInstrumentData.studentRoleId,
-    instrumentId: selectedInstrument.value.id,
-    instructorRoleId: selectedInstructor.value.id,
-    accompanistRoleId: selectedAccompanist.value.id,
-    levelId: editedLevel.value.id,
-  });
   await StudentInstrumentDataService.create({
     status: props.studentInstrumentData.status,
     studentRoleId: props.studentInstrumentData.studentRoleId,
@@ -146,10 +138,8 @@ async function updateLevel() {
 
 onMounted(async () => {
   await getLevels();
-  console.log(props.studentInstrumentData);
   await getInstruments();
   await getAllInstructors();
-  console.log(instructors.value[81]);
   await getAllAccompanists();
 });
 </script>

@@ -9,10 +9,9 @@ import UserRoleDataService from "./../../services/UserRoleDataService";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
 
 const emits = defineEmits([
-  "updateUserSuccessEvent",
+  "addUserSuccessEvent",
+  "closeAddUserDialogEvent",
   "closeUserDialogEvent",
-  "disableUserEvent",
-  "enableUserEvent",
 ]);
 
 const props = defineProps({
@@ -32,7 +31,9 @@ function closeAddInstrumentDialog() {
 }
 
 const isStudent = ref(
-  props.userRoles.some((ur) => ur.roleId === 1 && ur.status === "Active")
+  props.isEdit
+    ? props.userRoles.some((ur) => ur.roleId === 1 && ur.status === "Active")
+    : false
 );
 
 const studentRole = isStudent.value
@@ -40,7 +41,9 @@ const studentRole = isStudent.value
   : null;
 
 const isFaculty = ref(
-  props.userRoles.some((ur) => ur.roleId === 2 && ur.status === "Active")
+  props.isEdit
+    ? props.userRoles.some((ur) => ur.roleId === 2 && ur.status === "Active")
+    : false
 );
 
 const facultyRole = isFaculty.value
@@ -51,12 +54,14 @@ const editedUserData = ref(props.userData);
 // const editedUserRoles = ref(props.userRoles);
 
 const editedUserRoles = ref(
-  props.userRoles
-    .filter((ur) => ur.status === "Active")
-    .map((ur) => {
-      ur = ur.role;
-      return ur;
-    })
+  props.isEdit
+    ? props.userRoles
+        .filter((ur) => ur.status === "Active")
+        .map((ur) => {
+          ur = ur.role;
+          return ur;
+        })
+    : []
 );
 
 const roleOptions = ref([]);
@@ -105,6 +110,26 @@ const editedStudentHours = ref(
 );
 
 const editedFacultyTitle = ref(isFaculty.value ? facultyRole.title : null);
+
+async function addUser() {
+  await UserDataService.create(editedUserData.value)
+    .then(async (response) => {
+      for (let editedUserRole of editedUserRoles.value) {
+        await UserRoleDataService.create({
+          userId: response.data.id,
+          roleId: editedUserRole.id,
+          status: "Active",
+        }).catch((err) => {
+          console.log(err);
+        });
+      }
+
+      emits("addUserSuccessEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 
 // Update the user's roles, then
 // if isStudent, update the student's major, classification, semesters, and hours, then
@@ -294,7 +319,7 @@ onMounted(async () => {
           {{ props.isEdit ? "Edit" : "Add" }} User
         </v-col>
         <v-spacer></v-spacer>
-        <v-col cols="auto" class="pt-0 mt-0 pr-2">
+        <v-col v-if="props.isEdit" cols="auto" class="pt-0 mt-0 pr-2">
           <v-chip
             label
             flat
@@ -308,7 +333,7 @@ onMounted(async () => {
       </v-row>
     </v-card-title>
     <v-card-text class="pt-0">
-      <v-row class="pt-0 mt-0">
+      <v-row v-if="props.isEdit" class="pt-0 mt-0">
         <v-col cols="1">
           <v-avatar size="55" color="darkBlue">
             <v-img referrerpolicy="no-referrer" :src="userData.picture" />
@@ -326,8 +351,50 @@ onMounted(async () => {
           </v-card-subtitle>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row :class="props.isEdit ? '' : 'mt-2'">
         <v-col>
+          <v-card-subtitle
+            v-if="!props.isEdit"
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            First Name
+          </v-card-subtitle>
+          <v-text-field
+            v-if="!props.isEdit"
+            placeholder="John"
+            v-model="editedUserData.firstName"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          ></v-text-field>
+
+          <v-card-subtitle
+            v-if="!props.isEdit"
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Last Name
+          </v-card-subtitle>
+          <v-text-field
+            v-if="!props.isEdit"
+            placeholder="Doe"
+            v-model="editedUserData.lastName"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          ></v-text-field>
+
+          <v-card-subtitle
+            v-if="!props.isEdit"
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Email
+          </v-card-subtitle>
+          <v-text-field
+            v-if="!props.isEdit"
+            placeholder="john.doe@oc.edu"
+            v-model="editedUserData.email"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          ></v-text-field>
+
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
@@ -486,18 +553,24 @@ onMounted(async () => {
       <v-btn
         flat
         class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-        @click="updateUser"
+        @click="props.isEdit ? updateUser() : addUser()"
       >
-        Save
+        {{ props.isEdit ? "Save" : "Add" }}
       </v-btn>
       <v-btn
         flat
         class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-        @click="emits('closeUserDialogEvent')"
+        :class="props.isEdit ? '' : 'mr-auto'"
+        @click="
+          props.isEdit
+            ? emits('closeUserDialogEvent')
+            : emits('closeAddUserDialogEvent')
+        "
       >
         Cancel
       </v-btn>
       <v-btn
+        v-if="props.isEdit"
         flat
         class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
         :class="
