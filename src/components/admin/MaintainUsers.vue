@@ -119,11 +119,12 @@ onMounted(async () => {
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
       <h1 class="text-maroon font-weight">Users</h1>
+
       <v-menu v-model="filterMenuBool" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
           <v-btn
-            size="small"
-            class="font-weight-bold text-darkBlue mt-3 ml-6 mainCardBorder"
+            size="medium"
+            class="font-weight-semi-bold text-darkBlue ml-6 px-2 my-1 mainCardBorder text-none"
             v-bind="props"
           >
             <template v-slot:append>
@@ -131,7 +132,7 @@ onMounted(async () => {
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter and Sort
+            Filter users
           </v-btn>
         </template>
 
@@ -207,17 +208,17 @@ onMounted(async () => {
           roleFilterSelection != 0 ||
           studentTypeFilterSelection != 0
         "
-        size="small"
+        size="medium"
         color="maroon"
-        class="font-weight-bold mt-3 ml-6 mainCardBorder"
+        class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="clearFilters"
       >
         Clear filters
       </v-btn>
       <v-btn
-        size="small"
+        size="medium"
         color="blue"
-        class="font-weight-bold mt-3 ml-6 mainCardBorder"
+        class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="addUserDialog = true"
       >
         Add new user
