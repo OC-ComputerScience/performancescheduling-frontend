@@ -1,3 +1,61 @@
+<script setup>
+import AuthServices from "../services/authServices.js";
+import { useLoginStore } from "../stores/LoginStore.js";
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const loginStore = useLoginStore();
+
+onMounted(() => {
+  loginWithGoogle();
+});
+
+async function loginWithGoogle() {
+  window.handleCredentialResponse = handleCredentialResponse;
+  const client = import.meta.env.VITE_APP_CLIENT_ID;
+  console.log(client);
+  window.google.accounts.id.initialize({
+    client_id: client,
+    cancel_on_tap_outside: false,
+    auto_select: true,
+    callback: window.handleCredentialResponse,
+  });
+  window.google.accounts.id.renderButton(document.getElementById("parent_id"), {
+    type: "standard",
+    theme: "outline",
+    size: "large",
+    text: "signup_with",
+    width: 250,
+  });
+}
+
+async function handleCredentialResponse(response) {
+  let token = {
+    credential: response.credential,
+  };
+  await AuthServices.loginUser(token)
+    .then((response) => {
+      loginStore.setUser(response.data);
+
+      if (loginStore.currentRole.roleId == 1) {
+        router.push({ path: "studentHome" });
+      } else if (loginStore.currentRole.roleId == 2) {
+        router.push({ path: "facultyHome" });
+      } else if (loginStore.currentRole.roleId == 3) {
+        router.push({ path: "adminHome" });
+      } else if (loginStore.currentRole.roleId == 4) {
+        router.push({ path: "accompanistHome" });
+      } else {
+        router.push({ path: "base" });
+      }
+    })
+    .catch((error) => {
+      console.log("error", error);
+    });
+}
+</script>
+
 <template>
   <div class="signup-buttons">
     <v-row justify="center">
@@ -5,76 +63,3 @@
     </v-row>
   </div>
 </template>
-
-<script>
-import AuthServices from "../services/authServices.js";
-import { mapStores } from "pinia";
-import { useLoginStore } from "../stores/LoginStore.js";
-
-export default {
-  name: "login_signup_social",
-  data() {
-    return {
-      roleCounter: 0,
-      user: {},
-    };
-  },
-  async created() {},
-  mounted() {
-    this.loginWithGoogle();
-  },
-  computed: {
-    ...mapStores(useLoginStore),
-  },
-  methods: {
-    async loginWithGoogle() {
-      window.handleCredentialResponse = this.handleCredentialResponse;
-      const client = import.meta.env.VITE_APP_CLIENT_ID;
-      console.log(client);
-      window.google.accounts.id.initialize({
-        client_id: client,
-        cancel_on_tap_outside: false,
-        auto_select: true,
-        callback: window.handleCredentialResponse,
-      });
-      window.google.accounts.id.renderButton(
-        document.getElementById("parent_id"),
-        {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          text: "signup_with",
-          width: 250,
-        }
-      );
-    },
-    async handleCredentialResponse(response) {
-      let token = {
-        credential: response.credential,
-      };
-      console.log(token);
-      await AuthServices.loginUser(token)
-        .then((response) => {
-          this.user = response.data;
-          console.log(this.user);
-          this.loginStore.setUser(this.user);
-
-          if (this.loginStore.currentRole.role === "Faculty") {
-            this.$router.push({ path: "facultyHome" });
-          } else if (this.loginStore.currentRole.role === "Student") {
-            this.$router.push({ path: "studentHome" });
-          } else if (this.loginStore.currentRole.role === "Admin") {
-            this.$router.push({ path: "adminHome" });
-          } else if (this.loginStore.currentRole.role === "Accompanist") {
-            this.$router.push({ path: "accompanistHome" });
-          } else {
-            this.$router.push({ path: "base" });
-          }
-        })
-        .catch((error) => {
-          console.log("error", error);
-        });
-    },
-  },
-};
-</script>
