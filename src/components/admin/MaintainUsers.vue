@@ -227,6 +227,7 @@ onMounted(async () => {
               v-for="user in currentPageData"
               :key="user.id"
               cols="12"
+              md="6"
               lg="4"
             >
               <MaintainUserCard
