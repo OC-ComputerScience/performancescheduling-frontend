@@ -279,7 +279,7 @@ onMounted(async () => {
       }"
       :user-roles="null"
       @closeAddUserDialogEvent="addUserDialog = false"
-      @addUserSuccessEvent="closeAddUserDialog(), refreshUsers()"
+      @addUserSuccessEvent="(addUserDialog = false), refreshUsers()"
     ></UserDialogBody>
   </v-dialog>
 </template>
