@@ -29,6 +29,19 @@ async function refreshUsers() {
 const filterMenuBool = ref(false);
 const filteredUsers = ref([]);
 
+const searchInput = ref("");
+
+// Search filter
+// Filters the list of users by first and last name, based on searchInput
+function searchFilteredList() {
+  filteredUsers.value = users.value;
+  filteredUsers.value = filteredUsers.value.filter((user) =>
+    (user.firstName.toLowerCase() + " " + user.lastName.toLowerCase()).includes(
+      searchInput.value.toLowerCase()
+    )
+  );
+}
+
 const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
 
@@ -47,7 +60,8 @@ const studentTypeFilterOptions = [
 const studentTypeFilterSelection = ref([]);
 
 function filterUsers() {
-  filteredUsers.value = users.value;
+  // Never clear the serach filter, so filter by that first, then the actual filters
+  searchFilteredList();
   // Filter by status
   if (statusFilterSelection.value) {
     filteredUsers.value = users.value.filter(
@@ -86,6 +100,7 @@ function clearFilters() {
   statusFilterSelection.value = null;
   roleFilterSelection.value = [];
   studentTypeFilterSelection.value = [];
+  searchInput.value = "";
 }
 
 // Omits a specific key from an object
@@ -119,6 +134,18 @@ onMounted(async () => {
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
       <h1 class="text-maroon font-weight">Users</h1>
+
+      <input
+        type="text"
+        v-model="searchInput"
+        @input="searchFilteredList"
+        class="ml-6 px-4 my-1 mainCardBorder text-blue bg-white font-weight-semi-bold"
+        style="outline: none"
+        append-icon="mdi-magnify"
+        placeholder="Search"
+        single-line
+        hide-details
+      />
 
       <v-menu v-model="filterMenuBool" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
