@@ -26,6 +26,7 @@ async function refreshUsers() {
 }
 
 // Filtering
+
 const filterMenuBool = ref(false);
 const filteredUsers = ref([]);
 
@@ -35,6 +36,10 @@ const searchInput = ref("");
 // Filters the list of users by first and last name, based on searchInput
 function searchFilteredList() {
   filteredUsers.value = users.value;
+
+  // If the search input is empty, return the full list, otherwise filter
+  if (searchInput.value === "") return;
+
   filteredUsers.value = filteredUsers.value.filter((user) =>
     (user.firstName.toLowerCase() + " " + user.lastName.toLowerCase()).includes(
       searchInput.value.toLowerCase()
@@ -64,7 +69,7 @@ function filterUsers() {
   searchFilteredList();
   // Filter by status
   if (statusFilterSelection.value) {
-    filteredUsers.value = users.value.filter(
+    filteredUsers.value = filteredUsers.value.filter(
       (u) => u.status === statusFilterSelection.value
     );
   }
@@ -115,6 +120,7 @@ function omit(key, obj) {
 }
 
 // Pagination
+
 const currentPage = ref(1);
 const perPage = 15;
 
