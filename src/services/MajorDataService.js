@@ -17,5 +17,9 @@ class MajorDataService {
   update(data) {
     return http.put(this.baseUrl + data.id, data);
   }
+
+  getAllByStatus(status) {
+    return http.get(this.baseUrl + "status/" + status);
+  }
 }
 export default new MajorDataService();
