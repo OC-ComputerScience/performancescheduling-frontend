@@ -12,7 +12,6 @@ const props = defineProps({
 
 function handleClick() {
   if (props.roleId == 3) {
-    console.log(props.eventData);
     router.push({ path: "adminEvents" });
   }
 }
@@ -29,6 +28,13 @@ function handleClick() {
               <v-card-title class="font-weight-bold text-orange text-h4">
                 {{ eventData.name }}
               </v-card-title>
+              <v-card-subtitle
+                v-if="roleId == 3"
+                class="mb-0 pb-0 font-weight-semi-bold"
+                :class="eventData.isReady ? 'text-green' : 'text-red'"
+              >
+                {{ eventData.isReady ? "Ready" : "Not Ready" }}
+              </v-card-subtitle>
               <!-- Event Instrument Type -->
               <!-- TODO(@ethanimooney): Make this actually work -->
               <v-card-subtitle
@@ -53,7 +59,7 @@ function handleClick() {
                 class="bg-darkBlue py-2 px-0 text-white mt-0"
               >
                 <v-card-subtitle
-                  v-if="roleId == 1"
+                  v-if="eventData.isReady"
                   class="font-weight-semi-bold"
                 >
                   {{
