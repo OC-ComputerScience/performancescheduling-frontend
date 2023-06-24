@@ -2,8 +2,15 @@ import http from "./services.js";
 class StudentInstrumentEvaluationDataService {
   baseUrl = "/performanceapi/studentInstrumentEvaluation/";
 
-  getAll() {
-    return http.get(this.baseUrl);
+  getAll(sortVar = null, order = null) {
+    var url = this.baseUrl;
+    if (sortVar != null) {
+      url += "?sortVar=" + sortVar;
+      if (order != null) {
+        url += "&order=" + order;
+      }
+    }
+    return http.get(url);
   }
 
   create(data) {
