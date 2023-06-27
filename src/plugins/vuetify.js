@@ -4,9 +4,6 @@ import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import { VDataTable } from "vuetify/labs/VDataTable";
 
-import "@fortawesome/fontawesome-free/css/all.css";
-import { aliases, fa } from "vuetify/iconsets/fa";
-
 export default createVuetify({
   components: {
     VDataTable,
