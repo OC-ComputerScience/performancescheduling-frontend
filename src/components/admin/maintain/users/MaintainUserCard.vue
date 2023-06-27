@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import UserDialogBody from "./UserDialogBody.vue";
-import UserDataService from "../../services/UserDataService.js";
+import UserDataService from "../../../../services/UserDataService.js";
 
 const emits = defineEmits(["closeUserDialog", "refreshUsersEvent"]);
 

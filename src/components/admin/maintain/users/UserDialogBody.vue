@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import RoleDataService from "./../../services/RoleDataService";
-import MajorDataService from "./../../services/MajorDataService";
+import RoleDataService from "../../../../services/RoleDataService";
+import MajorDataService from "../../../../services/MajorDataService";
 import UserInstrumentCard from "./UserInstrumentCard.vue";
 import UserInstrumentDialogBody from "./UserInstrumentDialogBody.vue";
-import UserDataService from "./../../services/UserDataService";
-import UserRoleDataService from "./../../services/UserRoleDataService";
-import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
+import UserDataService from "../../../../services/UserDataService";
+import UserRoleDataService from "../../../../services/UserRoleDataService";
+import StudentInstrumentDataService from "../../../../services/StudentInstrumentDataService";
 
 const emits = defineEmits([
   "addUserSuccessEvent",

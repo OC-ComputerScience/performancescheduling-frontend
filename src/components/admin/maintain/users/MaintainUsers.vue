@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import UserDataService from "./../../services/UserDataService";
+import UserDataService from "./../../../../services/UserDataService";
 import MaintainUserCard from "./MaintainUserCard.vue";
 import UserDialogBody from "./UserDialogBody.vue";
 
@@ -10,7 +10,7 @@ const addUserDialog = ref(false);
 const users = ref([]);
 
 async function getUsers() {
-  await UserDataService.getAllWithRolesAndStudentInstruments()
+  await UserDataService.getAllWithRolesAndStudentInstruments("lastName")
     .then((response) => {
       users.value = response.data;
       filteredUsers.value = users.value;

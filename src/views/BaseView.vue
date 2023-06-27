@@ -8,7 +8,7 @@ import StudentSettings from "../components/student/StudentSettings.vue";
 import FacultyHome from "../components/faculty/FacultyHome.vue";
 
 import AdminHome from "../components/admin/AdminHome.vue";
-import MaintainUsers from "../components/admin/MaintainUsers.vue";
+import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue";
 </script>
 
 <template>

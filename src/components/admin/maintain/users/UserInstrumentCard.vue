@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import UserInstrumentDialogBody from "./UserInstrumentDialogBody.vue";
-import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
+import StudentInstrumentDataService from "../../../../services/StudentInstrumentDataService.js";
 
 const emits = defineEmits(["refreshStudentInstrumentsEvent"]);
 

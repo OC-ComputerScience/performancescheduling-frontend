@@ -3,9 +3,9 @@ class UserDataService {
   baseUrl = "/performanceapi/user/";
 
   getAll(sortVar = null, ascending = true) {
-    var url = this.baseUrl;
+    let url = this.baseUrl;
     if (sortVar != null) {
-      url += "?sortVar=" + sortVar + "&order=" + ascending ? "ASC" : "DESC";
+      url += "?sortVar=" + sortVar + "&order=" + (ascending ? "ASC" : "DESC");
     }
     return http.get(url);
   }
@@ -18,8 +18,12 @@ class UserDataService {
     return http.get(this.baseUrl + "all/roles");
   }
 
-  getAllWithRolesAndStudentInstruments() {
-    return http.get(this.baseUrl + "all/roles/studentInstruments");
+  getAllWithRolesAndStudentInstruments(sortVar = null, ascending = true) {
+    let url = this.baseUrl + "all/roles/studentInstruments/";
+    if (sortVar != null) {
+      url += "?sortVar=" + sortVar + "&order=" + (ascending ? "ASC" : "DESC");
+    }
+    return http.get(url);
   }
 
   remove(id) {

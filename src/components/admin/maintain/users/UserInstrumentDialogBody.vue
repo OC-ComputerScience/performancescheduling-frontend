@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import UserRoleDataService from "../../services/UserRoleDataService";
-import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
-import LevelDataService from "../../services/LevelDataService";
-import InstrumentDataService from "../../services/InstrumentDataService";
+import UserRoleDataService from "../../../../services/UserRoleDataService";
+import StudentInstrumentDataService from "../../../../services/StudentInstrumentDataService";
+import LevelDataService from "../../../../services/LevelDataService";
+import InstrumentDataService from "../../../../services/InstrumentDataService";
 
 const emits = defineEmits([
   "closeAddInstrumentDialog",
