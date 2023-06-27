@@ -1,13 +1,5 @@
 @import "./base.css";
 
-* {
-  font-family: Poppins, sans-serif !important;
-}
-
-.text-h5 {
-  font-family: Poppins, sans-serif !important;
-}
-
 .v-card-subtitle {
   opacity: 100% !important;
 }

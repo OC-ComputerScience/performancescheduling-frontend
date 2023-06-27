@@ -24,9 +24,3 @@ const props = defineProps({
     </v-card-actions>
   </v-card>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

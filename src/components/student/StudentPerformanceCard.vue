@@ -2,7 +2,7 @@
 import { onMounted } from "vue";
 import { useDisplay } from "vuetify";
 
-const { lg, smAndUp, mdAndUp } = useDisplay();
+const { smAndUp, mdAndUp } = useDisplay();
 
 const props = defineProps(["performance"]);
 
@@ -230,8 +230,5 @@ onMounted(() => {
 <style>
 .with-outline {
   border: 2px solid white;
-}
-* {
-  font-family: Poppins, sans-serif !important;
 }
 </style>

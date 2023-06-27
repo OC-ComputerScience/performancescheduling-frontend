@@ -23,7 +23,6 @@ async function loginWithGoogle() {
   });
   window.google.accounts.id.renderButton(document.getElementById("parent_id"), {
     type: "standard",
-    theme: "outline",
     size: "large",
     text: "signup_with",
     width: 250,
@@ -57,9 +56,12 @@ async function handleCredentialResponse(response) {
 </script>
 
 <template>
-  <div class="signup-buttons">
-    <v-row justify="center">
-      <div display="flex" id="parent_id"></div>
-    </v-row>
-  </div>
+  <v-row align="center" justify="center">
+    <v-col>
+      <v-container
+        id="parent_id"
+        class="text-blue font-weight-bold ml-4"
+      ></v-container>
+    </v-col>
+  </v-row>
 </template>

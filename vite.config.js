@@ -1,22 +1,19 @@
-import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vuetify from "vite-plugin-vuetify";
 
-// https://vitejs.dev/config/
-//   resolve: {
-//     alias: {
-//       "@": fileURLToPath(new URL("./src", import.meta.url)),
-//     },
-//   },
-// });
-
 export default () => {
-  const baseURL = process.env.APP_ENV === "development" ? "/" : "/";
+  const baseURL = import.meta.env === "development" ? "/" : "/";
 
   return defineConfig({
     transpileDependencies: ["vuetify"],
-    plugins: [vue(), vuetify({ autoImport: true })],
+    plugins: [
+      vue(),
+      vuetify({
+        autoImport: true,
+        styles: { configFile: "src/settings.scss" },
+      }),
+    ],
 
     server: {
       host: "localhost",
