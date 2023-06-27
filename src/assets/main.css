@@ -47,8 +47,26 @@ a,
   border-radius: 9px !important;
 }
 
+.insideCardBorder {
+  border-radius: 7px !important;
+}
+
 .flatCardBorder {
   border-radius: 9px !important;
+  box-shadow: none !important;
+}
+
+.innerFlatCardBorder {
+  border-radius: 7px !important;
+  box-shadow: none !important;
+}
+
+.flatChipBorder {
+  border-radius: 5px !important;
+}
+
+.mainDropShadow {
+  box-shadow: 8px 10px 35px 2px rgba(0, 0, 0, 0.11) !important;
 }
 
 .text-h7 {

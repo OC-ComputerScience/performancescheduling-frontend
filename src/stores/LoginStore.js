@@ -12,7 +12,6 @@ export const useLoginStore = defineStore(
       if (user.value.roles.length > 0) {
         currentRole.value = user.value.roles[0];
       }
-      console.log(newUser);
     }
 
     return { user, currentRole, setUser };

@@ -2,9 +2,10 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vuetify from "vite-plugin-vuetify";
 
-export default () => {
-  const baseURL = import.meta.env === "development" ? "/" : "/";
+import dns from "dns";
+dns.setDefaultResultOrder("verbatim");
 
+export default () => {
   return defineConfig({
     transpileDependencies: ["vuetify"],
     plugins: [
@@ -19,6 +20,6 @@ export default () => {
       host: "localhost",
       port: 8081,
     },
-    base: baseURL,
+    base: "/",
   });
 };

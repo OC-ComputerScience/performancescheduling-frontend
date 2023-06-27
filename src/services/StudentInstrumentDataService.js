@@ -5,7 +5,7 @@ class StudentInstrumentDataService {
   getAll(sortVar = null, ascending = true) {
     var url = this.baseUrl;
     if (sortVar != null) {
-      url += "?sortVar=" + sortVar + "&order=" + ascending ? "ASC" : "DESC";
+      url += "?sortVar=" + sortVar + "&order=" + (ascending ? "ASC" : "DESC");
     }
     return http.get(url);
   }
@@ -24,6 +24,10 @@ class StudentInstrumentDataService {
     return http.get(this.baseUrl + "instructorId/" + instructorId);
   }
 
+  getStudentInstrumentsForStudentId(studentId) {
+    return http.get(this.baseUrl + "studentId/" + studentId);
+  }
+
   create(data) {
     return http.post(this.baseUrl, data);
   }
@@ -34,6 +38,14 @@ class StudentInstrumentDataService {
 
   update(data) {
     return http.put(this.baseUrl + data.id, data);
+  }
+
+  disable(id) {
+    return http.put(this.baseUrl + "disable/" + id);
+  }
+
+  enable(id) {
+    return http.put(this.baseUrl + "enable/" + id);
   }
 }
 export default new StudentInstrumentDataService();
