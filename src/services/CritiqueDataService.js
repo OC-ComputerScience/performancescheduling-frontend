@@ -2,8 +2,12 @@ import http from "./services.js";
 class CritiqueDataService {
   baseUrl = "/performanceapi/critique/";
 
-  getAll() {
-    return http.get(this.baseUrl);
+  getAll(sortVar = null, ascending = true) {
+    var url = this.baseUrl;
+    if (sortVar != null) {
+      url += "?sortVar=" + sortVar + "&order=" + ascending ? "ASC" : "DESC";
+    }
+    return http.get(url);
   }
 
   getCritiquesByTimeslotAndFaculty(timeslotId, facultyId) {
