@@ -184,8 +184,3 @@ onMounted(async () => {
     </v-row>
   </v-container>
 </template>
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

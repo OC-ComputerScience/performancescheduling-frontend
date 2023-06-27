@@ -1,11 +1,8 @@
 import "@mdi/font/css/materialdesignicons.css";
+import "../settings.scss";
 import "vuetify/styles";
-
 import { createVuetify } from "vuetify";
 import { VDataTable } from "vuetify/labs/VDataTable";
-
-import "@fortawesome/fontawesome-free/css/all.css";
-import { aliases, fa } from "vuetify/iconsets/fa";
 
 export default createVuetify({
   components: {
@@ -33,13 +30,6 @@ export default createVuetify({
           lightGray: "#F4F4F4",
           white: "#FFFFFF",
         },
-      },
-    },
-    icons: {
-      defaultSet: "fa",
-      aliases,
-      sets: {
-        fa,
       },
     },
   },
