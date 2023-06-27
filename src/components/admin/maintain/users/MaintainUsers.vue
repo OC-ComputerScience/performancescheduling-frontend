@@ -8,6 +8,7 @@ const addUserDialog = ref(false);
 
 // User Data
 const users = ref([]);
+const filteredUsers = ref([]);
 
 async function getUsers() {
   await UserDataService.getAllWithRolesAndStudentInstruments("lastName")
@@ -28,7 +29,6 @@ async function refreshUsers() {
 // Filtering
 
 const filterMenuBool = ref(false);
-const filteredUsers = ref([]);
 
 const searchInput = ref("");
 
@@ -284,7 +284,7 @@ onMounted(async () => {
           <v-pagination
             color="blue"
             class="font-weight-bold"
-            :length="filteredUsers.length / perPage + 1"
+            :length="Math.round(filteredUsers.length / perPage + 1)"
             :total-visible="7"
             v-model="currentPage"
           ></v-pagination>
@@ -310,7 +310,7 @@ onMounted(async () => {
         googleToken: null,
         status: 'Active',
       }"
-      :user-roles="null"
+      :user-roles="[]"
       @closeAddUserDialogEvent="addUserDialog = false"
       @addUserSuccessEvent="(addUserDialog = false), refreshUsers()"
     ></UserDialogBody>

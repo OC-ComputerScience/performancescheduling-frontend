@@ -12,6 +12,9 @@ const emits = defineEmits([
   "addUserSuccessEvent",
   "closeAddUserDialogEvent",
   "closeUserDialogEvent",
+  "updateUserSuccessEvent",
+  "disableUserEvent",
+  "enableUserEvent",
 ]);
 
 const props = defineProps({
