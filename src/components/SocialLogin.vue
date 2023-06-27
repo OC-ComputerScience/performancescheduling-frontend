@@ -56,5 +56,12 @@ async function handleCredentialResponse(response) {
 </script>
 
 <template>
-  <v-container id="parent_id" class="text-blue font-weight-bold"></v-container>
+  <v-row align="center" justify="center">
+    <v-col>
+      <v-container
+        id="parent_id"
+        class="text-blue font-weight-bold ml-4"
+      ></v-container>
+    </v-col>
+  </v-row>
 </template>

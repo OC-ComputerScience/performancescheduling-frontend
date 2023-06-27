@@ -23,9 +23,11 @@ const logoURL = ref(OClogo);
               >
             </v-col>
           </v-row>
-          <v-card-actions class="mt-2 mb-0 pb-0">
-            <SocialLogin class="mx-auto mb-0 pb-0" />
-          </v-card-actions>
+          <v-row align="center" justify="center">
+            <v-col align-self="center">
+              <SocialLogin class="mb-0 pb-0" />
+            </v-col>
+          </v-row>
         </v-card>
       </v-col>
     </v-row>
