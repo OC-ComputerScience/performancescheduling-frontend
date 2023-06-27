@@ -31,12 +31,5 @@ export default createVuetify({
         },
       },
     },
-    icons: {
-      defaultSet: "fa",
-      aliases,
-      sets: {
-        fa,
-      },
-    },
   },
 });
