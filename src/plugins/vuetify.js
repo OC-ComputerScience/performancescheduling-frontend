@@ -1,6 +1,6 @@
 import "@mdi/font/css/materialdesignicons.css";
+import "../settings.scss";
 import "vuetify/styles";
-
 import { createVuetify } from "vuetify";
 import { VDataTable } from "vuetify/labs/VDataTable";
 

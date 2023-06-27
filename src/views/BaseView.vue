@@ -36,7 +36,7 @@ import StudentSettings from "../components/student/StudentSettings.vue";
 import FacultyHome from "../components/faculty/FacultyHome.vue";
 import AdminHome from "../components/admin/AdminHome.vue";
 export default {
-  name: "Base",
+  name: "BaseView",
   components: {
     MainNav,
     //Student Component

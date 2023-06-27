@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Base from "../views/Base.vue";
-import LoginPage from "../views/Login.vue";
+import Base from "../views/BaseView.vue";
+import LoginPage from "../views/LoginView.vue";
 import { useLoginStore } from "../stores/LoginStore.js";
 
 const router = createRouter({
