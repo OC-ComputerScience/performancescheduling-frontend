@@ -2,8 +2,12 @@ import http from "./services.js";
 class EventDataService {
   baseUrl = "/performanceapi/event/";
 
-  getAll() {
-    return http.get(this.baseUrl);
+  getAll(sortVar = null, ascending = true) {
+    var url = this.baseUrl;
+    if (sortVar != null) {
+      url += "?sortVar=" + sortVar + "&order=" + ascending ? "ASC" : "DESC";
+    }
+    return http.get(url);
   }
 
   getById(eventId) {
@@ -14,8 +18,12 @@ class EventDataService {
     return http.put(this.baseUrl + `${data.id}`, data);
   }
 
-  getGTEDate(date) {
-    return http.get(this.baseUrl + `date/${date}`);
+  getGTEDateForStudents(date) {
+    return http.get(this.baseUrl + `date/${date}?role=Student`);
+  }
+
+  getGTEDateForAdmins(date) {
+    return http.get(this.baseUrl + `date/${date}?role=Admin`);
   }
 
   create(data) {

@@ -2,12 +2,16 @@ import http from "./services.js";
 class UserDataService {
   baseUrl = "/performanceapi/user/";
 
-  create(data) {
-    return http.post(this.baseUrl, data);
+  getAll(sortVar = null, ascending = true) {
+    var url = this.baseUrl;
+    if (sortVar != null) {
+      url += "?sortVar=" + sortVar + "&order=" + ascending ? "ASC" : "DESC";
+    }
+    return http.get(url);
   }
 
-  getAll() {
-    return http.get(this.baseUrl);
+  create(data) {
+    return http.post(this.baseUrl, data);
   }
 
   getAllWithRoles() {

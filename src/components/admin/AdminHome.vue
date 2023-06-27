@@ -1,132 +1,145 @@
-<template>
-  <v-card>
-    <v-card-title>
-      {{ "Welcome Admin " + user.fName + " " + user.lName + "!" }}
-    </v-card-title>
-  </v-card>
-  <v-container>
-    <v-row>
-      <v-col>
-        <v-card>
-          <v-card-title> Event Tasks: </v-card-title>
-          <v-divider></v-divider>
+<script setup>
+import AdminPendingItemCard from "./AdminPendingItemCard.vue";
+import { useLoginStore } from "../../stores/LoginStore.js";
+import { ref, onMounted } from "vue";
 
-          <div v-for="(event, index) in events" :key="index">
-            <v-card-title>
-              <div class="d-flex justify-space-between">
-                {{ this.formatDate(event.date) }} | {{ event.type }}
-                <v-banner-text
-                  color="darkB"
-                  v-if="this.compareDates(event.date) == 0"
-                >
-                  TODAY!
-                </v-banner-text>
-                <v-btn color="primary" @click="editEvent()"> Edit Event </v-btn>
-              </div>
-            </v-card-title>
-            <v-divider inset></v-divider>
-          </div>
+import EventDataService from "../../services/EventDataService.js";
+import ComposerDataService from "../../services/ComposerDataService";
+import InstrumentDataService from "../../services/InstrumentDataService";
+import MajorDataService from "../../services/MajorDataService";
+import PieceDataService from "../../services/PieceDataService";
+import UpcomingEventItem from "../UpcomingEventItem.vue";
+
+const loginStore = useLoginStore();
+const pendingItemCount = ref(0);
+const pendingItems = ref([]);
+const upcomingEvents = ref([]);
+
+async function retrieveData() {
+  await EventDataService.getGTEDateForAdmins(new Date())
+    .then((response) => {
+      upcomingEvents.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await ComposerDataService.getAllByStatus("Pending")
+    .then((response) => {
+      if (response.data.length > 0) {
+        pendingItems.value.push({
+          count: response.data.length,
+          text: "Pending Composers",
+          link: "adminComposers",
+        });
+        pendingItemCount.value += response.data.length;
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await InstrumentDataService.getAllByStatus("Pending")
+    .then((response) => {
+      if (response.data.length > 0) {
+        pendingItems.value.push({
+          count: response.data.length,
+          text: "Pending Instruments",
+          link: "adminInstruments",
+        });
+        pendingItemCount.value += response.data.length;
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await MajorDataService.getAllByStatus("Pending")
+    .then((response) => {
+      if (response.data.length > 0) {
+        pendingItems.value.push({
+          count: response.data.length,
+          text: "Pending Majors",
+          link: "adminMajors",
+        });
+        pendingItemCount.value += response.data.length;
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await PieceDataService.getAllByStatus("Pending")
+    .then((response) => {
+      if (response.data.length > 0) {
+        pendingItems.value.push({
+          count: response.data.length,
+          text: "Pending Pieces",
+          link: "adminPieces",
+        });
+        pendingItemCount.value += response.data.length;
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
+onMounted(async () => {
+  await retrieveData();
+});
+</script>
+
+<template>
+  <v-container fluid class="fill-height bg-lightGray pa-4">
+    <v-row class="fill-height pa-0 ma-0">
+      <v-col cols="12" lg="1" class="ma-0 pa-4">
+        <h1 class="text-maroon">Home</h1>
+      </v-col>
+      <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
+        <v-card class="fill-height mainCardBorder pa-2">
+          <v-card-title>
+            <v-row class="pa-2">
+              <p class="font-weight-semi-bold text-darkBlue text-h5">
+                Pending Items
+              </p>
+              <v-spacer> </v-spacer>
+              <v-sheet class="bg-lightDarkBlue px-2" rounded>
+                <span class="text-darkBlue">{{ pendingItemCount }}</span>
+              </v-sheet>
+            </v-row>
+          </v-card-title>
+          <v-card-text>
+            <AdminPendingItemCard
+              v-for="pendingItem in pendingItems"
+              :item-count="pendingItem.count"
+              :text="pendingItem.text"
+              :link="pendingItem.link"
+            ></AdminPendingItemCard>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12" lg="6" class="pa-0 ma-0 pa-4">
+        <v-card class="fill-height mainCardBorder pa-2">
+          <v-card-title class="font-weight-semi-bold text-orange text-h5">
+            Upcoming Events
+          </v-card-title>
+          <v-card-text>
+            <UpcomingEventItem
+              v-for="event of upcomingEvents"
+              :key="event.id"
+              :event-data="event"
+              :role-id="loginStore.currentRole.roleId"
+            ></UpcomingEventItem>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
-<script>
-import EventDataService from "../../services/EventDataService";
-import SemesterDataService from "../../services/SemesterDataService";
-import UserRoleDataService from "../../services/UserRoleDataService";
-import { mapStores } from "pinia";
-import { useLoginStore } from "../../stores/LoginStore.js";
-export default {
-  name: "AdminHome",
-  components: {},
-  data: () => ({
-    events: [],
-    eventId: null,
-    id: {},
-    semester: {},
-    user: {},
-    userRole: {},
-  }),
-  async created() {},
-  computed: {
-    ...mapStores(useLoginStore),
-  },
-  methods: {
-    editEvent() {
-      this.$router.push({ path: "adminViewEvents" });
-    },
-    async getEvents() {
-      await EventDataService.getBySemester(this.semester.id)
-        .then((response) => {
-          this.events = response.data;
-          this.events.sort(function (a, b) {
-            if (a.date > b.date) {
-              return -1;
-            } else {
-              return 1;
-            }
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    async retrieveAllEvents() {
-      await EventDataService.getAll()
-        .then((response) => {
-          this.events = response.data;
-          this.events.forEach((obj) => (obj.title = obj.date));
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    compareDates(input) {
-      const today = new Date();
-      const todayString = `${today.getFullYear()}-${(today.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}`;
-
-      if (input > todayString) {
-        return 1;
-      } else if (input == todayString) {
-        return 0;
-      } else {
-        return -1;
-      }
-    },
-    async getCurrentSemester() {
-      this.currentDate = new Date();
-      let dateString = this.currentDate.toISOString().substring(0, 10);
-      await SemesterDataService.getCurrent(dateString)
-        .then((response) => {
-          this.semester = response.data[0];
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    formatDate(date) {
-      if (date === null || date === undefined) {
-        return date;
-      }
-      return new Date(date).toLocaleDateString("us-US", {
-        month: "long",
-        day: "numeric",
-        timeZone: "UTC",
-      });
-    },
-  },
-  async mounted() {
-    this.userRole = this.loginStore.currentRole;
-
-    await this.getCurrentSemester();
-    await this.getEvents();
-    await this.getCurrentSemester();
-  },
-};
-</script>
-
-<style scoped></style>
+<style scoped>
+* {
+  font-family: Poppins, sans-serif !important;
+}
+</style>

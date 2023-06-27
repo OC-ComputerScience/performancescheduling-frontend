@@ -2,8 +2,12 @@ import http from "./services.js";
 class EventSignupPieceDataService {
   baseUrl = "/performanceapi/eventSignupPiece/";
 
-  getAll() {
-    return http.get(this.baseUrl);
+  getAll(sortVar = null, ascending = true) {
+    var url = this.baseUrl;
+    if (sortVar != null) {
+      url += "?sortVar=" + sortVar + "&order=" + ascending ? "ASC" : "DESC";
+    }
+    return http.get(url);
   }
 
   getByEventSignupId(eventSignupId) {

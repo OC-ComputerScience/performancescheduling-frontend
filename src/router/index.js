@@ -123,6 +123,12 @@ const router = createRouter({
       name: "adminEvaluations",
       alias: "/adminEvaluations",
     },
+    {
+      path: "/base",
+      component: Base,
+      name: "adminMajors",
+      alias: "/adminMajors",
+    },
   ],
 });
 

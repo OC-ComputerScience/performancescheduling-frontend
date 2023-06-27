@@ -2,8 +2,12 @@ import http from "./services.js";
 class InstrumentDataService {
   baseUrl = "/performanceapi/instrument/";
 
-  getAll() {
-    return http.get(this.baseUrl);
+  getAll(sortVar = null, ascending = true) {
+    var url = this.baseUrl;
+    if (sortVar != null) {
+      url += "?sortVar=" + sortVar + "&order=" + ascending ? "ASC" : "DESC";
+    }
+    return http.get(url);
   }
 
   create(data) {
@@ -16,6 +20,10 @@ class InstrumentDataService {
 
   update(data) {
     return http.put(this.baseUrl + data.id, data);
+  }
+
+  getAllByStatus(status) {
+    return http.get(this.baseUrl + "status/" + status);
   }
 }
 export default new InstrumentDataService();
