@@ -2,13 +2,10 @@ import http from "./services.js";
 class LevelDataService {
   baseUrl = "/performanceapi/level/";
 
-  getAll(sortVar = null, order = null) {
+  getAll(sortVar = null, ascending = true) {
     var url = this.baseUrl;
     if (sortVar != null) {
-      url += "?sortVar=" + sortVar;
-      if (order != null) {
-        url += "&order=" + order;
-      }
+      url += "?sortVar=" + sortVar + "&order=" + ascending ? "ASC" : "DESC";
     }
     return http.get(url);
   }
