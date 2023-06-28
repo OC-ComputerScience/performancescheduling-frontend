@@ -6,11 +6,10 @@ import { formatDate } from "../../../../composables/dateFormatter";
 
 const emits = defineEmits(["closeSemesterDialog", "refreshSemestersEvent"]);
 
-const props = defineProps({
+defineProps({
   semesterData: { type: [Object], required: true },
 });
 
-console.log(props.semesterData);
 const createOrEditDialog = ref(false);
 
 function closeSemesterDialog() {
