@@ -129,6 +129,12 @@ const router = createRouter({
       name: "adminMajors",
       alias: "/adminMajors",
     },
+    {
+      path: "/base",
+      component: BaseView,
+      name: "adminLevels",
+      alias: "/adminLevels",
+    },
   ],
 });
 

@@ -39,6 +39,9 @@ import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue"
         <MaintainUsers
           v-if="this.$route.fullPath === '/adminUsers'"
         ></MaintainUsers>
+        <MaintainLevels
+          v-if="this.$route.fullPath === '/adminLevels'"
+        ></MaintainLevels>
       </v-col>
     </v-row>
   </v-container>
