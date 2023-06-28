@@ -78,7 +78,7 @@ async function enableSemester(semesterId) {
       </v-row>
     </v-card-title>
 
-    <v-dialog v-model="createOrEditDialog" persistent max-width="1200px">
+    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
       <SemesterDialogBody
         :is-edit="true"
         :semester-data="semesterData"
