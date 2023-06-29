@@ -75,6 +75,10 @@ const adminMenus = [
     text: "Events",
   },
   {
+    link: "adminEventTypes",
+    text: "Event Types",
+  },
+  {
     link: "adminInstruments",
     text: "Instruments",
   },
