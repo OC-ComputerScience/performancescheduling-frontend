@@ -117,15 +117,16 @@ function validateLevel() {
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Description
         </v-card-subtitle>
-        <v-text-field
+        <v-textarea
           placeholder="description of level"
+          autogrow
+          rows="3"
           v-model="editedLevelData.description"
-          variant="plain"
           class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
           :rules="[
             () => !!editedLevelData.description || 'This field is required',
           ]"
-        ></v-text-field>
+        ></v-textarea>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Hours
         </v-card-subtitle>
@@ -136,6 +137,7 @@ function validateLevel() {
           class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
           :rules="[
             () => !!editedLevelData.creditHours || 'This field is required',
+            () => /^\d+$/.test(v) || 'Must be a number',
           ]"
         ></v-text-field>
       </v-card-text>
