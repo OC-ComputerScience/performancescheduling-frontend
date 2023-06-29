@@ -153,7 +153,7 @@ function resetMenu() {
 }
 function logout() {
   AuthServices.logoutUser(loginStore.user)
-    .then((response) => {
+    .then(() => {
       loginStore.$patch({
         user: {},
         currentRole: {},
