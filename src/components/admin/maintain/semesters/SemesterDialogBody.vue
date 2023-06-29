@@ -17,7 +17,7 @@ const props = defineProps({
   semesterData: { type: [Object], required: true },
   isEdit: { type: [Boolean], required: true },
 });
-
+const form = ref(null);
 const editedSemesterData = ref(props.semesterData);
 
 // const editedSemesterRoles = ref(props.semesterRoles);
@@ -37,47 +37,40 @@ onMounted(() => {
 });
 
 async function addSemester() {
-  if (!validateSemester()) {
-    return;
-  }
-  await SemesterDataService.create(editedSemesterData.value)
-    .then(async () => {
-      emits("addSemesterSuccessEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  await form.value.validate().then(async (valid) => {
+    console.log(valid.valid);
+    if (valid.valid) {
+      console.log(valid);
+      await SemesterDataService.create(editedSemesterData.value)
+        .then(async () => {
+          emits("addSemesterSuccessEvent");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
 }
 
 async function updateSemester() {
-  if (!validateSemester()) {
-    return;
-  }
-  delete editedSemesterData.value["createdAt"];
-  delete editedSemesterData.value["updatedAt"];
+  await form.value.validate().then(async (valid) => {
+    if (valid.valid) {
+      delete editedSemesterData.value["createdAt"];
+      delete editedSemesterData.value["updatedAt"];
 
-  await SemesterDataService.update(editedSemesterData.value)
-    .then(() => {
-      emits("updateSemesterSuccessEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-
-function validateSemester() {
-  if (
-    semesterNameCheck() === "" &&
-    startDateCheck() === "" &&
-    endDateCheck() === ""
-  )
-    return true;
-  else return false;
+      await SemesterDataService.update(editedSemesterData.value)
+        .then(() => {
+          emits("updateSemesterSuccessEvent");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
 }
 
 function semesterNameCheck() {
   const pattern = /[0-9]{4}-[A-Z]{2}/;
-  console.log("test" + pattern.test(editedSemesterData.value.name));
   return pattern.test(editedSemesterData.value.name)
     ? ""
     : "Semester name must be in the format of YYYY-SS.";
@@ -129,49 +122,57 @@ function endDateCheck() {
       </v-row>
     </v-card-text>
     <v-card-actions :class="props.isEdit ? '' : 'mt-2'">
-      <v-card-text>
-        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-          Semester Name
-        </v-card-subtitle>
+      <v-form ref="form" validate-on="input" with="600px">
+        <v-card-text>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Semester Name
+          </v-card-subtitle>
 
-        <v-text-field
-          placeholder="2000-FA"
-          v-model="editedSemesterData.name"
-          variant="plain"
-          class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          :rules="[
-            () => !!editedSemesterData.name || 'This field is required',
-            semesterNameCheck,
-          ]"
-        ></v-text-field>
+          <v-text-field
+            placeholder="2000-FA"
+            v-model="editedSemesterData.name"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () => !!editedSemesterData.name || 'This field is required',
+              semesterNameCheck,
+            ]"
+          ></v-text-field>
 
-        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-          Start Date
-        </v-card-subtitle>
-        <v-text-field
-          placeholder="MM/DD/YYYY"
-          v-model="editedSemesterData.startDate"
-          variant="plain"
-          class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          :rules="[
-            () => !!editedSemesterData.startDate || 'This field is required',
-            startDateCheck,
-          ]"
-        ></v-text-field>
-        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-          End Date
-        </v-card-subtitle>
-        <v-text-field
-          placeholder="MM/DD/YYYY"
-          v-model="editedSemesterData.endDate"
-          variant="plain"
-          class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          :rules="[
-            () => !!editedSemesterData.endDate || 'This field is required',
-            endDateCheck,
-          ]"
-        ></v-text-field>
-      </v-card-text>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Start Date
+          </v-card-subtitle>
+          <v-text-field
+            placeholder="MM/DD/YYYY"
+            v-model="editedSemesterData.startDate"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () => !!editedSemesterData.startDate || 'This field is required',
+              startDateCheck,
+            ]"
+          ></v-text-field>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            End Date
+          </v-card-subtitle>
+          <v-text-field
+            placeholder="MM/DD/YYYY"
+            v-model="editedSemesterData.endDate"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () => !!editedSemesterData.endDate || 'This field is required',
+              endDateCheck,
+            ]"
+          ></v-text-field>
+        </v-card-text>
+      </v-form>
     </v-card-actions>
     <v-card-actions>
       <v-btn
