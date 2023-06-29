@@ -30,37 +30,32 @@ onMounted(() => {
 });
 
 async function addLevel() {
-  if (!validateLevel()) {
-    return;
-  }
-  console.log(editedLevelData.value);
-  await LevelDataService.create(editedLevelData.value)
-    .then(async () => {
-      emits("addLevelSuccessEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  await form.value.validate().then(async (valid) => {
+    if (valid.valid) {
+      await LevelDataService.create(editedLevelData.value)
+        .then(async () => {
+          emits("addLevelSuccessEvent");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
 }
-
 async function updateLevel() {
-  if (!validateLevel()) {
-    return;
-  }
-  delete editedLevelData.value["createdAt"];
-  delete editedLevelData.value["updatedAt"];
-
-  await LevelDataService.update(editedLevelData.value)
-    .then(() => {
-      emits("updateLevelSuccessEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-
-function validateLevel() {
-  return form.value.validate();
+  await form.value.validate().then(async (valid) => {
+    if (valid.valid) {
+      delete editedLevelData.value["createdAt"];
+      delete editedLevelData.value["updatedAt"];
+      await LevelDataService.update(editedLevelData.value)
+        .then(() => {
+          emits("updateLevelSuccessEvent");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
 }
 </script>
 
