@@ -94,6 +94,10 @@ const adminMenus = [
     link: "adminMajors",
     text: "Majors",
   },
+  {
+    link: "adminLevels",
+    text: "Levels",
+  },
 ];
 const userRoles = ref([]);
 const { currentRole } = storeToRefs(loginStore);
