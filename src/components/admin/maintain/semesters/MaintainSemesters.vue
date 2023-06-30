@@ -43,7 +43,7 @@ function searchFilteredList() {
 // Pagination
 
 const currentPage = ref(1);
-const perPage = 14;
+const perPage = 15;
 
 const currentPageData = computed(() => {
   return filteredSemesters.value.slice(
@@ -109,7 +109,11 @@ onMounted(async () => {
           <v-pagination
             color="blue"
             class="font-weight-bold"
-            :length="Math.round(filteredSemesters.length / perPage + 1)"
+            :length="
+              filteredSemesters.length % perPage == 0
+                ? filteredSemesters.length / perPage
+                : Math.floor(filteredSemesters.length / perPage) + 1
+            "
             :total-visible="7"
             v-model="currentPage"
           ></v-pagination>

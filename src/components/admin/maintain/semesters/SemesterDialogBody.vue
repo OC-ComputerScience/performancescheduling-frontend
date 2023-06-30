@@ -37,10 +37,9 @@ onMounted(() => {
 });
 
 async function addSemester() {
-  await form.value.validate().then(async (valid) => {
+  form.value.validate().then(async (valid) => {
     console.log(valid.valid);
     if (valid.valid) {
-      console.log(valid);
       await SemesterDataService.create(editedSemesterData.value)
         .then(async () => {
           emits("addSemesterSuccessEvent");
@@ -72,57 +71,59 @@ async function updateSemester() {
 function semesterNameCheck() {
   const pattern = /[0-9]{4}-[A-Z]{2}/;
   return pattern.test(editedSemesterData.value.name)
-    ? ""
+    ? true
     : "Semester name must be in the format of YYYY-SS.";
 }
 function startDateCheck() {
   const pattern = new RegExp("[0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2}$");
   return pattern.test(editedSemesterData.value.startDate)
-    ? ""
+    ? true
     : "Date  must be in the format of MM/DD/YYYY.";
 }
 function endDateCheck() {
   const pattern = new RegExp("[0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2}$");
   return pattern.test(editedSemesterData.value.endDate)
-    ? ""
+    ? true
     : "Date must be in the format of MM/DD/YYYY.";
 }
 </script>
 
 <template>
-  <v-card class="pa-2 flatCardBorder">
-    <v-card-title>
-      <v-row class="pt-0 mt-0">
-        <v-col
-          cols="auto"
-          class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
-        >
-          {{ props.isEdit ? "Edit" : "Add" }} Semester
-        </v-col>
-      </v-row>
-    </v-card-title>
-    <v-card-text class="pt-0">
-      <v-row v-if="props.isEdit" class="pt-0 mt-0">
-        <v-col cols="auto" class="pl-6" align-self="center">
-          <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
-            {{ semesterData.name }}
-          </v-card-title>
-        </v-col>
-        <v-col v-if="props.isEdit" cols="auto" align-self="center">
-          <v-chip
-            label
-            flat
-            size="small"
-            class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-            :class="semesterData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
+  <v-form ref="form" validate-on="input">
+    <v-card class="pa-2 flatCardBorder">
+      <v-card-title>
+        <v-row class="pt-0 mt-0">
+          <v-col
+            cols="auto"
+            class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
           >
-            {{ semesterData.status === "Active" ? "Active" : "Disabled" }}
-          </v-chip>
-        </v-col>
-      </v-row>
-    </v-card-text>
-    <v-card-actions :class="props.isEdit ? '' : 'mt-2'">
-      <v-form ref="form" validate-on="input" with="600px">
+            {{ props.isEdit ? "Edit" : "Add" }} Semester
+          </v-col>
+        </v-row>
+      </v-card-title>
+      <v-card-text class="pt-0">
+        <v-row v-if="props.isEdit" class="pt-0 mt-0">
+          <v-col cols="auto" class="pl-6" align-self="center">
+            <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
+              {{ semesterData.name }}
+            </v-card-title>
+          </v-col>
+          <v-col v-if="props.isEdit" cols="auto" align-self="center">
+            <v-chip
+              label
+              flat
+              size="small"
+              class="font-weight-bold mt-0 text-none text-white flatChipBorder"
+              :class="
+                semesterData.status === 'Active' ? 'bg-teal' : 'bg-maroon'
+              "
+            >
+              {{ semesterData.status === "Active" ? "Active" : "Disabled" }}
+            </v-chip>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions :class="props.isEdit ? '' : 'mt-2'">
         <v-card-text>
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
@@ -172,30 +173,30 @@ function endDateCheck() {
             ]"
           ></v-text-field>
         </v-card-text>
-      </v-form>
-    </v-card-actions>
-    <v-card-actions>
-      <v-btn
-        flat
-        class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-        @click="props.isEdit ? updateSemester() : addSemester()"
-      >
-        {{ props.isEdit ? "Save" : "Add" }}
-      </v-btn>
-      <v-btn
-        flat
-        class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-        :class="props.isEdit ? '' : 'mr-auto'"
-        @click="
-          props.isEdit
-            ? emits('closeSemesterDialogEvent')
-            : emits('closeAddSemesterDialogEvent')
-        "
-      >
-        Cancel
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+      </v-card-actions>
+      <v-card-actions>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateSemester() : addSemester()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeSemesterDialogEvent')
+              : emits('closeAddSemesterDialogEvent')
+          "
+        >
+          Cancel
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-form>
 </template>
 
 <style scoped>
