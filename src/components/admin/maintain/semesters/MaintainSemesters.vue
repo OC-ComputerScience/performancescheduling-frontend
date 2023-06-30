@@ -137,8 +137,4 @@ onMounted(async () => {
   </v-dialog>
 </template>
 
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>
+<style scoped></style>
