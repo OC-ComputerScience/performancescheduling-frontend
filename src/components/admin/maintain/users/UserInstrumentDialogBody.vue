@@ -20,6 +20,7 @@ const selectedInstructor = ref(props.studentInstrumentData.instructorRole);
 const selectedAccompanist = ref(props.studentInstrumentData.accompanistRole);
 
 const editedLevel = ref(props.studentInstrumentData.level);
+const privateHours = ref(props.studentInstrumentData.privateHours);
 
 const levelOptions = ref([]);
 
@@ -70,6 +71,7 @@ async function getAllAccompanists() {
 
 async function addInstrument() {
   await StudentInstrumentDataService.create({
+    privateHours: privateHours.value,
     status: props.studentInstrumentData.status,
     studentRoleId: props.studentInstrumentData.studentRoleId,
     instrumentId: selectedInstrument.value.id,
@@ -89,6 +91,7 @@ async function updateInstrument() {
   await updateSelectedInstructor();
   await updateSelectedAccompanist();
   await updateLevel();
+  await updatePrivateHours();
 
   emits("updateInstrumentSuccessEvent");
 }
@@ -130,6 +133,20 @@ async function updateLevel() {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
       levelId: editedLevel.value.id,
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
+async function updatePrivateHours() {
+  if (
+    props.studentInstrumentData.privateHours === null ||
+    privateHours.value != props.studentInstrumentData.privateHours
+  ) {
+    await StudentInstrumentDataService.update({
+      id: props.studentInstrumentData.id,
+      privateHours: privateHours.value,
     }).catch((err) => {
       console.log(err);
     });
@@ -231,6 +248,17 @@ onMounted(async () => {
         return-object
       >
       </v-select>
+      <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+        Private Hours
+      </v-card-subtitle>
+      <v-text-field
+        type="number"
+        color="darkBlue"
+        variant="plain"
+        class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+        v-model="privateHours"
+      >
+      </v-text-field>
     </v-card-text>
     <v-card-actions>
       <v-btn
