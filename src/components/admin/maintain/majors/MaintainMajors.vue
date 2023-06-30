@@ -51,8 +51,8 @@ const statusFilterSelection = ref(null);
 const roleFilterSelection = ref([]);
 
 const majorTypeFilterOptions = [
-  { title: "Music", value: "true" },
-  { title: "Non-Music", value: "false" },
+  { title: "Music", value: true },
+  { title: "Non-Music", value: false },
 ];
 const majorTypeFilterSelection = ref([]);
 
@@ -62,24 +62,15 @@ function filterMajors() {
   // Filter by status
   if (statusFilterSelection.value) {
     filteredMajors.value = filteredMajors.value.filter(
-      (u) => u.status === statusFilterSelection.value
+      (major) => major.status === statusFilterSelection.value
     );
   }
 
-  // Filter by student type, only available if student role filter is active
-  if (majorTypeFilterSelection.value.length > 0) {
-    // For each studentType filter selected, filter filteredMajors by major.majorRoles.
-    // {role that is a student}.studentRole.{check if any of these studentRoles.instrument.
-    // type are the type we are looking for.}
-    for (let type of majorTypeFilterSelection.value) {
-      filteredMajors.value = filteredMajors.value.filter(
-        (major) =>
-          major.isMusicMajor ===
-          type
-            .find((sur) => sur.roleId === 1)
-            .studentRole.some((sr) => sr.instrument.type === type)
-      );
-    }
+  // Filter by major type,
+  if (majorTypeFilterSelection.value != null) {
+    filteredMajors.value = filteredMajors.value.filter(
+      (major) => major.isMusicMajor === majorTypeFilterSelection.value
+    );
   }
 }
 
@@ -156,13 +147,9 @@ onMounted(async () => {
                   return-object
                 ></v-select>
               </v-list-item>
-              <v-list-item
-                v-if="roleFilterSelection.some((r) => r.id === 1)"
-                class="pa-0 font-weight-semi-bold text-darkBlue"
-              >
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Major Type
                 <v-select
-                  multiple
                   color="darkBlue"
                   variant="underlined"
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
@@ -182,11 +169,7 @@ onMounted(async () => {
               Apply Filters
             </v-btn>
             <v-btn
-              v-if="
-                statusFilterSelection ||
-                roleFilterSelection != 0 ||
-                studentTypeFilterSelection != 0
-              "
+              v-if="statusFilterSelection || majorTypeFilterSelection != 0"
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
             >
