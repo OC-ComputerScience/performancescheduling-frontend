@@ -110,7 +110,13 @@ const editedStudentSemesters = ref(
 );
 const editedStudentHours = ref(
   isStudent.value
-    ? studentRole.studentRole.reduce((sum, obj) => sum + obj.privateHours, 0)
+    ? studentRole.studentRole.reduce((sum, obj) => {
+        if (obj.status === "Active") {
+          return sum + obj.privateHours;
+        } else {
+          return sum;
+        }
+      }, 0)
     : null
 );
 
@@ -284,10 +290,13 @@ async function refreshStudentInstruments() {
   )
     .then((response) => {
       studentRole.studentRole = response.data;
-      editedStudentHours.value = studentRole.studentRole.reduce(
-        (sum, obj) => sum + obj.privateHours,
-        0
-      );
+      editedStudentHours.value = studentRole.studentRole.reduce((sum, obj) => {
+        if (obj.status === "Active") {
+          return sum + obj.privateHours;
+        } else {
+          return sum;
+        }
+      }, 0);
     })
     .catch((err) => {
       console.log(err);
