@@ -43,7 +43,7 @@ async function enableLevel(levelId) {
         <v-col cols="1" align-self="center"> </v-col>
         <v-col cols="6" class="pl-1">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
-            {{ levelData.name }} - {{ levelData.creditHours }} Credit Hour(s)
+            {{ levelData.name }} - {{ levelData.creditHours }} Hour(s)
           </v-card-subtitle>
 
           <v-card-text class="text-weight-semi-bold pt-1 pb-0">

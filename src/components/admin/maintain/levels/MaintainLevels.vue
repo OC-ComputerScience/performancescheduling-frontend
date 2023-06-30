@@ -109,7 +109,11 @@ onMounted(async () => {
           <v-pagination
             color="blue"
             class="font-weight-bold"
-            :length="Math.round(filteredLevels.length / perPage + 1)"
+            :length="
+              filteredLevels.length % perPage == 0
+                ? filteredLevels.length / perPage
+                : Math.floor(filteredLevels.length / perPage) + 1
+            "
             :total-visible="7"
             v-model="currentPage"
           ></v-pagination>
