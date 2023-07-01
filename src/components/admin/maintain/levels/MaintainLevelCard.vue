@@ -87,9 +87,3 @@ async function enableLevel(levelId) {
     </v-dialog>
   </v-card>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

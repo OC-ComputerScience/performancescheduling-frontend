@@ -165,9 +165,3 @@ async function updateLevel() {
     </v-card>
   </v-form>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>
