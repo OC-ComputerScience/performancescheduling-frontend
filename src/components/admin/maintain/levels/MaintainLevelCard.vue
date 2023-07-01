@@ -59,7 +59,7 @@ async function enableLevel(levelId) {
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
             :class="levelData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ levelData.status === "Active" ? "Active" : "Disabled" }}
+            {{ levelData.status }}
           </v-chip>
           <v-btn
             flat
