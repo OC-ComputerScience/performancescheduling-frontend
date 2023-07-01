@@ -53,7 +53,7 @@ const facultyRole = isFaculty.value
   ? props.userRoles.find((ur) => ur.roleId === 2)
   : null;
 
-const editedUserData = ref(props.userData);
+const editedUserData = ref(Object.assign({}, props.userData));
 // const editedUserRoles = ref(props.userRoles);
 
 const editedUserRoles = ref(

@@ -285,9 +285,9 @@ onMounted(async () => {
             color="blue"
             class="font-weight-bold"
             :length="
-              filteredUser.length % perPage == 0
-                ? filteredUser.length / perPage
-                : Math.floor(filteredUser.length / perPage) + 1
+              filteredUsers.length % perPage == 0
+                ? filteredUsers.length / perPage
+                : Math.floor(filteredUsers.length / perPage) + 1
             "
             :total-visible="7"
             v-model="currentPage"
