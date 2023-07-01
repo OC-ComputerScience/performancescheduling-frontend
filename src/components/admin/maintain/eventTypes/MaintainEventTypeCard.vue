@@ -57,7 +57,7 @@ async function enableEventType(eventTypeId) {
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
             :class="eventTypeData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ eventTypeData.status === "Active" ? "Active" : "Disabled" }}
+            {{ eventTypeData.status }}
           </v-chip>
           <v-btn
             flat

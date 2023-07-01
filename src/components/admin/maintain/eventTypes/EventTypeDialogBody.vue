@@ -79,7 +79,7 @@ async function updateEventType() {
                 eventTypeData.status === 'Active' ? 'bg-teal' : 'bg-maroon'
               "
             >
-              {{ eventTypeData.status === "Active" ? "Active" : "Disabled" }}
+              {{ eventTypeData.status }}
             </v-chip>
           </v-col>
         </v-row>
