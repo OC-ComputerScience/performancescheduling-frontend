@@ -118,7 +118,7 @@ function endDateCheck() {
                 semesterData.status === 'Active' ? 'bg-teal' : 'bg-maroon'
               "
             >
-              {{ semesterData.status === "Active" ? "Active" : "Disabled" }}
+              {{ semesterData.status }}
             </v-chip>
           </v-col>
         </v-row>
