@@ -118,7 +118,7 @@ onMounted(async () => {
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
             :class="userData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ userData.status === "Active" ? "Active" : "Disabled" }}
+            {{ userData.status }}
           </v-chip>
           <v-btn
             flat
