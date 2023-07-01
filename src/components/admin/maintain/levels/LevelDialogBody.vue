@@ -118,6 +118,7 @@ async function updateLevel() {
             autogrow
             rows="3"
             v-model="editedLevelData.description"
+            variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () => !!editedLevelData.description || 'This field is required',
@@ -165,3 +166,10 @@ async function updateLevel() {
     </v-card>
   </v-form>
 </template>
+<style scoped>
+.my-textarea textarea {
+  input {
+    color: green !important;
+  }
+}
+</style>
