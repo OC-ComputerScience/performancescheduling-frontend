@@ -16,7 +16,7 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
 });
 
-const editedMajorData = ref(props.majorData);
+const editedMajorData = ref(Object.assign({}, props.majorData));
 const form = ref(null);
 
 //add Major
@@ -71,7 +71,7 @@ async function updateMajor() {
         <v-row v-if="props.isEdit" class="pt-0 mt-0">
           <v-col cols="auto" class="pl-6" align-self="center">
             <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
-              {{ majorData.name }}
+              {{ editedMajorData.name }}
             </v-card-title>
           </v-col>
           <v-col v-if="props.isEdit" cols="auto" align-self="center">
@@ -82,7 +82,7 @@ async function updateMajor() {
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
               :class="majorData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
             >
-              {{ majorData.status === "Active" ? "Active" : "Disabled" }}
+              {{ editedMajorData.status === "Active" ? "Active" : "Disabled" }}
             </v-chip>
           </v-col>
         </v-row>
