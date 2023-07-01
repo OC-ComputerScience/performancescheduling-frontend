@@ -10,6 +10,7 @@ import FacultyHome from "../components/faculty/FacultyHome.vue";
 import AdminHome from "../components/admin/AdminHome.vue";
 import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue";
 import MaintainEventTypes from "../components/admin/maintain/eventTypes/MaintainEventTypes.vue";
+import MaintainSemesters from "../components/admin/maintain/semesters/MaintainSemesters.vue";
 </script>
 
 <template>
@@ -43,6 +44,9 @@ import MaintainEventTypes from "../components/admin/maintain/eventTypes/Maintain
         <MaintainEventTypes
           v-if="this.$route.fullPath === '/adminEventTypes'"
         ></MaintainEventTypes>
+        <MaintainSemesters
+          v-if="this.$route.fullPath === '/adminSemesters'"
+        ></MaintainSemesters>
       </v-col>
     </v-row>
   </v-container>

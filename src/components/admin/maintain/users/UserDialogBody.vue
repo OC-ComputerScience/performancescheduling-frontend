@@ -109,7 +109,15 @@ const editedStudentSemesters = ref(
   isStudent.value ? studentRole.studentSemesters : null
 );
 const editedStudentHours = ref(
-  isStudent.value ? studentRole.studentLessonHours : null
+  isStudent.value
+    ? studentRole.studentRole.reduce((sum, obj) => {
+        if (obj.status === "Active") {
+          return sum + obj.privateHours;
+        } else {
+          return sum;
+        }
+      }, 0)
+    : null
 );
 
 const editedFacultyTitle = ref(isFaculty.value ? facultyRole.title : null);
@@ -145,7 +153,6 @@ async function updateUser() {
     await updateStudentMajor();
     await updateStudentClassification();
     await updateStudentSemesters();
-    await updateStudentHours();
   }
 
   if (isFaculty.value) {
@@ -261,22 +268,6 @@ async function updateStudentSemesters() {
   }
 }
 
-// If the user's hours have changed, update it
-async function updateStudentHours() {
-  // If the editedStudentHours is different from the studentRole's hours, update it
-  if (
-    studentRole.studentLessonHours === null ||
-    editedStudentHours.value !== studentRole.studentLessonHours
-  ) {
-    await UserRoleDataService.update({
-      id: studentRole.id,
-      studentLessonHours: editedStudentHours.value,
-    }).catch((err) => {
-      console.log(err);
-    });
-  }
-}
-
 // If the user's title has changed, update it
 async function updateFacultyTitle() {
   // If the editedFacultyTitle is different from the facultyRole's title, update it
@@ -299,6 +290,13 @@ async function refreshStudentInstruments() {
   )
     .then((response) => {
       studentRole.studentRole = response.data;
+      editedStudentHours.value = studentRole.studentRole.reduce((sum, obj) => {
+        if (obj.status === "Active") {
+          return sum + obj.privateHours;
+        } else {
+          return sum;
+        }
+      }, 0);
     })
     .catch((err) => {
       console.log(err);
