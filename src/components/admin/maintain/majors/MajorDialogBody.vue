@@ -153,9 +153,3 @@ async function updateMajor() {
     </v-card>
   </v-form>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

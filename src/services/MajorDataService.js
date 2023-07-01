@@ -25,14 +25,5 @@ class MajorDataService {
   getAllByStatus(status) {
     return http.get(this.baseUrl + "status/" + status);
   }
-  disable(id) {
-    const data = { status: "Disabled" };
-    return http.put(this.baseUrl + id, data);
-  }
-
-  enable(id) {
-    const data = { status: "Active" };
-    return http.put(this.baseUrl + id, data);
-  }
 }
 export default new MajorDataService();

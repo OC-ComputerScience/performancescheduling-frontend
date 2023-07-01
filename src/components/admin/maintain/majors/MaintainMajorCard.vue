@@ -15,8 +15,9 @@ function closeMajorDialog() {
   createOrEditDialog.value = false;
 }
 
-async function disableMajor(majorId) {
-  await MajorDataService.disable(majorId)
+async function disableMajor(major) {
+  major.status = "Disabled";
+  await MajorDataService.update(major)
     .then(() => {
       emits("refreshMajorsEvent");
     })
@@ -25,8 +26,9 @@ async function disableMajor(majorId) {
     });
 }
 
-async function enableMajor(majorId) {
-  await MajorDataService.enable(majorId)
+async function enableMajor(major) {
+  major.status = "Active";
+  await MajorDataService.update(major)
     .then(() => {
       emits("refreshMajorsEvent");
     })
@@ -54,7 +56,7 @@ async function enableMajor(majorId) {
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
             :class="majorData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ majorData.status === "Active" ? "Active" : "Disabled" }}
+            {{ majorData.status }}
           </v-chip>
           <v-btn
             flat
@@ -89,15 +91,9 @@ async function enableMajor(majorId) {
         @updateMajorSuccessEvent="
           closeMajorDialog(), emits('refreshMajorsEvent')
         "
-        @disableMajorEvent="closeMajorDialog(), disableMajor(majorData.id)"
-        @enableMajorEvent="closeMajorDialog(), enableMajor(majorData.id)"
+        @disableMajorEvent="closeMajorDialog(), disableMajor(majorData)"
+        @enableMajorEvent="closeMajorDialog(), enableMajor(majorData)"
       ></MajorDialogBody>
     </v-dialog>
   </v-card>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

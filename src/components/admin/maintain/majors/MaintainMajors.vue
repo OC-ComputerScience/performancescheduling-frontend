@@ -23,7 +23,7 @@ async function getMajors() {
 
 async function refreshMajors() {
   await getMajors();
-  await filterMajors();
+  await searchAndFilterList();
 }
 
 // Filtering
@@ -34,31 +34,27 @@ const searchInput = ref("");
 
 // Search filter
 // Filters the list of majors by first and last name, based on searchInput
-function searchFilteredList() {
+function searchAndFilterList() {
   filteredMajors.value = majors.value;
-
   // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value === "") return;
+  if (searchInput.value != "")
+    filteredMajors.value = filteredMajors.value.filter((major) =>
+      major.name.toLowerCase().includes(searchInput.value.toLowerCase())
+    );
 
-  filteredMajors.value = filteredMajors.value.filter((major) =>
-    major.name.toLowerCase().includes(searchInput.value.toLowerCase())
-  );
+  filterMajors();
 }
 
 const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
 
-const roleFilterSelection = ref([]);
-
 const majorTypeFilterOptions = [
   { title: "Music", value: true },
   { title: "Non-Music", value: false },
 ];
-const majorTypeFilterSelection = ref([]);
+const majorTypeFilterSelection = ref(null);
 
 function filterMajors() {
-  // Never clear the serach filter, so filter by that first, then the actual filters
-  searchFilteredList();
   // Filter by status
   if (statusFilterSelection.value) {
     filteredMajors.value = filteredMajors.value.filter(
@@ -79,7 +75,7 @@ function clearFilters() {
   currentPage.value = 1;
   filteredMajors.value = majors.value;
   statusFilterSelection.value = null;
-  majorTypeFilterSelection.value = [];
+  majorTypeFilterSelection.value = null;
   searchInput.value = "";
 }
 
@@ -108,7 +104,7 @@ onMounted(async () => {
       <input
         type="text"
         v-model="searchInput"
-        @input="searchFilteredList"
+        @input="searchAndFilterList"
         class="ml-6 px-4 my-1 mainCardBorder text-blue bg-white font-weight-semi-bold"
         style="outline: none"
         append-icon="mdi-magnify"
@@ -163,13 +159,16 @@ onMounted(async () => {
           </v-card-text>
           <v-card-actions class="px-4 pb-4">
             <v-btn
-              @click="filterMajors(), (filterMenuBool = false)"
+              @click="searchAndFilterList(), (filterMenuBool = false)"
               class="bg-teal text-white font-weight-bold text-none innerCardBorder"
             >
               Apply Filters
             </v-btn>
             <v-btn
-              v-if="statusFilterSelection || majorTypeFilterSelection != 0"
+              v-if="
+                statusFilterSelection != null ||
+                majorTypeFilterSelection != null
+              "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
             >
@@ -179,7 +178,7 @@ onMounted(async () => {
         </v-card>
       </v-menu>
       <v-btn
-        v-if="statusFilterSelection || majorTypeFilterSelection != 0"
+        v-if="statusFilterSelection != null || majorTypeFilterSelection != null"
         size="medium"
         color="maroon"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
@@ -248,9 +247,3 @@ onMounted(async () => {
     ></MajorDialogBody>
   </v-dialog>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>
