@@ -57,7 +57,7 @@ const instrumentTypeFilterOptions = ["Instrument", "Vocal", "Both"];
 const instrumentTypeFilterSelection = ref(null);
 
 function filterEventTypes() {
-  // Never clear the serach filter, so filter by that first, then the actual filters
+  // Never clear the search filter, so filter by that first, then the actual filters
   searchFilteredList();
   // Filter by status
   if (statusFilterSelection.value) {

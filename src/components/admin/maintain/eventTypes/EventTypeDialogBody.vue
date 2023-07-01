@@ -130,7 +130,7 @@ async function updateEventType() {
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
-            Default Slot Duration
+            Default Slot Duration (minutes)
           </v-card-subtitle>
           <v-text-field
             type="number"
