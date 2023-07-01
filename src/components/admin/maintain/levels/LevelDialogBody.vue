@@ -19,7 +19,7 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
 });
 
-const editedLevelData = ref(props.levelData);
+const editedLevelData = ref(Object.assign({}, props.levelData));
 
 // const editedLevelsRoles = ref(props.levelsRoles);
 
