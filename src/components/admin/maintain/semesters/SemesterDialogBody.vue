@@ -18,9 +18,7 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
 });
 const form = ref(null);
-const editedSemesterData = ref(props.semesterData);
-
-// const editedSemesterRoles = ref(props.semesterRoles);
+const editedSemesterData = ref(Object.assign({}, props.semesterData));
 
 onMounted(() => {
   if (props.isEdit) {
