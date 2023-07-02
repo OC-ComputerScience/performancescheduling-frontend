@@ -4,56 +4,54 @@ import EventDataService from "../../../../services/EventDataService.js";
 import EventDialogBody from "./EventDialogBody.vue";
 import MaintainEventCard from "./MaintainEventCard.vue";
 
-const addSemesterDialog = ref(false);
+const addEventDialog = ref(false);
 
 // event data
 const events = ref([]);
 const filteredEvents = ref([]);
 
-async function getSemesters() {
-  await SemesterDataService.getAll("name")
+async function getEvents() {
+  await EventDataService.getAll("date")
     .then((response) => {
-      semesters.value = response.data;
-      filteredSemesters.value = semesters.value;
+      events.value = response.data;
+      filteredEvents.value = events.value;
     })
     .catch((err) => {
       console.log(err);
     });
 }
 
-async function refreshSemesters() {
-  await getSemesters();
+async function refreshEvents() {
+  await getEvents();
 }
 
 const searchInput = ref("");
 
 // Search filter
-// Filters the list of Semesters by first and last name, based on searchInput
 function searchFilteredList() {
-  filteredSemesters.value = semesters.value;
+  filteredEvents.value = events.value;
 
   // If the search input is empty, return the full list, otherwise filter
   if (searchInput.value === "") return;
 
-  filteredSemesters.value = filteredSemesters.value.filter((semester) =>
-    semester.name.toLowerCase().includes(searchInput.value.toLowerCase())
+  filteredEvents.value = filteredEvents.value.filter((event) =>
+    event.name.toLowerCase().includes(searchInput.value.toLowerCase())
   );
 }
 
 // Pagination
-
 const currentPage = ref(1);
 const perPage = 15;
 
 const currentPageData = computed(() => {
-  return filteredSemesters.value.slice(
+  return filteredEvents.value.slice(
     (currentPage.value - 1) * perPage,
     currentPage.value * perPage
   );
 });
 
 onMounted(async () => {
-  await getSemesters();
+  await getEvents();
 });
 </script>
 
@@ -78,9 +76,9 @@ onMounted(async () => {
         size="medium"
         color="blue"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
-        @click="addSemesterDialog = true"
+        @click="addEventDialog = true"
       >
-        Add new Semester
+        Add new Event
       </v-btn>
     </v-row>
     <v-row>
@@ -88,16 +86,16 @@ onMounted(async () => {
         <v-card class="pa-5 mainCardBorder">
           <v-row>
             <v-col
-              v-for="semester in currentPageData"
-              :key="semester.id"
+              v-for="event in currentPageData"
+              :key="event.id"
               cols="12"
               md="6"
               lg="4"
             >
-              <MaintainSemesterCard
-                :semester-data="semester"
-                @refreshSemestersEvent="refreshSemesters()"
-              ></MaintainSemesterCard>
+              <MaintainEventCard
+                :event-data="event"
+                @refreshEventsEvent="refreshEvents()"
+              ></MaintainEventCard>
             </v-col>
           </v-row>
         </v-card>
@@ -110,9 +108,9 @@ onMounted(async () => {
             color="blue"
             class="font-weight-bold"
             :length="
-              filteredSemesters.length % perPage == 0
-                ? filteredSemesters.length / perPage
-                : Math.floor(filteredSemesters.length / perPage) + 1
+              filteredEvents.length % perPage == 0
+                ? filteredEvents.length / perPage
+                : Math.floor(filteredEvents.length / perPage) + 1
             "
             :total-visible="7"
             v-model="currentPage"
@@ -121,20 +119,22 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog v-model="addSemesterDialog" persistent max-width="600px">
-    <SemesterDialogBody
+  <v-dialog v-model="addEventDialog" persistent max-width="600px">
+    <EventDialogBody
       :is-edit="false"
-      :semester-data="{
+      :event-data="{
         id: null,
         name: null,
-        startDate: null,
-        endDate: null,
-        status: 'Active',
+        date: null,
+        startTime: null,
+        endTime: null,
+        isReady: false,
+        eventTypeId: null,
+        semesterId: null,
+        locationId: null,
       }"
-      @closeAddSemesterDialogEvent="addSemesterDialog = false"
-      @addSemesterSuccessEvent="(addSemesterDialog = false), refreshSemesters()"
-    ></SemesterDialogBody>
+      @closeAddEventDialogEvent="addEventDialog = false"
+      @addEventSuccessEvent="(addEventDialog = false), refreshEvents()"
+    ></EventDialogBody>
   </v-dialog>
 </template>
-
-<style scoped></style>

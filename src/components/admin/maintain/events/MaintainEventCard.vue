@@ -1,41 +1,41 @@
 <script setup>
 import { ref } from "vue";
-import SemesterDialogBody from "./SemesterDialogBody.vue";
-import SemesterDataService from "../../../../services/SemesterDataService.js";
+import EventDialogBody from "./EventDialogBody.vue";
+import EventDataService from "../../../../services/EventDataService";
 import { formatDate } from "../../../../composables/dateFormatter";
 
-const emits = defineEmits(["closeSemesterDialog", "refreshSemestersEvent"]);
+const emits = defineEmits(["closeEventDialog", "refreshEventsEvent"]);
 
 defineProps({
-  semesterData: { type: [Object], required: true },
+  eventData: { type: [Object], required: true },
 });
 
 const createOrEditDialog = ref(false);
 
-function closeSemesterDialog() {
+function closeEventDialog() {
   createOrEditDialog.value = false;
 }
 
 // Creates role labels for each role, and if Student, gets StudentInstrument data.
 
-async function disableSemester(semesterId) {
-  await SemesterDataService.disable(semesterId)
-    .then(() => {
-      emits("refreshSemestersEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+async function disableEvent(eventId) {
+  // await SemesterDataService.disable(semesterId)
+  //   .then(() => {
+  //     emits("refreshSemestersEvent");
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
 }
 
-async function enableSemester(semesterId) {
-  await SemesterDataService.enable(semesterId)
-    .then(() => {
-      emits("refreshSemestersEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+async function enableEvent(eventId) {
+  // await SemesterDataService.enable(semesterId)
+  //   .then(() => {
+  //     emits("refreshSemestersEvent");
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
 }
 </script>
 
@@ -46,12 +46,12 @@ async function enableSemester(semesterId) {
         <v-col cols="1" align-self="center"> </v-col>
         <v-col cols="6" class="pl-1">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
-            {{ semesterData.name }}
+            {{ eventData.name }}
           </v-card-subtitle>
           <v-card-text class="text-weight-semi-bold pt-1 pb-0">
-            {{ formatDate(semesterData.startDate) }}
+            {{ formatDate(eventData.startDate) }}
             to
-            {{ formatDate(semesterData.endDate) }}
+            {{ formatDate(eventData.endDate) }}
           </v-card-text>
         </v-col>
         <v-spacer></v-spacer>
@@ -61,9 +61,9 @@ async function enableSemester(semesterId) {
             flat
             size="small"
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-            :class="semesterData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
+            :class="eventData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ semesterData.status === "Active" ? "Active" : "Disabled" }}
+            {{ eventData.status === "Active" ? "Active" : "Disabled" }}
           </v-chip>
           <v-btn
             flat
@@ -78,22 +78,16 @@ async function enableSemester(semesterId) {
     </v-card-title>
 
     <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
-      <SemesterDialogBody
+      <EventDialogBody
         :is-edit="true"
-        :semester-data="semesterData"
-        @closeSemesterDialogEvent="closeSemesterDialog"
-        @updateSemesterSuccessEvent="
-          closeSemesterDialog(), emits('refreshSemestersEvent')
+        :event-data="eventData"
+        @closeEventDialogEvent="closeEventDialog"
+        @updateEventSuccessEvent="
+          closeEventDialog(), emits('refreshEventEvent')
         "
-        @disableSemesterEvent="
-          closeSemesterDialog(), disableSemester(semesterData.id)
-        "
-        @enableSemesterEvent="
-          closeSemesterDialog(), enableSemester(semesterData.id)
-        "
-      ></SemesterDialogBody>
+        @disableEventEvent="closeEventDialog(), disableEvent(eventData.id)"
+        @enableEventEvent="closeEventDialog(), enableEvent(eventData.id)"
+      ></EventDialogBody>
     </v-dialog>
   </v-card>
 </template>
-
-<style scoped></style>
