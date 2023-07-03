@@ -76,7 +76,7 @@ function filterEventTypes() {
   // Filter by instrument type
   if (instrumentTypeFilterSelection.value) {
     filteredEventTypes.value = filteredEventTypes.value.filter(
-      (et) => et.instrumentType === slotTypeFilterSelection.value
+      (et) => et.instrumentType === instrumentTypeFilterSelection.value
     );
   }
 }

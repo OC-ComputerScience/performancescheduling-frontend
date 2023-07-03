@@ -155,32 +155,42 @@ async function updateEventType() {
             >
             </v-select>
 
-            <v-card-subtitle
-              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-            >
-              Default Slot Duration (minutes)
-            </v-card-subtitle>
-            <v-text-field
-              type="number"
-              color="darkBlue"
-              variant="plain"
-              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-              v-model="editedEventTypeData.defaultSlotDuration"
-              :rules="[
-                () =>
-                  !!editedEventTypeData.defaultSlotDuration ||
-                  'This field is required',
-              ]"
-            >
-            </v-text-field>
-
-            <v-checkbox
-              color="darkBlue"
-              label="Private Event"
-              class="font-weight-bold text-blue"
-              v-model="editedEventTypeData.isPrivate"
-            >
-            </v-checkbox>
+            <v-row class="pa-0 ma-0">
+              <v-col cols="auto">
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Default Slot Duration (minutes)
+                </v-card-subtitle>
+                <v-text-field
+                  type="number"
+                  color="darkBlue"
+                  variant="plain"
+                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+                  v-model="editedEventTypeData.defaultSlotDuration"
+                  :rules="[
+                    () =>
+                      !!editedEventTypeData.defaultSlotDuration ||
+                      'This field is required',
+                  ]"
+                >
+                </v-text-field>
+              </v-col>
+              <v-col cols="auto">
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Event Privacy
+                </v-card-subtitle>
+                <v-checkbox
+                  color="darkBlue"
+                  label="Private Event"
+                  class="font-weight-bold text-blue mt-3"
+                  v-model="editedEventTypeData.isPrivate"
+                >
+                </v-checkbox>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-card-text>
