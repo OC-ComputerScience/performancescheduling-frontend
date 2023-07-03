@@ -6,7 +6,7 @@ import ComposerDataService from "../../../../services/ComposerDataService.js";
 const emits = defineEmits(["closeComposerDialog", "refreshComposersEvent"]);
 
 defineProps({
-  majorData: { type: [Object], required: true },
+  composerData: { type: [Object], required: true },
 });
 
 const createOrEditDialog = ref(false);
@@ -15,9 +15,9 @@ function closeComposerDialog() {
   createOrEditDialog.value = false;
 }
 
-async function disableComposer(major) {
-  major.status = "Disabled";
-  await ComposerDataService.update(major)
+async function disableComposer(composer) {
+  composer.status = "Disabled";
+  await ComposerDataService.update(composer)
     .then(() => {
       emits("refreshComposersEvent");
     })
@@ -26,9 +26,9 @@ async function disableComposer(major) {
     });
 }
 
-async function enableComposer(major) {
-  major.status = "Active";
-  await ComposerDataService.update(major)
+async function enableComposer(composer) {
+  composer.status = "Active";
+  await ComposerDataService.update(composer)
     .then(() => {
       emits("refreshComposersEvent");
     })
@@ -44,8 +44,11 @@ async function enableComposer(major) {
       <v-row class="pt-0 mt-0 pl-2">
         <v-col cols="7" class="pl-1">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
-            {{ majorData.name }}
+            {{ composerData.lastName }}, {{ composerData.firstName }}
           </v-card-subtitle>
+          <v-card-text class="text-weight-semi-bold w-75">
+            {{ composerData.dateOfBirth }} - {{ composerData.dateOfDeath }}
+          </v-card-text>
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="auto" class="pt-1">
@@ -54,9 +57,9 @@ async function enableComposer(major) {
             flat
             size="small"
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-            :class="majorData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
+            :class="composerData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ majorData.status }}
+            {{ composerData.status }}
           </v-chip>
           <v-btn
             flat
@@ -68,33 +71,22 @@ async function enableComposer(major) {
           </v-btn>
         </v-col>
       </v-row>
-      <v-row class="pt-0 mt-0 pl-2">
-        <v-col cols="6" class="pl-1">
-          <v-chip
-            label
-            flat
-            size="small"
-            class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-            :class="majorData.isMusicComposer ? 'bg-green' : 'bg-darkBlue'"
-          >
-            {{ majorData.isMusicComposer ? "Music" : "Non Music" }}
-          </v-chip>
-        </v-col>
-      </v-row>
     </v-card-title>
 
-    <v-dialog v-model="createOrEditDialog" persistent max-width="1200px">
+    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
       <ComposerDialogBody
         :is-edit="true"
-        :major-data="majorData"
+        :composer-data="composerData"
         @closeComposerDialogEvent="closeComposerDialog"
         @updateComposerSuccessEvent="
           closeComposerDialog(), emits('refreshComposersEvent')
         "
         @disableComposerEvent="
-          closeComposerDialog(), disableComposer(majorData)
+          closeComposerDialog(), disableComposer(composerData)
         "
-        @enableComposerEvent="closeComposerDialog(), enableComposer(majorData)"
+        @enableComposerEvent="
+          closeComposerDialog(), enableComposer(composerData)
+        "
       ></ComposerDialogBody>
     </v-dialog>
   </v-card>

@@ -12,11 +12,11 @@ const emits = defineEmits([
 ]);
 
 const props = defineProps({
-  majorData: { type: [Object], required: true },
+  composerData: { type: [Object], required: true },
   isEdit: { type: [Boolean], required: true },
 });
 
-const editedComposerData = ref(Object.assign({}, props.majorData));
+const editedComposerData = ref(Object.assign({}, props.composerData));
 const form = ref(null);
 
 //add Composer
@@ -34,7 +34,7 @@ async function addComposer() {
   });
 }
 
-// Update the major's roles
+// Update the composer's roles
 
 async function updateComposer() {
   await form.value.validate().then(async (valid) => {
@@ -80,7 +80,9 @@ async function updateComposer() {
               flat
               size="small"
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-              :class="majorData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
+              :class="
+                composerData.status === 'Active' ? 'bg-teal' : 'bg-maroon'
+              "
             >
               {{
                 editedComposerData.status === "Active" ? "Active" : "Disabled"
@@ -94,28 +96,77 @@ async function updateComposer() {
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
-            Composer Name
+            First Name
           </v-card-subtitle>
           <v-text-field
-            placeholder="Music"
-            v-model="editedComposerData.name"
+            v-model="editedComposerData.firstName"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
-              () => !!editedComposerData.name || 'This field is required',
+              () => !!editedComposerData.firstName || 'This field is required',
             ]"
           ></v-text-field>
-
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
-            Music Composer?
+            Last Name
           </v-card-subtitle>
-          <v-checkbox
-            v-model="editedComposerData.isMusicComposer"
-            label="Music Composer?"
+          <v-text-field
+            v-model="editedComposerData.lastName"
+            variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-checkbox>
+            :rules="[
+              () => !!editedComposerData.lastName || 'This field is required',
+            ]"
+          ></v-text-field>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Nationality
+          </v-card-subtitle>
+          <v-text-field
+            v-model="editedComposerData.nationality"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () =>
+                !!editedComposerData.nationality || 'This field is required',
+            ]"
+          ></v-text-field>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Date of Birth
+          </v-card-subtitle>
+          <v-text-field
+            placeholder="YYYY"
+            v-model="editedComposerData.dateOfBirth"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () =>
+                !!editedComposerData.dateOfBirth || 'This field is required',
+              () =>
+                /^[0-9]{4}$/.test(editedComposerData.dateOfBirth) ||
+                'Must be a YYYY',
+            ]"
+          ></v-text-field>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Date of Death
+          </v-card-subtitle>
+          <v-text-field
+            placeholder="YYYY"
+            v-model="editedComposerData.dateOfDeath"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () =>
+                /^$|[0-9]{4}$/.test(editedComposerData.dateOfDeath) ||
+                'Must be YYYY',
+            ]"
+          ></v-text-field>
         </v-col>
       </v-row>
       <v-card-actions>
@@ -143,15 +194,17 @@ async function updateComposer() {
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
-            props.majorData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
+            props.composerData.status === 'Disabled'
+              ? 'bg-darkBlue'
+              : 'bg-maroon'
           "
           @click="
-            props.majorData.status === 'Disabled'
+            props.composerData.status === 'Disabled'
               ? emits('enableComposerEvent')
               : emits('disableComposerEvent')
           "
         >
-          {{ props.majorData.status === "Disabled" ? "Enable" : "Disable" }}
+          {{ props.composerData.status === "Disabled" ? "Enable" : "Disable" }}
         </v-btn>
       </v-card-actions>
     </v-card>
