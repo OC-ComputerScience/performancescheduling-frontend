@@ -1,14 +1,9 @@
 <script setup>
-import { onMounted } from "vue";
 import { useDisplay } from "vuetify";
 
 const { smAndUp, mdAndUp } = useDisplay();
 
 const props = defineProps(["performance"]);
-
-onMounted(() => {
-  console.log("event", props.performance);
-});
 </script>
 <template>
   <v-card color="lightMaroon" class="pa-2 flatCardBorder" elevation="0">
