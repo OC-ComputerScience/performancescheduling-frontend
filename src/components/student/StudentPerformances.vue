@@ -31,6 +31,8 @@ const semesterFilterSelection = ref([]);
 const instrumentFilterSelection = ref([]);
 const eventTypeFilterSelection = ref([]);
 
+// These 3 functions work the same as it did before, just more concise.
+// Finds the unique semesters, instruments, and event types from the list of performances
 function getSemesterFilterOptions() {
   semesterFilterOptions.value = [
     ...new Map(
@@ -61,12 +63,14 @@ function getEventTypeFilterOptions() {
 function filterPerformances() {
   filteredPerformances.value = performances.value;
 
+  // Filter by semester
   if (semesterFilterSelection.value.length != 0) {
     filteredPerformances.value = performances.value.filter(
       (p) => p.event.semester.id === semesterFilterSelection.value.id
     );
   }
 
+  // Filter by instrument
   if (instrumentFilterSelection.value.length != 0) {
     filteredPerformances.value = filteredPerformances.value.filter(
       (p) =>
@@ -75,6 +79,7 @@ function filterPerformances() {
     );
   }
 
+  // Filter by event type
   if (eventTypeFilterSelection.value.length != 0) {
     filteredPerformances.value = filteredPerformances.value.filter(
       (p) => p.event.eventType.id === eventTypeFilterSelection.value.id
@@ -82,6 +87,7 @@ function filterPerformances() {
   }
 }
 
+// Clears all filters and returns to page 1
 function clearFilters() {
   filteredPerformances.value = performances.value;
   semesterFilterSelection.value = [];
