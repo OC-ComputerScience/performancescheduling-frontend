@@ -1,37 +1,36 @@
 <script setup>
 import { ref } from "vue";
-import SemesterDialogBody from "./SemesterDialogBody.vue";
-import SemesterDataService from "../../../../services/SemesterDataService.js";
-import { formatDate } from "../../../../composables/dateFormatter";
+import ComposerDialogBody from "./ComposerDialogBody.vue";
+import ComposerDataService from "../../../../services/ComposerDataService.js";
 
-const emits = defineEmits(["closeSemesterDialog", "refreshSemestersEvent"]);
+const emits = defineEmits(["closeComposerDialog", "refreshComposersEvent"]);
 
 defineProps({
-  semesterData: { type: [Object], required: true },
+  majorData: { type: [Object], required: true },
 });
 
 const createOrEditDialog = ref(false);
 
-function closeSemesterDialog() {
+function closeComposerDialog() {
   createOrEditDialog.value = false;
 }
 
-// Creates role labels for each role, and if Student, gets StudentInstrument data.
-
-async function disableSemester(semesterId) {
-  await SemesterDataService.disable(semesterId)
+async function disableComposer(major) {
+  major.status = "Disabled";
+  await ComposerDataService.update(major)
     .then(() => {
-      emits("refreshSemestersEvent");
+      emits("refreshComposersEvent");
     })
     .catch((err) => {
       console.log(err);
     });
 }
 
-async function enableSemester(semesterId) {
-  await SemesterDataService.enable(semesterId)
+async function enableComposer(major) {
+  major.status = "Active";
+  await ComposerDataService.update(major)
     .then(() => {
-      emits("refreshSemestersEvent");
+      emits("refreshComposersEvent");
     })
     .catch((err) => {
       console.log(err);
@@ -43,16 +42,10 @@ async function enableSemester(semesterId) {
   <v-card color="lightMaroon" class="flatCardBorder" elevation="0">
     <v-card-title>
       <v-row class="pt-0 mt-0 pl-2">
-        <v-col cols="1" align-self="center"> </v-col>
-        <v-col cols="6" class="pl-1">
+        <v-col cols="7" class="pl-1">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
-            {{ semesterData.name }}
+            {{ majorData.name }}
           </v-card-subtitle>
-          <v-card-text class="text-weight-semi-bold pt-1 pb-0">
-            {{ formatDate(semesterData.startDate) }}
-            to
-            {{ formatDate(semesterData.endDate) }}
-          </v-card-text>
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="auto" class="pt-1">
@@ -61,9 +54,9 @@ async function enableSemester(semesterId) {
             flat
             size="small"
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-            :class="semesterData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
+            :class="majorData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ semesterData.status === "Active" ? "Active" : "Disabled" }}
+            {{ majorData.status }}
           </v-chip>
           <v-btn
             flat
@@ -75,25 +68,34 @@ async function enableSemester(semesterId) {
           </v-btn>
         </v-col>
       </v-row>
+      <v-row class="pt-0 mt-0 pl-2">
+        <v-col cols="6" class="pl-1">
+          <v-chip
+            label
+            flat
+            size="small"
+            class="font-weight-bold mt-0 text-none text-white flatChipBorder"
+            :class="majorData.isMusicComposer ? 'bg-green' : 'bg-darkBlue'"
+          >
+            {{ majorData.isMusicComposer ? "Music" : "Non Music" }}
+          </v-chip>
+        </v-col>
+      </v-row>
     </v-card-title>
 
-    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
-      <SemesterDialogBody
+    <v-dialog v-model="createOrEditDialog" persistent max-width="1200px">
+      <ComposerDialogBody
         :is-edit="true"
-        :semester-data="semesterData"
-        @closeSemesterDialogEvent="closeSemesterDialog"
-        @updateSemesterSuccessEvent="
-          closeSemesterDialog(), emits('refreshSemestersEvent')
+        :major-data="majorData"
+        @closeComposerDialogEvent="closeComposerDialog"
+        @updateComposerSuccessEvent="
+          closeComposerDialog(), emits('refreshComposersEvent')
         "
-        @disableSemesterEvent="
-          closeSemesterDialog(), disableSemester(semesterData.id)
+        @disableComposerEvent="
+          closeComposerDialog(), disableComposer(majorData)
         "
-        @enableSemesterEvent="
-          closeSemesterDialog(), enableSemester(semesterData.id)
-        "
-      ></SemesterDialogBody>
+        @enableComposerEvent="closeComposerDialog(), enableComposer(majorData)"
+      ></ComposerDialogBody>
     </v-dialog>
   </v-card>
 </template>
-
-<style scoped></style>

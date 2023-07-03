@@ -1,65 +1,31 @@
 <script setup>
-import { ref, onMounted } from "vue";
-
-import SemesterDataService from "../../../../services/SemesterDataService";
-import { formatDate } from "../../../../composables/dateFormatter";
+import { ref } from "vue";
+import ComposerDataService from "../../../../services/ComposerDataService";
 
 const emits = defineEmits([
-  "addSemesterSuccessEvent",
-  "closeAddSemesterDialogEvent",
-  "closeSemesterDialogEvent",
-  "updateSemesterSuccessEvent",
-  "disableSemesterEvent",
-  "enableSemesterEvent",
+  "addComposerSuccessEvent",
+  "closeAddComposerDialogEvent",
+  "closeComposerDialogEvent",
+  "updateComposerSuccessEvent",
+  "disableComposerEvent",
+  "enableComposerEvent",
 ]);
 
 const props = defineProps({
-  semesterData: { type: [Object], required: true },
+  majorData: { type: [Object], required: true },
   isEdit: { type: [Boolean], required: true },
 });
+
+const editedComposerData = ref(Object.assign({}, props.majorData));
 const form = ref(null);
-const editedSemesterData = ref(props.semesterData);
 
-// const editedSemesterRoles = ref(props.semesterRoles);
-
-onMounted(() => {
-  if (props.isEdit) {
-    editedSemesterData.value["id"] = props.semesterData.id;
-    editedSemesterData.value.startDate = formatDate(
-      editedSemesterData.value.startDate
-    );
-    editedSemesterData.value.endDate = formatDate(
-      editedSemesterData.value.endDate
-    );
-  } else {
-    editedSemesterData.value["status"] = "Active";
-  }
-});
-
-async function addSemester() {
-  form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
-    if (valid.valid) {
-      await SemesterDataService.create(editedSemesterData.value)
-        .then(async () => {
-          emits("addSemesterSuccessEvent");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  });
-}
-
-async function updateSemester() {
+//add Composer
+async function addComposer() {
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
-      delete editedSemesterData.value["createdAt"];
-      delete editedSemesterData.value["updatedAt"];
-
-      await SemesterDataService.update(editedSemesterData.value)
-        .then(() => {
-          emits("updateSemesterSuccessEvent");
+      await ComposerDataService.create(editedComposerData.value)
+        .then(async () => {
+          emits("addComposerSuccessEvent");
         })
         .catch((err) => {
           console.log(err);
@@ -68,23 +34,23 @@ async function updateSemester() {
   });
 }
 
-function semesterNameCheck() {
-  const pattern = /[0-9]{4}-[A-Z]{2}/;
-  return pattern.test(editedSemesterData.value.name)
-    ? true
-    : "Semester name must be in the format of YYYY-SS.";
-}
-function startDateCheck() {
-  const pattern = new RegExp("[0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2}$");
-  return pattern.test(editedSemesterData.value.startDate)
-    ? true
-    : "Date  must be in the format of MM/DD/YYYY.";
-}
-function endDateCheck() {
-  const pattern = new RegExp("[0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2}$");
-  return pattern.test(editedSemesterData.value.endDate)
-    ? true
-    : "Date must be in the format of MM/DD/YYYY.";
+// Update the major's roles
+
+async function updateComposer() {
+  await form.value.validate().then(async (valid) => {
+    if (valid.valid) {
+      delete editedComposerData.value["createdAt"];
+      delete editedComposerData.value["updatedAt"];
+
+      await ComposerDataService.update(editedComposerData.value)
+        .then(() => {
+          emits("updateComposerSuccessEvent");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
 }
 </script>
 
@@ -97,7 +63,7 @@ function endDateCheck() {
             cols="auto"
             class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
           >
-            {{ props.isEdit ? "Edit" : "Add" }} Semester
+            {{ props.isEdit ? "Edit" : "Add" }} Composer
           </v-col>
         </v-row>
       </v-card-title>
@@ -105,7 +71,7 @@ function endDateCheck() {
         <v-row v-if="props.isEdit" class="pt-0 mt-0">
           <v-col cols="auto" class="pl-6" align-self="center">
             <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
-              {{ semesterData.name }}
+              {{ editedComposerData.name }}
             </v-card-title>
           </v-col>
           <v-col v-if="props.isEdit" cols="auto" align-self="center">
@@ -114,71 +80,49 @@ function endDateCheck() {
               flat
               size="small"
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-              :class="
-                semesterData.status === 'Active' ? 'bg-teal' : 'bg-maroon'
-              "
+              :class="majorData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
             >
-              {{ semesterData.status }}
+              {{
+                editedComposerData.status === "Active" ? "Active" : "Disabled"
+              }}
             </v-chip>
           </v-col>
         </v-row>
       </v-card-text>
-      <v-card-actions :class="props.isEdit ? '' : 'mt-2'">
-        <v-card-text>
+      <v-row :class="props.isEdit ? '' : 'mt-2'">
+        <v-col>
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
-            Semester Name
+            Composer Name
           </v-card-subtitle>
-
           <v-text-field
-            placeholder="2000-FA"
-            v-model="editedSemesterData.name"
+            placeholder="Music"
+            v-model="editedComposerData.name"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
-              () => !!editedSemesterData.name || 'This field is required',
-              semesterNameCheck,
+              () => !!editedComposerData.name || 'This field is required',
             ]"
           ></v-text-field>
 
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
-            Start Date
+            Music Composer?
           </v-card-subtitle>
-          <v-text-field
-            placeholder="MM/DD/YYYY"
-            v-model="editedSemesterData.startDate"
-            variant="plain"
+          <v-checkbox
+            v-model="editedComposerData.isMusicComposer"
+            label="Music Composer?"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            :rules="[
-              () => !!editedSemesterData.startDate || 'This field is required',
-              startDateCheck,
-            ]"
-          ></v-text-field>
-          <v-card-subtitle
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            End Date
-          </v-card-subtitle>
-          <v-text-field
-            placeholder="MM/DD/YYYY"
-            v-model="editedSemesterData.endDate"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            :rules="[
-              () => !!editedSemesterData.endDate || 'This field is required',
-              endDateCheck,
-            ]"
-          ></v-text-field>
-        </v-card-text>
-      </v-card-actions>
+          ></v-checkbox>
+        </v-col>
+      </v-row>
       <v-card-actions>
         <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateSemester() : addSemester()"
+          @click="props.isEdit ? updateComposer() : addComposer()"
         >
           {{ props.isEdit ? "Save" : "Add" }}
         </v-btn>
@@ -188,15 +132,28 @@ function endDateCheck() {
           :class="props.isEdit ? '' : 'mr-auto'"
           @click="
             props.isEdit
-              ? emits('closeSemesterDialogEvent')
-              : emits('closeAddSemesterDialogEvent')
+              ? emits('closeComposerDialogEvent')
+              : emits('closeAddComposerDialogEvent')
           "
         >
           Cancel
+        </v-btn>
+        <v-btn
+          v-if="props.isEdit"
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          :class="
+            props.majorData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
+          "
+          @click="
+            props.majorData.status === 'Disabled'
+              ? emits('enableComposerEvent')
+              : emits('disableComposerEvent')
+          "
+        >
+          {{ props.majorData.status === "Disabled" ? "Enable" : "Disable" }}
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-form>
 </template>
-
-<style scoped></style>
