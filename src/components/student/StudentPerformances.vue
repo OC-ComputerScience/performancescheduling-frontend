@@ -61,13 +61,13 @@ function getEventTypeFilterOptions() {
 function filterPerformances() {
   filteredPerformances.value = performances.value;
 
-  if (semesterFilterSelection.value.length > 0) {
+  if (semesterFilterSelection.value.length != 0) {
     filteredPerformances.value = performances.value.filter(
       (p) => p.event.semester.id === semesterFilterSelection.value.id
     );
   }
 
-  if (instrumentFilterSelection.value.length > 0) {
+  if (instrumentFilterSelection.value.length != 0) {
     filteredPerformances.value = filteredPerformances.value.filter(
       (p) =>
         p.studentInstrumentSignups[0].studentInstrument.instrument.id ===
@@ -75,7 +75,7 @@ function filterPerformances() {
     );
   }
 
-  if (eventTypeFilterSelection.value.length > 0) {
+  if (eventTypeFilterSelection.value.length != 0) {
     filteredPerformances.value = filteredPerformances.value.filter(
       (p) => p.event.eventType.id === eventTypeFilterSelection.value.id
     );
