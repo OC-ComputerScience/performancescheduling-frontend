@@ -136,5 +136,3 @@ onMounted(async () => {
     ></SemesterDialogBody>
   </v-dialog>
 </template>
-
-<style scoped></style>

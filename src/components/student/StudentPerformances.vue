@@ -1,184 +1,240 @@
 <script setup>
 import { useLoginStore } from "../../stores/LoginStore.js";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 import StudentPerformanceCard from "./StudentPerformanceCard.vue";
 import EventSignupDataService from "./../../services/EventSignupDataService";
 
 const loginStore = useLoginStore();
 const performances = ref([]);
-const filteredPerforamces = ref([]);
-const filterMenuBool = ref(false);
-let semesterFilterArray = [];
-let instrumentFilterArray = [];
-let eventTypeFilterArray = [];
-
-const semesterFilter = ref({ id: 0, name: "" });
-const instrumentFilter = ref({ id: 0, name: "" });
-const eventTypeFilter = ref({ id: 0, type: "" });
+const filteredPerformances = ref([]);
 
 async function getStudentEvents() {
   await EventSignupDataService.getByStudent(loginStore.user.userId)
     .then((response) => {
       performances.value = response.data;
-      filteredPerforamces.value = response.data;
-      fillFilterArrays();
+      filteredPerformances.value = response.data;
     })
     .catch((err) => {
       console.log(err);
     });
 }
 
-function fillFilterArrays() {
-  semesterFilterArray = [{ id: 0, name: "" }];
-  instrumentFilterArray = [{ id: 0, name: "" }];
-  eventTypeFilterArray = [{ id: 0, type: "" }];
-  for (const performance of performances.value) {
-    if (
-      !semesterFilterArray.find(
-        (obj) => obj.id === performance.event.semester.id
-      )
-    ) {
-      semesterFilterArray.push(performance.event.semester);
-    }
+// Filtering
+const filterMenuBool = ref(false);
 
-    if (
-      !instrumentFilterArray.find(
-        (obj) =>
-          obj.id ===
-          performance.studentInstrumentSignups[0].studentInstrument.instrument
-            .id
-      )
-    ) {
-      instrumentFilterArray.push(
-        performance.studentInstrumentSignups[0].studentInstrument.instrument
-      );
-    }
+const semesterFilterOptions = ref([]);
+const instrumentFilterOptions = ref([]);
+const eventTypeFilterOptions = ref([]);
 
-    if (
-      !eventTypeFilterArray.find(
-        (obj) => obj.id === performance.event.eventType.id
-      )
-    ) {
-      eventTypeFilterArray.push(performance.event.eventType);
-    }
+const semesterFilterSelection = ref([]);
+const instrumentFilterSelection = ref([]);
+const eventTypeFilterSelection = ref([]);
+
+function getSemesterFilterOptions() {
+  semesterFilterOptions.value = [
+    ...new Map(
+      performances.value.map((p) => [p.event.semester.id, p.event.semester])
+    ).values(),
+  ];
+}
+
+function getInstrumentFilterOptions() {
+  instrumentFilterOptions.value = [
+    ...new Map(
+      performances.value.map((p) => [
+        p.studentInstrumentSignups[0].studentInstrument.instrument.id,
+        p.studentInstrumentSignups[0].studentInstrument.instrument,
+      ])
+    ).values(),
+  ];
+}
+
+function getEventTypeFilterOptions() {
+  eventTypeFilterOptions.value = [
+    ...new Map(
+      performances.value.map((p) => [p.event.eventType.id, p.event.eventType])
+    ).values(),
+  ];
+}
+
+function filterPerformances() {
+  filteredPerformances.value = performances.value;
+
+  if (semesterFilterSelection.value.length > 0) {
+    filteredPerformances.value = performances.value.filter(
+      (p) => p.event.semester.id === semesterFilterSelection.value.id
+    );
   }
 
-  clearFilters();
+  if (instrumentFilterSelection.value.length > 0) {
+    filteredPerformances.value = filteredPerformances.value.filter(
+      (p) =>
+        p.studentInstrumentSignups[0].studentInstrument.instrument.id ===
+        instrumentFilterSelection.value.id
+    );
+  }
+
+  if (eventTypeFilterSelection.value.length > 0) {
+    filteredPerformances.value = filteredPerformances.value.filter(
+      (p) => p.event.eventType.id === eventTypeFilterSelection.value.id
+    );
+  }
 }
 
 function clearFilters() {
-  semesterFilter.value = semesterFilterArray[0];
-  instrumentFilter.value = instrumentFilterArray[0];
-  eventTypeFilter.value = eventTypeFilterArray[0];
-  updateFilter();
+  filteredPerformances.value = performances.value;
+  semesterFilterSelection.value = [];
+  instrumentFilterSelection.value = [];
+  eventTypeFilterSelection.value = [];
 }
 
-function updateFilter() {
-  filteredPerforamces.value = [];
+// Pagination
 
-  performances.value.forEach((performance) => {
-    if (
-      (semesterFilter.value.id === 0 ||
-        semesterFilter.value.id === performance.event.semester.id) &&
-      (instrumentFilter.value.id === 0 ||
-        instrumentFilter.value.id ===
-          performance.studentInstrumentSignups[0].studentInstrument.instrument
-            .id) &&
-      (eventTypeFilter.value.id === 0 ||
-        eventTypeFilter.value.id === performance.event.eventType.id)
-    ) {
-      filteredPerforamces.value.push(performance);
-    }
-  });
-}
+const currentPage = ref(1);
+const perPage = 15;
+
+const currentPageData = computed(() => {
+  return filteredPerformances.value.slice(
+    (currentPage.value - 1) * perPage,
+    currentPage.value * perPage
+  );
+});
 
 onMounted(async () => {
   await getStudentEvents();
+  getSemesterFilterOptions();
+  getInstrumentFilterOptions();
+  getEventTypeFilterOptions();
 });
 </script>
 <template>
-  <v-container fluid class="ma-0 pa-4">
+  <v-container fluid class="pa-8">
     <v-row class="ml-1">
       <h1 class="text-maroon font-weight">Performances</h1>
       <v-menu v-model="filterMenuBool" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
           <v-btn
-            size="small"
-            class="font-weight-bold text-darkBlue mt-3 ml-6"
+            size="medium"
+            class="font-weight-semi-bold text-darkBlue ml-6 px-2 my-1 mainCardBorder text-none"
             v-bind="props"
-            width="13%"
-            elevation="1"
-            style="font-size: 80%"
           >
             <template v-slot:append>
               <v-icon
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter and Sort
+            Filter performances
           </v-btn>
         </template>
 
-        <v-card min-width="300">
-          <v-list>
-            <v-list-item title="Semester">
-              <v-select
-                v-model="semesterFilter"
-                @update:model-value="updateFilter"
-                :items="semesterFilterArray"
-                item-title="name"
-                return-object
-              ></v-select>
-            </v-list-item>
-            <v-list-item title="Instrument">
-              <v-select
-                v-model="instrumentFilter"
-                @update:model-value="updateFilter"
-                :items="instrumentFilterArray"
-                item-title="name"
-                return-object
-              ></v-select>
-            </v-list-item>
-            <v-list-item title="Event Type">
-              <v-select
-                v-model="eventTypeFilter"
-                @update:model-value="updateFilter"
-                :items="eventTypeFilterArray"
-                item-title="type"
-                return-object
-              ></v-select>
-            </v-list-item>
-          </v-list>
+        <v-card min-width="300" class="mainCardBorder mt-2">
+          <v-card-text>
+            <v-list class="pa-0 ma-0">
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Semester
+                <v-select
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="semesterFilterSelection"
+                  :items="semesterFilterOptions"
+                  item-title="name"
+                  return-object
+                ></v-select>
+              </v-list-item>
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Instrument
+                <v-select
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="instrumentFilterSelection"
+                  :items="instrumentFilterOptions"
+                  item-title="name"
+                  return-object
+                ></v-select>
+              </v-list-item>
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Event Type
+                <v-select
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="eventTypeFilterSelection"
+                  :items="eventTypeFilterOptions"
+                  item-title="type"
+                  return-object
+                ></v-select>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+          <v-card-actions class="px-4 pb-4">
+            <v-btn
+              @click="filterPerformances(), (filterMenuBool = false)"
+              class="bg-teal text-white font-weight-bold text-none innerCardBorder"
+            >
+              Apply Filters
+            </v-btn>
+            <v-btn
+              v-if="
+                semesterFilterSelection.length != 0 ||
+                instrumentFilterSelection.length != 0 ||
+                eventTypeFilterSelection.length != 0
+              "
+              @click="clearFilters"
+              class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
+            >
+              Clear Filters
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-menu>
       <v-btn
         v-if="
-          semesterFilter.id != 0 ||
-          instrumentFilter.id != 0 ||
-          eventTypeFilter.id != 0
+          semesterFilterSelection.length != 0 ||
+          instrumentFilterSelection.length != 0 ||
+          eventTypeFilterSelection.length != 0
         "
-        size="small"
+        size="medium"
         color="maroon"
-        class="font-weight-bold mt-3 ml-6"
-        width="13%"
-        elevation="1"
-        style="font-size: 80%"
+        class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="clearFilters"
       >
-        Clear Filters
+        Clear filters
       </v-btn>
     </v-row>
     <v-row>
       <v-col>
-        <v-card class="pa-5" elevation="0">
+        <v-card class="pa-5 mainCardBorder">
           <v-row>
-            <v-col v-for="performance in filteredPerforamces" cols="12">
+            <v-col
+              v-for="performance in currentPageData"
+              :key="performance.id"
+              cols="12"
+            >
               <StudentPerformanceCard
                 :performance="performance"
               ></StudentPerformanceCard>
             </v-col>
           </v-row>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row class="pt-3">
+      <v-col>
+        <v-card class="mainCardBorder">
+          <v-pagination
+            color="blue"
+            class="font-weight-bold"
+            :length="
+              filteredPerformances.length % perPage == 0
+                ? filteredPerformances.length / perPage
+                : Math.floor(filteredPerformances.length / perPage) + 1
+            "
+            :total-visible="7"
+            v-model="currentPage"
+          ></v-pagination>
         </v-card>
       </v-col>
     </v-row>
