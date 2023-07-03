@@ -2,6 +2,8 @@
 import { ref } from "vue";
 import ComposerDataService from "../../../../services/ComposerDataService";
 
+import { compareTwoStrings } from "string-similarity";
+
 const emits = defineEmits([
   "addComposerSuccessEvent",
   "closeAddComposerDialogEvent",
@@ -12,8 +14,9 @@ const emits = defineEmits([
 ]);
 
 const props = defineProps({
-  composerData: { type: [Object], required: true },
   isEdit: { type: [Boolean], required: true },
+  composerData: { type: [Object], required: true },
+  composersData: { type: [Array] },
 });
 
 const editedComposerData = ref(Object.assign({}, props.composerData));
@@ -51,6 +54,40 @@ async function updateComposer() {
         });
     }
   });
+}
+function findSimilar(composer) {
+  const similarComposers = props.composersData.filter((c) => {
+    return (
+      compareTwoStrings(
+        c.firstName.toLowerCase(),
+        composer.firstName.toLowerCase()
+      ) >= 0.85 &&
+      compareTwoStrings(
+        c.lastName.toLowerCase(),
+        composer.lastName.toLowerCase()
+      ) >= 0.9
+    );
+  });
+  return similarComposers;
+}
+function similarComposerCheck(composer) {
+  if (
+    props.isEdit == true ||
+    composer.lastName == null ||
+    composer.firstName == null
+  ) {
+    return true;
+  }
+  var similarComposers = findSimilar(composer);
+  var similarComposerNames = "";
+  similarComposers.forEach((c) => {
+    similarComposerNames += c.firstName + " " + c.lastName + ", ";
+  });
+  similarComposerNames = similarComposerNames.slice(0, -2);
+
+  return similarComposers == 0
+    ? true
+    : "This are very simialr existing composers: " + similarComposerNames;
 }
 </script>
 
@@ -104,6 +141,7 @@ async function updateComposer() {
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () => !!editedComposerData.firstName || 'This field is required',
+              similarComposerCheck(editedComposerData),
             ]"
           ></v-text-field>
           <v-card-subtitle
@@ -117,6 +155,7 @@ async function updateComposer() {
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () => !!editedComposerData.lastName || 'This field is required',
+              similarComposerCheck(editedComposerData),
             ]"
           ></v-text-field>
           <v-card-subtitle

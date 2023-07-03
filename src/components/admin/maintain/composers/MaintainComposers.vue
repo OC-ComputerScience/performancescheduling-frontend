@@ -141,10 +141,7 @@ onMounted(async () => {
               Apply Filters
             </v-btn>
             <v-btn
-              v-if="
-                statusFilterSelection != null ||
-                composerTypeFilterSelection != null
-              "
+              v-if="statusFilterSelection != null"
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
             >
@@ -154,9 +151,7 @@ onMounted(async () => {
         </v-card>
       </v-menu>
       <v-btn
-        v-if="
-          statusFilterSelection != null || composerTypeFilterSelection != null
-        "
+        v-if="statusFilterSelection != null"
         size="medium"
         color="maroon"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
@@ -223,6 +218,7 @@ onMounted(async () => {
         nationality: null,
         status: 'Active',
       }"
+      :composers-data="composers"
       @closeAddComposerDialogEvent="addComposerDialog = false"
       @addComposerSuccessEvent="(addComposerDialog = false), refreshComposers()"
     ></ComposerDialogBody>
