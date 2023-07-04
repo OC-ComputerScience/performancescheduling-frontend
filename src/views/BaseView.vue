@@ -10,7 +10,7 @@ import FacultyHome from "../components/faculty/FacultyHome.vue";
 import AdminHome from "../components/admin/AdminHome.vue";
 import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue";
 import MaintainSemesters from "../components/admin/maintain/semesters/MaintainSemesters.vue";
-import MaintainEvents from "../components/admin/maintain/semesters/MaintainEvents.vue";
+import MaintainEvents from "../components/admin/maintain/events/MaintainEvents.vue";
 </script>
 
 <template>
