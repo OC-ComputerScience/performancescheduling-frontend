@@ -48,13 +48,13 @@ async function enableEvent(event) {
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
             {{ eventData.name }}
           </v-card-subtitle>
-          <v-card-subtitle class="text-weight-semi-bold pt-1 pb-0">
+          <v-card-subtitle class="text-weight-semi-bold text-blue pt-1 pb-0">
             {{ formatDate(eventData.date) }}
             ({{ get12HourTimeStringFromString(eventData.startTime) }}
             to
             {{ get12HourTimeStringFromString(eventData.endTime) }})
           </v-card-subtitle>
-          <v-card-subtitle class="text-weight-semi-bold pt-1 pb-0">
+          <v-card-subtitle class="text-weight-semi-bold text-blue pt-1 pb-0">
             {{ eventData.location.roomName }}
           </v-card-subtitle>
         </v-col>
