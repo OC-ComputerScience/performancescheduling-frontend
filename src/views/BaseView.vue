@@ -10,6 +10,7 @@ import FacultyHome from "../components/faculty/FacultyHome.vue";
 import AdminHome from "../components/admin/AdminHome.vue";
 import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue";
 import MaintainSemesters from "../components/admin/maintain/semesters/MaintainSemesters.vue";
+import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.vue";
 </script>
 
 <template>
@@ -43,6 +44,9 @@ import MaintainSemesters from "../components/admin/maintain/semesters/MaintainSe
         <MaintainSemesters
           v-if="this.$route.fullPath === '/adminSemesters'"
         ></MaintainSemesters>
+        <MaintainPieces
+          v-if="this.$route.fullPath === '/adminPieces'"
+        ></MaintainPieces>
       </v-col>
     </v-row>
   </v-container>
