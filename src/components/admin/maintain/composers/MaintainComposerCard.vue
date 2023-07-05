@@ -5,11 +5,20 @@ import ComposerDataService from "../../../../services/ComposerDataService.js";
 
 const emits = defineEmits(["closeComposerDialog", "refreshComposersEvent"]);
 
-defineProps({
+const props = defineProps({
   composerData: { type: [Object], required: true },
 });
 
 const createOrEditDialog = ref(false);
+const comma = ref(", ");
+
+console.log(props.composerData.firstName.lenght);
+
+if (
+  props.composerData.firstName.length == 0 ||
+  props.composerData.lastName.length == 0
+)
+  comma.value = "";
 
 function closeComposerDialog() {
   createOrEditDialog.value = false;
@@ -44,9 +53,9 @@ async function enableComposer(composer) {
       <v-row class="pt-0 mt-0 pl-2">
         <v-col cols="7" class="pl-1">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
-            {{ composerData.lastName }}, {{ composerData.firstName }}
+            {{ composerData.lastName }}{{ comma }}{{ composerData.firstName }}
           </v-card-subtitle>
-          <v-card-text class="text-weight-semi-bold w-75">
+          <v-card-text class="text-weight-semi-bold pt-1 pb-0">
             {{ composerData.dateOfBirth }} - {{ composerData.dateOfDeath }}
           </v-card-text>
         </v-col>

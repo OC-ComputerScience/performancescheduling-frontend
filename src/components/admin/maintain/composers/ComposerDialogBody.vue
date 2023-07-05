@@ -170,40 +170,47 @@ function similarComposerCheck(composer) {
                 !!editedComposerData.nationality || 'This field is required',
             ]"
           ></v-text-field>
-          <v-card-subtitle
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Date of Birth
-          </v-card-subtitle>
-          <v-text-field
-            placeholder="YYYY"
-            v-model="editedComposerData.dateOfBirth"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            :rules="[
-              () =>
-                !!editedComposerData.dateOfBirth || 'This field is required',
-              () =>
-                /^[0-9]{4}$/.test(editedComposerData.dateOfBirth) ||
-                'Must be a YYYY',
-            ]"
-          ></v-text-field>
-          <v-card-subtitle
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Date of Death
-          </v-card-subtitle>
-          <v-text-field
-            placeholder="YYYY"
-            v-model="editedComposerData.dateOfDeath"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            :rules="[
-              () =>
-                /^$|[0-9]{4}$/.test(editedComposerData.dateOfDeath) ||
-                'Must be YYYY',
-            ]"
-          ></v-text-field>
+          <v-row>
+            <v-col cols="6">
+              <v-card-subtitle
+                class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+              >
+                Date of Birth
+              </v-card-subtitle>
+              <v-text-field
+                placeholder="YYYY"
+                v-model="editedComposerData.dateOfBirth"
+                variant="plain"
+                class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+                :rules="[
+                  () =>
+                    !!editedComposerData.dateOfBirth ||
+                    'This field is required',
+                  () =>
+                    /^[0-9]{4}$/.test(editedComposerData.dateOfBirth) ||
+                    'Must be a YYYY',
+                ]"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-card-subtitle
+                class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+              >
+                Date of Death
+              </v-card-subtitle>
+              <v-text-field
+                placeholder="YYYY"
+                v-model="editedComposerData.dateOfDeath"
+                variant="plain"
+                class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+                :rules="[
+                  () =>
+                    /^$|[0-9]{4}$/.test(editedComposerData.dateOfDeath) ||
+                    'Must be YYYY',
+                ]"
+              ></v-text-field>
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
       <v-card-actions>
