@@ -51,15 +51,6 @@ async function enableLevel(levelId) {
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="auto" class="pt-1">
-          <v-chip
-            label
-            flat
-            size="small"
-            class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-            :class="levelData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
-          >
-            {{ levelData.status }}
-          </v-chip>
           <v-btn
             flat
             size="small"
