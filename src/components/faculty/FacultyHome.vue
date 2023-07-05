@@ -89,20 +89,13 @@ onMounted(async () => {
                     Current Students
                   </v-card-title>
                 </v-col>
-                <v-spacer></v-spacer>
-                <v-col cols="auto">
-                  <v-btn flat icon>
-                    <v-icon class="text-darkBlue" icon="mdi-plus-circle">
-                    </v-icon>
-                  </v-btn>
-                </v-col>
               </v-row>
 
               <v-card-text>
                 <CurrentStudentsItem
                   v-for="student of students"
                   :key="student.id"
-                  :student-data="student.student"
+                  :students-data="student"
                 ></CurrentStudentsItem>
               </v-card-text>
             </v-card>
