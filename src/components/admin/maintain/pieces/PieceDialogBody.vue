@@ -101,7 +101,7 @@ function similarPieceCheck(piece) {
             <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
               {{ editedPieceData.title }}
             </v-card-title>
-            <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
+            <v-card-title class="text-weight-semi-bold pt-1 pb-0">
               {{ editedPieceData.composer.lastName }}
             </v-card-title>
           </v-col>
