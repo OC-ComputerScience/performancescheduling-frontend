@@ -140,9 +140,9 @@ function similarPieceCheck(piece) {
             Poetic Translation
           </v-card-subtitle>
           <v-textarea
-            placeholder="description of level"
-            autogrow
+            placeholder="lyric translated poetically"
             rows="3"
+            no-resize
             v-model="editedPieceData.poeticTranslation"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -153,8 +153,8 @@ function similarPieceCheck(piece) {
             Literal Translation
           </v-card-subtitle>
           <v-textarea
-            placeholder="description of level"
-            autogrow
+            placeholder="lyrics translated literally"
+            no-resize
             rows="3"
             v-model="editedPieceData.literalTranslation"
             variant="plain"
