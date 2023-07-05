@@ -64,8 +64,9 @@ function fillInstrumentRoleLabels(instruments) {
       : ["Vocal"];
 }
 
-async function disableUser(userId) {
-  await UserDataService.disable(userId)
+async function disableUser(user) {
+  user.status = "Disabled";
+  await UserDataService.update(user)
     .then(() => {
       emits("refreshUsersEvent");
     })
@@ -74,8 +75,9 @@ async function disableUser(userId) {
     });
 }
 
-async function enableUser(userId) {
-  await UserDataService.enable(userId)
+async function enableUser(user) {
+  user.status = "Active";
+  await UserDataService.update(user)
     .then(() => {
       emits("refreshUsersEvent");
     })
@@ -105,8 +107,8 @@ onMounted(async () => {
           </v-card-subtitle>
           <v-card-text class="text-weight-semi-bold pt-1 pb-0">
             <a v-bind:href="'mailto:' + userData.email" class="text-blue">
-              {{ userData.email }}</a
-            >
+              {{ userData.email }}
+            </a>
           </v-card-text>
         </v-col>
         <v-spacer></v-spacer>
@@ -118,7 +120,7 @@ onMounted(async () => {
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
             :class="userData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ userData.status === "Active" ? "Active" : "Disabled" }}
+            {{ userData.status }}
           </v-chip>
           <v-btn
             flat
@@ -172,15 +174,9 @@ onMounted(async () => {
         :user-roles="props.userRoles"
         @closeUserDialogEvent="closeUserDialog"
         @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
-        @disableUserEvent="closeUserDialog(), disableUser(userData.id)"
-        @enableUserEvent="closeUserDialog(), enableUser(userData.id)"
+        @disableUserEvent="closeUserDialog(), disableUser(userData)"
+        @enableUserEvent="closeUserDialog(), enableUser(userData)"
       ></UserDialogBody>
     </v-dialog>
   </v-card>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>
