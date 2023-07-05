@@ -121,9 +121,7 @@ function similarComposerCheck(composer) {
                 composerData.status === 'Active' ? 'bg-teal' : 'bg-maroon'
               "
             >
-              {{
-                editedComposerData.status === "Active" ? "Active" : "Disabled"
-              }}
+              {{ editedComposerData.status }}
             </v-chip>
           </v-col>
         </v-row>
