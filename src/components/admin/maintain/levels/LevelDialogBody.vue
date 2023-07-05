@@ -79,17 +79,6 @@ async function updateLevel() {
               {{ levelData.name }}
             </v-card-title>
           </v-col>
-          <v-col v-if="props.isEdit" cols="auto" align-self="center">
-            <v-chip
-              label
-              flat
-              size="small"
-              class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-              :class="levelData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
-            >
-              {{ levelData.status === "Active" ? "Active" : "Disabled" }}
-            </v-chip>
-          </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions :class="props.isEdit ? '' : 'mt-2'">
