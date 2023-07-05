@@ -44,11 +44,11 @@ async function enablePiece(piece) {
   <v-card color="lightMaroon" class="flatCardBorder" elevation="0">
     <v-card-title>
       <v-row class="pt-0 mt-0 pl-2">
-        <v-col cols="7" class="pl-1">
+        <v-col cols="6" class="pl-1">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
             {{ pieceData.title }}
           </v-card-subtitle>
-          <v-card-text class="text-weight-semi-bold w-75">
+          <v-card-text class="text-weight-semi-bold pt-1 pb-0">
             {{ pieceData.composer.lastName }},
             {{ pieceData.composer.firstName }}
           </v-card-text>
