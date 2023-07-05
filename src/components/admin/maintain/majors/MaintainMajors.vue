@@ -55,19 +55,13 @@ const majorTypeFilterOptions = [
 const majorTypeFilterSelection = ref(null);
 
 function filterMajors() {
-  // Filter by status
-  if (statusFilterSelection.value) {
-    filteredMajors.value = filteredMajors.value.filter(
-      (major) => major.status === statusFilterSelection.value
-    );
-  }
-
-  // Filter by major type,
-  if (majorTypeFilterSelection.value != null) {
-    filteredMajors.value = filteredMajors.value.filter(
-      (major) => major.isMusicMajor === majorTypeFilterSelection.value
-    );
-  }
+  filteredMajors.value = filteredMajors.value.filter(
+    (major) =>
+      (!statusFilterSelection.value ||
+        major.status === statusFilterSelection.value) &&
+      (!majorTypeFilterSelection.value ||
+        major.isMusicMajor === majorTypeFilterSelection.value)
+  );
 }
 
 // Clears all filters and returns to page 1

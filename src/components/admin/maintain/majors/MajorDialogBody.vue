@@ -82,7 +82,7 @@ async function updateMajor() {
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
               :class="majorData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
             >
-              {{ editedMajorData.status === "Active" ? "Active" : "Disabled" }}
+              {{ editedMajorData.status }}
             </v-chip>
           </v-col>
         </v-row>

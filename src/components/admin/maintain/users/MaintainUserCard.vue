@@ -65,6 +65,7 @@ function fillInstrumentRoleLabels(instruments) {
 }
 
 async function disableUser(user) {
+  user.status = "Disabled";
   await UserDataService.update(user)
     .then(() => {
       emits("refreshUsersEvent");
@@ -75,6 +76,7 @@ async function disableUser(user) {
 }
 
 async function enableUser(user) {
+  user.status = "Active";
   await UserDataService.update(user)
     .then(() => {
       emits("refreshUsersEvent");
