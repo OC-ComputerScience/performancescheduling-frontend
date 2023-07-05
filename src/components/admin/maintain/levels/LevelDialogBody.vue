@@ -104,7 +104,7 @@ async function updateLevel() {
           </v-card-subtitle>
           <v-textarea
             placeholder="description of level"
-            autogrow
+            no-resize
             rows="3"
             v-model="editedLevelData.description"
             variant="plain"
