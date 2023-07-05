@@ -107,8 +107,8 @@ onMounted(async () => {
           </v-card-subtitle>
           <v-card-text class="text-weight-semi-bold pt-1 pb-0">
             <a v-bind:href="'mailto:' + userData.email" class="text-blue">
-              {{ userData.email }}</a
-            >
+              {{ userData.email }}
+            </a>
           </v-card-text>
         </v-col>
         <v-spacer></v-spacer>
