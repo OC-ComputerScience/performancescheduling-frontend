@@ -113,7 +113,7 @@ function similarPieceCheck(piece) {
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
               :class="pieceData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
             >
-              {{ editedPieceData.status === "Active" ? "Active" : "Disabled" }}
+              {{ editedPieceData.status }}
             </v-chip>
           </v-col>
         </v-row>
