@@ -68,7 +68,7 @@ async function enableMajor(major) {
           </v-btn>
         </v-col>
       </v-row>
-      <v-row class="pt-0 mt-0 pl-2">
+      <v-row class="pt-0 mt-0 pl-1">
         <v-col cols="6" class="pl-1">
           <v-chip
             label
