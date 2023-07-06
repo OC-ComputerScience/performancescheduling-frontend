@@ -43,9 +43,6 @@ async function addPiece() {
 async function updatePiece() {
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
-      delete editedPieceData.value["createdAt"];
-      delete editedPieceData.value["updatedAt"];
-
       await PieceDataService.update(editedPieceData.value)
         .then(() => {
           emits("updatePieceSuccessEvent");
