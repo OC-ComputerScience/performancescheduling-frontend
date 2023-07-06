@@ -100,6 +100,10 @@ const adminMenus = [
     text: "Majors",
   },
   {
+    link: "adminLevels",
+    text: "Levels",
+  },
+  {
     link: "adminSemesters",
     text: "Semesters",
   },
