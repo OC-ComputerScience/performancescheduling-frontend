@@ -16,7 +16,7 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
 });
 
-const editedEventTypeData = ref(props.eventTypeData);
+const editedEventTypeData = ref(Object.assign({}, props.eventTypeData));
 
 const slotTypeOptions = ["Flexible", "Fixed"];
 
