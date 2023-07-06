@@ -55,8 +55,8 @@ async function updateMajor() {
 </script>
 
 <template>
-  <v-form ref="form" validate-on="input">
-    <v-card class="pa-2 flatCardBorder">
+  <v-card class="pa-2 flatCardBorder">
+    <v-form ref="form" validate-on="input">
       <v-card-title>
         <v-row class="pt-0 mt-0">
           <v-col
@@ -65,55 +65,52 @@ async function updateMajor() {
           >
             {{ props.isEdit ? "Edit" : "Add" }} Major
           </v-col>
-        </v-row>
-      </v-card-title>
-      <v-card-text class="pt-0">
-        <v-row v-if="props.isEdit" class="pt-0 mt-0">
-          <v-col cols="auto" class="pl-6" align-self="center">
-            <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
-              {{ editedMajorData.name }}
-            </v-card-title>
-          </v-col>
-          <v-col v-if="props.isEdit" cols="auto" align-self="center">
+          <v-col
+            v-if="props.isEdit"
+            cols="auto"
+            align-self="center"
+            class="pt-0 mt-0"
+          >
             <v-chip
               label
               flat
               size="small"
-              class="font-weight-bold mt-0 text-none text-white flatChipBorder"
+              class="font-weight-bold text-none text-white flatChipBorder"
               :class="majorData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
             >
               {{ editedMajorData.status }}
             </v-chip>
           </v-col>
         </v-row>
-      </v-card-text>
-      <v-row :class="props.isEdit ? '' : 'mt-2'">
-        <v-col>
-          <v-card-subtitle
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Major Name
-          </v-card-subtitle>
-          <v-text-field
-            placeholder="Music"
-            v-model="editedMajorData.name"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            :rules="[() => !!editedMajorData.name || 'This field is required']"
-          ></v-text-field>
+      </v-card-title>
+      <v-card-text class="pt-0">
+        <v-row v-if="props.isEdit" class="pt-0 mt-0"> </v-row>
+        <v-row :class="props.isEdit ? '' : 'mt-2'">
+          <v-col>
+            <v-card-subtitle
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Major Name
+            </v-card-subtitle>
+            <v-text-field
+              placeholder="Music"
+              v-model="editedMajorData.name"
+              variant="plain"
+              class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+              :rules="[
+                () => !!editedMajorData.name || 'This field is required',
+              ]"
+            ></v-text-field>
 
-          <v-card-subtitle
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Music Major?
-          </v-card-subtitle>
-          <v-checkbox
-            v-model="editedMajorData.isMusicMajor"
-            label="Music Major?"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-checkbox>
-        </v-col>
-      </v-row>
+            <v-checkbox
+              v-model="editedMajorData.isMusicMajor"
+              label="Music Major?"
+              class="text-blue font-weight-bold py-0 my-0 mb-4"
+            ></v-checkbox>
+          </v-col>
+        </v-row>
+      </v-card-text>
+
       <v-card-actions>
         <v-btn
           flat
@@ -150,6 +147,6 @@ async function updateMajor() {
           {{ props.majorData.status === "Disabled" ? "Enable" : "Disable" }}
         </v-btn>
       </v-card-actions>
-    </v-card>
-  </v-form>
+    </v-form>
+  </v-card>
 </template>
