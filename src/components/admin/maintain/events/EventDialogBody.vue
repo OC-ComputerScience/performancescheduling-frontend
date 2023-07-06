@@ -92,11 +92,8 @@ async function updateEvent() {
   });
 }
 
-function semesterNameCheck() {
-  const pattern = /[0-9]{4}-[A-Z]{2}/;
-  return pattern.test(editedEventData.value.name)
-    ? true
-    : "Semester name must be in the format of YYYY-SS.";
+function eventNameCheck() {
+  return editedEventData.value.name ? true : "This field is required";
 }
 function dateCheck(date) {
   const pattern = new RegExp("[0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2}$");
@@ -160,7 +157,7 @@ function endDateCheck() {
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () => !!editedEventData.name || 'This field is required',
-              semesterNameCheck,
+              eventNameCheck,
             ]"
           ></v-text-field>
 

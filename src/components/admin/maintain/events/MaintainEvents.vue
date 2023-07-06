@@ -90,7 +90,7 @@ function clearFilters() {
 
 // Pagination
 const currentPage = ref(1);
-const perPage = 6;
+const perPage = 9;
 
 const currentPageData = computed(() => {
   return filteredEvents.value.slice(
