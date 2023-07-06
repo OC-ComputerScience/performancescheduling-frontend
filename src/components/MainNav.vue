@@ -302,7 +302,7 @@ onMounted(() => {
                 color="secondary"
                 class="with-outline"
               >
-                <v-img
+                <img
                   v-if="loginStore.user.picture"
                   :src="loginStore.user.picture"
                   referrerpolicy="no-referrer"
