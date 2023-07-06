@@ -15,6 +15,8 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
 });
 
+const form = ref(null);
+
 const selectedInstrument = ref(props.studentInstrumentData.instrument);
 const selectedInstructor = ref(props.studentInstrumentData.instructorRole);
 const selectedAccompanist = ref(props.studentInstrumentData.accompanistRole);
@@ -70,30 +72,40 @@ async function getAllAccompanists() {
 }
 
 async function addInstrument() {
-  await StudentInstrumentDataService.create({
-    privateHours: privateHours.value,
-    status: props.studentInstrumentData.status,
-    studentRoleId: props.studentInstrumentData.studentRoleId,
-    instrumentId: selectedInstrument.value.id,
-    instructorRoleId: selectedInstructor.value.id,
-    accompanistRoleId: selectedAccompanist.value.id,
-    levelId: editedLevel.value.id,
-  })
-    .then(() => {
-      emits("addInstrumentSuccessEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  form.value.validate().then(async (valid) => {
+    console.log(valid.valid);
+    if (valid.valid) {
+      await StudentInstrumentDataService.create({
+        privateHours: privateHours.value,
+        status: props.studentInstrumentData.status,
+        studentRoleId: props.studentInstrumentData.studentRoleId,
+        instrumentId: selectedInstrument.value.id,
+        instructorRoleId: selectedInstructor.value.id,
+        accompanistRoleId: selectedAccompanist.value.id,
+        levelId: editedLevel.value.id,
+      })
+        .then(() => {
+          emits("addInstrumentSuccessEvent");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
 }
 
 async function updateInstrument() {
-  await updateSelectedInstructor();
-  await updateSelectedAccompanist();
-  await updateLevel();
-  await updatePrivateHours();
+  form.value.validate().then(async (valid) => {
+    console.log(valid.valid);
+    if (valid.valid) {
+      await updateSelectedInstructor();
+      await updateSelectedAccompanist();
+      await updateLevel();
+      await updatePrivateHours();
 
-  emits("updateInstrumentSuccessEvent");
+      emits("updateInstrumentSuccessEvent");
+    }
+  });
 }
 
 async function updateSelectedInstructor() {
@@ -163,140 +175,148 @@ onMounted(async () => {
 
 <template>
   <v-card class="pa-2 bg-lightBlue flatCardBorder">
-    <v-card-title>
-      <v-row class="pt-0 mt-0">
-        <v-col cols="auto" class="pt-0 mt-0 text-blue font-weight-bold text-h4">
-          {{ props.isEdit ? "Edit" : "Add" }} Instrument
-        </v-col>
-        <v-spacer></v-spacer>
-        <v-col v-if="props.isEdit" cols="auto" class="pt-0 mt-0 pr-2">
-          <v-chip
-            label
-            flat
-            size="small"
-            class="font-weight-bold mt-0 text-none bg-white flatChipBorder"
-            :class="
-              studentInstrumentData.status === 'Active'
-                ? 'text-teal'
-                : 'text-maroon'
-            "
+    <v-form ref="form" validate-on="input">
+      <v-card-title>
+        <v-row class="pt-0 mt-0">
+          <v-col
+            cols="auto"
+            class="pt-0 mt-0 text-blue font-weight-bold text-h4"
           >
-            {{
-              studentInstrumentData.status === "Active" ? "Active" : "Disabled"
-            }}
-          </v-chip>
-        </v-col>
-      </v-row>
-    </v-card-title>
-    <v-card-text class="pt-4">
-      <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-        Instrument
-      </v-card-subtitle>
-      <v-select
-        color="darkBlue"
-        variant="plain"
-        class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-        v-model="selectedInstrument"
-        :items="instrumentOptions"
-        :item-title="(item) => item.name"
-        item-value="id"
-        return-object
-        :disabled="props.isEdit"
-      >
-      </v-select>
+            {{ props.isEdit ? "Edit" : "Add" }} Instrument
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col v-if="props.isEdit" cols="auto" class="pt-0 mt-0 pr-2">
+            <v-chip
+              label
+              flat
+              size="small"
+              class="font-weight-bold mt-0 text-none bg-white flatChipBorder"
+              :class="
+                studentInstrumentData.status === 'Active'
+                  ? 'text-teal'
+                  : 'text-maroon'
+              "
+            >
+              {{ studentInstrumentData.status }}
+            </v-chip>
+          </v-col>
+        </v-row>
+      </v-card-title>
+      <v-card-text class="pt-4">
+        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+          Instrument
+        </v-card-subtitle>
+        <v-select
+          color="darkBlue"
+          variant="plain"
+          class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+          v-model="selectedInstrument"
+          :items="instrumentOptions"
+          :item-title="(item) => item.name"
+          item-value="id"
+          return-object
+          :disabled="props.isEdit"
+          :rules="[(v) => !!v || 'This field is required']"
+        >
+        </v-select>
 
-      <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-        Instructor
-      </v-card-subtitle>
-      <v-select
-        color="darkBlue"
-        variant="plain"
-        class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-        v-model="selectedInstructor"
-        :items="instructors"
-        :item-title="(item) => item.user.firstName + ' ' + item.user.lastName"
-        item-value="id"
-        return-object
-      >
-      </v-select>
+        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+          Instructor
+        </v-card-subtitle>
+        <v-select
+          color="darkBlue"
+          variant="plain"
+          class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+          v-model="selectedInstructor"
+          :items="instructors"
+          :item-title="(item) => item.user.firstName + ' ' + item.user.lastName"
+          item-value="id"
+          return-object
+          :rules="[(v) => !!v || 'This field is required']"
+        >
+        </v-select>
 
-      <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-        Accompanist
-      </v-card-subtitle>
-      <v-select
-        color="darkBlue"
-        variant="plain"
-        class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-        v-model="selectedAccompanist"
-        :items="accompanists"
-        :item-title="(item) => item.user.firstName + ' ' + item.user.lastName"
-        item-value="id"
-        return-object
-      >
-      </v-select>
-      <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-        Level
-      </v-card-subtitle>
-      <v-select
-        color="darkBlue"
-        variant="plain"
-        class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-        v-model="editedLevel"
-        :items="levelOptions"
-        :item-title="(item) => item.name"
-        item-value="id"
-        return-object
-      >
-      </v-select>
-      <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-        Private Hours
-      </v-card-subtitle>
-      <v-text-field
-        type="number"
-        color="darkBlue"
-        variant="plain"
-        class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-        v-model="privateHours"
-      >
-      </v-text-field>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn
-        flat
-        class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-        @click="props.isEdit ? updateInstrument() : addInstrument()"
-      >
-        {{ props.isEdit ? "Save" : "Add" }}
-      </v-btn>
-      <v-btn
-        flat
-        class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-        :class="props.isEdit ? '' : 'mr-auto'"
-        @click="emits('closeUserInstrumentDialogEvent')"
-      >
-        Cancel
-      </v-btn>
-      <v-btn
-        v-if="props.isEdit"
-        flat
-        class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
-        :class="
-          props.studentInstrumentData.status === 'Disabled'
-            ? 'bg-darkBlue'
-            : 'bg-maroon'
-        "
-        @click="
-          props.studentInstrumentData.status === 'Disabled'
-            ? emits('enableStudentInstrumentEvent')
-            : emits('disableStudentInstrumentEvent')
-        "
-      >
-        {{
-          props.studentInstrumentData.status === "Disabled"
-            ? "Enable"
-            : "Disable"
-        }}
-      </v-btn>
-    </v-card-actions>
+        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+          Accompanist
+        </v-card-subtitle>
+        <v-select
+          color="darkBlue"
+          variant="plain"
+          class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+          v-model="selectedAccompanist"
+          :items="accompanists"
+          :item-title="(item) => item.user.firstName + ' ' + item.user.lastName"
+          item-value="id"
+          return-object
+          :rules="[(v) => !!v || 'This field is required']"
+        >
+        </v-select>
+        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+          Level
+        </v-card-subtitle>
+        <v-select
+          color="darkBlue"
+          variant="plain"
+          class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+          v-model="editedLevel"
+          :items="levelOptions"
+          :item-title="(item) => item.name"
+          item-value="id"
+          return-object
+          :rules="[(v) => !!v || 'This field is required']"
+        >
+        </v-select>
+        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+          Private Hours
+        </v-card-subtitle>
+        <v-text-field
+          type="number"
+          color="darkBlue"
+          variant="plain"
+          class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+          v-model="privateHours"
+          :rules="[(v) => !!v || 'This field is required']"
+        >
+        </v-text-field>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateInstrument() : addInstrument()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="emits('closeUserInstrumentDialogEvent')"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          v-if="props.isEdit"
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          :class="
+            props.studentInstrumentData.status === 'Disabled'
+              ? 'bg-darkBlue'
+              : 'bg-maroon'
+          "
+          @click="
+            props.studentInstrumentData.status === 'Disabled'
+              ? emits('enableStudentInstrumentEvent')
+              : emits('disableStudentInstrumentEvent')
+          "
+        >
+          {{
+            props.studentInstrumentData.status === "Disabled"
+              ? "Enable"
+              : "Disable"
+          }}
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </v-card>
 </template>
