@@ -174,8 +174,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-form ref="form" validate-on="input">
-    <v-card class="pa-2 bg-lightBlue flatCardBorder">
+  <v-card class="pa-2 bg-lightBlue flatCardBorder">
+    <v-form ref="form" validate-on="input">
       <v-card-title>
         <v-row class="pt-0 mt-0">
           <v-col
@@ -197,11 +197,7 @@ onMounted(async () => {
                   : 'text-maroon'
               "
             >
-              {{
-                studentInstrumentData.status === "Active"
-                  ? "Active"
-                  : "Disabled"
-              }}
+              {{ studentInstrumentData.status }}
             </v-chip>
           </v-col>
         </v-row>
@@ -321,6 +317,6 @@ onMounted(async () => {
           }}
         </v-btn>
       </v-card-actions>
-    </v-card>
-  </v-form>
+    </v-form>
+  </v-card>
 </template>

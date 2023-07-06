@@ -167,7 +167,12 @@ onMounted(async () => {
         </v-col>
       </v-row>
     </v-card-actions>
-    <v-dialog v-model="createOrEditDialog" persistent max-width="1200px">
+    <v-dialog
+      v-model="createOrEditDialog"
+      persistent
+      max-width="1200px"
+      scrollable
+    >
       <UserDialogBody
         :is-edit="true"
         :user-data="userData"

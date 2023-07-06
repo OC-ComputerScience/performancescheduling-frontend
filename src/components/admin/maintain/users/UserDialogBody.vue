@@ -168,9 +168,6 @@ async function updateUser() {
         await updateFacultyTitle();
       }
 
-      delete editedUserData.value["createdAt"];
-      delete editedUserData.value["updatedAt"];
-
       await UserDataService.update(editedUserData.value)
         .then(() => {
           emits("updateUserSuccessEvent");
@@ -321,8 +318,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-form ref="form" validate-on="input">
-    <v-card class="pa-2 flatCardBorder">
+  <v-card class="pa-2 flatCardBorder">
+    <v-form ref="form" validate-on="input">
       <v-card-title>
         <v-row class="pt-0 mt-0">
           <v-col
@@ -359,7 +356,7 @@ onMounted(async () => {
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
               :class="userData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
             >
-              {{ userData.status === "Active" ? "Active" : "Disabled" }}
+              {{ userData.status }}
             </v-chip>
           </v-col>
         </v-row>
@@ -622,8 +619,8 @@ onMounted(async () => {
           {{ props.userData.status === "Disabled" ? "Enable" : "Disable" }}
         </v-btn>
       </v-card-actions>
-    </v-card>
-  </v-form>
+    </v-form>
+  </v-card>
   <v-dialog v-model="addInstrumentDialog" persistent max-width="600px">
     <UserInstrumentDialogBody
       :is-edit="false"
