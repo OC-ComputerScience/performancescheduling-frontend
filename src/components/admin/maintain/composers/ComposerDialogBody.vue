@@ -42,9 +42,6 @@ async function addComposer() {
 async function updateComposer() {
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
-      delete editedComposerData.value["createdAt"];
-      delete editedComposerData.value["updatedAt"];
-
       await ComposerDataService.update(editedComposerData.value)
         .then(() => {
           emits("updateComposerSuccessEvent");
