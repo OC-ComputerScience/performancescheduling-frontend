@@ -58,8 +58,8 @@ async function updateEventType() {
 </script>
 
 <template>
-  <v-form ref="form" validate-on="input">
-    <v-card class="pa-2 flatCardBorder">
+  <v-card class="pa-2 flatCardBorder">
+    <v-form ref="form" validate-on="input">
       <v-card-title>
         <v-row class="pt-0 mt-0">
           <v-col
@@ -232,6 +232,6 @@ async function updateEventType() {
           {{ props.eventTypeData.status === "Disabled" ? "Enable" : "Disable" }}
         </v-btn>
       </v-card-actions>
-    </v-card>
-  </v-form>
+    </v-form>
+  </v-card>
 </template>
