@@ -132,6 +132,12 @@ const router = createRouter({
     {
       path: "/base",
       component: BaseView,
+      name: "adminLevels",
+      alias: "/adminLevels",
+    },
+    {
+      path: "/base",
+      component: BaseView,
       name: "adminSemesters",
       alias: "/adminSemesters",
     },
