@@ -86,6 +86,12 @@ function similarComposerCheck(composer) {
     ? true
     : "This are very simialr existing composers: " + similarComposerNames;
 }
+
+function emptyNameCheck(composer) {
+  return composer.lastName != null || composer.firstName != null
+    ? true
+    : "First Name or Last Name is required";
+}
 </script>
 
 <template>
@@ -135,7 +141,7 @@ function similarComposerCheck(composer) {
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
-              () => !!editedComposerData.firstName || 'This field is required',
+              emptyNameCheck(editedComposerData),
               similarComposerCheck(editedComposerData),
             ]"
           ></v-text-field>
@@ -149,7 +155,7 @@ function similarComposerCheck(composer) {
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
-              () => !!editedComposerData.lastName || 'This field is required',
+              emptyNameCheck(editedComposerData),
               similarComposerCheck(editedComposerData),
             ]"
           ></v-text-field>
