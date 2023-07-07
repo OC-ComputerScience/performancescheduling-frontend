@@ -1,42 +1,42 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import SemesterDataService from "./../../../../services/SemesterDataService";
-import MaintainSemesterCard from "./MaintainSemesterCard.vue";
-import SemesterDialogBody from "./SemesterDialogBody.vue";
+import LevelDataService from "./../../../../services/LevelDataService";
+import MaintainLevelCard from "./MaintainLevelCard.vue";
+import LevelDialogBody from "./LevelDialogBody.vue";
 
-const addSemesterDialog = ref(false);
+const addLevelDialog = ref(false);
 
-// Semester Data
-const semesters = ref([]);
-const filteredSemesters = ref([]);
+// Levels Data
+const levels = ref([]);
+const filteredLevels = ref([]);
 
-async function getSemesters() {
-  await SemesterDataService.getAll("name")
+async function getLevels() {
+  await LevelDataService.getAll("name")
     .then((response) => {
-      semesters.value = response.data;
-      filteredSemesters.value = semesters.value;
+      levels.value = response.data;
+      filteredLevels.value = levels.value;
     })
     .catch((err) => {
       console.log(err);
     });
 }
 
-async function refreshSemesters() {
-  await getSemesters();
+async function refreshLevels() {
+  await getLevels();
 }
 
 const searchInput = ref("");
 
 // Search filter
-// Filters the list of Semesters by first and last name, based on searchInput
+// Filters the list of Levelss by first and last name, based on searchInput
 function searchFilteredList() {
-  filteredSemesters.value = semesters.value;
+  filteredLevels.value = levels.value;
 
   // If the search input is empty, return the full list, otherwise filter
   if (searchInput.value === "") return;
 
-  filteredSemesters.value = filteredSemesters.value.filter((semester) =>
-    semester.name.toLowerCase().includes(searchInput.value.toLowerCase())
+  filteredLevels.value = filteredLevels.value.filter((levels) =>
+    levels.name.toLowerCase().includes(searchInput.value.toLowerCase())
   );
 }
 
@@ -46,21 +46,21 @@ const currentPage = ref(1);
 const perPage = 15;
 
 const currentPageData = computed(() => {
-  return filteredSemesters.value.slice(
+  return filteredLevels.value.slice(
     (currentPage.value - 1) * perPage,
     currentPage.value * perPage
   );
 });
 
 onMounted(async () => {
-  await getSemesters();
+  await getLevels();
 });
 </script>
 
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight-bold text-h3">Semesters</h1>
+      <h1 class="text-maroon font-weight">Levels</h1>
 
       <input
         type="text"
@@ -78,9 +78,9 @@ onMounted(async () => {
         size="medium"
         color="blue"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
-        @click="addSemesterDialog = true"
+        @click="addLevelDialog = true"
       >
-        Add new Semester
+        Add new Levels
       </v-btn>
     </v-row>
     <v-row>
@@ -88,16 +88,16 @@ onMounted(async () => {
         <v-card class="pa-5 mainCardBorder">
           <v-row>
             <v-col
-              v-for="semester in currentPageData"
-              :key="semester.id"
+              v-for="level in currentPageData"
+              :key="level.id"
               cols="12"
               md="6"
               lg="4"
             >
-              <MaintainSemesterCard
-                :semester-data="semester"
-                @refreshSemestersEvent="refreshSemesters()"
-              ></MaintainSemesterCard>
+              <MaintainLevelCard
+                :level-data="level"
+                @refreshLevelsEvent="refreshLevels()"
+              ></MaintainLevelCard>
             </v-col>
           </v-row>
         </v-card>
@@ -110,9 +110,9 @@ onMounted(async () => {
             color="blue"
             class="font-weight-bold"
             :length="
-              filteredSemesters.length % perPage == 0
-                ? filteredSemesters.length / perPage
-                : Math.floor(filteredSemesters.length / perPage) + 1
+              filteredLevels.length % perPage == 0
+                ? filteredLevels.length / perPage
+                : Math.floor(filteredLevels.length / perPage) + 1
             "
             :total-visible="7"
             v-model="currentPage"
@@ -121,18 +121,18 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog v-model="addSemesterDialog" persistent max-width="600px">
-    <SemesterDialogBody
+  <v-dialog v-model="addLevelDialog" persistent max-width="600px">
+    <LevelDialogBody
       :is-edit="false"
-      :semester-data="{
+      :levelData="{
         id: null,
         name: null,
-        startDate: null,
-        endDate: null,
+        description: null,
+        hours: null,
         status: 'Active',
       }"
-      @closeAddSemesterDialogEvent="addSemesterDialog = false"
-      @addSemesterSuccessEvent="(addSemesterDialog = false), refreshSemesters()"
-    ></SemesterDialogBody>
+      @closeAddLevelDialogEvent="addLevelDialog = false"
+      @addLevelSuccessEvent="(addLevelDialog = false), refreshLevels()"
+    ></LevelDialogBody>
   </v-dialog>
 </template>

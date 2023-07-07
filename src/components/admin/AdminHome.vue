@@ -93,10 +93,7 @@ onMounted(async () => {
 <template>
   <v-container fluid class="fill-height bg-lightGray pa-4">
     <v-row class="fill-height pa-0 ma-0">
-      <v-col cols="12" lg="1" class="ma-0 pa-4">
-        <h1 class="text-maroon">Home</h1>
-      </v-col>
-      <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
+      <v-col cols="12" lg="6" class="pa-0 ma-0 pa-4">
         <v-card class="fill-height mainCardBorder pa-2">
           <v-card-title>
             <v-row class="pa-2">
@@ -115,6 +112,7 @@ onMounted(async () => {
               :item-count="pendingItem.count"
               :text="pendingItem.text"
               :link="pendingItem.link"
+              :key="pendingItem.id"
             ></AdminPendingItemCard>
           </v-card-text>
         </v-card>
@@ -137,9 +135,3 @@ onMounted(async () => {
     </v-row>
   </v-container>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

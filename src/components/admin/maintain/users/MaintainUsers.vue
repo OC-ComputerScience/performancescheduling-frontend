@@ -139,7 +139,7 @@ onMounted(async () => {
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight">Users</h1>
+      <h1 class="text-maroon font-weight-bold text-h3">Users</h1>
 
       <input
         type="text"
