@@ -42,13 +42,12 @@ async function enableSemester(semesterId) {
 <template>
   <v-card color="lightMaroon" class="flatCardBorder" elevation="0">
     <v-card-title>
-      <v-row class="pt-0 mt-0 pl-2">
-        <v-col cols="1" align-self="center"> </v-col>
-        <v-col cols="6" class="pl-1">
+      <v-row class="pt-0 mt-0 pl-0 pb-2">
+        <v-col cols="6" class="pl-0">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
             {{ semesterData.name }}
           </v-card-subtitle>
-          <v-card-text class="text-weight-semi-bold pt-1 pb-0">
+          <v-card-text class="text-weight-semi-bold pt-1 text-blue pb-0">
             {{ formatDate(semesterData.startDate) }}
             to
             {{ formatDate(semesterData.endDate) }}
@@ -63,7 +62,7 @@ async function enableSemester(semesterId) {
             class="font-weight-bold mt-0 text-none text-white flatChipBorder"
             :class="semesterData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
           >
-            {{ semesterData.status === "Active" ? "Active" : "Disabled" }}
+            {{ semesterData.status }}
           </v-chip>
           <v-btn
             flat
