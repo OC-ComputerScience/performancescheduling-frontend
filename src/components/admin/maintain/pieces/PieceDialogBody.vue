@@ -63,19 +63,19 @@ function findSimilar(piece) {
   return similarPieces;
 }
 function similarPieceCheck(piece) {
-  if (props.isEdit == true || piece.title == null) {
-    return true;
-  }
+  if (props.isEdit == true || piece.title == null) return true;
+
   var similarPieces = findSimilar(piece);
   var similarPieceNames = "";
-  similarPieces.forEach((c) => {
-    similarPieceNames += c.title + ", ";
+  similarPieces.forEach((p) => {
+    if (p.composerId == piece.composerId) similarPieceNames += p.title + ", ";
   });
-  similarPieceNames = similarPieceNames.slice(0, -2);
+  if (similarPieceNames.length > 0)
+    similarPieceNames = similarPieceNames.slice(0, -2);
 
-  return similarPieces.length == 0
+  return similarPieceNames.length == 0
     ? true
-    : "This are very simialr existing pieces: " + similarPieceNames;
+    : "There are very simialr existing pieces: " + similarPieceNames;
 }
 </script>
 
@@ -164,6 +164,7 @@ function similarPieceCheck(piece) {
             Composer
           </v-card-subtitle>
           <v-autocomplete
+            placeholder="Start typing the composer's last name"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -172,8 +173,36 @@ function similarPieceCheck(piece) {
             item-title="lastName"
             item-value="id"
           >
-            ></v-autocomplete
-          >
+            <template v-slot:item="{ item, props: { onClick } }">
+              <v-list-item
+                v-if="
+                  item.raw.firstName != null &&
+                  item.raw.firstName.length != 0 &&
+                  item.raw.lastName != null &&
+                  item.raw.lastName.length != 0
+                "
+                @click="onClick"
+              >
+                {{ item.raw.lastName }}, {{ item.raw.firstName }}
+              </v-list-item>
+              <v-list-item
+                v-else-if="
+                  item.raw.lastname == null || item.raw.lastname.length == 0
+                "
+                @click="onClick"
+              >
+                {{ item.raw.firstName }}
+              </v-list-item>
+              <v-list-item
+                v-else-if="
+                  item.raw.lastName == null || item.raw.lastName.length == 0
+                "
+                @click="onClick"
+              >
+                {{ item.raw.lastName }}
+              </v-list-item>
+            </template>
+          </v-autocomplete>
         </v-col>
       </v-row>
       <v-card-actions>
