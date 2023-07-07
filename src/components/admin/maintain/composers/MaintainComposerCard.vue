@@ -12,8 +12,6 @@ const props = defineProps({
 const createOrEditDialog = ref(false);
 const comma = ref(", ");
 
-console.log(props.composerData.firstName.lenght);
-
 if (
   props.composerData.firstName.length == 0 ||
   props.composerData.lastName.length == 0
