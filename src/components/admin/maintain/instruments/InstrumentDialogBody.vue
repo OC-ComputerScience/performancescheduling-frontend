@@ -41,9 +41,6 @@ async function addInstrument() {
 async function updateInstrument() {
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
-      delete editedInstrumentData.value["createdAt"];
-      delete editedInstrumentData.value["updatedAt"];
-
       await InstrumentDataService.update(editedInstrumentData.value)
         .then(() => {
           emits("updateInstrumentSuccessEvent");
