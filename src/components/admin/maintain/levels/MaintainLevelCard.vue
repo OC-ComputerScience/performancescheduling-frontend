@@ -39,14 +39,14 @@ async function enableLevel(levelId) {
 <template>
   <v-card color="lightMaroon" class="flatCardBorder" elevation="0">
     <v-card-title>
-      <v-row class="pt-0 mt-0 pl-2">
-        <v-col cols="6" class="pl-1">
+      <v-row class="pt-0 mt-0 pb-0">
+        <v-col cols="8" class="pl-0">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
             {{ levelData.name }} - {{ levelData.creditHours }} Hour(s)
           </v-card-subtitle>
 
-          <v-card-text class="text-weight-semi-bold w-75">
-            {{ levelData.description.slice(0, 50) + "..." }}
+          <v-card-text class="font-weight-semi-bold text-truncate pb-2">
+            {{ levelData.description }}
           </v-card-text>
         </v-col>
         <v-spacer></v-spacer>

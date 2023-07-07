@@ -452,17 +452,7 @@ onMounted(() => {
   >
     <v-list>
       <v-list-item
-        v-for="menu in activeMenus"
-        :key="menu.text"
-        exact
-        @click="changeComp(menu.link)"
-        :class="activeLink === menu.link ? 'text-blue' : 'text-maroon'"
-      >
-        <v-list-item-title>{{ menu.text }} </v-list-item-title>
-      </v-list-item>
-      <v-list-item
-        v-if="loginStore.currentRole.roleId == 3"
-        v-for="menu in adminMenus"
+        v-for="menu in loginStore.currentRole.roleId == 3 ? activeMenus : menus"
         :key="menu.text"
         exact
         @click="changeComp(menu.link)"

@@ -60,7 +60,7 @@ onMounted(async () => {
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight">Semesters</h1>
+      <h1 class="text-maroon font-weight-bold text-h3">Semesters</h1>
 
       <input
         type="text"
@@ -136,5 +136,3 @@ onMounted(async () => {
     ></SemesterDialogBody>
   </v-dialog>
 </template>
-
-<style scoped></style>

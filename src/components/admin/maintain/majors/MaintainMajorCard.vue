@@ -41,8 +41,8 @@ async function enableMajor(major) {
 <template>
   <v-card color="lightMaroon" class="flatCardBorder" elevation="0">
     <v-card-title>
-      <v-row class="pt-0 mt-0 pl-2">
-        <v-col cols="7" class="pl-1">
+      <v-row class="pt-0 mt-0 pl-0">
+        <v-col cols="7" class="pl-0">
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
             {{ majorData.name }}
           </v-card-subtitle>
@@ -68,7 +68,7 @@ async function enableMajor(major) {
           </v-btn>
         </v-col>
       </v-row>
-      <v-row class="pt-0 mt-0 pl-2">
+      <v-row class="pt-0 mt-0 pl-2 pb-1">
         <v-col cols="6" class="pl-1">
           <v-chip
             label
@@ -83,7 +83,7 @@ async function enableMajor(major) {
       </v-row>
     </v-card-title>
 
-    <v-dialog v-model="createOrEditDialog" persistent max-width="1200px">
+    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
       <MajorDialogBody
         :is-edit="true"
         :major-data="majorData"
