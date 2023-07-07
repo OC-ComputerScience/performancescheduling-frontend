@@ -88,7 +88,8 @@ function similarComposerCheck(composer) {
 }
 
 function emptyNameCheck(composer) {
-  return composer.lastName != null || composer.firstName != null
+  return (composer.lastName != null && composer.lastName.length != 0) ||
+    (composer.firstName != null && composer.firstName.length != 0)
     ? true
     : "First Name or Last Name is required";
 }

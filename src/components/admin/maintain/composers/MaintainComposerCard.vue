@@ -13,7 +13,9 @@ const createOrEditDialog = ref(false);
 const comma = ref(", ");
 
 if (
+  props.composerData.firstName == null ||
   props.composerData.firstName.length == 0 ||
+  props.composerData.lastName.length == null ||
   props.composerData.lastName.length == 0
 )
   comma.value = "";
