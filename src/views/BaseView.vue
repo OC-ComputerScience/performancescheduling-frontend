@@ -16,6 +16,7 @@ import MaintainSemesters from "../components/admin/maintain/semesters/MaintainSe
 import MaintainInstruments from "../components/admin/maintain/instruments/MaintainInstruments.vue";
 import MaintainComposers from "../components/admin/maintain/composers/MaintainComposers.vue";
 import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.vue";
+import MaintainLocations from "../components/admin/maintain/locations/MaintainLocations.vue";
 </script>
 
 <template>
@@ -67,6 +68,9 @@ import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.v
         <MaintainPieces
           v-if="this.$route.fullPath === '/adminPieces'"
         ></MaintainPieces>
+        <MaintainLocations
+          v-if="this.$route.fullPath === '/adminLocations'"
+        ></MaintainLocations>
       </v-col>
     </v-row>
   </v-container>
