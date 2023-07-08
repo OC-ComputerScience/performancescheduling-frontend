@@ -57,6 +57,13 @@ async function unreadyEvent(event) {
           <v-card-subtitle class="text-weight-semi-bold text-blue pt-1 pb-0">
             {{ eventData.location.roomName }}
           </v-card-subtitle>
+          <v-card-subtitle class="text-weight-semi-bold text-blue pt-1 pb-0">
+            {{
+              eventData.eventType.type +
+              " - instrument: " +
+              eventData.eventType.instrumentType
+            }}
+          </v-card-subtitle>
         </v-col>
         <v-col cols="3" class="text-right">
           <v-chip
