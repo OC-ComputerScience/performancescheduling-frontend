@@ -14,6 +14,7 @@ import MaintainLevels from "../components/admin/maintain/levels/MaintainLevels.v
 import MaintainMajors from "../components/admin/maintain/majors/MaintainMajors.vue";
 import MaintainSemesters from "../components/admin/maintain/semesters/MaintainSemesters.vue";
 import MaintainInstruments from "../components/admin/maintain/instruments/MaintainInstruments.vue";
+import MaintainComposers from "../components/admin/maintain/composers/MaintainComposers.vue";
 import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.vue";
 </script>
 
@@ -45,6 +46,9 @@ import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.v
         <MaintainUsers
           v-if="this.$route.fullPath === '/adminUsers'"
         ></MaintainUsers>
+        <MaintainComposers
+          v-if="this.$route.fullPath === '/adminComposers'"
+        ></MaintainComposers>
         <MaintainEventTypes
           v-if="this.$route.fullPath === '/adminEventTypes'"
         ></MaintainEventTypes>
@@ -57,15 +61,12 @@ import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.v
         <MaintainSemesters
           v-if="this.$route.fullPath === '/adminSemesters'"
         ></MaintainSemesters>
-
         <MaintainInstruments
           v-if="this.$route.fullPath === '/adminInstruments'"
         ></MaintainInstruments>
-
         <MaintainPieces
           v-if="this.$route.fullPath === '/adminPieces'"
         ></MaintainPieces>
-
       </v-col>
     </v-row>
   </v-container>

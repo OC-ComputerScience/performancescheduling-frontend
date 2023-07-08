@@ -23,6 +23,7 @@ async function getSemesters() {
 
 async function refreshSemesters() {
   await getSemesters();
+  searchFilteredList();
 }
 
 const searchInput = ref("");
