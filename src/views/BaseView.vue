@@ -13,6 +13,7 @@ import MaintainEventTypes from "../components/admin/maintain/eventTypes/Maintain
 import MaintainLevels from "../components/admin/maintain/levels/MaintainLevels.vue";
 import MaintainMajors from "../components/admin/maintain/majors/MaintainMajors.vue";
 import MaintainSemesters from "../components/admin/maintain/semesters/MaintainSemesters.vue";
+import MaintainEvents from "../components/admin/maintain/events/MaintainEvents.vue";
 import MaintainInstruments from "../components/admin/maintain/instruments/MaintainInstruments.vue";
 import MaintainComposers from "../components/admin/maintain/composers/MaintainComposers.vue";
 import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.vue";
@@ -61,6 +62,9 @@ import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.v
         <MaintainSemesters
           v-if="this.$route.fullPath === '/adminSemesters'"
         ></MaintainSemesters>
+        <MaintainEvents
+          v-if="this.$route.fullPath === '/adminEvents'"
+        ></MaintainEvents>
         <MaintainInstruments
           v-if="this.$route.fullPath === '/adminInstruments'"
         ></MaintainInstruments>

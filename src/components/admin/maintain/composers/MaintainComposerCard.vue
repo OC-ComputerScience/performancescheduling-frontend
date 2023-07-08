@@ -70,33 +70,33 @@ async function enableComposer(composer) {
           >
             {{ composerData.status }}
           </v-chip>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
-            @click="createOrEditDialog = true"
-          >
-            Edit
-          </v-btn>
         </v-col>
       </v-row>
     </v-card-title>
-
-    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
-      <ComposerDialogBody
-        :is-edit="true"
-        :composer-data="composerData"
-        @closeComposerDialogEvent="closeComposerDialog"
-        @updateComposerSuccessEvent="
-          closeComposerDialog(), emits('refreshComposersEvent')
-        "
-        @disableComposerEvent="
-          closeComposerDialog(), disableComposer(composerData)
-        "
-        @enableComposerEvent="
-          closeComposerDialog(), enableComposer(composerData)
-        "
-      ></ComposerDialogBody>
-    </v-dialog>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-bold mt-0 ml-4 mr-2 text-none text-blue bg-white flatChipBorder"
+        @click="createOrEditDialog = true"
+      >
+        Edit
+      </v-btn>
+    </v-card-actions>
   </v-card>
+  <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+    <ComposerDialogBody
+      :is-edit="true"
+      :composer-data="composerData"
+      @closeComposerDialogEvent="closeComposerDialog"
+      @updateComposerSuccessEvent="
+        closeComposerDialog(), emits('refreshComposersEvent')
+      "
+      @disableComposerEvent="
+        closeComposerDialog(), disableComposer(composerData)
+      "
+      @enableComposerEvent="closeComposerDialog(), enableComposer(composerData)"
+    ></ComposerDialogBody>
+  </v-dialog>
 </template>

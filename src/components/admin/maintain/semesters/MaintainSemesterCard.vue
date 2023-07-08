@@ -64,35 +64,37 @@ async function enableSemester(semesterId) {
           >
             {{ semesterData.status }}
           </v-chip>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
-            @click="createOrEditDialog = true"
-          >
-            Edit
-          </v-btn>
         </v-col>
       </v-row>
     </v-card-title>
-
-    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
-      <SemesterDialogBody
-        :is-edit="true"
-        :semester-data="semesterData"
-        @closeSemesterDialogEvent="closeSemesterDialog"
-        @updateSemesterSuccessEvent="
-          closeSemesterDialog(), emits('refreshSemestersEvent')
-        "
-        @disableSemesterEvent="
-          closeSemesterDialog(), disableSemester(semesterData.id)
-        "
-        @enableSemesterEvent="
-          closeSemesterDialog(), enableSemester(semesterData.id)
-        "
-      ></SemesterDialogBody>
-    </v-dialog>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-bold mt-0 mr-2 text-none text-blue bg-white flatChipBorder"
+        @click="createOrEditDialog = true"
+      >
+        Edit
+      </v-btn>
+    </v-card-actions>
   </v-card>
+  <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+    <SemesterDialogBody
+      :is-edit="true"
+      :semester-data="semesterData"
+      @closeSemesterDialogEvent="closeSemesterDialog"
+      @updateSemesterSuccessEvent="
+        closeSemesterDialog(), emits('refreshSemestersEvent')
+      "
+      @disableSemesterEvent="
+        closeSemesterDialog(), disableSemester(semesterData.id)
+      "
+      @enableSemesterEvent="
+        closeSemesterDialog(), enableSemester(semesterData.id)
+      "
+    ></SemesterDialogBody>
+  </v-dialog>
 </template>
 
 <style scoped></style>
