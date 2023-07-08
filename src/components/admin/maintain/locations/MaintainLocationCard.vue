@@ -61,6 +61,11 @@ async function enableLocation(location) {
           >
             {{ locationData.status }}
           </v-chip>
+        </v-col>
+      </v-row>
+      <v-row class="pt-0 mt-0 pl-0">
+        <v-spacer></v-spacer>
+        <v-col cols="auto" class="pt-1">
           <v-btn
             flat
             size="small"
