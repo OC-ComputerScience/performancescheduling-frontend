@@ -90,7 +90,7 @@ onMounted(async () => {
       <input
         type="text"
         v-model="searchInput"
-        @input="searchFilteredList"
+        @input="searchAndFilterList"
         class="ml-6 px-4 my-1 mainCardBorder text-blue bg-white font-weight-semi-bold"
         style="outline: none"
         append-icon="mdi-magnify"
