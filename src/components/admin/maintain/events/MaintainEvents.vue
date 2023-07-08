@@ -6,10 +6,19 @@ import EventDialogBody from "./EventDialogBody.vue";
 import MaintainEventCard from "./MaintainEventCard.vue";
 
 const addEventDialog = ref(false);
-
-// event data
 const events = ref([]);
 const filteredEvents = ref([]);
+const filterMenuBool = ref(false);
+// Search
+const searchInput = ref("");
+// Filter options
+const semesterFilterOptions = ref([]);
+const semesterFilterSelection = ref(null);
+const locationFilterOptions = ref([]);
+const locationFilterSelection = ref(null);
+// Pagination
+const currentPage = ref(1);
+const perPage = 9;
 
 async function getData() {
   await EventDataService.getAll("date", false)
@@ -20,7 +29,9 @@ async function getData() {
     .catch((err) => {
       console.log(err);
     });
+}
 
+function fillFilterOptions() {
   semesterFilterOptions.value = Array.from(
     events.value
       .reduce(
@@ -41,12 +52,10 @@ async function getData() {
 
 async function refreshEvents() {
   await getData();
+  fillFilterOptions();
   filterEvents();
 }
 
-const searchInput = ref("");
-
-// Search filter
 function searchFilteredList() {
   filterEvents(true);
   // If the search input is empty, return the full list, otherwise filter
@@ -59,12 +68,6 @@ function searchFilteredList() {
     );
   });
 }
-
-const filterMenuBool = ref(false);
-const semesterFilterOptions = ref([]);
-const semesterFilterSelection = ref(null);
-const locationFilterOptions = ref([]);
-const locationFilterSelection = ref(null);
 
 function filterEvents(fromSearch = false) {
   filteredEvents.value = events.value;
@@ -92,10 +95,6 @@ function clearFilters() {
   searchInput.value = "";
 }
 
-// Pagination
-const currentPage = ref(1);
-const perPage = 9;
-
 const currentPageData = computed(() => {
   return filteredEvents.value.slice(
     (currentPage.value - 1) * perPage,
@@ -105,6 +104,7 @@ const currentPageData = computed(() => {
 
 onMounted(async () => {
   await getData();
+  fillFilterOptions();
 });
 </script>
 
