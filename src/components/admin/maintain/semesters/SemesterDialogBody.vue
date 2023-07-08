@@ -36,7 +36,7 @@ onMounted(() => {
 
 async function addSemester() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
+    editedSemesterData.value.name = editedSemesterData.value.name.toUpperCase();
     if (valid.valid) {
       await SemesterDataService.create(editedSemesterData.value)
         .then(async () => {
@@ -52,8 +52,8 @@ async function addSemester() {
 async function updateSemester() {
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
-      delete editedSemesterData.value["createdAt"];
-      delete editedSemesterData.value["updatedAt"];
+      editedSemesterData.value.name =
+        editedSemesterData.value.name.toUpperCase();
 
       await SemesterDataService.update(editedSemesterData.value)
         .then(() => {
@@ -67,7 +67,7 @@ async function updateSemester() {
 }
 
 function semesterNameCheck() {
-  const pattern = /[0-9]{4}-[A-Z]{2}/;
+  const pattern = /[0-9]{4}-[a-z|A-Z]{2}/;
   return pattern.test(editedSemesterData.value.name)
     ? true
     : "Semester name must be in the format of YYYY-SS.";
