@@ -122,14 +122,6 @@ onMounted(async () => {
           >
             {{ userData.status }}
           </v-chip>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
-            @click="createOrEditDialog = true"
-          >
-            Edit
-          </v-btn>
         </v-col>
       </v-row>
     </v-card-title>
@@ -165,23 +157,34 @@ onMounted(async () => {
             {{ instrumentLabel }}
           </v-chip>
         </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="auto" class="pb-0 pr-5">
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
+            @click="createOrEditDialog = true"
+          >
+            Edit
+          </v-btn>
+        </v-col>
       </v-row>
     </v-card-actions>
-    <v-dialog
-      v-model="createOrEditDialog"
-      persistent
-      max-width="1200px"
-      scrollable
-    >
-      <UserDialogBody
-        :is-edit="true"
-        :user-data="userData"
-        :user-roles="props.userRoles"
-        @closeUserDialogEvent="closeUserDialog"
-        @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
-        @disableUserEvent="closeUserDialog(), disableUser(userData)"
-        @enableUserEvent="closeUserDialog(), enableUser(userData)"
-      ></UserDialogBody>
-    </v-dialog>
   </v-card>
+  <v-dialog
+    v-model="createOrEditDialog"
+    persistent
+    max-width="1200px"
+    scrollable
+  >
+    <UserDialogBody
+      :is-edit="true"
+      :user-data="userData"
+      :user-roles="props.userRoles"
+      @closeUserDialogEvent="closeUserDialog"
+      @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
+      @disableUserEvent="closeUserDialog(), disableUser(userData)"
+      @enableUserEvent="closeUserDialog(), enableUser(userData)"
+    ></UserDialogBody>
+  </v-dialog>
 </template>

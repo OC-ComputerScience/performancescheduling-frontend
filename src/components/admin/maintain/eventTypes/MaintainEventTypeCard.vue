@@ -59,14 +59,6 @@ async function enableEventType(eventTypeId) {
           >
             {{ eventTypeData.status }}
           </v-chip>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
-            @click="createOrEditDialog = true"
-          >
-            Edit
-          </v-btn>
         </v-col>
       </v-row>
     </v-card-title>
@@ -111,6 +103,17 @@ async function enableEventType(eventTypeId) {
           >
             Private
           </v-chip>
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="auto" class="pb-0 pr-5">
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
+            @click="createOrEditDialog = true"
+          >
+            Edit
+          </v-btn>
         </v-col>
       </v-row>
     </v-card-actions>
