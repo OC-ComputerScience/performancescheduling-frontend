@@ -1,9 +1,12 @@
 <script setup>
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
+import StudentEventSignupDialog from "./student/StudentEventSignupDialog.vue";
 
 const router = useRouter();
+const dialog = ref(false);
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
@@ -13,6 +16,8 @@ const props = defineProps({
 function handleClick() {
   if (props.roleId == 3) {
     router.push({ path: "adminEvents" });
+  } else if (props.roleId == 1) {
+    dialog.value = true;
   }
 }
 </script>
@@ -117,4 +122,8 @@ function handleClick() {
       </v-btn>
     </v-card-actions>
   </v-card>
+  <v-dialog v-model="dialog" persistent max-width="600px">
+    <student-event-signup-dialog :eventData="eventData" @close="dialog = false">
+    </student-event-signup-dialog>
+  </v-dialog>
 </template>
