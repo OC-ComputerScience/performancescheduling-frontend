@@ -58,14 +58,6 @@ async function enableMajor(major) {
           >
             {{ majorData.status }}
           </v-chip>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
-            @click="createOrEditDialog = true"
-          >
-            Edit
-          </v-btn>
         </v-col>
       </v-row>
       <v-row class="pt-0 mt-0 pl-2 pb-1">
@@ -82,18 +74,25 @@ async function enableMajor(major) {
         </v-col>
       </v-row>
     </v-card-title>
-
-    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
-      <MajorDialogBody
-        :is-edit="true"
-        :major-data="majorData"
-        @closeMajorDialogEvent="closeMajorDialog"
-        @updateMajorSuccessEvent="
-          closeMajorDialog(), emits('refreshMajorsEvent')
-        "
-        @disableMajorEvent="closeMajorDialog(), disableMajor(majorData)"
-        @enableMajorEvent="closeMajorDialog(), enableMajor(majorData)"
-      ></MajorDialogBody>
-    </v-dialog>
+    <v-card-actions>
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
+        @click="createOrEditDialog = true"
+      >
+        Edit
+      </v-btn>
+    </v-card-actions>
   </v-card>
+  <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+    <MajorDialogBody
+      :is-edit="true"
+      :major-data="majorData"
+      @closeMajorDialogEvent="closeMajorDialog"
+      @updateMajorSuccessEvent="closeMajorDialog(), emits('refreshMajorsEvent')"
+      @disableMajorEvent="closeMajorDialog(), disableMajor(majorData)"
+      @enableMajorEvent="closeMajorDialog(), enableMajor(majorData)"
+    ></MajorDialogBody>
+  </v-dialog>
 </template>

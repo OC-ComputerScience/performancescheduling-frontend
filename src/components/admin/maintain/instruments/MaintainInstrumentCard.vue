@@ -60,17 +60,11 @@ async function enableInstrument(instrument) {
           >
             {{ instrumentData.status }}
           </v-chip>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
-            @click="createOrEditDialog = true"
-          >
-            Edit
-          </v-btn>
         </v-col>
       </v-row>
-      <v-row class="pt-0 mt-0 pl-2 pb-1">
+    </v-card-title>
+    <v-card-actions>
+      <v-row class="pb-2 pl-5 pr-2 pt-2">
         <v-col cols="6" class="pl-1">
           <v-chip
             label
@@ -82,24 +76,34 @@ async function enableInstrument(instrument) {
             {{ instrumentData.type }}
           </v-chip>
         </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="auto" class="pb-0 pr-0 mr-3">
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
+            @click="createOrEditDialog = true"
+          >
+            Edit
+          </v-btn>
+        </v-col>
       </v-row>
-    </v-card-title>
-
-    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
-      <InstrumentDialogBody
-        :is-edit="true"
-        :instrument-data="instrumentData"
-        @closeInstrumentDialogEvent="closeInstrumentDialog"
-        @updateInstrumentSuccessEvent="
-          closeInstrumentDialog(), emits('refreshInstrumentsEvent')
-        "
-        @disableInstrumentEvent="
-          closeInstrumentDialog(), disableInstrument(instrumentData)
-        "
-        @enableInstrumentEvent="
-          closeInstrumentDialog(), enableInstrument(instrumentData)
-        "
-      ></InstrumentDialogBody>
-    </v-dialog>
+    </v-card-actions>
   </v-card>
+  <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+    <InstrumentDialogBody
+      :is-edit="true"
+      :instrument-data="instrumentData"
+      @closeInstrumentDialogEvent="closeInstrumentDialog"
+      @updateInstrumentSuccessEvent="
+        closeInstrumentDialog(), emits('refreshInstrumentsEvent')
+      "
+      @disableInstrumentEvent="
+        closeInstrumentDialog(), disableInstrument(instrumentData)
+      "
+      @enableInstrumentEvent="
+        closeInstrumentDialog(), enableInstrument(instrumentData)
+      "
+    ></InstrumentDialogBody>
+  </v-dialog>
 </template>

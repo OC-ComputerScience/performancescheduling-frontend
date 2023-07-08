@@ -64,31 +64,31 @@ async function enablePiece(piece) {
           >
             {{ pieceData.status }}
           </v-chip>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
-            @click="createOrEditDialog = true"
-          >
-            Edit
-          </v-btn>
         </v-col>
       </v-row>
     </v-card-title>
-
-    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
-      <PieceDialogBody
-        :is-edit="true"
-        :piece-data="pieceData"
-        :pieces-data="piecesData"
-        :composers-data="composersData"
-        @closePieceDialogEvent="closePieceDialog"
-        @updatePieceSuccessEvent="
-          closePieceDialog(), emits('refreshPiecesEvent')
-        "
-        @disablePieceEvent="closePieceDialog(), disablePiece(pieceData)"
-        @enablePieceEvent="closePieceDialog(), enablePiece(pieceData)"
-      ></PieceDialogBody>
-    </v-dialog>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-bold mt-0 mr-2 text-none text-blue bg-white flatChipBorder"
+        @click="createOrEditDialog = true"
+      >
+        Edit
+      </v-btn>
+    </v-card-actions>
   </v-card>
+  <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+    <PieceDialogBody
+      :is-edit="true"
+      :piece-data="pieceData"
+      :pieces-data="piecesData"
+      :composers-data="composersData"
+      @closePieceDialogEvent="closePieceDialog"
+      @updatePieceSuccessEvent="closePieceDialog(), emits('refreshPiecesEvent')"
+      @disablePieceEvent="closePieceDialog(), disablePiece(pieceData)"
+      @enablePieceEvent="closePieceDialog(), enablePiece(pieceData)"
+    ></PieceDialogBody>
+  </v-dialog>
 </template>
