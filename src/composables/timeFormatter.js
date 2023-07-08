@@ -50,7 +50,7 @@ export function get24HourTimeString(t) {
     hours = "00";
   }
 
-  if (modifier === "PM") {
+  if (modifier === "pm") {
     hours = parseInt(hours, 10) + 12;
   }
 
