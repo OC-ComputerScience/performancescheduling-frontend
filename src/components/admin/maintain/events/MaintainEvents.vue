@@ -41,6 +41,7 @@ async function getData() {
 
 async function refreshEvents() {
   await getData();
+  filterEvents();
 }
 
 const searchInput = ref("");

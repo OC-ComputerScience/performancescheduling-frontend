@@ -17,8 +17,8 @@ function closeEventDialog() {
   createOrEditDialog.value = false;
 }
 
-async function disableEvent(event) {
-  event.status = "Disabled";
+async function readyEvent(event) {
+  event.isReady = true;
   await EventDataService.update(event)
     .then(() => {
       emits("refreshEventsEvent");
@@ -28,8 +28,8 @@ async function disableEvent(event) {
     });
 }
 
-async function enableEvent(event) {
-  event.status = "Active";
+async function unreadyEvent(event) {
+  event.isReady = false;
   await EventDataService.update(event)
     .then(() => {
       emits("refreshEventsEvent");
@@ -96,9 +96,9 @@ async function enableEvent(event) {
       :is-edit="true"
       :event-data="eventData"
       @closeEventDialogEvent="closeEventDialog"
-      @updateEventSuccessEvent="closeEventDialog(), emits('refreshEventEvent')"
-      @disableEventEvent="closeEventDialog(), disableEvent(eventData.id)"
-      @enableEventEvent="closeEventDialog(), enableEvent(eventData.id)"
+      @updateEventSuccessEvent="closeEventDialog(), emits('refreshEventsEvent')"
+      @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
+      @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
     ></EventDialogBody>
   </v-dialog>
 </template>
