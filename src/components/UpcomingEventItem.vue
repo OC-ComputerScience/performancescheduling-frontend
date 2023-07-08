@@ -122,7 +122,7 @@ function handleClick() {
       </v-btn>
     </v-card-actions>
   </v-card>
-  <v-dialog v-model="dialog" persistent max-width="600px">
+  <v-dialog v-model="dialog" persistent max-width="1200px">
     <student-event-signup-dialog :eventData="eventData" @close="dialog = false">
     </student-event-signup-dialog>
   </v-dialog>
