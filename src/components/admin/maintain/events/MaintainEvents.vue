@@ -48,8 +48,7 @@ const searchInput = ref("");
 
 // Search filter
 function searchFilteredList() {
-  filteredEvents.value = events.value;
-
+  filterEvents(true);
   // If the search input is empty, return the full list, otherwise filter
   if (searchInput.value === "") return;
 
@@ -67,9 +66,8 @@ const semesterFilterSelection = ref(null);
 const locationFilterOptions = ref([]);
 const locationFilterSelection = ref(null);
 
-function filterEvents() {
-  // Never clear the serach filter, so filter by that first, then the actual filters
-  searchFilteredList();
+function filterEvents(fromSearch = false) {
+  filteredEvents.value = events.value;
 
   filteredEvents.value = filteredEvents.value.filter((event) => {
     return (
@@ -79,6 +77,11 @@ function filterEvents() {
         event.location.id === locationFilterSelection.value.id)
     );
   });
+
+  if (!fromSearch) {
+    // Never clear the serach filter, so filter by that first, then the actual filters
+    searchFilteredList();
+  }
 }
 
 function clearFilters() {
