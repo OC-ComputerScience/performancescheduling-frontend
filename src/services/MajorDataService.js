@@ -10,6 +10,10 @@ class MajorDataService {
     return http.get(url);
   }
 
+  getById(id) {
+    return http.get(this.baseUrl + id);
+  }
+
   create(data) {
     return http.post(this.baseUrl, data);
   }

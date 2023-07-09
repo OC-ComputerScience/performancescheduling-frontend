@@ -5,6 +5,7 @@ import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
 import StudentPieceDataService from "../../services/StudentPieceDataService.js";
+import MajorDataService from "../../services/MajorDataService.js";
 import AvailabilityDataService from "../../services/AvailabilityDataService.js";
 
 const emits = defineEmits(["closeDialogEvent"]);
@@ -13,21 +14,27 @@ const props = defineProps({
 });
 const loginStore = useLoginStore();
 
+// event variable
 const eventTypeLabel = ref("");
+// student instrument variables
 const instruments = ref([]);
 const selectedStudentInstrument = ref(null);
 const selectedInstructor = ref(null);
 const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 const accompanistName = ref(null);
-const accompanistNotNeeded = ref(true);
+// student piece variables
 const searchInput = ref("");
 const studentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
+// timeslot logic variables
+const accompanistNotNeeded = ref(true);
+const isMusicMajor = ref(false);
+const timeslotLength = ref(0);
 
-async function retrieveData() {
+async function getData() {
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
       if (props.eventData.eventType.instrumentType === "Instrument") {
@@ -72,6 +79,14 @@ async function retrieveData() {
     .catch((e) => {
       console.log(e);
     });
+
+  await MajorDataService.getById(loginStore.currentRole.majorId)
+    .then((response) => {
+      isMusicMajor.value = response.data.isMusicMajor;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 }
 
 function searchStudentPieces() {
@@ -94,7 +109,7 @@ function searchStudentPieces() {
 }
 
 function selectStudentPiece(studentPiece) {
-  if (!isSelected(studentPiece)) {
+  if (!isStudentPieceSelected(studentPiece)) {
     selectedStudentPieces.value.push(studentPiece);
   } else {
     selectedStudentPieces.value.splice(
@@ -104,17 +119,33 @@ function selectStudentPiece(studentPiece) {
   }
 }
 
-function isSelected(studentPiece) {
+function isStudentPieceSelected(studentPiece) {
   return (
     selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id) !==
     -1
   );
 }
 
-watch(selectedStudentInstrument, async () => {
+function getTimeslotLength() {
+  if (selectedStudentInstrument.value.instrument.type === "Vocal") {
+    if (isMusicMajor.value) {
+      timeslotLength.value =
+        selectedStudentInstrument.value.privateHours == 1 ? 10 : 15;
+    } else {
+      timeslotLength.value =
+        selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
+    }
+  } else {
+    timeslotLength.value = 10;
+  }
+}
+
+watch(selectedStudentInstrument, () => {
   if (selectedStudentInstrument.value == null) {
     return;
   }
+
+  // update instructor and accompanist
   selectedInstructor.value = selectedStudentInstrument.value.instructorRole;
   instructorName.value = selectedInstructor.value
     ? selectedInstructor.value.user.firstName +
@@ -128,28 +159,35 @@ watch(selectedStudentInstrument, async () => {
       selectedAccompanist.value.user.lastName
     : null;
 
+  // update accompanist not needed
   if (selectedStudentInstrument.value.instrument.type === "Vocal") {
     accompanistNotNeeded.value = false;
   } else {
     accompanistNotNeeded.value = true;
   }
 
+  // update student pieces
   selectedStudentPieces.value = [];
   studentInstrumentStudentPieces.value = studentPieces.value.filter(
     (studentPiece) =>
       studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
   );
   searchStudentPieces();
+
+  // update timeslot length
+  getTimeslotLength();
 });
 
 onMounted(async () => {
-  await retrieveData();
+  await getData();
   eventTypeLabel.value =
     props.eventData.eventType.instrumentType === "Both"
       ? "Vocal & Instrumental Event"
       : props.eventData.eventType.instrumentType === "Vocal"
       ? "Vocal Event"
       : "Instrumental Event";
+
+  getTimeslotLength();
 });
 </script>
 <template>
@@ -161,7 +199,7 @@ onMounted(async () => {
             {{ eventData.name }}
           </v-card-title>
           <v-spacer></v-spacer>
-          <v-card color="lightMaroon">
+          <v-card color="lightMaroon" elevation="0">
             <v-card-text>
               <v-row class="pt-0 mt-0">
                 <div class="text-maroon mx-2 mb-2 text-h7">
@@ -265,8 +303,8 @@ onMounted(async () => {
                   >
                     <v-card
                       v-bind:class="{
-                        'bg-blue': isSelected(studentPiece),
-                        'bg-white': !isSelected(studentPiece),
+                        'bg-blue': isStudentPieceSelected(studentPiece),
+                        'bg-white': !isStudentPieceSelected(studentPiece),
                       }"
                       @click="selectStudentPiece(studentPiece)"
                     >
@@ -275,7 +313,7 @@ onMounted(async () => {
                           no-gutters
                           class="text-blue font-weight-semi-bold"
                           v-bind:class="{
-                            'text-white': isSelected(studentPiece),
+                            'text-white': isStudentPieceSelected(studentPiece),
                           }"
                         >
                           {{ studentPiece.piece.title }}
@@ -291,8 +329,17 @@ onMounted(async () => {
             </v-row>
           </v-col>
           <v-col cols="6">
-            <v-row class="font-weight-bold text-maroon text-h6">
-              Timeslots Available
+            <v-row>
+              <div class="font-weight-bold text-h6 text-maroon">
+                Timeslots Available
+              </div>
+              <v-card color="lightMaroon" elevation="0" class="ml-2">
+                <v-card-text
+                  class="mt-1 py-0 font-weight-semi-bold text-maroon"
+                >
+                  {{ timeslotLength }} Min Timeslot Length
+                </v-card-text>
+              </v-card>
             </v-row>
           </v-col>
         </v-row>
