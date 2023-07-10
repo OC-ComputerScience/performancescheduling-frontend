@@ -9,6 +9,7 @@ import StudentPieceDataService from "../../services/StudentPieceDataService.js";
 import MajorDataService from "../../services/MajorDataService.js";
 import AvailabilityDataService from "../../services/AvailabilityDataService.js";
 import EventSignupDataService from "../../services/EventSignupDataService.js";
+import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService.js";
 
 const emits = defineEmits(["closeDialogEvent"]);
 const props = defineProps({
@@ -18,6 +19,7 @@ const loginStore = useLoginStore();
 
 // event variable
 const eventTypeLabel = ref("");
+const errorMessage = ref("");
 // student instrument variables
 const instruments = ref([]);
 const selectedStudentInstrument = ref(null);
@@ -39,6 +41,9 @@ const timeslots = ref([]);
 const instructorAvailability = ref([]);
 const accompanistAvailability = ref([]);
 const existingSignups = ref([]);
+// confirmation dialog variables
+const confimationDialog = ref(false);
+const confirmationMessage = ref("");
 
 async function getData() {
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
@@ -215,6 +220,111 @@ function getChipClass(timeslot) {
   } else {
     return "bg-teal text-white";
   }
+}
+
+function openConfirmationDialog() {
+  // validation checks
+  if (selectedStudentInstrument.value == null) {
+    errorMessage.value = "Please select an instrument.";
+    return;
+  }
+  if (selectedStudentPieces.value.length == 0) {
+    errorMessage.value = "Please select at least one piece.";
+    return;
+  }
+  if (selectedTimeslot.value === "") {
+    errorMessage.value = "Please select a timeslot.";
+    return;
+  }
+  // reset error message
+  errorMessage.value = "";
+
+  //helper confirmation message variables
+  const timeslotEndTime = moment(selectedTimeslot.value, "HH:mma")
+    .add(timeslotLength.value, "minutes")
+    .format("HH:mma");
+  const existingSignup = existingSignups.value.find(
+    (signup) =>
+      signup.startTime <= selectedTimeslot.value &&
+      signup.endTime > selectedTimeslot.value
+  );
+  const otherStudentsInSingup = existingSignup
+    ? existingSignup.studentInstrumentSignups.map(
+        (x) =>
+          x.studentInstrument.studentRole.user.firstName +
+          " " +
+          x.studentInstrument.studentRole.user.lastName
+      )
+    : [];
+  var studentsInSignup = "";
+  if (otherStudentsInSingup.length > 0) {
+    if (otherStudentsInSingup.length == 1) {
+      studentsInSignup = otherStudentsInSingup[0];
+    } else if (otherStudentsInSingup.length === 2) {
+      //joins all with "and" but no commas
+      studentsInSignup = otherStudentsInSingup.join(" and ");
+    } else {
+      //joins all with commas, but last one gets ", and"
+      studentsInSignup =
+        otherStudentsInSingup.slice(0, -1).join(", ") +
+        ", and " +
+        otherStudentsInSingup.slice(-1);
+    }
+  }
+
+  // set confirmation message
+  confirmationMessage.value = `Are you sure you want to signup for the (${selectedTimeslot.value} - ${timeslotEndTime}) timeslot`;
+  if (otherStudentsInSingup.length > 0) {
+    confirmationMessage.value += ` with ${studentsInSignup}?`;
+  } else {
+    confirmationMessage.value += "?";
+  }
+
+  // open confirmation dialog
+  confimationDialog.value = true;
+}
+
+async function confirmSignup() {
+  var eventSignupId;
+  if (hasExistingSignup(selectedTimeslot.value)) {
+    eventSignupId = existingSignups.value.find(
+      (signup) =>
+        signup.startTime <= selectedTimeslot.value &&
+        signup.endTime > selectedTimeslot.value
+    ).id;
+  } else {
+    const eventSignupData = {
+      startTime: moment(selectedTimeslot.value, "HH:mma").format("HH:mm:ss"),
+      endTime: moment(selectedTimeslot.value, "HH:mma")
+        .add(timeslotLength.value, "minutes")
+        .format("HH:mm:ss"),
+      eventId: props.eventData.id,
+    };
+    await EventSignupDataService.create(eventSignupData)
+      .then((response) => {
+        eventSignupId = response.data.id;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+  const studentInstrumentSignupData = {
+    eventSignupId: eventSignupId,
+    studentInstrumentId: selectedStudentInstrument.value.id,
+    instructorRoleId: selectedInstructor.value.id,
+    accompanistRoleId: selectedAccompanist.value
+      ? selectedAccompanist.value.id
+      : null,
+  };
+
+  await StudentInstrumentSignupDataService.create(studentInstrumentSignupData)
+    .then(() => {
+      confimationDialog.value = false;
+      emits("closeDialogEvent");
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 }
 
 watch(selectedStudentInstrument, async () => {
@@ -484,6 +594,9 @@ onMounted(async () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
+        <div class="font-weight-bold mr-2 text-red text-h6">
+          {{ errorMessage }}
+        </div>
         <v-btn
           flat
           size="small"
@@ -496,11 +609,38 @@ onMounted(async () => {
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          @click="emits('closeDialogEvent')"
+          @click="openConfirmationDialog"
         >
           Signup
         </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
+  <v-dialog v-model="confimationDialog" persistent max-width="600px">
+    <v-card>
+      <v-card-title class="text-h6 font-weight-bold text-maroon">
+        Confirm Signup
+      </v-card-title>
+      <v-card-text class="text-h8 font-weight-semi-bold text-blue">
+        {{ confirmationMessage }}
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          @click="confimationDialog = false"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-lightMaroon text-maroon"
+          >Cancel</v-btn
+        >
+        <v-btn
+          @click="confirmSignup"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          >Confirm</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
