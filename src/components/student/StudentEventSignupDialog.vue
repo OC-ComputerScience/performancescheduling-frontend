@@ -1,4 +1,5 @@
 <script setup>
+import moment from "moment";
 import { ref, onMounted, watch } from "vue";
 import { useLoginStore } from "../../stores/LoginStore.js";
 import { formatDate } from "../../composables/dateFormatter";
@@ -7,6 +8,7 @@ import StudentInstrumentDataService from "../../services/StudentInstrumentDataSe
 import StudentPieceDataService from "../../services/StudentPieceDataService.js";
 import MajorDataService from "../../services/MajorDataService.js";
 import AvailabilityDataService from "../../services/AvailabilityDataService.js";
+import EventSignupDataService from "../../services/EventSignupDataService.js";
 
 const emits = defineEmits(["closeDialogEvent"]);
 const props = defineProps({
@@ -29,10 +31,14 @@ const studentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
-// timeslot logic variables
-const accompanistNotNeeded = ref(true);
+// timeslot variables
 const isMusicMajor = ref(false);
 const timeslotLength = ref(0);
+const selectedTimeslot = ref("");
+const timeslots = ref([]);
+const instructorAvailability = ref([]);
+const accompanistAvailability = ref([]);
+const existingSignups = ref([]);
 
 async function getData() {
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
@@ -83,6 +89,14 @@ async function getData() {
   await MajorDataService.getById(loginStore.currentRole.majorId)
     .then((response) => {
       isMusicMajor.value = response.data.isMusicMajor;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await EventSignupDataService.getByEvent(props.eventData.id)
+    .then((response) => {
+      existingSignups.value = response.data;
     })
     .catch((e) => {
       console.log(e);
@@ -140,7 +154,70 @@ function getTimeslotLength() {
   }
 }
 
-watch(selectedStudentInstrument, () => {
+function getTimeslots() {
+  timeslots.value = [];
+  var startTime = moment(props.eventData.startTime, "HH:mm:ss");
+  var endTime = moment(props.eventData.endTime, "HH:mm:ss");
+
+  while (startTime <= endTime) {
+    if (isAvailable(startTime)) {
+      timeslots.value.push(new moment(startTime).format("HH:mma"));
+    }
+    startTime.add(timeslotLength.value, "minutes");
+  }
+}
+
+function isAvailable(time) {
+  const endTimeSlot = moment(time).add(timeslotLength.value, "minutes");
+  const isInstructorAvailable = instructorAvailability.value.some(
+    (availability) => {
+      const startTimeMoment = moment(availability.startTime, "HH:mm:ss");
+      const endTimeMoment = moment(availability.endTime, "HH:mm:ss");
+      return (
+        (time.isBetween(startTimeMoment, endTimeMoment) ||
+          time.isSame(startTimeMoment)) &&
+        (endTimeSlot.isBetween(startTimeMoment, endTimeMoment) ||
+          endTimeSlot.isSame(endTimeMoment))
+      );
+    }
+  );
+  if (!isInstructorAvailable) {
+    return false;
+  }
+  if (selectedStudentInstrument.value.instrument.type === "Instrument") {
+    return true;
+  }
+  return accompanistAvailability.value.some((availability) => {
+    const startTimeMoment = moment(availability.startTime, "HH:mm:ss");
+    const endTimeMoment = moment(availability.endTime, "HH:mm:ss");
+    return (
+      (time.isBetween(startTimeMoment, endTimeMoment) ||
+        time.isSame(startTimeMoment)) &&
+      (endTimeSlot.isBetween(startTimeMoment, endTimeMoment) ||
+        endTimeSlot.isSame(endTimeMoment))
+    );
+  });
+}
+
+function hasExistingSignup(timeslot) {
+  return existingSignups.value.some(
+    (signup) => signup.startTime <= timeslot && signup.endTime > timeslot
+  );
+}
+
+function getChipClass(timeslot) {
+  if (selectedTimeslot.value === timeslot) {
+    return hasExistingSignup(timeslot)
+      ? "bg-white text-blue pl-1"
+      : "bg-blue text-white";
+  } else if (hasExistingSignup(timeslot)) {
+    return "bg-white text-mediumGray pl-1";
+  } else {
+    return "bg-teal text-white";
+  }
+}
+
+watch(selectedStudentInstrument, async () => {
   if (selectedStudentInstrument.value == null) {
     return;
   }
@@ -159,11 +236,31 @@ watch(selectedStudentInstrument, () => {
       selectedAccompanist.value.user.lastName
     : null;
 
-  // update accompanist not needed
-  if (selectedStudentInstrument.value.instrument.type === "Vocal") {
-    accompanistNotNeeded.value = false;
+  // get availability for instructor and accompanist
+  await AvailabilityDataService.getByUserRoleAndEvent(
+    selectedInstructor.value.id,
+    props.eventData.id
+  )
+    .then((response) => {
+      instructorAvailability.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  if (selectedAccompanist.value) {
+    await AvailabilityDataService.getByUserRoleAndEvent(
+      selectedAccompanist.value.id,
+      props.eventData.id
+    )
+      .then((response) => {
+        accompanistAvailability.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   } else {
-    accompanistNotNeeded.value = true;
+    accompanistAvailability.value = [];
   }
 
   // update student pieces
@@ -174,8 +271,9 @@ watch(selectedStudentInstrument, () => {
   );
   searchStudentPieces();
 
-  // update timeslot length
+  // update timeslots
   getTimeslotLength();
+  getTimeslots();
 });
 
 onMounted(async () => {
@@ -253,14 +351,6 @@ onMounted(async () => {
               readonly
             ></v-text-field>
           </v-col>
-          <v-col cols="4">
-            <v-checkbox
-              label="Accompanist not needed"
-              v-model="accompanistNotNeeded"
-              variant="plain"
-              class="text-darkBlue font-weight-bold flatCardBorder mt-2"
-            ></v-checkbox>
-          </v-col>
         </v-row>
         <v-row class="ml-1">
           <v-col cols="6">
@@ -294,7 +384,7 @@ onMounted(async () => {
             <v-row class="mt-5">
               <v-col cols="11" class="pl-0">
                 <v-list
-                  style="max-height: 250px"
+                  style="height: 250px"
                   class="overflow-y-auto bg-lightBlue"
                 >
                   <v-list-item
@@ -340,6 +430,54 @@ onMounted(async () => {
                   {{ timeslotLength }} Min Timeslot Length
                 </v-card-text>
               </v-card>
+            </v-row>
+            <v-row>
+              <v-col cols="5" class="pl-0">
+                <v-card color="lightBlue" elevation="0">
+                  <v-card-text class="text-blue py-2 font-weight-bold text-h8">
+                    Selected: {{ selectedTimeslot }}
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col>
+                <v-btn class="font-weight-bold text-none px-5" color="blue">
+                  Request additional
+                </v-btn>
+              </v-col>
+            </v-row>
+            <v-row class="mt-6">
+              <v-col class="pl-0">
+                <v-card
+                  style="height: 250px"
+                  class="bg-lightTeal"
+                  elevation="0"
+                >
+                  <v-card-text>
+                    <v-row class="pl-4">
+                      <v-col cols="3" v-for="timeslot in timeslots">
+                        <v-chip
+                          @click="selectedTimeslot = timeslot"
+                          label
+                          flat
+                          class="font-weight-bold flatChipBorder"
+                          :class="getChipClass(timeslot)"
+                        >
+                          <v-icon
+                            icon="mdi-account"
+                            :color="
+                              selectedTimeslot == timeslot
+                                ? 'blue'
+                                : 'lightMaroon'
+                            "
+                            v-if="hasExistingSignup(timeslot)"
+                          ></v-icon>
+                          {{ timeslot }}
+                        </v-chip>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-col>
             </v-row>
           </v-col>
         </v-row>
