@@ -1,8 +1,10 @@
 <script setup>
-import { ref,onMounted } from "vue";
-import StudentPieceDataService from "../../../../services/StudentPieceDataService";
-import SemesterDataService from "../../../../services/SemesterDataService";
-import PieceDataService from "../../../../services/PieceDataService";
+import { ref, onMounted } from "vue";
+import StudentPieceDataService from "./../../../services/StudentPieceDataService";
+import SemesterDataService from "./../../../services/SemesterDataService";
+import PieceDataService from "./../../../services/PieceDataService";
+import StudentInsturmentDataService from "./../../../services/StudentInstrumentDataService";
+import { useLoginStore } from "./../../../stores/LoginStore.js";
 
 const emits = defineEmits([
   "addStudentPieceSuccessEvent",
@@ -16,13 +18,13 @@ const emits = defineEmits([
 const props = defineProps({
   isEdit: { type: [Boolean], required: true },
   studentpieceData: { type: [Object], required: true },
-
 });
-
+const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
 const form = ref(null);
 const pieces = ref([]);
 const semesters = ref([]);
+const studentInstruments = ref([]);
 
 //add StudentPiece
 async function addStudentPiece() {
@@ -55,30 +57,40 @@ async function updateStudentPiece() {
   });
 }
 async function getSemesters() {
- await SemesterDataService.getAll("name", false)
+  await SemesterDataService.getAll("name", false)
     .then((response) => {
       semesters.value = response.data;
     })
     .catch((err) => {
       console.log(err);
     });
-
 }
 async function getPieces() {
- await SemesterDataService.getAll("name", false)
+  await PieceDataService.getAll("title", false)
     .then((response) => {
       pieces.value = response.data;
     })
     .catch((err) => {
       console.log(err);
     });
-
 }
 
+async function getStudentInsrument(studentRoleId) {
+  await StudentInsturmentDataService.getStudentInstrumentsForStudentId(
+    studentRoleId
+  )
+    .then((response) => {
+      studentInstruments.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 
 onMounted(async () => {
   getSemesters();
-  getPieces
+  getPieces();
+  getStudentInsrument(loginStore.currentRole.id);
 });
 </script>
 
@@ -97,16 +109,16 @@ onMounted(async () => {
       </v-card-title>
       <v-card-text class="pt-0">
         <v-row v-if="props.isEdit" class="pt-0 mt-0">
-          <v-col cols="auto" class="pl-6" align-self="center">
-
-          </v-col>
+          <v-col cols="auto" class="pl-6" align-self="center"> </v-col>
           <v-col v-if="props.isEdit" cols="auto" align-self="center">
             <v-chip
               label
               flat
               size="small"
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-              :class="studentpieceData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
+              :class="
+                studentpieceData.status === 'Active' ? 'bg-teal' : 'bg-maroon'
+              "
             >
               {{ editedStudentPieceData.status }}
             </v-chip>
@@ -115,28 +127,46 @@ onMounted(async () => {
       </v-card-text>
       <v-row :class="props.isEdit ? '' : 'mt-2'">
         <v-col>
-              <v-card-subtitle
-                class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-              >
-                Semester
-              </v-card-subtitle>
-              <v-select
-                placeholder="2000-FA"
-                v-model="editedStudentPieceData.semesterId"
-                :items="semesters"
-                item-title="name"
-                variant="plain"
-                return-object
-                class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-                :rules="[
-                  () => !!editedEventData.semester || 'This field is required',
-                ]"
-              ></v-select>
-            </v-col>
-          <v-card-subtitle>
-            Piece
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Semester
           </v-card-subtitle>
-          <v-autocomplete
+          <v-select
+            v-model="editedStudentPieceData.semesterId"
+            :items="semesters"
+            item-title="name"
+            variant="plain"
+            return-object
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () =>
+                !!editedStudentPieceData.semesterId || 'This field is required',
+            ]"
+          ></v-select>
+
+          <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >Instrument
+          </v-card-subtitle>
+          <v-select
+            v-model="editedStudentPieceData.studentIntstrumentId"
+            :items="studentInstruments"
+            item-title="instrument.name"
+            item-value="id"
+            variant="plain"
+            return-object
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () =>
+                !!editedStudentPieceData.studentIntstrumentId ||
+                'This field is required',
+            ]"
+          ></v-select>
+
+          <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >Piece
+          </v-card-subtitle>
+          <v-select
             placeholder="Start typing the piece title"
             color="darkBlue"
             variant="plain"
@@ -146,15 +176,7 @@ onMounted(async () => {
             item-title="title"
             item-value="id"
           >
-            <template v-slot:item="{ item, props: { onClick } }">
-              <v-list-item
-         
-              >
-                {{ item.raw.title}}
-              </v-list-item>
-              
-            </template>
-          </v-autocomplete>
+          </v-select>
         </v-col>
       </v-row>
       <v-card-actions>
@@ -182,7 +204,9 @@ onMounted(async () => {
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
-            props.studentpieceData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
+            props.studentpieceData.status === 'Disabled'
+              ? 'bg-darkBlue'
+              : 'bg-maroon'
           "
           @click="
             props.studentpieceData.status === 'Disabled'
@@ -190,7 +214,9 @@ onMounted(async () => {
               : emits('disableStudentPieceEvent')
           "
         >
-          {{ props.studentpieceData.status === "Disabled" ? "Enable" : "Disable" }}
+          {{
+            props.studentpieceData.status === "Disabled" ? "Enable" : "Disable"
+          }}
         </v-btn>
       </v-card-actions>
     </v-form>
