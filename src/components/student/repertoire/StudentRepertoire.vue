@@ -1,21 +1,20 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import StudentPieceDataService from "./../../../../services/StudentPieceDataService";
-import PieceDataService from "./../../../../services/PieceDataService";
-import ComposerDataService from "./../../../../services/ComposerDataService";
+import StudentPieceDataService from "./../../../services/StudentPieceDataService";
+import SemesterDataService from "./../../../services/SemesterDataService";
 import MaintainStudentPieceCard from "./MaintainStudentPieceCard.vue";
 import StudentPieceDialogBody from "./StudentPieceDialogBody.vue";
+import { useLoginStore } from "./../../../stores/LoginStore.js";
 
 const addStudentPieceDialog = ref(false);
-const piecesData = ref([]);
-
+const loginStore = useLoginStore();
 // StudentStudentPiece Data
 const studentpieces = ref([]);
 const filteredStudentPieces = ref([]);
-const composers = ref([]);
+const semesters = ref([]);
 
-async function getStudentPieces() {
-  await StudentPieceDataService.getAll()
+async function getStudentPieces(studentId) {
+  await StudentPieceDataService.getByUser(studentId)
     .then((response) => {
       studentpieces.value = response.data;
       filteredStudentPieces.value = studentpieces.value;
@@ -25,10 +24,10 @@ async function getStudentPieces() {
     });
 }
 
-async function getPieces() {
-  await PieceDataService.getAll()
+async function getSemesters() {
+  await SemesterDataService.getAll("name", false)
     .then((response) => {
-      piecesData.value = response.data;
+      semesters.value = response.data;
     })
     .catch((err) => {
       console.log(err);
@@ -53,12 +52,8 @@ function searchAndFilterList() {
   // If the search input is empty, return the full list, otherwise filter
   if (searchInput.value != "")
     filteredStudentPieces.value = filteredStudentPieces.value.filter(
-      (studentstudentpiece) =>
-        (
-          studentstudentpiece.title.toLowerCase() +
-          " " +
-          studentstudentpiece.title
-        )
+      (studentpiece) =>
+        studentpiece.piece.title
           .toLowerCase()
           .includes(searchInput.value.toLowerCase())
     );
@@ -68,13 +63,17 @@ function searchAndFilterList() {
 
 const statusFilterOptions = ["Active", "Disabled", "Pending"];
 const statusFilterSelection = ref(null);
+const semesterFilterSelection = ref(null);
 
 function filterStudentPieces() {
   // Filter by status
   if (statusFilterSelection.value) {
     filteredStudentPieces.value = filteredStudentPieces.value.filter(
-      (studentstudentpiece) =>
-        studentstudentpiece.status === statusFilterSelection.value
+      (studentpiece) => studentpiece.status === statusFilterSelection.value
+    );
+    filteredStudentPieces.value = filteredStudentPieces.value.filter(
+      (studentpiece) =>
+        studentpiece.semester.name === semesterFilterSelection.value
     );
   }
 }
@@ -98,27 +97,17 @@ const currentPageData = computed(() => {
     currentPage.value * perPage
   );
 });
-async function getComposers() {
-  await ComposerDataService.getAll("lastName")
-    .then((response) => {
-      composers.value = response.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
 
 onMounted(async () => {
-  await getStudentPieces();
-  await getComposers();
-  await getPieces();
+  await getStudentPieces(loginStore.currentRole.userId);
+  await getSemesters();
 });
 </script>
 
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight">StudentPieces</h1>
+      <h1 class="text-maroon font-weight">Repertoire</h1>
 
       <input
         type="text"
@@ -144,7 +133,7 @@ onMounted(async () => {
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter studentpieces
+            Filter Repertoire
           </v-btn>
         </template>
 
@@ -159,6 +148,22 @@ onMounted(async () => {
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
+                  return-object
+                ></v-select>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+          <v-card-text>
+            <v-list class="pa-0 ma-0">
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Semester
+                <v-select
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="statusFilterSelection"
+                  :items="semesters"
+                  item-title="name"
                   return-object
                 ></v-select>
               </v-list-item>
@@ -196,7 +201,7 @@ onMounted(async () => {
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="addStudentPieceDialog = true"
       >
-        Add new studentstudentpiece
+        Add new Piece
       </v-btn>
     </v-row>
     <v-row>
@@ -204,16 +209,14 @@ onMounted(async () => {
         <v-card class="pa-5 mainCardBorder">
           <v-row>
             <v-col
-              v-for="studentstudentpiece in currentPageData"
-              :key="studentstudentpiece.id"
+              v-for="studentpiece in currentPageData"
+              :key="studentpiece.id"
               cols="12"
               md="6"
               lg="4"
             >
               <MaintainStudentPieceCard
-                :studentstudentpiece-data="studentstudentpiece"
-                :studentpieces-data="studentpieces"
-                :composers-data="composers"
+                :studentpiece-data="studentpiece"
                 @refreshStudentPiecesEvent="refreshStudentPieces()"
               ></MaintainStudentPieceCard>
             </v-col>
@@ -246,10 +249,10 @@ onMounted(async () => {
         id: null,
         pieceId: null,
         semesterId: null,
-        studentId: null,
+        studetninstrumentId: null,
         status: 'Active',
       }"
-      :pieces-data="piecesDatsa"
+      :student-id="loginStore.currentRole.userId"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="
         (addStudentPieceDialog = false), refreshStudentPieces()
