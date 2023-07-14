@@ -24,6 +24,10 @@ class StudentInstrumentDataService {
     return http.get(this.baseUrl + "instructorId/" + instructorId);
   }
 
+  getStudentsForAccompanistId(accompanistId) {
+    return http.get(this.baseUrl + "accompanistId/" + accompanistId);
+  }
+
   getStudentInstrumentsForStudentId(studentId) {
     return http.get(this.baseUrl + "studentId/" + studentId);
   }
