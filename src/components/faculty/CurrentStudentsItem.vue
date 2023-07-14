@@ -1,6 +1,6 @@
   <script setup>
   const props = defineProps({
-    studentsData: { type: [Array], required: true },
+    studentsData: { type: [Object], required: true },
   });
   console.log("students current", props.studentsData)
   </script>
