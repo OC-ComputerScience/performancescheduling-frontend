@@ -1,9 +1,12 @@
 <script setup>
-import moment from "moment";
 import { ref, onMounted, watch } from "vue";
 import { useLoginStore } from "../../stores/LoginStore.js";
 import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
+import {
+  generateTimeSlots,
+  addMinsToTime,
+} from "../../composables/timeManipulator";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
 import StudentPieceDataService from "../../services/StudentPieceDataService.js";
 import MajorDataService from "../../services/MajorDataService.js";
@@ -20,6 +23,7 @@ const loginStore = useLoginStore();
 // event variable
 const eventTypeLabel = ref("");
 const errorMessage = ref("");
+const groupSignup = ref(false);
 // student instrument variables
 const instruments = ref([]);
 const selectedStudentInstrument = ref(null);
@@ -36,7 +40,7 @@ const selectedStudentPieces = ref([]);
 // timeslot variables
 const isMusicMajor = ref(false);
 const timeslotLength = ref(0);
-const selectedTimeslot = ref("");
+const selectedTimeslot = ref(null);
 const timeslots = ref([]);
 const instructorAvailability = ref([]);
 const accompanistAvailability = ref([]);
@@ -145,81 +149,86 @@ function isStudentPieceSelected(studentPiece) {
   );
 }
 
-function getTimeslotLength() {
-  if (selectedStudentInstrument.value.instrument.type === "Vocal") {
-    if (isMusicMajor.value) {
-      timeslotLength.value =
-        selectedStudentInstrument.value.privateHours == 1 ? 10 : 15;
-    } else {
-      timeslotLength.value =
-        selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
-    }
-  } else {
-    timeslotLength.value = 10;
-  }
-}
-
-function getTimeslots() {
-  timeslots.value = [];
-  var startTime = moment(props.eventData.startTime, "HH:mm:ss");
-  var endTime = moment(props.eventData.endTime, "HH:mm:ss");
-
-  while (startTime <= endTime) {
-    if (isAvailable(startTime)) {
-      timeslots.value.push(new moment(startTime).format("HH:mma"));
-    }
-    startTime.add(timeslotLength.value, "minutes");
-  }
-}
-
-function isAvailable(time) {
-  const endTimeSlot = moment(time).add(timeslotLength.value, "minutes");
-  const isInstructorAvailable = instructorAvailability.value.some(
-    (availability) => {
-      const startTimeMoment = moment(availability.startTime, "HH:mm:ss");
-      const endTimeMoment = moment(availability.endTime, "HH:mm:ss");
-      return (
-        (time.isBetween(startTimeMoment, endTimeMoment) ||
-          time.isSame(startTimeMoment)) &&
-        (endTimeSlot.isBetween(startTimeMoment, endTimeMoment) ||
-          endTimeSlot.isSame(endTimeMoment))
-      );
-    }
+function generateTimeslots() {
+  timeslots.value = generateTimeSlots(
+    props.eventData.startTime,
+    props.eventData.endTime,
+    props.eventData.eventType.defaultSlotDuration
   );
-  if (!isInstructorAvailable) {
-    return false;
-  }
-  if (selectedStudentInstrument.value.instrument.type === "Instrument") {
-    return true;
-  }
-  return accompanistAvailability.value.some((availability) => {
-    const startTimeMoment = moment(availability.startTime, "HH:mm:ss");
-    const endTimeMoment = moment(availability.endTime, "HH:mm:ss");
-    return (
-      (time.isBetween(startTimeMoment, endTimeMoment) ||
-        time.isSame(startTimeMoment)) &&
-      (endTimeSlot.isBetween(startTimeMoment, endTimeMoment) ||
-        endTimeSlot.isSame(endTimeMoment))
+
+  timeslots.value.forEach((timeslot) => {
+    timeslot.hasExistingSignup = hasExistingSignup(
+      timeslot.time,
+      addMinsToTime(
+        props.eventData.eventType.defaultSlotDuration,
+        timeslot.time
+      )
     );
+  });
+  disableTimeslots();
+}
+
+// Disabled timeslots are determined by the length the user needs to sign up for
+function disableTimeslots() {
+  timeslots.value.forEach((timeslot) => {
+    const timeslotEnd = addMinsToTime(timeslotLength.value, timeslot.time);
+    timeslot.isDisabled =
+      timeslotEnd >
+        addMinsToTime(
+          props.eventData.eventType.defaultSlotDuration,
+          timeslots.value[timeslots.value.length - 1].time
+        ) ||
+      (!timeslot.hasExistingSignup &&
+        hasExistingSignup(timeslot.time, timeslotEnd));
   });
 }
 
-function hasExistingSignup(timeslot) {
+function getTimeslotLength() {
+  if (props.eventData.eventType.slotType === "Fixed") {
+    timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
+  } else {
+    if (selectedStudentInstrument.value.instrument.type === "Vocal") {
+      if (isMusicMajor.value) {
+        timeslotLength.value =
+          selectedStudentInstrument.value.privateHours == 1 ? 10 : 15;
+      } else {
+        timeslotLength.value =
+          selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
+      }
+    } else {
+      timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
+    }
+  }
+
+  timeslotLength.value = 30;
+}
+
+function hasExistingSignup(timeslotStart, timeslotEnd) {
   return existingSignups.value.some(
-    (signup) => signup.startTime <= timeslot && signup.endTime > timeslot
+    (signup) => signup.endTime > timeslotStart && timeslotEnd > signup.startTime
   );
 }
 
 function getChipClass(timeslot) {
+  // if the timeslot is selected
   if (selectedTimeslot.value === timeslot) {
-    return hasExistingSignup(timeslot)
+    return timeslot.hasExistingSignup
       ? "bg-white text-blue pl-1"
       : "bg-blue text-white";
-  } else if (hasExistingSignup(timeslot)) {
-    return "bg-white text-mediumGray pl-1";
-  } else {
-    return "bg-teal text-white";
   }
+
+  // if the timeslot is already reserved
+  if (timeslot.hasExistingSignup) {
+    return "bg-maroon text-white pl-1";
+  }
+
+  // if the timeslot would not provide enough time for the student
+  if (timeslot.isDisabled) {
+    return "bg-white text-mediumGray";
+  }
+
+  // default
+  return "bg-teal text-white";
 }
 
 function openConfirmationDialog() {
@@ -240,9 +249,11 @@ function openConfirmationDialog() {
   errorMessage.value = "";
 
   //helper confirmation message variables
-  const timeslotEndTime = moment(selectedTimeslot.value, "HH:mma")
-    .add(timeslotLength.value, "minutes")
-    .format("HH:mma");
+  const timeslotEndTime = addMinsToTime(
+    selectedTimeslot.value,
+    timeslotLength.value
+  );
+
   const existingSignup = existingSignups.value.find(
     (signup) =>
       signup.startTime <= selectedTimeslot.value &&
@@ -294,10 +305,8 @@ async function confirmSignup() {
     ).id;
   } else {
     const eventSignupData = {
-      startTime: moment(selectedTimeslot.value, "HH:mma").format("HH:mm:ss"),
-      endTime: moment(selectedTimeslot.value, "HH:mma")
-        .add(timeslotLength.value, "minutes")
-        .format("HH:mm:ss"),
+      startTime: selectedTimeslot.time,
+      endTime: addMinsToTime(selectedTimeslot.value, timeslotLength.value),
       eventId: props.eventData.id,
     };
     await EventSignupDataService.create(eventSignupData)
@@ -381,9 +390,7 @@ watch(selectedStudentInstrument, async () => {
   );
   searchStudentPieces();
 
-  // update timeslots
   getTimeslotLength();
-  getTimeslots();
 });
 
 onMounted(async () => {
@@ -396,6 +403,7 @@ onMounted(async () => {
       : "Instrumental Event";
 
   getTimeslotLength();
+  generateTimeslots();
 });
 </script>
 <template>
@@ -542,15 +550,36 @@ onMounted(async () => {
               </v-card>
             </v-row>
             <v-row>
-              <v-col cols="5" class="pl-0">
+              <v-col cols="6" class="pl-0">
                 <v-card color="lightBlue" elevation="0">
-                  <v-card-text class="text-blue py-2 font-weight-bold text-h8">
-                    Selected: {{ selectedTimeslot }}
+                  <v-card-text
+                    class="text-blue py-2 font-weight-bold"
+                    style="font-size: 0.95em"
+                  >
+                    <div v-if="selectedTimeslot != null">
+                      Selected:
+                      {{
+                        selectedTimeslot.timeText +
+                        "-" +
+                        get12HourTimeStringFromString(
+                          addMinsToTime(timeslotLength, selectedTimeslot.time)
+                        )
+                      }}
+                    </div>
+                    <div v-else>Selected: None</div>
                   </v-card-text>
                 </v-card>
               </v-col>
               <v-col>
-                <v-btn class="font-weight-bold text-none px-5" color="blue">
+                <v-btn
+                  v-if="
+                    instructorAvailability.length > 0 &&
+                    (selectedAccompanist == null ||
+                      accompanistAvailability.length > 0)
+                  "
+                  class="font-weight-bold text-none px-5"
+                  color="blue"
+                >
                   Request additional
                 </v-btn>
               </v-col>
@@ -558,36 +587,96 @@ onMounted(async () => {
             <v-row class="mt-6">
               <v-col class="pl-0">
                 <v-card
-                  style="height: 250px"
-                  class="bg-lightTeal"
+                  style="height: 175px"
+                  class="overflow-y-auto bg-lightTeal"
                   elevation="0"
                 >
-                  <v-card-text>
+                  <v-card-text
+                    v-if="
+                      instructorAvailability.length > 0 &&
+                      (selectedAccompanist == null ||
+                        accompanistAvailability.length > 0)
+                    "
+                  >
                     <v-row class="pl-4">
                       <v-col cols="3" v-for="timeslot in timeslots">
                         <v-chip
-                          @click="selectedTimeslot = timeslot"
+                          @click="
+                            if (!timeslot.isDisabled)
+                              selectedTimeslot = timeslot;
+                          "
                           label
                           flat
-                          class="font-weight-bold flatChipBorder"
+                          class="font-weight-semi-bold flatChipBorder"
                           :class="getChipClass(timeslot)"
                         >
                           <v-icon
                             icon="mdi-account"
+                            size="small"
                             :color="
                               selectedTimeslot == timeslot
                                 ? 'blue'
                                 : 'lightMaroon'
                             "
-                            v-if="hasExistingSignup(timeslot)"
+                            v-if="timeslot.hasExistingSignup"
                           ></v-icon>
-                          {{ timeslot }}
+                          {{ timeslot.timeText }}
                         </v-chip>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                  <v-card-text v-else>
+                    <v-row v-if="instructorAvailability.length == 0">
+                      <v-col cols="6">
+                        <div
+                          class="font-weight-semi-bold text-maroon text-body-1"
+                        >
+                          {{ instructorName }} has not setup availability for
+                          this event.
+                        </div>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-btn
+                          class="font-weight-bold text-none px-5"
+                          color="blue"
+                        >
+                          Request availability
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                    <v-row
+                      v-if="
+                        selectedAccompanist != null &&
+                        accompanistAvailability.length == 0
+                      "
+                    >
+                      <v-col cols="6">
+                        <div
+                          class="font-weight-semi-bold text-maroon text-body-1"
+                        >
+                          {{ accompanistName }} has not setup availability for
+                          this event.
+                        </div>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-btn
+                          class="font-weight-bold text-none px-5"
+                          color="blue"
+                        >
+                          Request availability
+                        </v-btn>
                       </v-col>
                     </v-row>
                   </v-card-text>
                 </v-card>
               </v-col>
+            </v-row>
+            <v-row>
+              <v-checkbox
+                v-model="groupSignup"
+                label="Allow other students to signup with you"
+                class="text-body-1 font-weight-bold text-darkBlue"
+              ></v-checkbox>
             </v-row>
           </v-col>
         </v-row>

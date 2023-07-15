@@ -1,14 +1,18 @@
 export function get12HourTimeStringFromString(t) {
-  return parseInt(t.substring(0, 2)) > 12
-    ? parseInt(t.substring(0, 2)) - 12 + t.substring(2, t.length - 3) + "pm"
+  return parseInt(t.substring(0, 2)) > 11
+    ? parseInt(t.substring(0, 2)) == 12
+      ? parseInt(t.substring(0, 2)) + t.substring(2, t.length - 3) + "pm"
+      : parseInt(t.substring(0, 2)) - 12 + t.substring(2, t.length - 3) + "pm"
     : parseInt(t.substring(0, 2)) < 10
     ? t.substring(1, t.length - 3) + "am"
     : t.substring(0, t.length - 3) + "am";
 }
 
 export function get12HourTimeStringFromStringWithoutPostfix(t) {
-  return parseInt(t.substring(0, 2)) > 12
-    ? parseInt(t.substring(0, 2)) - 12 + t.substring(2, t.length - 3)
+  return parseInt(t.substring(0, 2)) > 11
+    ? parseInt(t.substring(0, 2)) == 12
+      ? parseInt(t.substring(0, 2)) + t.substring(2, t.length - 3)
+      : parseInt(t.substring(0, 2)) - 12 + t.substring(2, t.length - 3)
     : parseInt(t.substring(0, 2)) < 10
     ? t.substring(1, t.length - 3)
     : t.substring(0, t.length - 3);
