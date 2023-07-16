@@ -13,6 +13,8 @@ import MajorDataService from "../../services/MajorDataService.js";
 import AvailabilityDataService from "../../services/AvailabilityDataService.js";
 import EventSignupDataService from "../../services/EventSignupDataService.js";
 import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService.js";
+import UserRoleDataService from "../../services/UserRoleDataService.js";
+import UserNotificationDataService from "../../services/UserNotificationDataService.js";
 
 const emits = defineEmits(["closeDialogEvent"]);
 const props = defineProps({
@@ -24,13 +26,13 @@ const loginStore = useLoginStore();
 const eventTypeLabel = ref("");
 const errorMessage = ref("");
 const groupSignup = ref(false);
+const activeAccompanists = ref([]);
 // student instrument variables
 const instruments = ref([]);
 const selectedStudentInstrument = ref(null);
 const selectedInstructor = ref(null);
 const instructorName = ref(null);
 const selectedAccompanist = ref(null);
-const accompanistName = ref(null);
 // student piece variables
 const searchInput = ref("");
 const studentPieces = ref([]);
@@ -46,10 +48,29 @@ const instructorAvailability = ref([]);
 const accompanistAvailability = ref([]);
 const existingSignups = ref([]);
 // confirmation dialog variables
+const existingSignup = ref(null);
 const confimationDialog = ref(false);
-const confirmationMessage = ref("");
+const otherSignupDialog = ref(false);
+const dialogMessage = ref("");
+// snackbar variables
+const snackbar = ref(false);
+const snackbarMessage = ref("");
 
 async function getData() {
+  // due to the watch statements, accompanists must be gotten before student instruments
+  await UserRoleDataService.getRolesForRoleId(4)
+    .then((response) => {
+      activeAccompanists.value = response.data;
+      activeAccompanists.value.map(
+        (accompanist) =>
+          (accompanist.fullName =
+            accompanist.user.firstName + " " + accompanist.user.lastName)
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
       if (props.eventData.eventType.instrumentType === "Instrument") {
@@ -178,9 +199,25 @@ function disableTimeslots() {
           props.eventData.eventType.defaultSlotDuration,
           timeslots.value[timeslots.value.length - 1].time
         ) ||
-      (!timeslot.hasExistingSignup &&
-        hasExistingSignup(timeslot.time, timeslotEnd));
+      (hasExistingSignup(timeslot.time, timeslotEnd) &&
+        findExistingSignup(timeslot.time, timeslotEnd) == undefined) ||
+      !withinAvailability(timeslot.time, timeslotEnd);
   });
+}
+
+function withinAvailability(timeslotStart, timeslotEnd) {
+  var isAvailable = instructorAvailability.value.some(
+    (avail) => avail.startTime <= timeslotStart && avail.endTime >= timeslotEnd
+  );
+
+  if (isAvailable && accompanistAvailability.value.length > 0) {
+    isAvailable = accompanistAvailability.value.some(
+      (avail) =>
+        avail.startTime <= timeslotStart && avail.endTime >= timeslotEnd
+    );
+  }
+
+  return isAvailable;
 }
 
 function getTimeslotLength() {
@@ -199,13 +236,18 @@ function getTimeslotLength() {
       timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
     }
   }
-
-  timeslotLength.value = 30;
 }
 
 function hasExistingSignup(timeslotStart, timeslotEnd) {
   return existingSignups.value.some(
     (signup) => signup.endTime > timeslotStart && timeslotEnd > signup.startTime
+  );
+}
+
+function findExistingSignup(timeslotStart, timeslotEnd) {
+  return existingSignups.value.find(
+    (signup) =>
+      signup.startTime === timeslotStart && signup.endTime === timeslotEnd
   );
 }
 
@@ -231,7 +273,7 @@ function getChipClass(timeslot) {
   return "bg-teal text-white";
 }
 
-function openConfirmationDialog() {
+function openDialog() {
   // validation checks
   if (selectedStudentInstrument.value == null) {
     errorMessage.value = "Please select an instrument.";
@@ -241,37 +283,54 @@ function openConfirmationDialog() {
     errorMessage.value = "Please select at least one piece.";
     return;
   }
-  if (selectedTimeslot.value === "") {
+  if (selectedTimeslot.value == null) {
     errorMessage.value = "Please select a timeslot.";
     return;
   }
+
   // reset error message
   errorMessage.value = "";
 
-  //helper confirmation message variables
   const timeslotEndTime = addMinsToTime(
-    selectedTimeslot.value,
-    timeslotLength.value
+    timeslotLength.value,
+    selectedTimeslot.value.time
   );
 
-  const existingSignup = existingSignups.value.find(
-    (signup) =>
-      signup.startTime <= selectedTimeslot.value &&
-      signup.endTime > selectedTimeslot.value
+  existingSignup.value = findExistingSignup(
+    selectedTimeslot.value.time,
+    timeslotEndTime
   );
-  const otherStudentsInSingup = existingSignup
-    ? existingSignup.studentInstrumentSignups.map(
+
+  if (existingSignup.value == null) {
+    // there is no existing signup
+
+    // set confirmation message
+    dialogMessage.value = `Event: ${formatDate(
+      props.eventData.date
+    )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+      weekday: "long",
+      timeZone: "UTC",
+    })})
+    \nTimeslot: ${get12HourTimeStringFromString(
+      selectedTimeslot.value.time
+    )} - ${get12HourTimeStringFromString(timeslotEndTime)}
+    \nInstrument: ${selectedStudentInstrument.value.instrument.name}`;
+
+    // open confirmation dialog
+    confimationDialog.value = true;
+  } else {
+    // there is an existing signup
+    const otherStudentsInSingup =
+      existingSignup.value.studentInstrumentSignups.map(
         (x) =>
           x.studentInstrument.studentRole.user.firstName +
           " " +
           x.studentInstrument.studentRole.user.lastName
-      )
-    : [];
-  var studentsInSignup = "";
-  if (otherStudentsInSingup.length > 0) {
+      );
+    var studentsInSignup = "";
     if (otherStudentsInSingup.length == 1) {
       studentsInSignup = otherStudentsInSingup[0];
-    } else if (otherStudentsInSingup.length === 2) {
+    } else if (otherStudentsInSingup.length == 2) {
       //joins all with "and" but no commas
       studentsInSignup = otherStudentsInSingup.join(" and ");
     } else {
@@ -281,18 +340,38 @@ function openConfirmationDialog() {
         ", and " +
         otherStudentsInSingup.slice(-1);
     }
-  }
 
-  // set confirmation message
-  confirmationMessage.value = `Are you sure you want to signup for the (${selectedTimeslot.value} - ${timeslotEndTime}) timeslot`;
-  if (otherStudentsInSingup.length > 0) {
-    confirmationMessage.value += ` with ${studentsInSignup}?`;
-  } else {
-    confirmationMessage.value += "?";
-  }
+    if (existingSignup.value.isGroupEvent) {
+      // set confirmation message
+      dialogMessage.value = `Event: ${formatDate(
+        props.eventData.date
+      )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+        weekday: "long",
+        timeZone: "UTC",
+      })})
+    \nTimeslot: ${get12HourTimeStringFromString(
+      selectedTimeslot.value.time
+    )} - ${get12HourTimeStringFromString(timeslotEndTime)}
+    \nInstrument: ${selectedStudentInstrument.value.instrument.name}
+    \nWith: ${studentsInSignup}`;
 
-  // open confirmation dialog
-  confimationDialog.value = true;
+      // open confirmation dialog
+      confimationDialog.value = true;
+    } else {
+      dialogMessage.value = `Event: ${formatDate(
+        props.eventData.date
+      )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+        weekday: "long",
+        timeZone: "UTC",
+      })})
+    \nTimeslot: ${get12HourTimeStringFromString(
+      selectedTimeslot.value.time
+    )} - ${get12HourTimeStringFromString(timeslotEndTime)}
+    \nIs already reserved by ${studentsInSignup}`;
+      // open other signup dialog
+      otherSignupDialog.value = true;
+    }
+  }
 }
 
 async function confirmSignup() {
@@ -336,6 +415,89 @@ async function confirmSignup() {
     });
 }
 
+function requestTimeslotFromStudent() {
+  existingSignup.value.studentInstrumentSignups.forEach((student) => {
+    const data = {
+      text: `${loginStore.user.firstName} ${
+        loginStore.user.lastName
+      } has requested to join your timeslot for ${formatDate(
+        props.eventData.date
+      )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+        weekday: "long",
+        timeZone: "UTC",
+      })})`,
+      data: `eventId=${props.eventData.id}&eventSignupId=${existingSignup.value.id}`,
+      isCompleted: false,
+      userRoleId: student.studentInstrument.studentRole.id,
+      notificationId: 3,
+    };
+    UserNotificationDataService.create(data).catch((e) => {
+      console.log(e);
+    });
+  });
+
+  otherSignupDialog.value = false;
+  snackbar.value = true;
+  snackbarMessage.value = "Request sent";
+}
+
+async function requestTimeslotsFromAdmin() {
+  var admins = [];
+  await UserRoleDataService.getRolesForRoleId(3)
+    .then((response) => {
+      admins = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  admins.forEach((admin) => {
+    const data = {
+      text: `${loginStore.user.firstName} ${
+        loginStore.user.lastName
+      } has requested you create more timeslots for ${formatDate(
+        props.eventData.date
+      )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+        weekday: "long",
+        timeZone: "UTC",
+      })})`,
+      data: `eventId=${props.eventData.id}`,
+      isCompleted: false,
+      userRoleId: admin.id,
+      notificationId: 1,
+    };
+    UserNotificationDataService.create(data).catch((e) => {
+      console.log(e);
+    });
+  });
+
+  snackbar.value = true;
+  snackbarMessage.value = "Request sent";
+}
+
+async function requestAvailabilityFromUserRole(userRole) {
+  const data = {
+    text: `${loginStore.user.firstName} ${
+      loginStore.user.lastName
+    } has requested you enter availability for ${formatDate(
+      props.eventData.date
+    )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+      weekday: "long",
+      timeZone: "UTC",
+    })})`,
+    data: `eventId=${props.eventData.id}`,
+    isCompleted: false,
+    userRoleId: userRole.id,
+    notificationId: 2,
+  };
+  UserNotificationDataService.create(data).catch((e) => {
+    console.log(e);
+  });
+
+  snackbar.value = true;
+  snackbarMessage.value = "Request sent";
+}
+
 watch(selectedStudentInstrument, async () => {
   if (selectedStudentInstrument.value == null) {
     return;
@@ -348,14 +510,8 @@ watch(selectedStudentInstrument, async () => {
       " " +
       selectedInstructor.value.user.lastName
     : null;
-  selectedAccompanist.value = selectedStudentInstrument.value.accompanistRole;
-  accompanistName.value = selectedAccompanist.value
-    ? selectedAccompanist.value.user.firstName +
-      " " +
-      selectedAccompanist.value.user.lastName
-    : null;
 
-  // get availability for instructor and accompanist
+  // get availability for instructor
   await AvailabilityDataService.getByUserRoleAndEvent(
     selectedInstructor.value.id,
     props.eventData.id
@@ -367,7 +523,29 @@ watch(selectedStudentInstrument, async () => {
       console.log(e);
     });
 
-  if (selectedAccompanist.value) {
+  selectedAccompanist.value = activeAccompanists.value.find(
+    (accompanist) =>
+      accompanist.id == selectedStudentInstrument.value.accompanistRole.id
+  );
+
+  // update student pieces
+  selectedStudentPieces.value = [];
+  studentInstrumentStudentPieces.value = studentPieces.value.filter(
+    (studentPiece) =>
+      studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
+  );
+  searchStudentPieces();
+
+  getTimeslotLength();
+});
+
+watch(selectedAccompanist, async () => {
+  if (selectedAccompanist.value != null) {
+    selectedAccompanist.value.fullName =
+      selectedAccompanist.value.user.firstName +
+      " " +
+      selectedAccompanist.value.user.lastName;
+
     await AvailabilityDataService.getByUserRoleAndEvent(
       selectedAccompanist.value.id,
       props.eventData.id
@@ -381,16 +559,7 @@ watch(selectedStudentInstrument, async () => {
   } else {
     accompanistAvailability.value = [];
   }
-
-  // update student pieces
-  selectedStudentPieces.value = [];
-  studentInstrumentStudentPieces.value = studentPieces.value.filter(
-    (studentPiece) =>
-      studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
-  );
-  searchStudentPieces();
-
-  getTimeslotLength();
+  disableTimeslots();
 });
 
 onMounted(async () => {
@@ -403,6 +572,7 @@ onMounted(async () => {
       : "Instrumental Event";
 
   getTimeslotLength();
+
   generateTimeslots();
 });
 </script>
@@ -461,13 +631,16 @@ onMounted(async () => {
             ></v-text-field
           ></v-col>
           <v-col>
-            <v-text-field
+            <v-select
+              clearable
               label="Accompanist"
-              v-model="accompanistName"
+              v-model="selectedAccompanist"
+              :items="activeAccompanists"
+              item-title="fullName"
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-              readonly
-            ></v-text-field>
+              return-object
+            ></v-select>
           </v-col>
         </v-row>
         <v-row class="ml-1">
@@ -577,6 +750,7 @@ onMounted(async () => {
                     (selectedAccompanist == null ||
                       accompanistAvailability.length > 0)
                   "
+                  @click="requestTimeslotsFromAdmin"
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
@@ -639,6 +813,9 @@ onMounted(async () => {
                         <v-btn
                           class="font-weight-bold text-none px-5"
                           color="blue"
+                          @click="
+                            requestAvailabilityFromUserRole(selectedInstructor)
+                          "
                         >
                           Request availability
                         </v-btn>
@@ -654,14 +831,17 @@ onMounted(async () => {
                         <div
                           class="font-weight-semi-bold text-maroon text-body-1"
                         >
-                          {{ accompanistName }} has not setup availability for
-                          this event.
+                          {{ selectedAccompanist.fullName }} has not setup
+                          availability for this event.
                         </div>
                       </v-col>
                       <v-col cols="6">
                         <v-btn
                           class="font-weight-bold text-none px-5"
                           color="blue"
+                          @click="
+                            requestAvailabilityFromUserRole(selectedAccompanist)
+                          "
                         >
                           Request availability
                         </v-btn>
@@ -698,7 +878,7 @@ onMounted(async () => {
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          @click="openConfirmationDialog"
+          @click="openDialog"
         >
           Signup
         </v-btn>
@@ -708,10 +888,14 @@ onMounted(async () => {
   <v-dialog v-model="confimationDialog" persistent max-width="600px">
     <v-card>
       <v-card-title class="text-h6 font-weight-bold text-maroon">
-        Confirm Signup
+        <div v-if="existingSignup == null">Confirm Signup</div>
+        <div v-else>Confirm Group Signup</div>
       </v-card-title>
-      <v-card-text class="text-h8 font-weight-semi-bold text-blue">
-        {{ confirmationMessage }}
+      <v-card-text
+        class="text-h8 font-weight-semi-bold text-blue"
+        style="white-space: pre"
+      >
+        {{ dialogMessage }}
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -727,9 +911,44 @@ onMounted(async () => {
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          >Confirm</v-btn
+        >
+          <div v-if="existingSignup == null">Confirm</div>
+          <div v-else>Confirm Group Signup</div>
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="otherSignupDialog" persistent max-width="600px">
+    <v-card>
+      <v-card-title class="text-h6 font-weight-bold text-maroon">
+        This timeslot is already taken
+      </v-card-title>
+      <v-card-text
+        class="text-h8 font-weight-semi-bold text-blue"
+        style="white-space: pre"
+      >
+        {{ dialogMessage }}
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          @click="otherSignupDialog = false"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-lightMaroon text-maroon"
+          >Cancel</v-btn
+        >
+        <v-btn
+          @click="requestTimeslotFromStudent"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          >Request This Timeslot</v-btn
         >
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <v-snackbar v-model="snackbar" color="success" :timeout="3000" right>
+    <v-icon left>mdi-check</v-icon>{{ snackbarMessage }}
+  </v-snackbar>
 </template>
