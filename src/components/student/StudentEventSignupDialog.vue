@@ -53,8 +53,7 @@ const confimationDialog = ref(false);
 const otherSignupDialog = ref(false);
 const dialogMessage = ref("");
 // snackbar variables
-const snackbar = ref(false);
-const snackbarMessage = ref("");
+const snackbar = ref({ show: false, color: "", message: "" });
 
 async function getData() {
   // due to the watch statements, accompanists must be gotten before student instruments
@@ -374,47 +373,6 @@ function openDialog() {
   }
 }
 
-async function confirmSignup() {
-  var eventSignupId;
-  if (hasExistingSignup(selectedTimeslot.value)) {
-    eventSignupId = existingSignups.value.find(
-      (signup) =>
-        signup.startTime <= selectedTimeslot.value &&
-        signup.endTime > selectedTimeslot.value
-    ).id;
-  } else {
-    const eventSignupData = {
-      startTime: selectedTimeslot.time,
-      endTime: addMinsToTime(selectedTimeslot.value, timeslotLength.value),
-      eventId: props.eventData.id,
-    };
-    await EventSignupDataService.create(eventSignupData)
-      .then((response) => {
-        eventSignupId = response.data.id;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }
-  const studentInstrumentSignupData = {
-    eventSignupId: eventSignupId,
-    studentInstrumentId: selectedStudentInstrument.value.id,
-    instructorRoleId: selectedInstructor.value.id,
-    accompanistRoleId: selectedAccompanist.value
-      ? selectedAccompanist.value.id
-      : null,
-  };
-
-  await StudentInstrumentSignupDataService.create(studentInstrumentSignupData)
-    .then(() => {
-      confimationDialog.value = false;
-      emits("closeDialogEvent");
-    })
-    .catch((e) => {
-      console.log(e);
-    });
-}
-
 function requestTimeslotFromStudent() {
   existingSignup.value.studentInstrumentSignups.forEach((student) => {
     const data = {
@@ -437,8 +395,9 @@ function requestTimeslotFromStudent() {
   });
 
   otherSignupDialog.value = false;
-  snackbar.value = true;
-  snackbarMessage.value = "Request sent";
+  snackbar.value.show = true;
+  snackbar.value.color = "success";
+  snackbar.value.message = "Request sent";
 }
 
 async function requestTimeslotsFromAdmin() {
@@ -472,7 +431,9 @@ async function requestTimeslotsFromAdmin() {
   });
 
   snackbar.value = true;
-  snackbarMessage.value = "Request sent";
+  snackbar.value.show = true;
+  snackbar.value.color = "success";
+  snackbar.value.message = "Request sent";
 }
 
 async function requestAvailabilityFromUserRole(userRole) {
@@ -495,7 +456,102 @@ async function requestAvailabilityFromUserRole(userRole) {
   });
 
   snackbar.value = true;
-  snackbarMessage.value = "Request sent";
+  snackbar.value.show = true;
+  snackbar.value.color = "success";
+  snackbar.value.message = "Request sent";
+}
+
+async function confirmSignup() {
+  var isSignupValid = await confirmTimeslotAvailable();
+  if (!isSignupValid) {
+    timeslots.value.forEach((timeslot) => {
+      timeslot.hasExistingSignup = hasExistingSignup(
+        timeslot.time,
+        addMinsToTime(
+          props.eventData.eventType.defaultSlotDuration,
+          timeslot.time
+        )
+      );
+    });
+    disableTimeslots();
+    selectedTimeslot.value = null;
+
+    snackbar.value.show = true;
+    snackbar.value.color = "error";
+    snackbar.value.message =
+      existingSignup.value == null
+        ? "This timeslot has already been reserved"
+        : "This group signup is no longer available";
+    confimationDialog.value = false;
+    return;
+  }
+
+  var eventSignupId;
+  if (existingSignup.value != null) {
+    eventSignupId = existingSignup.value.id;
+  } else {
+    const eventSignupData = {
+      startTime: selectedTimeslot.value.time,
+      isGroupEvent: groupSignup.value,
+      endTime: addMinsToTime(timeslotLength.value, selectedTimeslot.value.time),
+      eventId: props.eventData.id,
+    };
+    await EventSignupDataService.create(eventSignupData)
+      .then((response) => {
+        eventSignupId = response.data.id;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  const studentInstrumentSignupData = {
+    eventSignupId: eventSignupId,
+    studentInstrumentId: selectedStudentInstrument.value.id,
+    instructorRoleId: selectedInstructor.value.id,
+    accompanistRoleId: selectedAccompanist.value
+      ? selectedAccompanist.value.id
+      : null,
+  };
+
+  await StudentInstrumentSignupDataService.create(studentInstrumentSignupData)
+    .then(() => {
+      confimationDialog.value = false;
+      emits("closeDialogEvent");
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
+async function confirmTimeslotAvailable() {
+  await EventSignupDataService.getByEvent(props.eventData.id)
+    .then((response) => {
+      existingSignups.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  if (existingSignup.value == null) {
+    //No existing signup, checking to see if another student has already signed up for the timeslot
+    return !hasExistingSignup(
+      selectedTimeslot.value.time,
+      addMinsToTime(timeslotLength.value, selectedTimeslot.value.time)
+    );
+  } else {
+    //Signing up with a group, checking to see if the signup still exists, is the same signup, and if the signup is still a group
+    const newSignup = findExistingSignup(
+      selectedTimeslot.value.time,
+      addMinsToTime(timeslotLength.value, selectedTimeslot.value.time)
+    );
+
+    return (
+      newSignup != undefined &&
+      newSignup.id == existingSignup.value.id &&
+      newSignup.isGroupEvent
+    );
+  }
 }
 
 watch(selectedStudentInstrument, async () => {
@@ -948,7 +1004,17 @@ onMounted(async () => {
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <v-snackbar v-model="snackbar" color="success" :timeout="3000" right>
-    <v-icon left>mdi-check</v-icon>{{ snackbarMessage }}
+  <v-snackbar
+    v-model="snackbar.show"
+    :color="snackbar.color"
+    :timeout="3000"
+    right
+  >
+    <v-icon
+      left
+      :icon="snackbar.color === 'success' ? 'mdi-check' : 'mdi-alert'"
+    >
+    </v-icon>
+    {{ snackbar.message }}
   </v-snackbar>
 </template>
