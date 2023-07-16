@@ -15,8 +15,9 @@ function closeUserInstrumentDialog() {
   addOrEditInstrumentDialog.value = false;
 }
 
-async function disableStudentInstrument(studentInstrumentId) {
-  await StudentInstrumentDataService.disable(studentInstrumentId)
+async function disableStudentInstrument(studentInstrument) {
+  studentInstrument.status = "Disabled";
+  await StudentInstrumentDataService.update(studentInstrument)
     .then(() => {
       emits("refreshStudentInstrumentsEvent");
     })
@@ -25,8 +26,9 @@ async function disableStudentInstrument(studentInstrumentId) {
     });
 }
 
-async function enableStudentInstrument(studentInstrumentId) {
-  await StudentInstrumentDataService.enable(studentInstrumentId)
+async function enableStudentInstrument(studentInstrument) {
+  studentInstrument.status = "Active";
+  await StudentInstrumentDataService.update(studentInstrument)
     .then(() => {
       emits("refreshStudentInstrumentsEvent");
     })
@@ -130,11 +132,11 @@ onMounted(async () => {});
       @closeUserInstrumentDialogEvent="closeUserInstrumentDialog"
       @disableStudentInstrumentEvent="
         closeUserInstrumentDialog(),
-          disableStudentInstrument(studentInstrumentData.id)
+          disableStudentInstrument(studentInstrumentData)
       "
       @enableStudentInstrumentEvent="
         closeUserInstrumentDialog(),
-          enableStudentInstrument(studentInstrumentData.id)
+          enableStudentInstrument(studentInstrumentData)
       "
     ></UserInstrumentDialogBody>
   </v-dialog>

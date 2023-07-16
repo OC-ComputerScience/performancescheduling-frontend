@@ -15,8 +15,9 @@ function closeLevelDialog() {
   createOrEditDialog.value = false;
 }
 
-async function disableLevel(levelId) {
-  await LevelDataService.disable(levelId)
+async function disableLevel(level) {
+  level.status = "Disabled";
+  await LevelDataService.update(level)
     .then(() => {
       emits("refreshLevelsEvent");
     })
@@ -25,8 +26,9 @@ async function disableLevel(levelId) {
     });
 }
 
-async function enableLevel(levelId) {
-  await LevelDataService.enable(levelId)
+async function enableLevel(level) {
+  level.status = "Active";
+  await LevelDataService.update(level)
     .then(() => {
       emits("refreshLevelsEvent");
     })
@@ -70,8 +72,8 @@ async function enableLevel(levelId) {
       :levelData="levelData"
       @closeLevelDialogEvent="closeLevelDialog"
       @updateLevelSuccessEvent="closeLevelDialog(), emits('refreshLevelsEvent')"
-      @disableLevelEvent="closeLevelDialog(), disableLevel(levelData.id)"
-      @enableLevelEvent="closeLevelDialog(), enableLevel(levelData.id)"
+      @disableLevelEvent="closeLevelDialog(), disableLevel(levelData)"
+      @enableLevelEvent="closeLevelDialog(), enableLevel(levelData)"
     ></LevelDialogBody>
   </v-dialog>
 </template>
