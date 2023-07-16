@@ -15,6 +15,7 @@ import EventSignupDataService from "../../services/EventSignupDataService.js";
 import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService.js";
 import UserRoleDataService from "../../services/UserRoleDataService.js";
 import UserNotificationDataService from "../../services/UserNotificationDataService.js";
+import EventSignupPieceDataService from "../../services/EventSignupPieceDataService.js";
 
 const emits = defineEmits(["closeDialogEvent"]);
 const props = defineProps({
@@ -503,6 +504,16 @@ async function confirmSignup() {
       .catch((e) => {
         console.log(e);
       });
+
+    selectedStudentPieces.value.forEach((piece) => {
+      const studentPieceData = {
+        eventSignupId: eventSignupId,
+        pieceId: piece.id,
+      };
+      EventSignupPieceDataService.create(studentPieceData).catch((e) => {
+        console.log(e);
+      });
+    });
   }
 
   const studentInstrumentSignupData = {
