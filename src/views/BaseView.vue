@@ -6,6 +6,7 @@ import StudentPerformances from "../components/student/StudentPerformances.vue";
 // import StudentSettings from "../components/student/StudentSettings.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
+import FacultyCreateCritique from "../components/faculty/FacultyCreateCritique.vue";
 
 import AdminHome from "../components/admin/AdminHome.vue";
 import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue";
@@ -46,6 +47,9 @@ console.log("fullPath.value: ", fullPath);
           v-if="fullPath === '/facultyHome' || fullPath === '/accompanistHome'"
         >
         </FacultyHome>
+        <FacultyCreateCritique
+          v-if="this.$route.path === '/facultyCreateCritique'"
+        ></FacultyCreateCritique>
         <!-- Admin pages -->
         <AdminHome v-if="fullPath === '/adminHome'"> </AdminHome>
         <MaintainUsers v-if="fullPath === '/adminUsers'"></MaintainUsers>
