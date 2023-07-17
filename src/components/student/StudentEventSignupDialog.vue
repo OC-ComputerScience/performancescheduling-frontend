@@ -505,10 +505,10 @@ async function confirmSignup() {
         console.log(e);
       });
 
-    selectedStudentPieces.value.forEach((piece) => {
+    selectedStudentPieces.value.forEach((studentPiece) => {
       const studentPieceData = {
         eventSignupId: eventSignupId,
-        pieceId: piece.id,
+        pieceId: studentPiece.pieceId,
       };
       EventSignupPieceDataService.create(studentPieceData).catch((e) => {
         console.log(e);
