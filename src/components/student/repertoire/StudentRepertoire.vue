@@ -13,8 +13,8 @@ const studentpieces = ref([]);
 const filteredStudentPieces = ref([]);
 const semesters = ref([]);
 
-async function getStudentPieces(studentId) {
-  await StudentPieceDataService.getByUser(studentId)
+async function getStudentPieces() {
+  await StudentPieceDataService.getByUser(loginStore.currentRole.userId)
     .then((response) => {
       studentpieces.value = response.data;
       filteredStudentPieces.value = studentpieces.value;
@@ -99,7 +99,7 @@ const currentPageData = computed(() => {
 });
 
 onMounted(async () => {
-  await getStudentPieces(loginStore.currentRole.userId);
+  await getStudentPieces();
   await getSemesters();
 });
 </script>
@@ -249,7 +249,7 @@ onMounted(async () => {
         id: null,
         pieceId: null,
         semesterId: null,
-        studetninstrumentId: null,
+        studentIntstrumentId: null,
         status: 'Active',
       }"
       :student-id="loginStore.currentRole.userId"
