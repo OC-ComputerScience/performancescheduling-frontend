@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import StudentPieceDataService from "./../../../services/StudentPieceDataService";
+import ComposerDataService from "./../../../services/ComposerDataService";
 import SemesterDataService from "./../../../services/SemesterDataService";
 import PieceDataService from "./../../../services/PieceDataService";
-import StudentInsturmentDataService from "./../../../services/StudentInstrumentDataService";
+import StudentInstrumentDataService from "./../../../services/StudentInstrumentDataService";
 import { useLoginStore } from "./../../../stores/LoginStore.js";
 
 const emits = defineEmits([
@@ -25,6 +26,9 @@ const form = ref(null);
 const pieces = ref([]);
 const semesters = ref([]);
 const studentInstruments = ref([]);
+const composers = ref([]);
+const composerId = ref(null);
+const filteredPieces = ref([]);
 
 //add StudentPiece
 async function addStudentPiece() {
@@ -74,10 +78,25 @@ async function getPieces() {
       console.log(err);
     });
 }
+async function getComposers() {
+  await ComposerDataService.getAll("lastName", false)
+    .then((response) => {
+      composers.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 
-async function getStudentInsrument(studentRoleId) {
-  await StudentInsturmentDataService.getStudentInstrumentsForStudentId(
-    studentRoleId
+function filterPieces() {
+  filteredPieces.value = pieces.value.filter((piece) => {
+    return piece.composerId === composerId.value;
+  });
+}
+
+async function getStudentInstrument() {
+  await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
+    loginStore.currentRole.id
   )
     .then((response) => {
       studentInstruments.value = response.data;
@@ -90,7 +109,8 @@ async function getStudentInsrument(studentRoleId) {
 onMounted(async () => {
   getSemesters();
   getPieces();
-  getStudentInsrument(loginStore.currentRole.id);
+  getComposers();
+  getStudentInstrument(loginStore.currentRole.id);
 });
 </script>
 
@@ -130,14 +150,93 @@ onMounted(async () => {
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
+            Composer
+          </v-card-subtitle>
+          <v-text-field
+            v-if="props.isEdit"
+            v-model="editedStudentPieceData.piece.composer.lastName"
+            color="darkBlue"
+            variant="plain"
+            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            readonly
+          ></v-text-field>
+
+          <v-autocomplete
+            v-if="!props.isEdit"
+            placeholder="Start typing the composer's last name"
+            color="darkBlue"
+            variant="plain"
+            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            v-model="composerId"
+            :items="composers"
+            item-title="lastName"
+            item-value="id"
+            @change="filterPieces"
+          >
+            <template v-slot:item="{ item, props: { onClick } }">
+              <v-list-item
+                v-if="
+                  item.raw.firstName != null &&
+                  item.raw.firstName.length != 0 &&
+                  item.raw.lastName != null &&
+                  item.raw.lastName.length != 0
+                "
+                @click="onClick"
+              >
+                {{ item.raw.lastName }}, {{ item.raw.firstName }}
+              </v-list-item>
+              <v-list-item
+                v-else-if="
+                  item.raw.lastname == null || item.raw.lastname.length == 0
+                "
+                @click="onClick"
+              >
+                {{ item.raw.firstName }}
+              </v-list-item>
+              <v-list-item
+                v-else-if="
+                  item.raw.lastName == null || item.raw.lastName.length == 0
+                "
+                @click="onClick"
+              >
+                {{ item.raw.lastName }}
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+          <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >Piece
+          </v-card-subtitle>
+          <v-text-field
+            v-if="props.isEdit"
+            v-model="editedStudentPieceData.piece.title"
+            color="darkBlue"
+            variant="plain"
+            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            readonly
+          ></v-text-field>
+          <v-select
+            v-if="!props.isEdit"
+            placeholder="Select from the list of pieces"
+            color="darkBlue"
+            variant="plain"
+            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            v-model="editedStudentPieceData.pieceId"
+            :items="filteredPieces"
+            item-title="title"
+            item-value="id"
+          >
+          </v-select>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
             Semester
           </v-card-subtitle>
           <v-select
             v-model="editedStudentPieceData.semesterId"
             :items="semesters"
             item-title="name"
+            item-value="id"
             variant="plain"
-            return-object
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () =>
@@ -149,34 +248,18 @@ onMounted(async () => {
             >Instrument
           </v-card-subtitle>
           <v-select
-            v-model="editedStudentPieceData.studentIntstrumentId"
+            v-model="editedStudentPieceData.studentInstrumentId"
             :items="studentInstruments"
             item-title="instrument.name"
             item-value="id"
             variant="plain"
-            return-object
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () =>
-                !!editedStudentPieceData.studentIntstrumentId ||
+                !!editedStudentPieceData.studentInstrumentId ||
                 'This field is required',
             ]"
           ></v-select>
-
-          <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-            >Piece
-          </v-card-subtitle>
-          <v-select
-            placeholder="Start typing the piece title"
-            color="darkBlue"
-            variant="plain"
-            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-            v-model="editedStudentPieceData.pieceId"
-            :items="pieces"
-            item-title="title"
-            item-value="id"
-          >
-          </v-select>
         </v-col>
       </v-row>
       <v-card-actions>
