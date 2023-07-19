@@ -82,6 +82,7 @@ async function enablePiece(piece) {
   <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
     <PieceDialogBody
       :is-edit="true"
+      :is-admin="true"
       :piece-data="pieceData"
       :pieces-data="piecesData"
       :composers-data="composersData"
