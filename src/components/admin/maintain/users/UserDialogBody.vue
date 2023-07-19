@@ -191,22 +191,20 @@ async function updateUserRoles() {
     // and it gets spliced out of editedUserRoles at the end of the if statement.
 
     // If role exists in editedUserRoles, and is disabled, enable it
-    editedUserRoles.value.forEach(async (eur) => {
-      if (eur.id === userRole.roleId) {
-        if (userRole.status === "Disabled") {
-          userRole.status = "Active";
-          await UserRoleDataService.update(userRole).catch((err) => {
-            console.log(err);
-          });
-        } else {
-          // Role does not exist in editedUserRoles, so delete from database
-          userRole.status = "Disabled";
-          await UserRoleDataService.update(userRole).catch((err) => {
-            console.log(err);
-          });
-        }
+    if (editedUserRoles.value.some((eur) => eur.id === userRole.roleId)) {
+      if (userRole.status === "Disabled") {
+        userRole.status = "Active";
+        await UserRoleDataService.update(userRole).catch((err) => {
+          console.log(err);
+        });
       }
-    });
+    } else {
+      // Role does not exist in editedUserRoles, so delete from database
+      userRole.status = "Disabled";
+      await UserRoleDataService.update(userRole).catch((err) => {
+        console.log(err);
+      });
+    }
 
     // Find index of role to splice in editedUserRoles
     let index = editedUserRoles.value.findIndex(
