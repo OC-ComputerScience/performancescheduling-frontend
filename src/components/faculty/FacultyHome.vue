@@ -1,7 +1,7 @@
 <script setup>
-import FacultyPendingItemCard from "./FacultyPendingItemCard.vue";
 import { useLoginStore } from "../../stores/LoginStore.js";
-import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { ref, onMounted, watch } from "vue";
 
 
 import UserNotificationDataService from "../../services/UserNotificationDataService.js";
@@ -12,8 +12,10 @@ import UpcomingEventItem from "../UpcomingEventItem.vue";
 import NotificationItem from "../NotificationItem.vue";
 import CurrentStudentsItem from "./CurrentStudentsItem.vue";
 import EventAvailabilityItem from "./EventAvailabilityItem.vue";
+import EventSignupAndAvailabilityItem from "../EventSignupAndAvailabilityItem.vue";
 
 const loginStore = useLoginStore();
+const { currentRole } = storeToRefs(loginStore);
 
 const notifications = ref([]);
 const students = ref([]);
@@ -21,8 +23,8 @@ const availabilities = ref([]);
 const upcomingEvents = ref([]);
 
 async function retrieveData() {
-  console.log("loginStore", loginStore.currentRole)
-  await UserNotificationDataService.getByUserRole(loginStore.currentRole.id)
+  console.log("loginStore", currentRole)
+  await UserNotificationDataService.getByUserRole(currentRole.value.id)
   .then((response) => {
       console.log("notifications", response.data)
       notifications.value = response.data;
@@ -31,8 +33,8 @@ async function retrieveData() {
       console.log(e);
     });
   
-  if (loginStore.currentRole.role.role == 'Faculty'){
-    await StudentInstrumentDataService.getStudentsForInstructorId(loginStore.currentRole.id)
+  if (currentRole.value.role.role == 'Faculty'){
+    await StudentInstrumentDataService.getStudentsForInstructorId(currentRole.value.id)
     .then((response) => {
       students.value = response.data;
       console.log("students", students)
@@ -42,8 +44,8 @@ async function retrieveData() {
     });
   }
 
-  if (loginStore.currentRole.role.role == 'Accompanist'){
-    await StudentInstrumentDataService.getStudentsForAccompanistId(loginStore.currentRole.id)
+  if (currentRole.value.role.role == 'Accompanist'){
+    await StudentInstrumentDataService.getStudentsForAccompanistId(currentRole.value.id)
     .then((response) => {
       students.value = response.data;
       console.log("students", students)
@@ -53,9 +55,10 @@ async function retrieveData() {
     });
   }
 
-  await AvailabilityDataService.getByUserRole(loginStore.currentRole.id)
+  await AvailabilityDataService.getByUserRole(currentRole.value.id)
     .then((response) => {
       availabilities.value = response.data;
+      console.log("availability", availabilities)
     })
     .catch((e) => {
       console.log(e);
@@ -69,6 +72,10 @@ async function retrieveData() {
       console.log(e);
     });
 }
+
+watch(currentRole, async () => {
+  await retrieveData(); 
+});
 
 onMounted(async () => {
   await retrieveData();
@@ -142,6 +149,15 @@ onMounted(async () => {
               :availability-data="availability"
             ></EventAvailabilityItem>
           </v-card-text>
+          <v-card-text>
+            <EventSignupAndAvailabilityItem
+              v-for="availability of availabilities"
+              :key="availability.id"
+              :event-data="availability.event"
+              :event-signup-data="availability"
+              :is-signup="false"
+            ></EventSignupAndAvailabilityItem>
+          </v-card-text>
         </v-card>
       </v-col>
       <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
@@ -154,7 +170,7 @@ onMounted(async () => {
               v-for="event of upcomingEvents"
               :key="event.id"
               :event-data="event"
-              :role-id="loginStore.currentRole.roleId"
+              :role-id="currentRole.value.roleId"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>
