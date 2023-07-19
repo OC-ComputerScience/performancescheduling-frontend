@@ -15,6 +15,7 @@ const emits = defineEmits([
 
 const props = defineProps({
   isEdit: { type: [Boolean], required: true },
+  isAdmin: { type: [Boolean], required: true },
   pieceData: { type: [Object], required: true },
   piecesData: { type: [Array] },
   composersData: { type: [Array] },
@@ -41,6 +42,9 @@ async function addPiece() {
 // Update the piece's roles
 
 async function updatePiece() {
+  if (!props.isAdmin) {
+    editedPieceData.value.status = "Pending";
+  }
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
       await PieceDataService.update(editedPieceData.value)
@@ -102,7 +106,8 @@ function similarPieceCheck(piece) {
               {{ editedPieceData.composer.lastName }}
             </v-card-title>
           </v-col>
-          <v-col v-if="props.isEdit" cols="auto" align-self="center">
+          <v-spacer></v-spacer>
+          <v-col v-if="props.isEdit" cols="auto">
             <v-chip
               label
               flat
@@ -159,11 +164,14 @@ function similarPieceCheck(piece) {
           ></v-textarea>
 
           <v-card-subtitle
+            v-if="props.isAdmin"
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
             Composer
           </v-card-subtitle>
+
           <v-autocomplete
+            v-if="props.isAdmin"
             placeholder="Start typing the composer's last name"
             color="darkBlue"
             variant="plain"
@@ -226,7 +234,7 @@ function similarPieceCheck(piece) {
           Cancel
         </v-btn>
         <v-btn
-          v-if="props.isEdit"
+          v-if="props.isEdit && props.isAdmin"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="

@@ -6,6 +6,7 @@ import SemesterDataService from "./../../../services/SemesterDataService";
 import PieceDataService from "./../../../services/PieceDataService";
 import StudentInstrumentDataService from "./../../../services/StudentInstrumentDataService";
 import { useLoginStore } from "./../../../stores/LoginStore.js";
+import PieceDialogBody from "./../../admin/maintain/pieces/PieceDialogBody.vue";
 
 const emits = defineEmits([
   "addStudentPieceSuccessEvent",
@@ -29,6 +30,7 @@ const studentInstruments = ref([]);
 const composers = ref([]);
 const composerId = ref(null);
 const filteredPieces = ref([]);
+const createOrEditPieceDialog = ref(false);
 
 //add StudentPiece
 async function addStudentPiece() {
@@ -105,7 +107,9 @@ async function getStudentInstrument() {
       console.log(err);
     });
 }
-
+function closePieceDialog() {
+  createOrEditPieceDialog.value = false;
+}
 onMounted(async () => {
   getSemesters();
   getPieces();
@@ -125,26 +129,25 @@ onMounted(async () => {
           >
             {{ props.isEdit ? "Edit" : "Add" }} Repertiore Piece
           </v-col>
-        </v-row>
-      </v-card-title>
-      <v-card-text class="pt-0">
-        <v-row v-if="props.isEdit" class="pt-0 mt-0">
-          <v-col cols="auto" class="pl-6" align-self="center"> </v-col>
-          <v-col v-if="props.isEdit" cols="auto" align-self="center">
+          <v-spacer></v-spacer>
+          <v-col v-if="props.isEdit" cols="auto" class="pt-0 mt-0">
             <v-chip
               label
               flat
               size="small"
-              class="font-weight-bold mt-0 text-none text-white flatChipBorder"
+              class="font-weight-bold text-none text-white flatChipBorder"
               :class="
-                studentpieceData.status === 'Active' ? 'bg-teal' : 'bg-maroon'
+                editedStudentPieceData.status === 'Active'
+                  ? 'bg-teal'
+                  : 'bg-maroon'
               "
             >
               {{ editedStudentPieceData.status }}
             </v-chip>
           </v-col>
         </v-row>
-      </v-card-text>
+      </v-card-title>
+
       <v-row :class="props.isEdit ? '' : 'mt-2'">
         <v-col>
           <v-card-subtitle
@@ -266,6 +269,13 @@ onMounted(async () => {
         <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          @click="createOrEditPieceDialog = true"
+        >
+          Edit Piece
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
           @click="props.isEdit ? updateStudentPiece() : addStudentPiece()"
         >
           {{ props.isEdit ? "Save" : "Add" }}
@@ -304,4 +314,13 @@ onMounted(async () => {
       </v-card-actions>
     </v-form>
   </v-card>
+  <v-dialog v-model="createOrEditPieceDialog" persistent max-width="600px">
+    <PieceDialogBody
+      :is-edit="true"
+      :is-admin="false"
+      :piece-data="editedStudentPieceData.piece"
+      @closePieceDialogEvent="closePieceDialog"
+      @updatePieceSuccessEvent="closePieceDialog"
+    ></PieceDialogBody>
+  </v-dialog>
 </template>
