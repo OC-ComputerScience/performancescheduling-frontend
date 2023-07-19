@@ -178,7 +178,7 @@ function generateTimeslots() {
   );
 
   timeslots.value.forEach((timeslot) => {
-    timeslot.hasExistingSignup = hasExistingSignup(
+    timeslot.existingSignup = hasExistingSignup(
       timeslot.time,
       addMinsToTime(
         props.eventData.eventType.defaultSlotDuration,
@@ -199,7 +199,7 @@ function disableTimeslots() {
           props.eventData.eventType.defaultSlotDuration,
           timeslots.value[timeslots.value.length - 1].time
         ) ||
-      (hasExistingSignup(timeslot.time, timeslotEnd) &&
+      (hasExistingSignup(timeslot.time, timeslotEnd) != undefined &&
         findExistingSignup(timeslot.time, timeslotEnd) == undefined) ||
       !withinAvailability(timeslot.time, timeslotEnd);
   });
@@ -239,7 +239,7 @@ function getTimeslotLength() {
 }
 
 function hasExistingSignup(timeslotStart, timeslotEnd) {
-  return existingSignups.value.some(
+  return existingSignups.value.find(
     (signup) => signup.endTime > timeslotStart && timeslotEnd > signup.startTime
   );
 }
@@ -254,13 +254,13 @@ function findExistingSignup(timeslotStart, timeslotEnd) {
 function getChipClass(timeslot) {
   // if the timeslot is selected
   if (selectedTimeslot.value === timeslot) {
-    return timeslot.hasExistingSignup
+    return timeslot.existingSignup != undefined
       ? "bg-white text-blue pl-1"
       : "bg-blue text-white";
   }
 
   // if the timeslot is already reserved
-  if (timeslot.hasExistingSignup) {
+  if (timeslot.existingSignup != undefined) {
     return "bg-maroon text-white pl-1";
   }
 
@@ -466,7 +466,7 @@ async function confirmSignup() {
   var isSignupValid = await confirmTimeslotAvailable();
   if (!isSignupValid) {
     timeslots.value.forEach((timeslot) => {
-      timeslot.hasExistingSignup = hasExistingSignup(
+      timeslot.existingSignup = hasExistingSignup(
         timeslot.time,
         addMinsToTime(
           props.eventData.eventType.defaultSlotDuration,
@@ -546,9 +546,11 @@ async function confirmTimeslotAvailable() {
 
   if (existingSignup.value == null) {
     //No existing signup, checking to see if another student has already signed up for the timeslot
-    return !hasExistingSignup(
-      selectedTimeslot.value.time,
-      addMinsToTime(timeslotLength.value, selectedTimeslot.value.time)
+    return (
+      hasExistingSignup(
+        selectedTimeslot.value.time,
+        addMinsToTime(timeslotLength.value, selectedTimeslot.value.time)
+      ) == undefined
     );
   } else {
     //Signing up with a group, checking to see if the signup still exists, is the same signup, and if the signup is still a group
@@ -828,7 +830,7 @@ onMounted(async () => {
             <v-row class="mt-6">
               <v-col class="pl-0">
                 <v-card
-                  style="height: 230px"
+                  style="height: 190px"
                   class="overflow-y-auto bg-lightTeal"
                   elevation="0"
                 >
@@ -854,14 +856,19 @@ onMounted(async () => {
                           :class="getChipClass(timeslot)"
                         >
                           <v-icon
-                            icon="mdi-account"
+                            :icon="
+                              timeslot.existingSignup.studentInstrumentSignups
+                                .length > 1
+                                ? 'mdi-account-multiple'
+                                : 'mdi-account'
+                            "
                             size="small"
                             :color="
                               selectedTimeslot == timeslot
                                 ? 'blue'
                                 : 'lightMaroon'
                             "
-                            v-if="timeslot.hasExistingSignup"
+                            v-if="timeslot.existingSignup != undefined"
                           ></v-icon>
                           {{ timeslot.timeText }}
                         </v-chip>
@@ -920,14 +927,16 @@ onMounted(async () => {
                 </v-card>
               </v-col>
             </v-row>
+            <v-row no-gutters>
+              <v-checkbox
+                v-model="groupSignup"
+                label="Allow other students to signup with you"
+                class="text-body-1 font-weight-bold text-darkBlue"
+              ></v-checkbox>
+            </v-row>
           </v-col>
         </v-row>
-        <v-row>
-          <v-checkbox
-            v-model="groupSignup"
-            label="Allow other students to signup with you"
-            class="text-body-1 font-weight-bold text-darkBlue"
-          ></v-checkbox>
+        <v-row no-gutters>
           <v-spacer></v-spacer>
           <div class="font-weight-bold mr-2 mt-4 text-red text-h6">
             {{ errorMessage }}
