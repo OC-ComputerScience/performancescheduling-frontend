@@ -379,7 +379,7 @@ function requestTimeslotFromStudent() {
     const data = {
       text: `${loginStore.user.firstName} ${
         loginStore.user.lastName
-      } has requested to join your timeslot for ${formatDate(
+      } has requested your timeslot for ${formatDate(
         props.eventData.date
       )} (${new Date(props.eventData.date).toLocaleDateString("default", {
         weekday: "long",
@@ -742,7 +742,7 @@ onMounted(async () => {
             <v-row class="mt-5">
               <v-col cols="11" class="pl-0">
                 <v-list
-                  style="height: 250px"
+                  style="height: 230px"
                   class="overflow-y-auto bg-lightBlue"
                 >
                   <v-list-item
@@ -828,18 +828,19 @@ onMounted(async () => {
             <v-row class="mt-6">
               <v-col class="pl-0">
                 <v-card
-                  style="height: 175px"
+                  style="height: 230px"
                   class="overflow-y-auto bg-lightTeal"
                   elevation="0"
                 >
                   <v-card-text
+                    class="py-0 px-1"
                     v-if="
                       instructorAvailability.length > 0 &&
                       (selectedAccompanist == null ||
                         accompanistAvailability.length > 0)
                     "
                   >
-                    <v-row class="pl-4">
+                    <v-row class="pl-4" no-gutters>
                       <v-col cols="3" v-for="timeslot in timeslots">
                         <v-chip
                           @click="
@@ -848,7 +849,8 @@ onMounted(async () => {
                           "
                           label
                           flat
-                          class="font-weight-semi-bold flatChipBorder"
+                          style="width: 90%"
+                          class="font-weight-semi-bold flatChipBorder mt-3"
                           :class="getChipClass(timeslot)"
                         >
                           <v-icon
@@ -918,38 +920,36 @@ onMounted(async () => {
                 </v-card>
               </v-col>
             </v-row>
-            <v-row>
-              <v-checkbox
-                v-model="groupSignup"
-                label="Allow other students to signup with you"
-                class="text-body-1 font-weight-bold text-darkBlue"
-              ></v-checkbox>
-            </v-row>
           </v-col>
         </v-row>
+        <v-row>
+          <v-checkbox
+            v-model="groupSignup"
+            label="Allow other students to signup with you"
+            class="text-body-1 font-weight-bold text-darkBlue"
+          ></v-checkbox>
+          <v-spacer></v-spacer>
+          <div class="font-weight-bold mr-2 mt-4 text-red text-h6">
+            {{ errorMessage }}
+          </div>
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold mr-2 mt-4 bg-lightMaroon text-maroon"
+            @click="emits('closeDialogEvent')"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold mr-2 mt-4 bg-blue text-none"
+            @click="openDialog"
+          >
+            Signup
+          </v-btn>
+        </v-row>
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <div class="font-weight-bold mr-2 text-red text-h6">
-          {{ errorMessage }}
-        </div>
-        <v-btn
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-lightMaroon text-maroon"
-          @click="emits('closeDialogEvent')"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          @click="openDialog"
-        >
-          Signup
-        </v-btn>
-      </v-card-actions>
     </v-form>
   </v-card>
   <v-dialog v-model="confimationDialog" persistent max-width="600px">
