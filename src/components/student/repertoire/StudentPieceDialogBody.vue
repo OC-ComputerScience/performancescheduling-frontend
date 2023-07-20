@@ -110,6 +110,17 @@ async function getStudentInstrument() {
 function closePieceDialog() {
   createOrEditPieceDialog.value = false;
 }
+async function updatePieceSuccess() {
+  createOrEditPieceDialog.value = false;
+  await PieceDataService.get(editedStudentPieceData.value.piece.id)
+    .then((response) => {
+      editedStudentPieceData.value.piece.title = response.data.title;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 onMounted(async () => {
   getSemesters();
   getPieces();
@@ -320,7 +331,7 @@ onMounted(async () => {
       :is-admin="false"
       :piece-data="editedStudentPieceData.piece"
       @closePieceDialogEvent="closePieceDialog"
-      @updatePieceSuccessEvent="closePieceDialog"
+      @updatePieceSuccessEvent="closePieceDialog, updatePieceSuccess()"
     ></PieceDialogBody>
   </v-dialog>
 </template>
