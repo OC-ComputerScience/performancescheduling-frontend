@@ -121,6 +121,13 @@ async function updatePieceSuccess() {
     });
 }
 
+function setPiece(id) {
+  editedStudentPieceData.value.piece = pieces.value.find((piece) => {
+    return piece.id === id;
+  });
+  console.log("last=" + editedStudentPieceData.value.piece.composer.lastName);
+}
+
 onMounted(async () => {
   getSemesters();
   getPieces();
@@ -238,6 +245,7 @@ onMounted(async () => {
             :items="filteredPieces"
             item-title="title"
             item-value="id"
+            @update:modelValue="setPiece(editedStudentPieceData.pieceId)"
           >
           </v-select>
           <v-card-subtitle
