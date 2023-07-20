@@ -112,7 +112,9 @@ async function enableStudentPiece(studentpiece) {
       :is-edit="true"
       :studentpiece-data="studentpieceData"
       :student-id="studentpieceData.studentId"
-      @closeStudentPieceDialogEvent="closeStudentPieceDialog"
+      @closeStudentPieceDialogEvent="
+        closeStudentPieceDialog(), emits('refreshStudentPiecesEvent')
+      "
       @updateStudentPieceSuccessEvent="
         closeStudentPieceDialog(), emits('refreshStudentPiecesEvent')
       "
