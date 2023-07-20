@@ -18,8 +18,9 @@ function closeSemesterDialog() {
 
 // Creates role labels for each role, and if Student, gets StudentInstrument data.
 
-async function disableSemester(semesterId) {
-  await SemesterDataService.disable(semesterId)
+async function disableSemester(semester) {
+  semester.status = "Disabled";
+  await SemesterDataService.update(semester)
     .then(() => {
       emits("refreshSemestersEvent");
     })
@@ -28,8 +29,9 @@ async function disableSemester(semesterId) {
     });
 }
 
-async function enableSemester(semesterId) {
-  await SemesterDataService.enable(semesterId)
+async function enableSemester(semester) {
+  semester.status = "Active";
+  await SemesterDataService.update(semester)
     .then(() => {
       emits("refreshSemestersEvent");
     })
@@ -88,11 +90,9 @@ async function enableSemester(semesterId) {
         closeSemesterDialog(), emits('refreshSemestersEvent')
       "
       @disableSemesterEvent="
-        closeSemesterDialog(), disableSemester(semesterData.id)
+        closeSemesterDialog(), disableSemester(semesterData)
       "
-      @enableSemesterEvent="
-        closeSemesterDialog(), enableSemester(semesterData.id)
-      "
+      @enableSemesterEvent="closeSemesterDialog(), enableSemester(semesterData)"
     ></SemesterDialogBody>
   </v-dialog>
 </template>

@@ -52,7 +52,7 @@ const instructors = ref([]);
 const accompanists = ref([]);
 
 async function getAllInstructors() {
-  await UserRoleDataService.getRolesFoRoleId(2)
+  await UserRoleDataService.getRolesForRoleId(2)
     .then((response) => {
       instructors.value = response.data;
     })
@@ -62,7 +62,7 @@ async function getAllInstructors() {
 }
 
 async function getAllAccompanists() {
-  await UserRoleDataService.getRolesFoRoleId(4)
+  await UserRoleDataService.getRolesForRoleId(4)
     .then((response) => {
       accompanists.value = response.data;
     })

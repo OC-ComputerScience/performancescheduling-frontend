@@ -3,7 +3,7 @@ import MainNav from "../components/MainNav.vue";
 
 import StudentHome from "../components/student/StudentHome.vue";
 import StudentPerformances from "../components/student/StudentPerformances.vue";
-import StudentSettings from "../components/student/StudentSettings.vue";
+// import StudentSettings from "../components/student/StudentSettings.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
 
@@ -29,9 +29,9 @@ import MaintainLocations from "../components/admin/maintain/locations/MaintainLo
         <StudentHome
           v-if="this.$route.fullPath === '/studentHome'"
         ></StudentHome>
-        <StudentSettings
+        <!-- <StudentSettings
           v-if="this.$route.fullPath === '/studentSettings'"
-        ></StudentSettings>
+        ></StudentSettings> -->
         <StudentPerformances
           v-if="this.$route.fullPath === '/studentPerformances'"
         ></StudentPerformances>
