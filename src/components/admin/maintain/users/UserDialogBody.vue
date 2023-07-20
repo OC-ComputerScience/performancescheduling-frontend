@@ -192,18 +192,18 @@ async function updateUserRoles() {
 
     // If role exists in editedUserRoles, and is disabled, enable it
     if (editedUserRoles.value.some((eur) => eur.id === userRole.roleId)) {
-      userRole.status === "Disabled"
-        ? await UserRoleDataService.enable(userRole.id).catch((err) => {
-            console.log(err);
-          })
-        : null;
-    } else {
-      // Role does not exist in editedUserRoles, so delete from database
-      await UserRoleDataService.disable(userRole.id)
-        .then(() => {})
-        .catch((err) => {
+      if (userRole.status === "Disabled") {
+        userRole.status = "Active";
+        await UserRoleDataService.update(userRole).catch((err) => {
           console.log(err);
         });
+      }
+    } else {
+      // Role does not exist in editedUserRoles, so delete from database
+      userRole.status = "Disabled";
+      await UserRoleDataService.update(userRole).catch((err) => {
+        console.log(err);
+      });
     }
 
     // Find index of role to splice in editedUserRoles

@@ -15,8 +15,9 @@ function closeEventTypeDialog() {
   createOrEditDialog.value = false;
 }
 
-async function disableEventType(eventTypeId) {
-  await EventTypeDataService.update({ id: eventTypeId, status: "Disabled" })
+async function disableEventType(eventType) {
+  eventType.status = "Disabled";
+  await EventTypeDataService.update(eventType)
     .then(() => {
       emits("refreshEventTypesEvent");
     })
@@ -25,8 +26,9 @@ async function disableEventType(eventTypeId) {
     });
 }
 
-async function enableEventType(eventTypeId) {
-  await EventTypeDataService.update({ id: eventTypeId, status: "Active" })
+async function enableEventType(eventType) {
+  eventType.status = "Active";
+  await EventTypeDataService.update(eventType)
     .then(() => {
       emits("refreshEventTypesEvent");
     })
@@ -126,10 +128,10 @@ async function enableEventType(eventTypeId) {
           closeEventTypeDialog(), emits('refreshEventTypesEvent')
         "
         @disableEventTypeEvent="
-          closeEventTypeDialog(), disableEventType(eventTypeData.id)
+          closeEventTypeDialog(), disableEventType(eventTypeData)
         "
         @enableEventTypeEvent="
-          closeEventTypeDialog(), enableEventType(eventTypeData.id)
+          closeEventTypeDialog(), enableEventType(eventTypeData)
         "
       ></EventTypeDialogBody>
     </v-dialog>

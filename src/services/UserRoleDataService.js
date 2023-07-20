@@ -18,7 +18,7 @@ class UserRoleDataService {
     return http.get(this.baseUrl + "userId/" + userId);
   }
 
-  getRolesFoRoleId(roleId) {
+  getRolesForRoleId(roleId) {
     return http.get(this.baseUrl + "roleId/" + roleId);
   }
 
@@ -28,14 +28,6 @@ class UserRoleDataService {
 
   update(data) {
     return http.put(this.baseUrl + data.id, data);
-  }
-
-  disable(id) {
-    return http.put(this.baseUrl + "disable/" + id);
-  }
-
-  enable(id) {
-    return http.put(this.baseUrl + "enable/" + id);
   }
 }
 export default new UserRoleDataService();

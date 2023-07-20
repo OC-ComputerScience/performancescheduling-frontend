@@ -30,9 +30,9 @@ import MaintainLocations from "../components/admin/maintain/locations/MaintainLo
         <StudentHome
           v-if="this.$route.fullPath === '/studentHome'"
         ></StudentHome>
-        <StudentSettings
+        <!-- <StudentSettings
           v-if="this.$route.fullPath === '/studentSettings'"
-        ></StudentSettings>
+        ></StudentSettings> -->
         <StudentPerformances
           v-if="this.$route.fullPath === '/studentPerformances'"
         ></StudentPerformances>
