@@ -38,6 +38,7 @@ function handleClick() {
               <!-- Event Instrument Type -->
               <!-- TODO(@ethanimooney): Make this actually work -->
               <v-card-subtitle
+                v-if="roleId == 3 || roleId == 1"
                 class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
               >
                 {{
@@ -59,7 +60,7 @@ function handleClick() {
                 class="bg-darkBlue py-2 px-0 text-white mt-0"
               >
                 <v-card-subtitle
-                  v-if="eventData.isReady"
+                  v-if="(roleId == 3 || roleId == 1) && eventData.isReady"
                   class="font-weight-semi-bold"
                 >
                   {{
@@ -68,6 +69,19 @@ function handleClick() {
                       : eventData.eventSignups.length
                   }}
                   People Signed Up
+                </v-card-subtitle>
+                <v-card-subtitle
+                  v-if="roleId == 2 || roleId == 4"
+                  class="font-weight-semi-bold"
+                >
+                {{
+                  eventData.eventType.instrumentType === "Both"
+                    ? "Vocal & Instrumental"
+                    : eventData.eventType.instrumentType === "Vocal"
+                    ? "Vocal"
+                    : "Instrumental"
+                }}
+                Event
                 </v-card-subtitle>
                 <v-card-subtitle
                   v-if="roleId == 3"
