@@ -10,7 +10,7 @@
       <v-row>
         <v-col cols="auto">
           <v-card-title class="font-weight-semi-bold text-darkBlue">
-            {{ props.studentsData.firstName }} {{ props.studentsData.lastName }}
+            {{ studentsData.firstName }} {{ studentsData.lastName }}
           </v-card-title>
         </v-col>
         <v-spacer></v-spacer>

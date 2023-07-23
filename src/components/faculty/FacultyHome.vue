@@ -56,17 +56,36 @@ async function retrieveData() {
   }
 
   await AvailabilityDataService.getByUserRole(currentRole.value.id)
-    .then((response) => {
-      availabilities.value = response.data;
-      console.log("availability", availabilities)
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  .then((response) => {
+    const groupedAvailabilities = {};
+    
+    //Iterate through list of availabilities to group them by eventId
+    for (let i = 0; i < response.data.length; i++) {
+      const availability = response.data[i];
+      const eventId = availability.eventId;
+      
+      //Index will be the eventId value
+      if (!groupedAvailabilities[eventId]) {
+        groupedAvailabilities[eventId] = [availability];
+      } else {
+        groupedAvailabilities[eventId].push(availability);
+      }
+    }
+
+    //Put the values of the loop list into an availabilities list with "normal" indexes
+    availabilities.value = Object.values(groupedAvailabilities);
+
+    //availabilities.value = response.data;
+    console.log("availability", availabilities);
+  })
+  .catch((e) => {
+    console.log(e);
+  });
 
   await EventDataService.getGTEDateForFaculty(new Date())
     .then((response) => {
       upcomingEvents.value = response.data;
+      console.log("upcoming", upcomingEvents)
     })
     .catch((e) => {
       console.log(e);
@@ -120,7 +139,6 @@ onMounted(async () => {
                   </v-card-title>
                 </v-col>
               </v-row>
-
               <v-card-text>
                 <CurrentStudentsItem
                   v-for="student of students"
@@ -143,13 +161,13 @@ onMounted(async () => {
           </v-card-title>
           <v-card-text>
             <EventAvailabilityItem
-              v-for="availability of availabilities"
-              :key="availability.id"
-              :event-data="availability.event"
-              :availability-data="availability"
+              v-for="availability in availabilities"
+              :key="availability[0].id"
+              :event-data="availability[0].event"
+              :availability-data="availability[0]"
             ></EventAvailabilityItem>
           </v-card-text>
-          <v-card-text>
+          <!-- <v-card-text>
             <EventSignupAndAvailabilityItem
               v-for="availability of availabilities"
               :key="availability.id"
@@ -157,7 +175,7 @@ onMounted(async () => {
               :event-signup-data="availability"
               :is-signup="false"
             ></EventSignupAndAvailabilityItem>
-          </v-card-text>
+          </v-card-text> -->
         </v-card>
       </v-col>
       <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
@@ -170,7 +188,7 @@ onMounted(async () => {
               v-for="event of upcomingEvents"
               :key="event.id"
               :event-data="event"
-              :role-id="currentRole.value.roleId"
+              :role-id="currentRole.roleId"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>
