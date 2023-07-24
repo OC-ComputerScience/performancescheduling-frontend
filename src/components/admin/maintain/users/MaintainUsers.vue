@@ -139,7 +139,7 @@ onMounted(async () => {
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight">Users</h1>
+      <h1 class="text-maroon font-weight-bold text-h3">Users</h1>
 
       <input
         type="text"
@@ -284,7 +284,11 @@ onMounted(async () => {
           <v-pagination
             color="blue"
             class="font-weight-bold"
-            :length="Math.round(filteredUsers.length / perPage + 1)"
+            :length="
+              filteredUsers.length % perPage == 0
+                ? filteredUsers.length / perPage
+                : Math.floor(filteredUsers.length / perPage) + 1
+            "
             :total-visible="7"
             v-model="currentPage"
           ></v-pagination>
@@ -316,9 +320,3 @@ onMounted(async () => {
     ></UserDialogBody>
   </v-dialog>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

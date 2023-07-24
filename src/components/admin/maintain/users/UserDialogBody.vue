@@ -23,6 +23,8 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
 });
 
+const form = ref(null);
+
 const addInstrumentDialog = ref(false);
 
 function addInstrument() {
@@ -53,8 +55,7 @@ const facultyRole = isFaculty.value
   ? props.userRoles.find((ur) => ur.roleId === 2)
   : null;
 
-const editedUserData = ref(props.userData);
-// const editedUserRoles = ref(props.userRoles);
+const editedUserData = ref(Object.assign({}, props.userData));
 
 const editedUserRoles = ref(
   props.isEdit
@@ -109,29 +110,42 @@ const editedStudentSemesters = ref(
   isStudent.value ? studentRole.studentSemesters : null
 );
 const editedStudentHours = ref(
-  isStudent.value ? studentRole.studentLessonHours : null
+  isStudent.value
+    ? studentRole.studentRole.reduce((sum, obj) => {
+        if (obj.status === "Active") {
+          return sum + obj.privateHours;
+        } else {
+          return sum;
+        }
+      }, 0)
+    : null
 );
 
 const editedFacultyTitle = ref(isFaculty.value ? facultyRole.title : null);
 
 async function addUser() {
-  await UserDataService.create(editedUserData.value)
-    .then(async (response) => {
-      for (let editedUserRole of editedUserRoles.value) {
-        await UserRoleDataService.create({
-          userId: response.data.id,
-          roleId: editedUserRole.id,
-          status: "Active",
-        }).catch((err) => {
+  form.value.validate().then(async (valid) => {
+    console.log(valid.valid);
+    if (valid.valid) {
+      await UserDataService.create(editedUserData.value)
+        .then(async (response) => {
+          for (let editedUserRole of editedUserRoles.value) {
+            await UserRoleDataService.create({
+              userId: response.data.id,
+              roleId: editedUserRole.id,
+              status: "Active",
+            }).catch((err) => {
+              console.log(err);
+            });
+          }
+
+          emits("addUserSuccessEvent");
+        })
+        .catch((err) => {
           console.log(err);
         });
-      }
-
-      emits("addUserSuccessEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+    }
+  });
 }
 
 // Update the user's roles, then
@@ -139,29 +153,30 @@ async function addUser() {
 // if isFaculty, update the faculty's title, then
 // update the user's data
 async function updateUser() {
-  await updateUserRoles();
+  form.value.validate().then(async (valid) => {
+    console.log(valid.valid);
+    if (valid.valid) {
+      await updateUserRoles();
 
-  if (isStudent.value) {
-    await updateStudentMajor();
-    await updateStudentClassification();
-    await updateStudentSemesters();
-    await updateStudentHours();
-  }
+      if (isStudent.value) {
+        await updateStudentMajor();
+        await updateStudentClassification();
+        await updateStudentSemesters();
+      }
 
-  if (isFaculty.value) {
-    await updateFacultyTitle();
-  }
+      if (isFaculty.value) {
+        await updateFacultyTitle();
+      }
 
-  delete editedUserData.value["createdAt"];
-  delete editedUserData.value["updatedAt"];
-
-  await UserDataService.update(editedUserData.value)
-    .then(() => {
-      emits("updateUserSuccessEvent");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+      await UserDataService.update(editedUserData.value)
+        .then(() => {
+          emits("updateUserSuccessEvent");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
 }
 
 // For each role in userRoles, check if it exists in editedUserRoles
@@ -177,18 +192,18 @@ async function updateUserRoles() {
 
     // If role exists in editedUserRoles, and is disabled, enable it
     if (editedUserRoles.value.some((eur) => eur.id === userRole.roleId)) {
-      userRole.status === "Disabled"
-        ? await UserRoleDataService.enable(userRole.id).catch((err) => {
-            console.log(err);
-          })
-        : null;
-    } else {
-      // Role does not exist in editedUserRoles, so delete from database
-      await UserRoleDataService.disable(userRole.id)
-        .then(() => {})
-        .catch((err) => {
+      if (userRole.status === "Disabled") {
+        userRole.status = "Active";
+        await UserRoleDataService.update(userRole).catch((err) => {
           console.log(err);
         });
+      }
+    } else {
+      // Role does not exist in editedUserRoles, so delete from database
+      userRole.status = "Disabled";
+      await UserRoleDataService.update(userRole).catch((err) => {
+        console.log(err);
+      });
     }
 
     // Find index of role to splice in editedUserRoles
@@ -261,22 +276,6 @@ async function updateStudentSemesters() {
   }
 }
 
-// If the user's hours have changed, update it
-async function updateStudentHours() {
-  // If the editedStudentHours is different from the studentRole's hours, update it
-  if (
-    studentRole.studentLessonHours === null ||
-    editedStudentHours.value !== studentRole.studentLessonHours
-  ) {
-    await UserRoleDataService.update({
-      id: studentRole.id,
-      studentLessonHours: editedStudentHours.value,
-    }).catch((err) => {
-      console.log(err);
-    });
-  }
-}
-
 // If the user's title has changed, update it
 async function updateFacultyTitle() {
   // If the editedFacultyTitle is different from the facultyRole's title, update it
@@ -299,6 +298,13 @@ async function refreshStudentInstruments() {
   )
     .then((response) => {
       studentRole.studentRole = response.data;
+      editedStudentHours.value = studentRole.studentRole.reduce((sum, obj) => {
+        if (obj.status === "Active") {
+          return sum + obj.privateHours;
+        } else {
+          return sum;
+        }
+      }, 0);
     })
     .catch((err) => {
       console.log(err);
@@ -313,280 +319,307 @@ onMounted(async () => {
 
 <template>
   <v-card class="pa-2 flatCardBorder">
-    <v-card-title>
-      <v-row class="pt-0 mt-0">
-        <v-col
-          cols="auto"
-          class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
-        >
-          {{ props.isEdit ? "Edit" : "Add" }} User
-        </v-col>
-      </v-row>
-    </v-card-title>
-    <v-card-text class="pt-0">
-      <v-row v-if="props.isEdit" class="pt-0 mt-0">
-        <v-col cols="1">
-          <v-avatar size="55" color="darkBlue">
-            <v-img referrerpolicy="no-referrer" :src="userData.picture" />
-          </v-avatar>
-        </v-col>
-        <v-col cols="auto" class="pl-6" align-self="center">
-          <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
-            {{ userData.firstName }}
-            {{ userData.lastName }}
-          </v-card-title>
-          <v-card-subtitle class="text-weight-semi-bold mt-0 py-0">
-            <a v-bind:href="'mailto:' + userData.email" class="text-blue">
-              {{ userData.email }}</a
+    <v-form ref="form" validate-on="input">
+      <v-card-title>
+        <v-row class="pt-0 mt-0">
+          <v-col
+            cols="auto"
+            class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
+          >
+            {{ props.isEdit ? "Edit" : "Add" }} User
+          </v-col>
+        </v-row>
+      </v-card-title>
+      <v-card-text class="pt-0">
+        <v-row v-if="props.isEdit" class="pt-0 mt-0">
+          <v-col cols="1">
+            <v-avatar size="55" color="darkBlue">
+              <v-img referrerpolicy="no-referrer" :src="userData.picture" />
+            </v-avatar>
+          </v-col>
+          <v-col cols="auto" class="pl-6" align-self="center">
+            <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
+              {{ userData.firstName }}
+              {{ userData.lastName }}
+            </v-card-title>
+            <v-card-subtitle class="text-weight-semi-bold mt-0 py-0">
+              <a v-bind:href="'mailto:' + userData.email" class="text-blue">
+                {{ userData.email }}</a
+              >
+            </v-card-subtitle>
+          </v-col>
+          <v-col v-if="props.isEdit" cols="auto" align-self="center">
+            <v-chip
+              label
+              flat
+              size="small"
+              class="font-weight-bold mt-0 text-none text-white flatChipBorder"
+              :class="userData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
             >
-          </v-card-subtitle>
-        </v-col>
-        <v-col v-if="props.isEdit" cols="auto" align-self="center">
-          <v-chip
-            label
-            flat
-            size="small"
-            class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-            :class="userData.status === 'Active' ? 'bg-teal' : 'bg-maroon'"
-          >
-            {{ userData.status === "Active" ? "Active" : "Disabled" }}
-          </v-chip>
-        </v-col>
-      </v-row>
-      <v-row :class="props.isEdit ? '' : 'mt-2'">
-        <v-col>
-          <v-card-subtitle
-            v-if="!props.isEdit"
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            First Name
-          </v-card-subtitle>
-          <v-text-field
-            v-if="!props.isEdit"
-            placeholder="John"
-            v-model="editedUserData.firstName"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-text-field>
+              {{ userData.status }}
+            </v-chip>
+          </v-col>
+        </v-row>
+        <v-row :class="props.isEdit ? '' : 'mt-2'">
+          <v-col>
+            <v-card-subtitle
+              v-if="!props.isEdit"
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              First Name
+            </v-card-subtitle>
+            <v-text-field
+              v-if="!props.isEdit"
+              placeholder="John"
+              v-model="editedUserData.firstName"
+              variant="plain"
+              class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+              :rules="[(v) => !!v || 'This field is required']"
+            ></v-text-field>
 
-          <v-card-subtitle
-            v-if="!props.isEdit"
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Last Name
-          </v-card-subtitle>
-          <v-text-field
-            v-if="!props.isEdit"
-            placeholder="Doe"
-            v-model="editedUserData.lastName"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-text-field>
+            <v-card-subtitle
+              v-if="!props.isEdit"
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Last Name
+            </v-card-subtitle>
+            <v-text-field
+              v-if="!props.isEdit"
+              placeholder="Doe"
+              v-model="editedUserData.lastName"
+              variant="plain"
+              class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+              :rules="[(v) => !!v || 'This field is required']"
+            ></v-text-field>
 
-          <v-card-subtitle
-            v-if="!props.isEdit"
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Email
-          </v-card-subtitle>
-          <v-text-field
-            v-if="!props.isEdit"
-            placeholder="john.doe@oc.edu"
-            v-model="editedUserData.email"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-text-field>
+            <v-card-subtitle
+              v-if="!props.isEdit"
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Email
+            </v-card-subtitle>
+            <v-text-field
+              v-if="!props.isEdit"
+              placeholder="john.doe@oc.edu"
+              v-model="editedUserData.email"
+              variant="plain"
+              class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+              :rules="[
+                (v) => !!v || 'This field is required',
+                (v) =>
+                  /^\S+@\S+$/.test(v) ||
+                  'Must contain an @ followed by a domain',
+                (v) =>
+                  (!!v && v.split('@').pop() === 'oc.edu') ||
+                  (!!v && v.split('@').pop() === 'eagles.oc.edu') ||
+                  'Must be a valid OC domain (oc.edu or eagles.oc.edu)',
+              ]"
+            ></v-text-field>
 
-          <v-card-subtitle
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Phone Number
-          </v-card-subtitle>
-          <v-text-field
-            placeholder="405-555-5555"
-            v-model="editedUserData.phoneNumber"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-text-field>
+            <v-card-subtitle
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Phone Number
+            </v-card-subtitle>
+            <v-text-field
+              placeholder="4051234567"
+              v-model="editedUserData.phoneNumber"
+              variant="plain"
+              class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+              :rules="[
+                (v) => !!v || 'This field is required',
+                (v) => /^[0-9]+$/.test(v) || 'Must contain only numbers',
+                (v) => (!!v && v.length >= 10) || 'Number too short',
+                (v) => (!!v && v.length <= 10) || 'Number too long',
+              ]"
+            ></v-text-field>
 
-          <v-card-subtitle
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Roles
-          </v-card-subtitle>
-          <v-select
-            color="darkBlue"
-            variant="plain"
-            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-            v-model="editedUserRoles"
-            :items="roleOptions"
-            :item-title="(item) => item.role"
-            item-value="id"
-            multiple
-            return-object
-          >
-            <template v-slot:selection="{ item }">
-              <v-chip
-                label
-                flat
-                size="small"
-                class="font-weight-bold text-none text-white flatChipBorder bg-blue"
-              >
-                {{ item.title }}
-              </v-chip>
-            </template>
-          </v-select>
+            <v-card-subtitle
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Roles
+            </v-card-subtitle>
+            <v-select
+              color="darkBlue"
+              variant="plain"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+              v-model="editedUserRoles"
+              :items="roleOptions"
+              :item-title="(item) => item.role"
+              item-value="id"
+              multiple
+              return-object
+            >
+              <template v-slot:selection="{ item }">
+                <v-chip
+                  label
+                  flat
+                  size="small"
+                  class="font-weight-bold text-none text-white flatChipBorder bg-blue"
+                >
+                  {{ item.title }}
+                </v-chip>
+              </template>
+            </v-select>
 
-          <v-card-subtitle
-            v-if="isFaculty"
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Title
-          </v-card-subtitle>
-          <v-text-field
-            v-if="isFaculty"
-            s
-            placeholder="Professor of Music"
-            v-model="editedFacultyTitle"
-            variant="plain"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-text-field>
+            <v-card-subtitle
+              v-if="isFaculty"
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Title
+            </v-card-subtitle>
+            <v-text-field
+              v-if="isFaculty"
+              s
+              placeholder="Professor of Music"
+              v-model="editedFacultyTitle"
+              variant="plain"
+              class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+              :rules="[(v) => !!v || 'This field is required']"
+            ></v-text-field>
 
-          <v-card-subtitle
-            v-if="isStudent"
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Classification
-          </v-card-subtitle>
-          <v-select
-            v-if="isStudent"
-            color="darkBlue"
-            variant="plain"
-            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-            v-model="editedStudentClassification"
-            :items="classificationOptions"
-          >
-          </v-select>
+            <v-card-subtitle
+              v-if="isStudent"
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Classification
+            </v-card-subtitle>
+            <v-select
+              v-if="isStudent"
+              color="darkBlue"
+              variant="plain"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+              v-model="editedStudentClassification"
+              :items="classificationOptions"
+              :rules="[(v) => !!v || 'This field is required']"
+            >
+            </v-select>
 
-          <v-card-subtitle
-            v-if="isStudent"
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Major
-          </v-card-subtitle>
-          <v-select
-            v-if="isStudent"
-            color="darkBlue"
-            variant="plain"
-            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-            v-model="editedStudentMajor"
-            :items="majorOptions"
-            :item-title="(item) => item.name"
-            item-value="id"
-            return-object
-          >
-          </v-select>
+            <v-card-subtitle
+              v-if="isStudent"
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Major
+            </v-card-subtitle>
+            <v-select
+              v-if="isStudent"
+              color="darkBlue"
+              variant="plain"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+              v-model="editedStudentMajor"
+              :items="majorOptions"
+              :item-title="(item) => item.name"
+              item-value="id"
+              return-object
+              :rules="[(v) => !!v || 'This field is required']"
+            >
+            </v-select>
 
-          <v-row v-if="isStudent" class="pa-0 ma-0">
-            <v-col cols="12" lg="auto" class="pa-0 ma-0">
-              <v-card-subtitle
-                class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-              >
-                Semesters
-              </v-card-subtitle>
-              <v-text-field
-                type="number"
-                color="darkBlue"
-                variant="plain"
-                class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-                v-model="editedStudentSemesters"
-              >
-              </v-text-field>
-            </v-col>
-            <v-spacer></v-spacer>
-            <v-col cols="12" lg="auto" class="pa-0 ma-o">
-              <v-card-subtitle
-                class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-              >
-                Private Hours
-              </v-card-subtitle>
-              <v-text-field
-                type="number"
-                color="darkBlue"
-                variant="plain"
-                class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-                v-model="editedStudentHours"
-              >
-              </v-text-field>
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col v-if="isStudent">
-          <v-row class="pb-2">
-            <v-col cols="auto" align-self="center">
-              <v-card-subtitle class="pl-0 font-weight-semi-bold text-darkBlue">
-                Instruments
-              </v-card-subtitle>
-            </v-col>
-            <v-col cols="auto" align-self="center">
-              <v-btn
-                flat
-                size="small"
-                class="font-weight-semi-bold text-none text-white bg-darkBlue flatChipBorder"
-                @click="addInstrument"
-              >
-                Add Instrument
-              </v-btn>
-            </v-col>
-          </v-row>
+            <v-row v-if="isStudent" class="pa-0 ma-0">
+              <v-col cols="12" lg="auto" class="pa-0 ma-0">
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Semesters
+                </v-card-subtitle>
+                <v-text-field
+                  type="number"
+                  color="darkBlue"
+                  variant="plain"
+                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+                  v-model="editedStudentSemesters"
+                  :rules="[(v) => !!v || 'This field is required']"
+                >
+                </v-text-field>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="12" lg="auto" class="pa-0 ma-o">
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Private Hours
+                </v-card-subtitle>
+                <v-text-field
+                  type="number"
+                  color="darkBlue"
+                  variant="plain"
+                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+                  v-model="editedStudentHours"
+                  :rules="[(v) => !!v || 'This field is required']"
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col v-if="isStudent">
+            <v-row class="pb-2">
+              <v-col cols="auto" align-self="center">
+                <v-card-subtitle
+                  class="pl-0 font-weight-semi-bold text-darkBlue"
+                >
+                  Instruments
+                </v-card-subtitle>
+              </v-col>
+              <v-col cols="auto" align-self="center">
+                <v-btn
+                  flat
+                  size="small"
+                  class="font-weight-semi-bold text-none text-white bg-darkBlue flatChipBorder"
+                  @click="addInstrument"
+                >
+                  Add Instrument
+                </v-btn>
+              </v-col>
+            </v-row>
 
-          <v-card class="bg-lightGray pa-4 pb-0 flatCardBorder">
-            <UserInstrumentCard
-              v-for="studentInstrument of studentRole.studentRole"
-              :key="studentInstrument.id"
-              :student-instrument-data="studentInstrument"
-              @refreshStudentInstrumentsEvent="refreshStudentInstruments"
-            ></UserInstrumentCard>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn
-        flat
-        class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-        @click="props.isEdit ? updateUser() : addUser()"
-      >
-        {{ props.isEdit ? "Save" : "Add" }}
-      </v-btn>
-      <v-btn
-        flat
-        class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-        :class="props.isEdit ? '' : 'mr-auto'"
-        @click="
-          props.isEdit
-            ? emits('closeUserDialogEvent')
-            : emits('closeAddUserDialogEvent')
-        "
-      >
-        Cancel
-      </v-btn>
-      <v-btn
-        v-if="props.isEdit"
-        flat
-        class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
-        :class="
-          props.userData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
-        "
-        @click="
-          props.userData.status === 'Disabled'
-            ? emits('enableUserEvent')
-            : emits('disableUserEvent')
-        "
-      >
-        {{ props.userData.status === "Disabled" ? "Enable" : "Disable" }}
-      </v-btn>
-    </v-card-actions>
+            <v-card class="bg-lightGray pa-4 pb-0 flatCardBorder">
+              <UserInstrumentCard
+                v-for="studentInstrument of studentRole.studentRole"
+                :key="studentInstrument.id"
+                :student-instrument-data="studentInstrument"
+                @refreshStudentInstrumentsEvent="refreshStudentInstruments"
+              ></UserInstrumentCard>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateUser() : addUser()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeUserDialogEvent')
+              : emits('closeAddUserDialogEvent')
+          "
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          v-if="props.isEdit"
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          :class="
+            props.userData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
+          "
+          @click="
+            props.userData.status === 'Disabled'
+              ? emits('enableUserEvent')
+              : emits('disableUserEvent')
+          "
+        >
+          {{ props.userData.status === "Disabled" ? "Enable" : "Disable" }}
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </v-card>
   <v-dialog v-model="addInstrumentDialog" persistent max-width="600px">
     <UserInstrumentDialogBody
@@ -611,9 +644,3 @@ onMounted(async () => {
     ></UserInstrumentDialogBody>
   </v-dialog>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

@@ -112,6 +112,7 @@ onMounted(async () => {
               :item-count="pendingItem.count"
               :text="pendingItem.text"
               :link="pendingItem.link"
+              :key="pendingItem.id"
             ></AdminPendingItemCard>
           </v-card-text>
         </v-card>
@@ -134,9 +135,3 @@ onMounted(async () => {
     </v-row>
   </v-container>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>

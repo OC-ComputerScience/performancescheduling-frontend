@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-use-v-if-with-v-for -->
 <script setup>
 import ocLogo from "../../public/oc_logo_red.png";
 import AuthServices from "../services/authServices.js";
@@ -75,6 +76,10 @@ const adminMenus = [
     text: "Events",
   },
   {
+    link: "adminEventTypes",
+    text: "Event Types",
+  },
+  {
     link: "adminInstruments",
     text: "Instruments",
   },
@@ -93,6 +98,18 @@ const adminMenus = [
   {
     link: "adminMajors",
     text: "Majors",
+  },
+  {
+    link: "adminLevels",
+    text: "Levels",
+  },
+  {
+    link: "adminSemesters",
+    text: "Semesters",
+  },
+  {
+    link: "adminLocations",
+    text: "Locations",
   },
 ];
 const userRoles = ref([]);
@@ -153,7 +170,7 @@ function resetMenu() {
 }
 function logout() {
   AuthServices.logoutUser(loginStore.user)
-    .then((response) => {
+    .then(() => {
       loginStore.$patch({
         user: {},
         currentRole: {},

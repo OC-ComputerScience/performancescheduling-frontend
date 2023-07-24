@@ -1,6 +1,6 @@
 import http from "./services.js";
-class MajorDataService {
-  baseUrl = "/performanceapi/major/";
+class LocationDataService {
+  baseUrl = "/performanceapi/location/";
 
   getAll(sortVar = null, ascending = true) {
     var url = this.baseUrl;
@@ -8,10 +8,6 @@ class MajorDataService {
       url += "?sortVar=" + sortVar + "&order=" + (ascending ? "ASC" : "DESC");
     }
     return http.get(url);
-  }
-
-  getById(id) {
-    return http.get(this.baseUrl + id);
   }
 
   create(data) {
@@ -25,9 +21,5 @@ class MajorDataService {
   update(data) {
     return http.put(this.baseUrl + data.id, data);
   }
-
-  getAllByStatus(status) {
-    return http.get(this.baseUrl + "status/" + status);
-  }
 }
-export default new MajorDataService();
+export default new LocationDataService();

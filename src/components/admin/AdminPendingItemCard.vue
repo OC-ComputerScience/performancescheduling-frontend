@@ -31,9 +31,3 @@ function redirectPage() {
     </v-card-text>
   </v-card>
 </template>
-
-<style scoped>
-* {
-  font-family: Poppins, sans-serif !important;
-}
-</style>
