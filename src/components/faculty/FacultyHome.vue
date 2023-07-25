@@ -164,7 +164,7 @@ onMounted(async () => {
               v-for="availability in availabilities"
               :key="availability[0].id"
               :event-data="availability[0].event"
-              :availability-data="availability[0]"
+              :availability-data="availability.length <= 1 ? availability[0] : availability"
             ></EventAvailabilityItem>
           </v-card-text>
           <!-- <v-card-text>

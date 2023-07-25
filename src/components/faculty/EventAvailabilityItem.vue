@@ -47,25 +47,23 @@ console.log("card event", props.eventData)
           <v-card-subtitle class="font-weight-semi-bold text-maroon">
             Availability
           </v-card-subtitle>
-          <!-- <div v-if="availabilityData.length > 1">
+          <!-- If there is more than one availability for the same event -->
+          <div v-if="availabilityData.length > 1">
             <v-card-subtitle
               v-for="availability in availabilityData"
               :key="availability.id"
-              class="font-weight-semi-bold text-maroon"
+              class="font-weight-semi-bold text-darkBlue"
             >
               {{ get12HourTimeStringFromString(availability.startTime) }} -
               {{ get12HourTimeStringFromString(availability.endTime) }}
             </v-card-subtitle>
           </div>
-          <div v-else> -->
+          <div v-else>
             <v-card-subtitle class="font-weight-semi-bold text-darkBlue">
               {{ get12HourTimeStringFromString(availabilityData.startTime) }} -
               {{ get12HourTimeStringFromString(availabilityData.endTime) }}
             </v-card-subtitle>
-          <!-- </div> -->
-
-          
-          <!-- If there is more than one availability for the same event -->
+          </div>
 
         </v-col>
       </v-row>
