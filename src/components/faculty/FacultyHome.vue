@@ -12,7 +12,6 @@ import UpcomingEventItem from "../UpcomingEventItem.vue";
 import NotificationItem from "../NotificationItem.vue";
 import CurrentStudentsItem from "./CurrentStudentsItem.vue";
 import EventAvailabilityItem from "./EventAvailabilityItem.vue";
-import EventSignupAndAvailabilityItem from "../EventSignupAndAvailabilityItem.vue";
 
 const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
@@ -26,7 +25,6 @@ async function retrieveData() {
   console.log("loginStore", currentRole)
   await UserNotificationDataService.getByUserRole(currentRole.value.id)
   .then((response) => {
-      console.log("notifications", response.data)
       notifications.value = response.data;
     })
     .catch((e) => {
@@ -37,7 +35,6 @@ async function retrieveData() {
     await StudentInstrumentDataService.getStudentsForInstructorId(currentRole.value.id)
     .then((response) => {
       students.value = response.data;
-      console.log("students", students)
     })
     .catch((e) => {
       console.log(e);
@@ -48,7 +45,6 @@ async function retrieveData() {
     await StudentInstrumentDataService.getStudentsForAccompanistId(currentRole.value.id)
     .then((response) => {
       students.value = response.data;
-      console.log("students", students)
     })
     .catch((e) => {
       console.log(e);
@@ -74,9 +70,6 @@ async function retrieveData() {
 
     //Put the values of the loop list into an availabilities list with "normal" indexes
     availabilities.value = Object.values(groupedAvailabilities);
-
-    //availabilities.value = response.data;
-    console.log("availability", availabilities);
   })
   .catch((e) => {
     console.log(e);
@@ -85,7 +78,6 @@ async function retrieveData() {
   await EventDataService.getGTEDateForFaculty(new Date())
     .then((response) => {
       upcomingEvents.value = response.data;
-      console.log("upcoming", upcomingEvents)
     })
     .catch((e) => {
       console.log(e);
@@ -150,7 +142,7 @@ onMounted(async () => {
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
+      <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
         <v-card class="fill-height mainCardBorder pa-2">
           <v-card-title>
             <v-row class="pa-2">
@@ -167,18 +159,9 @@ onMounted(async () => {
               :availability-data="availability.length <= 1 ? availability[0] : availability"
             ></EventAvailabilityItem>
           </v-card-text>
-          <!-- <v-card-text>
-            <EventSignupAndAvailabilityItem
-              v-for="availability of availabilities"
-              :key="availability.id"
-              :event-data="availability.event"
-              :event-signup-data="availability"
-              :is-signup="false"
-            ></EventSignupAndAvailabilityItem>
-          </v-card-text> -->
         </v-card>
       </v-col>
-      <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
+      <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
         <v-card class="fill-height mainCardBorder pa-2">
           <v-card-title class="font-weight-semi-bold text-orange text-h5">
             Upcoming Events

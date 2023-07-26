@@ -1,7 +1,7 @@
 <script setup>
-import { formatDate } from "../composables/dateFormatter";
-import { get12HourTimeStringFromString } from "../composables/timeFormatter";
-import { getHourWordFromNumber } from "../composables/timeFormatter";
+import { formatDate } from "../../composables/dateFormatter";
+import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
+import { getHourWordFromNumber } from "../../composables/timeFormatter";
 
 const props = defineProps({
   eventData: { type: [Object], required: true },

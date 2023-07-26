@@ -7,7 +7,6 @@
   const props = defineProps({
     studentsData: { type: [Object], required: true },
   });
-  console.log("students current", props.studentsData)
 </script>
 
   <template>

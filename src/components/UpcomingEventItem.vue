@@ -30,7 +30,7 @@ function handleClick() {
           <v-row class="pa-0 ma-0">
             <v-col cols="auto" class="pa-0 ma-0">
               <!-- Event Name -->
-              <v-card-title class="font-weight-bold text-orange text-h4">
+              <v-card-title class="font-weight-bold text-orange text-h5">
                 {{ eventData.name }}
               </v-card-title>
               <v-card-subtitle
@@ -76,12 +76,13 @@ function handleClick() {
                   People Signed Up
                 </v-card-subtitle>
                 <v-card-subtitle
+                  size="small"
                   v-if="roleId == 2 || roleId == 4"
-                  class="font-weight-semi-bold"
+                  class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
                 >
                 {{
                   eventData.eventType.instrumentType === "Both"
-                    ? "Vocal & Instrumental"
+                    ? "Voice & Instrumental"
                     : eventData.eventType.instrumentType === "Vocal"
                     ? "Vocal"
                     : "Instrumental"

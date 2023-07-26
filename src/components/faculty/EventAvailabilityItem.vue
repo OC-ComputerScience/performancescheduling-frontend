@@ -6,25 +6,13 @@ const props = defineProps({
   eventData: { type: [Object], required: true },
   availabilityData: { type: [Object], required: true },
 });
-
-// const availabilityList = {};
-
-// if(props.availabilityData.length > 1){
-//   for(let i = 0;i<props.availabilityData.length;i++){
-//     console.log('here in loop')
-//     availabilityList.push(props.availabilityData[i]);
-//   }
-//   console.log('list availability', availabilityList);
-// }
-console.log("card availabilities", props.availabilityData)
-console.log("card event", props.eventData)
 </script>
 
 <template>
   <v-card flat class="flatCardBorder bg-lightBlue mt-4">
     <v-card-title>
       <!-- Event Name -->
-      <v-card-title class="font-weight-bold text-maroon text-h4">
+      <v-card-title class="font-weight-bold text-maroon text-h5">
         {{ eventData.name }}
       </v-card-title>
       <v-row>
@@ -33,9 +21,7 @@ console.log("card event", props.eventData)
           <v-card-subtitle class="font-weight-semi-bold text-maroon">
             {{ formatDate(eventData.date) }}
           </v-card-subtitle>
-          <!-- Event Time (for loop) we currently don't handle more than one time for an event?-->
-            <!--<div v-for="(event,index) of eventData"
-              :key="index">-->
+          <!-- Event Time -->
           <v-card-subtitle class="font-weight-semi-bold text-maroon">
             {{ get12HourTimeStringFromString(eventData.startTime) }} -
             {{ get12HourTimeStringFromString(eventData.endTime) }}
@@ -74,7 +60,7 @@ console.log("card event", props.eventData)
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-2 bg-darkBlue text-none"
+        class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
       >
         Edit availability
       </v-btn>
