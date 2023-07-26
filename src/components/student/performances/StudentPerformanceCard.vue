@@ -1,14 +1,28 @@
 <script setup>
-import { formatDate } from "../composables/dateFormatter";
-import { get12HourTimeStringFromString } from "../composables/timeFormatter";
-import { getHourWordFromNumber } from "../composables/timeFormatter";
+import { ref } from "vue";
+import { formatDate } from "./../../../composables/dateFormatter";
+import { get12HourTimeStringFromString } from "./../../../composables/timeFormatter";
+import { getHourWordFromNumber } from "./../../../composables/timeFormatter";
+import PerformanceDialogBody from "./PerformanceDialogBody.vue";
+
+PerformanceDialogBody;
+const viewCritique = ref(false);
+const pieceData = ref(null);
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
   eventSignupData: { type: [Object], required: true },
   studentInstrumentSignupData: { type: [Object], required: true },
-  isSignup: { type: [Boolean], required: true },
 });
+
+function openDialog(piece) {
+  pieceData.value = piece;
+  viewCritique.value = true;
+}
+
+function closePerformanceDialog() {
+  viewCritique.value = false;
+}
 </script>
 
 <template>
@@ -19,12 +33,15 @@ const props = defineProps({
           <v-row class="pa-0 ma-0">
             <v-col cols="auto" class="pa-0 ma-0">
               <!-- Event Name -->
-              <v-card-title class="font-weight-bold text-maroon text-h5">
+              <v-card-title class="font-weight-bold text-maroon text-h4">
                 {{ eventData.name }}
               </v-card-title>
               <!-- Event Location -->
               <v-card-subtitle class="font-weight-semi-bold text-maroon">
                 {{ eventData.location.roomName }}
+              </v-card-subtitle>
+              <v-card-subtitle class="font-weight-semi-bold text-maroon">
+                {{ eventData.semester.name }}
               </v-card-subtitle>
             </v-col>
             <v-spacer></v-spacer>
@@ -44,7 +61,7 @@ const props = defineProps({
                       {{ formatDate(eventData.date) }}
                     </v-card-subtitle>
                   </v-col>
-                  <v-col cols="auto" align-self="end" v-if="isSignup">
+                  <v-col cols="auto" align-self="end">
                     <!-- Signup Time Data -->
                     <v-card-subtitle class="font-weight-semi-bold pl-0">
                       <v-icon
@@ -62,13 +79,6 @@ const props = defineProps({
                       }}
                     </v-card-subtitle>
                   </v-col>
-                  <v-col cols="auto" align-self="end" v-if="!isSignup">
-                    <!-- Event Times (for availability version) -->
-                    <v-card-subtitle>
-                      {{ get12HourTimeStringFromString(eventData.startTime) }} -
-                      {{ get12HourTimeStringFromString(eventData.endTime) }}
-                    </v-card-subtitle>
-                  </v-col>
                 </v-row>
               </v-card>
             </v-col>
@@ -78,10 +88,10 @@ const props = defineProps({
     </v-card-title>
     <v-card-text class="pt-4 pb-0">
       <v-row class="pb-0 mb-0">
-        <v-col cols="12" lg="6" v-if="props.isSignup" class="mb-0 pb-0">
+        <v-col cols="auto" lg="6" class="mb-0 pb-0">
           <v-row>
             <v-card-title class="font-weight-semi-bold text-maroon">
-              Signup Information
+              Performance Information
             </v-card-title>
           </v-row>
           <v-row class="pl-2 pt-0 mt-0">
@@ -169,9 +179,9 @@ const props = defineProps({
               </v-card-text>
             </v-col>
           </v-row>
-        </v-col>
-        <!-- Musical Selection Data -->
-        <v-col cols="12" lg="6" v-if="props.isSignup">
+
+          <!-- Musical Selection Data -->
+
           <v-row>
             <v-card-title class="font-weight-semi-bold text-maroon">
               Musical Selection
@@ -188,7 +198,7 @@ const props = defineProps({
                 <img referrerpolicy="no-referrer" />
               </v-avatar>
             </v-col>
-            <v-col cols="10">
+            <v-col cols="7">
               <v-card-subtitle
                 class="font-weight-semi-bold text-h7 text-darkBlue"
               >
@@ -199,19 +209,26 @@ const props = defineProps({
                 {{ eventSignupPiece.piece.composer.lastName }}
               </v-card-text>
             </v-col>
+            <v-col cols="4">
+              <v-btn
+                flat
+                size="small"
+                class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+                @click="openDialog(eventSignupPiece)"
+              >
+                View Critique
+              </v-btn>
+            </v-col>
           </v-row>
         </v-col>
       </v-row>
     </v-card-text>
-    <v-card-actions class="pt-0 mt-0">
-      <!-- Edit Signup/Availability Button -->
-      <v-btn
-        flat
-        size="small"
-        class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
-      >
-        Edit {{ isSignup ? "signup" : "availability" }}
-      </v-btn>
-    </v-card-actions>
   </v-card>
+  <v-dialog v-model="viewCritique" persistent max-width="600px">
+    <PerformanceDialogBody
+      :event-name="eventData.name"
+      :piece-data="pieceData"
+      @closePerformanceDialog="closePerformanceDialog"
+    ></PerformanceDialogBody>
+  </v-dialog>
 </template>

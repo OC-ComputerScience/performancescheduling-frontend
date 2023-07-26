@@ -2,7 +2,7 @@
 import MainNav from "../components/MainNav.vue";
 
 import StudentHome from "../components/student/StudentHome.vue";
-import StudentPerformances from "../components/student/StudentPerformances.vue";
+import StudentPerformances from "../components/student/performances/StudentPerformances.vue";
 // import StudentSettings from "../components/student/StudentSettings.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
