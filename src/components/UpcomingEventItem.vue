@@ -30,7 +30,7 @@ function handleClick() {
           <v-row class="pa-0 ma-0">
             <v-col cols="auto" class="pa-0 ma-0">
               <!-- Event Name -->
-              <v-card-title class="font-weight-bold text-orange text-h4">
+              <v-card-title class="font-weight-bold text-orange text-h5">
                 {{ eventData.name }}
               </v-card-title>
               <v-card-subtitle

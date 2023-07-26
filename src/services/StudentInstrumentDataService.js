@@ -14,9 +14,15 @@ class StudentInstrumentDataService {
     return http.get(this.baseUrl + "userId/" + userId);
   }
 
-  getStudentInstrumentSignupsByUserRoleId(userRoleId, date) {
+  getStudentInstrumentSignupsByUserRoleId(userRoleId, date, select) {
     return http.get(
-      this.baseUrl + "instrumentSignups/" + userRoleId + "/" + date
+      this.baseUrl +
+        "instrumentSignups/" +
+        userRoleId +
+        "?date=" +
+        date +
+        "&select=" +
+        select
     );
   }
 
