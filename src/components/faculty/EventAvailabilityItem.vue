@@ -30,7 +30,7 @@ const props = defineProps({
 
         <!-- Event Time and Availability Time -->
         <v-col cols="auto pt-4">
-          <v-card-subtitle class="font-weight-semi-bold text-maroon">
+          <v-card-subtitle class="font-weight-bold text-maroon">
             Availability
           </v-card-subtitle>
           <!-- If there is more than one availability for the same event -->

@@ -82,7 +82,7 @@ function handleClick() {
                 >
                 {{
                   eventData.eventType.instrumentType === "Both"
-                    ? "Voice & Instrumental"
+                    ? "Vocal & Instrumental"
                     : eventData.eventType.instrumentType === "Vocal"
                     ? "Vocal"
                     : "Instrumental"
