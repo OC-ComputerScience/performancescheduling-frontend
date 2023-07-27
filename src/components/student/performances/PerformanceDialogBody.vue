@@ -26,7 +26,7 @@ const props = defineProps({
       </v-card-title>
     </v-row>
 
-    <v-expansion-panels class="pt-6">
+    <v-expansion-panels v-if="pieceData.critiques" class="pt-6">
       <v-expansion-panel
         v-for="critique in pieceData.critiques"
         :key="critique.id"
