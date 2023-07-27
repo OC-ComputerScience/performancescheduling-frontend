@@ -27,7 +27,6 @@ async function getData() {
     .then((response) => {
       eventData.value = response.data[0];
       clearFilters();
-      console.log(eventData.value);
     })
     .catch((error) => {
       console.log(error);
@@ -68,8 +67,10 @@ function clearFilters() {
   filteredSignups.value = eventData.value.eventSignups.filter(
     (signup) =>
       signup.pass == null &&
-      !signup.critiques.some(
-        (critique) => critique.userRoleId == currentFaculty.value.id
+      !signup.eventSignupPieces.some((signupPiece) =>
+        signupPiece.critiques.some(
+          (critique) => critique.userRoleId == currentFaculty.value.id
+        )
       )
   );
 }
@@ -163,10 +164,7 @@ onMounted(async () => {
         <v-card class="pa-5 mainCardBorder">
           <v-row>
             <v-col v-for="signup in filteredSignups" :key="signup.id" cols="12">
-              <FacultyCritiqueCard
-                :signup="signup"
-                :facultyUserRoleId="currentFaculty.id"
-              ></FacultyCritiqueCard>
+              <FacultyCritiqueCard :signup="signup"></FacultyCritiqueCard>
             </v-col>
           </v-row>
         </v-card>
