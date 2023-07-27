@@ -88,7 +88,7 @@ function closePerformanceDialog() {
     </v-card-title>
     <v-card-text class="pt-4 pb-0">
       <v-row class="pb-0 mb-0">
-        <v-col cols="auto" lg="6" class="mb-0 pb-0">
+        <v-col cols="12" class="mb-0 pb-0">
           <v-row>
             <v-card-title class="font-weight-semi-bold text-maroon">
               Performance Information
@@ -193,12 +193,12 @@ function closePerformanceDialog() {
             :key="eventSignupPiece.id"
             class="pt-0 mt-0 pl-2"
           >
-            <v-col align-self="center">
+            <v-col align-self="center" cols="1">
               <v-avatar size="30" color="darkBlue">
                 <img referrerpolicy="no-referrer" />
               </v-avatar>
             </v-col>
-            <v-col>
+            <v-col cols="8">
               <v-card-subtitle
                 class="font-weight-semi-bold text-h7 text-darkBlue"
               >
@@ -209,7 +209,7 @@ function closePerformanceDialog() {
                 {{ eventSignupPiece.piece.composer.lastName }}
               </v-card-text>
             </v-col>
-            <v-col>
+            <v-col cols="3">
               <v-btn
                 flat
                 size="small"
