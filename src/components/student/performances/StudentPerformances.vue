@@ -159,9 +159,8 @@ onMounted(async () => {
       <v-col>
         <v-card class="pa-5 mainCardBorder">
           <v-row>
-            <v-col cols="6">
+            <v-col cols="6" v-for="studentInstrumentSignup in currentPageData">
               <StudentPerformanceCard
-                v-for="studentInstrumentSignup in currentPageData"
                 :key="studentInstrumentSignup.id"
                 :event-data="studentInstrumentSignup.eventSignup.event"
                 :event-signup-data="studentInstrumentSignup.eventSignup"
