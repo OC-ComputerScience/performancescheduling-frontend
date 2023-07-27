@@ -1,7 +1,19 @@
 <script setup>
+import { useLoginStore } from "../../stores/LoginStore";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
+import FacultyCreateCritiqueDialog from "./FacultyCreateCritiqueDialog.vue";
 
-const props = defineProps(["signup", "facultyUserRoleId"]);
+const props = defineProps(["signup"]);
+
+const LoginStore = useLoginStore();
+
+function signupHasFeedbackByFaculty() {
+  return props.signup.eventSignupPieces.some((signupPiece) =>
+    signupPiece.critiques.some(
+      (critique) => critique.userRoleId == LoginStore.currentRole.id
+    )
+  );
+}
 </script>
 <template>
   <v-card color="lightMaroon" class="pa-2 flatCardBorder" elevation="0">
@@ -27,7 +39,7 @@ const props = defineProps(["signup", "facultyUserRoleId"]);
           </v-row>
         </v-col>
         <!-- student(s) -->
-        <v-col cols="3">
+        <v-col cols="2">
           <v-card-title
             class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h5"
           >
@@ -51,8 +63,11 @@ const props = defineProps(["signup", "facultyUserRoleId"]);
                     .lastName +
                   ", " +
                   studentInstrumentSignup.studentInstrument.studentRole.user
-                    .firstName +
-                  " - (" +
+                    .firstName
+                }}
+                <br />
+                {{
+                  "(" +
                   studentInstrumentSignup.studentInstrument.instrument.name +
                   ")"
                 }}
@@ -60,8 +75,50 @@ const props = defineProps(["signup", "facultyUserRoleId"]);
             </v-col>
           </v-row>
         </v-col>
+        <!-- instructor/accompanist -->
+        <v-col cols="2">
+          <v-card-title
+            class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h5"
+          >
+            Instructor
+          </v-card-title>
+          <v-card-subtitle
+            class="text-darkBlue mb-0 text-body-2 font-weight-bold pl-0 ml-0"
+          >
+            {{
+              props.signup.studentInstrumentSignups[0].instructorRoleSignup.user
+                .lastName +
+              ", " +
+              props.signup.studentInstrumentSignups[0].instructorRoleSignup.user
+                .firstName
+            }}
+          </v-card-subtitle>
+          <div
+            v-if="
+              props.signup.studentInstrumentSignups[0].accompanistRoleSignup !=
+              null
+            "
+          >
+            <v-card-title
+              class="font-weight-bold text-maroon pl-0 ml-0 py-0 mt-5 text-h5"
+            >
+              Accompanist
+            </v-card-title>
+            <v-card-subtitle
+              class="text-darkBlue mb-0 text-body-2 font-weight-bold pl-0 ml-0"
+            >
+              {{
+                props.signup.studentInstrumentSignups[0].accompanistRoleSignup
+                  .user.lastName +
+                ", " +
+                props.signup.studentInstrumentSignups[0].accompanistRoleSignup
+                  .user.firstName
+              }}
+            </v-card-subtitle>
+          </div>
+        </v-col>
         <!-- pieces -->
-        <v-col>
+        <v-col cols="4">
           <v-card-title
             class="font-weight-bold text-maroon pl-0 ml-0 pt-0 mt-0 text-h5"
           >
@@ -99,14 +156,12 @@ const props = defineProps(["signup", "facultyUserRoleId"]);
               flat
               size="small"
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-              :class="
-                props.signup.critiques.length == 0 ? 'bg-maroon' : 'bg-teal'
-              "
+              :class="signupHasFeedbackByFaculty() ? 'bg-teal' : 'bg-maroon'"
             >
               {{
-                props.signup.critiques.length == 0
-                  ? "Feedback Pending"
-                  : "Critiques Available"
+                signupHasFeedbackByFaculty()
+                  ? "Feedback Given"
+                  : "Feedback Pending"
               }}
             </v-chip>
           </v-row>
@@ -129,6 +184,30 @@ const props = defineProps(["signup", "facultyUserRoleId"]);
           </v-row>
         </v-col>
       </v-row>
+      <v-row>
+        <v-spacer></v-spacer>
+        <v-btn
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+        >
+          {{ signupHasFeedbackByFaculty() ? "Edit Feedback" : "Add Feedback" }}
+        </v-btn>
+        <v-btn
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+        >
+          {{ props.signup.pass == null ? "Add Grade" : "Edit Grade" }}
+        </v-btn>
+      </v-row>
     </v-card-text>
   </v-card>
+  <v-dialog v-model="dialog" persistent max-width="1050px">
+    <FacultyCreateCritiqueDialog
+      :signup="props.signup"
+      @closeDialogEvent="dialog = false"
+    >
+    </FacultyCreateCritiqueDialog>
+  </v-dialog>
 </template>
