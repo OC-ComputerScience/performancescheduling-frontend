@@ -193,12 +193,12 @@ function closePerformanceDialog() {
             :key="eventSignupPiece.id"
             class="pt-0 mt-0 pl-2"
           >
-            <v-col cols="1" align-self="center">
+            <v-col align-self="center">
               <v-avatar size="30" color="darkBlue">
                 <img referrerpolicy="no-referrer" />
               </v-avatar>
             </v-col>
-            <v-col cols="7">
+            <v-col>
               <v-card-subtitle
                 class="font-weight-semi-bold text-h7 text-darkBlue"
               >
@@ -209,7 +209,7 @@ function closePerformanceDialog() {
                 {{ eventSignupPiece.piece.composer.lastName }}
               </v-card-text>
             </v-col>
-            <v-col cols="4">
+            <v-col>
               <v-btn
                 flat
                 size="small"
