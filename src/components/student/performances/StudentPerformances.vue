@@ -13,6 +13,8 @@ const loginStore = useLoginStore();
 // Filter options
 const semesterFilterOptions = ref([]);
 const semesterFilterSelection = ref(null);
+const instrumentFilterOptions = ref([]);
+const instrumentFilterSelection = ref(null);
 
 // Pagination
 const currentPage = ref(1);
@@ -38,6 +40,7 @@ async function getPerformances() {
   filteredPerformances.value = performances.value;
   console.log(performances.value);
   buildSemesterList();
+  buildInstrumentList();
 }
 
 function buildSemesterList() {
@@ -55,6 +58,21 @@ function buildSemesterList() {
     }
   });
 }
+function buildInstrumentList() {
+  instrumentFilterOptions.value = [];
+  performances.value.forEach((performance) => {
+    if (
+      !instrumentFilterOptions.value.some(function callback(item) {
+        return item.name == performance.studentInstrument.instrument.name;
+      })
+    ) {
+      instrumentFilterOptions.value.push({
+        id: performance.studentInstrument.instrument.id,
+        name: performance.studentInstrument.instrument.name,
+      });
+    }
+  });
+}
 
 async function refreshPerformances() {
   await getPerformances();
@@ -62,11 +80,19 @@ async function refreshPerformances() {
 }
 
 function filterPerformances() {
+  filteredPerformances.value = performances.value;
   if (semesterFilterSelection.value != null) {
     filteredPerformances.value = performances.value.filter(
       (performance) =>
         performance.eventSignup.event.semesterId ===
         semesterFilterSelection.value.id
+    );
+  }
+  if (instrumentFilterSelection.value != null) {
+    filteredPerformances.value = filteredPerformances.value.filter(
+      (performance) =>
+        performance.studentInstrument.instrument.id ===
+        instrumentFilterSelection.value.id
     );
   }
 }
@@ -75,6 +101,7 @@ function clearFilters() {
   currentPage.value = 1;
   filteredPerformances.value = performances.value;
   semesterFilterSelection.value = null;
+  instrumentFilterSelection.value = null;
 }
 
 const currentPageData = computed(() => {
@@ -127,6 +154,21 @@ onMounted(async () => {
                 ></v-select>
               </v-list-item>
             </v-list>
+            <v-list class="pa-0 ma-0">
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Instrument
+                <v-select
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="instrumentFilterSelection"
+                  :items="instrumentFilterOptions"
+                  item-title="name"
+                  item-value="id"
+                  return-object
+                ></v-select>
+              </v-list-item>
+            </v-list>
           </v-card-text>
           <v-card-actions class="px-4 pb-4">
             <v-btn
@@ -146,7 +188,7 @@ onMounted(async () => {
         </v-card>
       </v-menu>
       <v-btn
-        v-if="semesterFilterSelection"
+        v-if="semesterFilterSelection || instrumentFilterSelection"
         size="medium"
         color="maroon"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
@@ -159,7 +201,13 @@ onMounted(async () => {
       <v-col>
         <v-card class="pa-5 mainCardBorder">
           <v-row>
-            <v-col cols="6" v-for="studentInstrumentSignup in currentPageData">
+            <v-col
+              cols="6"
+              sm="12"
+              lg="6"
+              v-for="studentInstrumentSignup in currentPageData"
+              :key="studentInstrumentSignup.id"
+            >
               <StudentPerformanceCard
                 :key="studentInstrumentSignup.id"
                 :event-data="studentInstrumentSignup.eventSignup.event"
