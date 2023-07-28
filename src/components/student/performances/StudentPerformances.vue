@@ -24,7 +24,8 @@ async function getPerformances() {
   await StudentInstrumentDataService.getStudentInstrumentSignupsByUserRoleId(
     loginStore.currentRole.id,
     new Date(),
-    "LTE"
+    "LTE",
+    "desc"
   ).then((response) => {
     performances.value = [];
     console.log(response.data);
