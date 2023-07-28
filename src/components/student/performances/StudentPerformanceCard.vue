@@ -33,7 +33,7 @@ function closePerformanceDialog() {
           <v-row class="pa-0 ma-0">
             <v-col cols="auto" class="pa-0 ma-0">
               <!-- Event Name -->
-              <v-card-title class="font-weight-bold text-maroon text-h4">
+              <v-card-title class="font-weight-bold text-maroon text-h5">
                 {{ eventData.name }}
               </v-card-title>
               <!-- Event Location -->
@@ -90,134 +90,141 @@ function closePerformanceDialog() {
       <v-row class="pb-0 mb-0">
         <v-col cols="12" class="mb-0 pb-0">
           <v-row>
-            <v-card-title class="font-weight-semi-bold text-maroon">
-              Performance Information
-            </v-card-title>
-          </v-row>
-          <v-row class="pl-2 pt-0 mt-0">
-            <v-col cols="1" align-self="center">
-              <v-avatar size="30" color="lightBlue">
-                <v-icon
-                  size="35"
-                  class="text-darkBlue"
-                  icon="mdi-music-circle"
-                ></v-icon>
-              </v-avatar>
-            </v-col>
-            <v-col cols="10">
-              <v-card-subtitle
-                class="font-weight-semi-bold text-h6 text-darkBlue"
-              >
-                {{
-                  studentInstrumentSignupData.studentInstrument.instrument.name
-                }}
-              </v-card-subtitle>
-              <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
-                Instrument
-              </v-card-text>
-            </v-col>
-          </v-row>
-          <v-row class="pt-0 mt-0 pl-2">
-            <v-col cols="1" align-self="center">
-              <v-avatar size="30" color="darkBlue">
-                <img
-                  referrerpolicy="no-referrer"
-                  :src="
-                    studentInstrumentSignupData.instructorRoleSignup.user
-                      .picture
-                  "
-                />
-              </v-avatar>
-            </v-col>
-            <v-col cols="10">
-              <v-card-subtitle
-                class="font-weight-semi-bold text-h7 text-darkBlue"
-              >
-                {{
-                  studentInstrumentSignupData.instructorRoleSignup.user
-                    .firstName
-                }}
-                {{
-                  studentInstrumentSignupData.instructorRoleSignup.user.lastName
-                }}
-              </v-card-subtitle>
-              <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
-                Private Instructor
-              </v-card-text>
-            </v-col>
-          </v-row>
-          <v-row
-            class="pt-0 mt-0 pl-2"
-            v-if="studentInstrumentSignupData.accompanistRoleSignup"
-          >
-            <v-col cols="1" align-self="center">
-              <v-avatar size="30" color="darkBlue">
-                <img
-                  referrerpolicy="no-referrer"
-                  :src="
-                    studentInstrumentSignupData.accompanistRoleSignup.user
-                      .picture
-                  "
-                />
-              </v-avatar>
-            </v-col>
-            <v-col cols="10">
-              <v-card-subtitle
-                class="font-weight-semi-bold text-h7 text-darkBlue"
-              >
-                {{
-                  studentInstrumentSignupData.accompanistRoleSignup.user
-                    .firstName
-                }}
-                {{
-                  studentInstrumentSignupData.accompanistRoleSignup.user
-                    .lastName
-                }}
-              </v-card-subtitle>
-              <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
-                Accompanist
-              </v-card-text>
-            </v-col>
-          </v-row>
+            <v-col cols="4">
+              <v-row>
+                <v-card-title class="font-weight-semi-bold text-maroon">
+                  Performance Info
+                </v-card-title>
+              </v-row>
+              <v-row class="pl-2 pt-0 mt-0">
+                <v-col cols="1" align-self="center">
+                  <v-avatar size="30" color="lightBlue">
+                    <v-icon
+                      size="35"
+                      class="text-darkBlue"
+                      icon="mdi-music-circle"
+                    ></v-icon>
+                  </v-avatar>
+                </v-col>
+                <v-col cols="10">
+                  <v-card-subtitle
+                    class="font-weight-semi-bold text-h6 text-darkBlue"
+                  >
+                    {{
+                      studentInstrumentSignupData.studentInstrument.instrument
+                        .name
+                    }}
+                  </v-card-subtitle>
+                  <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
+                    Instrument
+                  </v-card-text>
+                </v-col>
+              </v-row>
+              <v-row class="pt-0 mt-0 pl-2">
+                <v-col cols="1" align-self="center">
+                  <v-avatar size="30" color="darkBlue">
+                    <img
+                      referrerpolicy="no-referrer"
+                      :src="
+                        studentInstrumentSignupData.instructorRoleSignup.user
+                          .picture
+                      "
+                    />
+                  </v-avatar>
+                </v-col>
+                <v-col cols="10">
+                  <v-card-subtitle
+                    class="font-weight-semi-bold text-h7 text-darkBlue"
+                  >
+                    {{
+                      studentInstrumentSignupData.instructorRoleSignup.user
+                        .firstName
+                    }}
+                    {{
+                      studentInstrumentSignupData.instructorRoleSignup.user
+                        .lastName
+                    }}
+                  </v-card-subtitle>
+                  <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
+                    Private Instructor
+                  </v-card-text>
+                </v-col>
+              </v-row>
 
-          <!-- Musical Selection Data -->
-
-          <v-row>
-            <v-card-title class="font-weight-semi-bold text-maroon">
-              Musical Selection
-            </v-card-title>
-          </v-row>
-          <v-row
-            v-for="eventSignupPiece of studentInstrumentSignupData.eventSignup
-              .eventSignupPieces"
-            :key="eventSignupPiece.id"
-            class="pt-0 mt-0 pl-2"
-          >
-            <v-col align-self="center" cols="1">
-              <v-avatar size="30" color="darkBlue">
-                <img referrerpolicy="no-referrer" />
-              </v-avatar>
+              <v-row
+                class="pt-0 mt-0 pl-2"
+                v-if="studentInstrumentSignupData.accompanistRoleSignup"
+              >
+                <v-col cols="1" align-self="center">
+                  <v-avatar size="30" color="darkBlue">
+                    <img
+                      referrerpolicy="no-referrer"
+                      :src="
+                        studentInstrumentSignupData.accompanistRoleSignup.user
+                          .picture
+                      "
+                    />
+                  </v-avatar>
+                </v-col>
+                <v-col cols="10">
+                  <v-card-subtitle
+                    class="font-weight-semi-bold text-h7 text-darkBlue"
+                  >
+                    {{
+                      studentInstrumentSignupData.accompanistRoleSignup.user
+                        .firstName
+                    }}
+                    {{
+                      studentInstrumentSignupData.accompanistRoleSignup.user
+                        .lastName
+                    }}
+                  </v-card-subtitle>
+                  <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
+                    Accompanist
+                  </v-card-text>
+                </v-col>
+              </v-row>
             </v-col>
             <v-col cols="8">
-              <v-card-subtitle
-                class="font-weight-semi-bold text-h7 text-darkBlue"
+              <!-- Musical Selection Data -->
+              <v-row>
+                <v-card-title class="font-weight-semi-bold text-maroon">
+                  Musical Selection
+                </v-card-title>
+              </v-row>
+              <v-row
+                v-for="eventSignupPiece of studentInstrumentSignupData
+                  .eventSignup.eventSignupPieces"
+                :key="eventSignupPiece.id"
+                class="pt-0 mt-0 pl-2"
               >
-                {{ eventSignupPiece.piece.title }}
-              </v-card-subtitle>
-              <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
-                {{ eventSignupPiece.piece.composer.firstName }}
-                {{ eventSignupPiece.piece.composer.lastName }}
-              </v-card-text>
-            </v-col>
-            <v-col cols="3">
-              <v-btn
-                flat
-                size="small"
-                class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
-                @click="openDialog(eventSignupPiece)"
-              >
-                View Critique
-              </v-btn>
+                <v-col align-self="center" cols="1">
+                  <v-avatar size="30" color="darkBlue">
+                    <img referrerpolicy="no-referrer" />
+                  </v-avatar>
+                </v-col>
+                <v-col cols="8">
+                  <v-card-subtitle
+                    class="font-weight-semi-bold text-h7 text-darkBlue"
+                  >
+                    {{ eventSignupPiece.piece.title }}
+                  </v-card-subtitle>
+                  <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
+                    {{ eventSignupPiece.piece.composer.firstName }}
+                    {{ eventSignupPiece.piece.composer.lastName }}
+                  </v-card-text>
+                </v-col>
+                <v-col cols="3">
+                  <v-btn
+                    flat
+                    size="small"
+                    class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+                    @click="openDialog(eventSignupPiece)"
+                  >
+                    View Critique
+                  </v-btn>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
         </v-col>
