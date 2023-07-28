@@ -223,6 +223,7 @@ onMounted(async () => {
             >
               <MaintainStudentPieceCard
                 :studentpiece-data="studentpiece"
+                :student-pieces="studentpieces"
                 @refreshStudentPiecesEvent="refreshStudentPieces()"
               ></MaintainStudentPieceCard>
             </v-col>
@@ -259,6 +260,7 @@ onMounted(async () => {
         status: 'Active',
       }"
       :student-id="loginStore.currentRole.userId"
+      :student-pieces="studentpieces"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="
         (addStudentPieceDialog = false), refreshStudentPieces()

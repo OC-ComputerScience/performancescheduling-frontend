@@ -10,6 +10,7 @@ const emits = defineEmits([
 
 const props = defineProps({
   studentpieceData: { type: [Object], required: true },
+  studentPieces: { type: [Array], required: true },
 });
 
 const createOrEditDialog = ref(false);
@@ -122,6 +123,7 @@ async function enableStudentPiece(studentpiece) {
       :is-edit="true"
       :studentpiece-data="studentpieceData"
       :student-id="studentpieceData.studentId"
+      :student-pieces="studentPieces"
       @closeStudentPieceDialogEvent="
         closeStudentPieceDialog(), emits('refreshStudentPiecesEvent')
       "
