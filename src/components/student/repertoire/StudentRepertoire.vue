@@ -55,7 +55,12 @@ function searchAndFilterList() {
       (studentpiece) =>
         studentpiece.piece.title
           .toLowerCase()
-          .includes(searchInput.value.toLowerCase())
+          .includes(searchInput.value.toLowerCase()) ||
+        (
+          studentpiece.piece.composer.lastName.toLowerCase() +
+          " " +
+          studentpiece.piece.composer.firstName.toLowerCase()
+        ).includes(searchInput.value.toLowerCase())
     );
 
   filterStudentPieces();
@@ -71,9 +76,11 @@ function filterStudentPieces() {
     filteredStudentPieces.value = filteredStudentPieces.value.filter(
       (studentpiece) => studentpiece.status === statusFilterSelection.value
     );
+  }
+  if (semesterFilterSelection.value) {
     filteredStudentPieces.value = filteredStudentPieces.value.filter(
       (studentpiece) =>
-        studentpiece.semester.name === semesterFilterSelection.value
+        studentpiece.semesterId === semesterFilterSelection.value
     );
   }
 }
@@ -148,7 +155,6 @@ onMounted(async () => {
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
-                  return-object
                 ></v-select>
               </v-list-item>
             </v-list>
@@ -161,10 +167,10 @@ onMounted(async () => {
                   color="darkBlue"
                   variant="underlined"
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
-                  v-model="statusFilterSelection"
+                  v-model="semesterFilterSelection"
                   :items="semesters"
                   item-title="name"
-                  return-object
+                  item-value="id"
                 ></v-select>
               </v-list-item>
             </v-list>

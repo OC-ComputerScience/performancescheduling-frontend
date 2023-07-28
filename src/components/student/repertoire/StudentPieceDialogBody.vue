@@ -63,7 +63,7 @@ async function updateStudentPiece() {
   });
 }
 async function getSemesters() {
-  await SemesterDataService.getAll("name", false)
+  await SemesterDataService.getAll("name")
     .then((response) => {
       semesters.value = response.data;
     })
@@ -72,7 +72,7 @@ async function getSemesters() {
     });
 }
 async function getPieces() {
-  await PieceDataService.getAll("title", false)
+  await PieceDataService.getAll("title")
     .then((response) => {
       pieces.value = response.data;
     })
@@ -81,7 +81,7 @@ async function getPieces() {
     });
 }
 async function getComposers() {
-  await ComposerDataService.getAll("lastName", false)
+  await ComposerDataService.getAll("lastName")
     .then((response) => {
       composers.value = response.data;
     })
@@ -114,6 +114,11 @@ async function updatePieceSuccess() {
   createOrEditPieceDialog.value = false;
   await PieceDataService.get(editedStudentPieceData.value.piece.id)
     .then((response) => {
+      editedStudentPieceData.value.piece.literalTranslation =
+        response.data.literalTranslation;
+      editedStudentPieceData.value.piece.poeticTranslation =
+        response.data.poeticTranslation;
+
       editedStudentPieceData.value.piece.title = response.data.title;
     })
     .catch((err) => {
@@ -125,7 +130,6 @@ function setPiece(id) {
   editedStudentPieceData.value.piece = pieces.value.find((piece) => {
     return piece.id === id;
   });
-  console.log("last=" + editedStudentPieceData.value.piece.composer.lastName);
 }
 
 onMounted(async () => {
