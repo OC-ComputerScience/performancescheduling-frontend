@@ -20,6 +20,7 @@ const emits = defineEmits([
 const props = defineProps({
   isEdit: { type: [Boolean], required: true },
   studentpieceData: { type: [Object], required: true },
+  studentPieces: { type: [Array], required: true },
 });
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
@@ -53,7 +54,7 @@ async function updateStudentPiece() {
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
       await StudentPieceDataService.update(editedStudentPieceData.value)
-        .then(() => {
+        .then(async () => {
           emits("updateStudentPieceSuccessEvent");
         })
         .catch((err) => {
@@ -130,6 +131,23 @@ function setPiece(id) {
   editedStudentPieceData.value.piece = pieces.value.find((piece) => {
     return piece.id === id;
   });
+}
+
+function checkDuplicateStudentPiece() {
+  console.log(editedStudentPieceData.value);
+  console.log(props.studentPieces);
+  const duplicatePiece = props.studentPieces.find((piece) => {
+    return (
+      piece.pieceId === editedStudentPieceData.value.pieceId &&
+      piece.semesterId === editedStudentPieceData.value.semesterId &&
+      piece.studentInstrumentId ===
+        editedStudentPieceData.value.studentInstrumentId
+    );
+  });
+  console.log(duplicatePiece);
+  return duplicatePiece == null
+    ? true
+    : "This is piece, instrument and semester already exist for this student pieces";
 }
 
 onMounted(async () => {
@@ -238,6 +256,7 @@ onMounted(async () => {
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
             readonly
+            :rules="[checkDuplicateStudentPiece()]"
           ></v-text-field>
           <v-select
             v-if="!props.isEdit"
@@ -250,6 +269,7 @@ onMounted(async () => {
             item-title="title"
             item-value="id"
             @update:modelValue="setPiece(editedStudentPieceData.pieceId)"
+            :rules="[checkDuplicateStudentPiece()]"
           >
           </v-select>
           <v-card-subtitle
