@@ -3,7 +3,6 @@ import MainNav from "../components/MainNav.vue";
 
 import StudentHome from "../components/student/StudentHome.vue";
 import StudentPerformances from "../components/student/StudentPerformances.vue";
-
 import StudentRepertoire from "../components/student/repertoire/StudentRepertoire.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";

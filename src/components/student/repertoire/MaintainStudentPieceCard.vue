@@ -8,11 +8,21 @@ const emits = defineEmits([
   "refreshStudentPiecesEvent",
 ]);
 
-defineProps({
+const props = defineProps({
   studentpieceData: { type: [Object], required: true },
 });
 
 const createOrEditDialog = ref(false);
+
+let comma = ", ";
+if (
+  props.studentpieceData.piece.composer.firstName === null ||
+  props.studentpieceData.piece.composer.firstName === "" ||
+  props.studentpieceData.piece.composer.firstName === null ||
+  props.studentpieceData.piece.composer.firstName === ""
+) {
+  comma = "";
+}
 
 function closeStudentPieceDialog() {
   createOrEditDialog.value = false;
@@ -50,8 +60,8 @@ async function enableStudentPiece(studentpiece) {
             {{ studentpieceData.piece.title }}
           </v-card-subtitle>
           <v-card-text class="text-weight-semi-bold pt-1 pb-0">
-            {{ studentpieceData.piece.composer.lastName }},
-            {{ studentpieceData.piece.composer.firstName }}
+            {{ studentpieceData.piece.composer.lastName }}{{ comma
+            }}{{ studentpieceData.piece.composer.firstName }}
           </v-card-text>
         </v-col>
         <v-spacer></v-spacer>
