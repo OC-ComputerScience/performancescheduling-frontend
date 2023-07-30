@@ -95,6 +95,7 @@ async function getComposers() {
 }
 
 function filterPieces() {
+  editedStudentPieceData.value.pieceId = null;
   filteredPieces.value = pieces.value.filter((piece) => {
     return piece.composerId === composerId.value;
   });
@@ -147,7 +148,7 @@ function checkDuplicateStudentPiece() {
         editedStudentPieceData.value.studentInstrumentId
     );
   });
-  console.log(duplicatePiece);
+
   return duplicatePiece == null
     ? true
     : "This is piece, instrument and semester already exist for this student pieces";
@@ -230,35 +231,20 @@ onMounted(async () => {
             :items="composers"
             item-title="fullName"
             item-value="id"
-            @change="filterPieces"
+            @update:modelValue="filterPieces"
           >
             <template v-slot:item="{ item, props: { onClick } }">
-              <v-list-item
-                v-if="
-                  item.raw.firstName != null &&
+              <v-list-item @click="onClick">
+                {{
+                  item.raw.firstName +
+                  (item.raw.firstName != null &&
                   item.raw.firstName.length != 0 &&
                   item.raw.lastName != null &&
                   item.raw.lastName.length != 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.lastName }}, {{ item.raw.firstName }}
-              </v-list-item>
-              <v-list-item
-                v-else-if="
-                  item.raw.lastname == null || item.raw.lastname.length == 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.firstName }}
-              </v-list-item>
-              <v-list-item
-                v-else-if="
-                  item.raw.lastName == null || item.raw.lastName.length == 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.lastName }}
+                    ? ", "
+                    : "") +
+                  item.raw.lastName
+                }}
               </v-list-item>
             </template>
           </v-autocomplete>
