@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 import StudentEventSignupDialog from "./student/StudentEventSignupDialog.vue";
+import AvailabilityDialogBody from "./faculty/AvailabilityDialogBody.vue";
 
 const router = useRouter();
 const dialog = ref(false);
@@ -11,13 +12,27 @@ const dialog = ref(false);
 const props = defineProps({
   eventData: { type: [Object], required: true },
   roleId: { type: [Number], required: true },
+  availabilityData: { type: [Object], required: false }
 });
+
+console.log("availability upcoming", props.availabilityData)
+
+const emits = defineEmits(["refreshAvailabilitiesEvent"]);
+
+const addOrEditAvailabilityDialog = ref(false);
+
+function closeAvailabilityDialog() {
+  addOrEditAvailabilityDialog.value = false;
+}
 
 function handleClick() {
   if (props.roleId == 3) {
     router.push({ path: "adminEvents" });
   } else if (props.roleId == 1) {
     dialog.value = true;
+  }
+  else{
+    addOrEditAvailabilityDialog.value = true;
   }
 }
 </script>
@@ -122,6 +137,7 @@ function handleClick() {
     <v-card-actions class="pt-0 mt-0">
       <!-- Signup/Availability Button -->
       <v-btn
+      v-if="!(availabilityData != undefined && (roleId == 2 || roleId == 4))"
         flat
         size="small"
         class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
@@ -143,5 +159,19 @@ function handleClick() {
       @closeDialogEvent="dialog = false"
     >
     </student-event-signup-dialog>
+  </v-dialog>
+  <v-dialog v-model="addOrEditAvailabilityDialog" persistent max-width="600px">
+    <AvailabilityDialogBody
+      :is-edit="false"
+      :availability-data="availabilityData ? availabilityData : { startTime: null, endTime: null }"
+      :event-data="eventData"
+      @updateAvailabilityEvent="
+        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+      "
+      @addAvailabilityEvent="
+        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+      "
+      @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
+    ></AvailabilityDialogBody>
   </v-dialog>
 </template>

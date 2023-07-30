@@ -19,6 +19,8 @@ const { currentRole } = storeToRefs(loginStore);
 const notifications = ref([]);
 const students = ref([]);
 const availabilities = ref([]);
+const groupedAvailabilities = {};
+//const eventAvailabilities = ref([]);
 const upcomingEvents = ref([]);
 
 async function retrieveData() {
@@ -53,7 +55,6 @@ async function retrieveData() {
 
   await AvailabilityDataService.getByUserRole(currentRole.value.id)
   .then((response) => {
-    const groupedAvailabilities = {};
     
     //Iterate through list of availabilities to group them by eventId
     for (let i = 0; i < response.data.length; i++) {
@@ -67,6 +68,12 @@ async function retrieveData() {
         groupedAvailabilities[eventId].push(availability);
       }
     }
+
+    // for (const eventId of Object.keys(groupedAvailabilities)) {
+    //     eventAvailabilities[eventId].value.push(groupedAvailabilities[eventId]);
+    //   }
+
+    // console.log("events availabilities", eventAvailabilities)
 
     //Put the values of the loop list into an availabilities list with "normal" indexes
     availabilities.value = Object.values(groupedAvailabilities);
@@ -172,6 +179,7 @@ onMounted(async () => {
               :key="event.id"
               :event-data="event"
               :role-id="currentRole.roleId"
+              :availability-data="groupedAvailabilities[event.id]"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>

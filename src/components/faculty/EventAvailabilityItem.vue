@@ -1,11 +1,49 @@
 <script setup>
+import { ref, onMounted } from "vue";
 import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
+import AvailabilityDialogBody from "./AvailabilityDialogBody.vue";
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
   availabilityData: { type: [Object], required: true },
 });
+
+const emits = defineEmits(["refreshAvailabilitiesEvent"]);
+
+const addOrEditAvailabilityDialog = ref(false);
+
+function closeAvailabilityDialog() {
+  addOrEditAvailabilityDialog.value = false;
+}
+
+// async function refreshAvailabilities() {
+//   await AvailabilityDataService.getByUserRole(currentRole.value.id)
+//     .then((response) => {
+//       const groupedAvailabilities = {};
+    
+//     //Iterate through list of availabilities to group them by eventId
+//     for (let i = 0; i < response.data.length; i++) {
+//       const availability = response.data[i];
+//       const eventId = availability.eventId;
+      
+//       //Index will be the eventId value
+//       if (!groupedAvailabilities[eventId]) {
+//         groupedAvailabilities[eventId] = [availability];
+//       } else {
+//         groupedAvailabilities[eventId].push(availability);
+//       }
+//     }
+
+//     //Put the values of the loop list into an availabilities list with "normal" indexes
+//     props.availabilityData = Object.values(groupedAvailabilities);
+//   })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// }
+
+onMounted(async () => {});
 </script>
 
 <template>
@@ -61,10 +99,22 @@ const props = defineProps({
         flat
         size="small"
         class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
+        @click="addOrEditAvailabilityDialog = true"
       >
         Edit availability
       </v-btn>
     </v-card-actions>
   </v-card>
+
+  <v-dialog v-model="addOrEditAvailabilityDialog" persistent max-width="600px">
+    <AvailabilityDialogBody
+      :is-edit="true"
+      :availability-data="availabilityData"
+      @updateAvailabilityEvent="
+        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+      "
+      @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
+    ></AvailabilityDialogBody>
+  </v-dialog>
 </template>
 
