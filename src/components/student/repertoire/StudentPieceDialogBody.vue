@@ -73,7 +73,7 @@ async function getSemesters() {
     });
 }
 async function getPieces() {
-  await PieceDataService.getAll("title")
+  await PieceDataService.getAll("title", "ASC")
     .then((response) => {
       pieces.value = response.data;
     })
@@ -85,6 +85,9 @@ async function getComposers() {
   await ComposerDataService.getAll("lastName")
     .then((response) => {
       composers.value = response.data;
+      composers.value.forEach((composer) => {
+        composer.fullName = composerName(composer);
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -150,6 +153,19 @@ function checkDuplicateStudentPiece() {
     : "This is piece, instrument and semester already exist for this student pieces";
 }
 
+function composerName(composer) {
+  let comma = ", ";
+  if (
+    composer.firstName === null ||
+    composer.firstName === "" ||
+    composer.lastName === "" ||
+    composer.lastName == ""
+  ) {
+    comma = "";
+  }
+  return composer.lastName + comma + composer.firstName;
+}
+
 onMounted(async () => {
   getSemesters();
   getPieces();
@@ -206,13 +222,13 @@ onMounted(async () => {
 
           <v-autocomplete
             v-if="!props.isEdit"
-            placeholder="Start typing the composer's last name"
+            placeholder="First start typing the composer's last name"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
             v-model="composerId"
             :items="composers"
-            item-title="lastName"
+            item-title="fullName"
             item-value="id"
             @change="filterPieces"
           >
@@ -260,7 +276,7 @@ onMounted(async () => {
           ></v-text-field>
           <v-select
             v-if="!props.isEdit"
-            placeholder="Select from the list of pieces"
+            placeholder="Select a Compoers then select from the list of pieces"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
