@@ -19,8 +19,8 @@ let comma = ", ";
 if (
   props.studentpieceData.piece.composer.firstName === null ||
   props.studentpieceData.piece.composer.firstName === "" ||
-  props.studentpieceData.piece.composer.firstName === null ||
-  props.studentpieceData.piece.composer.firstName === ""
+  props.studentpieceData.piece.composer.lastName === null ||
+  props.studentpieceData.piece.composer.lastName === ""
 ) {
   comma = "";
 }
