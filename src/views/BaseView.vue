@@ -6,7 +6,7 @@ import StudentPerformances from "../components/student/StudentPerformances.vue";
 // import StudentSettings from "../components/student/StudentSettings.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
-import FacultyCreateCritique from "../components/faculty/FacultyCreateCritique.vue";
+import FacultyCreateCritique from "../components/faculty/critique/FacultyCreateCritique.vue";
 
 import AdminHome from "../components/admin/AdminHome.vue";
 import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue";
