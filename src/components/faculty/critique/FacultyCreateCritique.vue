@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useLoginStore } from "../../stores/LoginStore";
-import EventDataService from "../../services/EventDataService";
+import { useLoginStore } from "../../../stores/LoginStore";
+import EventDataService from "../../../services/EventDataService";
 import FacultyCritiqueCard from "./FacultyCritiqueCard.vue";
 
 const router = useRouter();
@@ -15,24 +15,24 @@ const eventData = ref({});
 const filteredSignups = ref([]);
 //filter variables
 const filterMenuBool = ref(false);
-const feedbackFilterArray = ["Not Given", "Given", "All"];
+const feedbackFilterArray = ["All", "Not Given", "Given"];
 const feedbackFilterSelection = ref("Not Given");
-const gradeFilterArray = ["Not Given", "Given", "All"];
+const gradeFilterArray = ["All", "Not Given", "Given"];
 const gradeFilterSelection = ref("Not Given");
 
 async function getData() {
   const eventId = router.currentRoute.value.query.eventId;
+  currentFaculty.value = LoginStore.currentRole;
 
   await EventDataService.getStudentTimeslotsForEvent(eventId)
     .then((response) => {
       eventData.value = response.data[0];
-      clearFilters();
     })
     .catch((error) => {
       console.log(error);
     });
 
-  currentFaculty.value = LoginStore.currentRole;
+  filterSignups();
 }
 
 function filterSignups() {
@@ -47,13 +47,17 @@ function filterSignups() {
           : signup.pass == null;
     }
 
-    if (matchesFilter && feedbackFilterArray.value !== "All") {
-      const feedbackGiven = signup.critiques.some(
-        (critique) => critique.userRoleId == currentFaculty.value.id
+    if (matchesFilter && feedbackFilterSelection.value !== "All") {
+      const feedbackGiven = signup.eventSignupPieces.some((signupPiece) =>
+        signupPiece.critiques.some(
+          (critique) => critique.userRoleId == currentFaculty.value.id
+        )
       );
 
       matchesFilter =
-        feedbackFilterArray.value === "Given" ? feedbackGiven : !feedbackGiven;
+        feedbackFilterSelection.value === "Given"
+          ? feedbackGiven
+          : !feedbackGiven;
     }
 
     return matchesFilter;
@@ -61,22 +65,15 @@ function filterSignups() {
 }
 
 function clearFilters() {
-  feedbackFilterSelection.value = "Not Given";
-  gradeFilterSelection.value = "Not Given";
+  feedbackFilterSelection.value = "All";
+  gradeFilterSelection.value = "All";
 
-  filteredSignups.value = eventData.value.eventSignups.filter(
-    (signup) =>
-      signup.pass == null &&
-      !signup.eventSignupPieces.some((signupPiece) =>
-        signupPiece.critiques.some(
-          (critique) => critique.userRoleId == currentFaculty.value.id
-        )
-      )
-  );
+  filteredSignups.value = eventData.value.eventSignups;
 }
 
 onMounted(async () => {
   await getData();
+  filterSignups();
 });
 </script>
 <template>
@@ -135,8 +132,8 @@ onMounted(async () => {
             </v-btn>
             <v-btn
               v-if="
-                feedbackFilterSelection != 'Not Given' ||
-                gradeFilterSelection != 'Not Given'
+                feedbackFilterSelection != 'All' ||
+                gradeFilterSelection != 'All'
               "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
@@ -147,10 +144,7 @@ onMounted(async () => {
         </v-card>
       </v-menu>
       <v-btn
-        v-if="
-          feedbackFilterSelection != 'Not Given' ||
-          gradeFilterSelection != 'Not Given'
-        "
+        v-if="feedbackFilterSelection != 'All' || gradeFilterSelection != 'All'"
         size="medium"
         color="maroon"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
@@ -164,7 +158,10 @@ onMounted(async () => {
         <v-card class="pa-5 mainCardBorder">
           <v-row>
             <v-col v-for="signup in filteredSignups" :key="signup.id" cols="12">
-              <FacultyCritiqueCard :signup="signup"></FacultyCritiqueCard>
+              <FacultyCritiqueCard
+                :signup="signup"
+                @dialogClosedEvent="getData()"
+              ></FacultyCritiqueCard>
             </v-col>
           </v-row>
         </v-card>

@@ -1,11 +1,16 @@
 <script setup>
-import { useLoginStore } from "../../stores/LoginStore";
-import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
+import { ref } from "vue";
+import { useLoginStore } from "../../../stores/LoginStore";
+import { get12HourTimeStringFromString } from "../../../composables/timeFormatter";
 import FacultyCreateCritiqueDialog from "./FacultyCreateCritiqueDialog.vue";
+import FacultyGradeCritiqueDialog from "./FacultyGradeCritiqueDialog.vue";
 
+const emits = defineEmits(["dialogClosedEvent"]);
 const props = defineProps(["signup"]);
-
 const LoginStore = useLoginStore();
+
+const feedbackDialog = ref(false);
+const gradeDialog = ref(false);
 
 function signupHasFeedbackByFaculty() {
   return props.signup.eventSignupPieces.some((signupPiece) =>
@@ -13,6 +18,12 @@ function signupHasFeedbackByFaculty() {
       (critique) => critique.userRoleId == LoginStore.currentRole.id
     )
   );
+}
+
+function closeDialogs() {
+  feedbackDialog.value = false;
+  gradeDialog.value = false;
+  emits("dialogClosedEvent");
 }
 </script>
 <template>
@@ -124,29 +135,30 @@ function signupHasFeedbackByFaculty() {
           >
             Musical Selection
           </v-card-title>
-          <v-container
-            class="pa-0 ma-0"
-            v-for="piece in props.signup.eventSignupPieces"
+          <div
+            v-for="(piece, index) in props.signup.eventSignupPieces"
             :key="piece.id"
           >
-            <v-card-subtitle
-              class="font-weight-bold text-darkBlue text-body-2 pl-0 ml-0"
-            >
-              {{ piece.piece.title }}
-            </v-card-subtitle>
-            <v-card-text
-              class="text-blue font-weight-semi-bold pl-0 ml-0 pt-1"
-              v-if="piece.piece.composer.lastName"
-            >
-              {{
-                piece.piece.composer.lastName
-                  ? piece.piece.composer.lastName +
-                    ", " +
-                    piece.piece.composer.firstName
-                  : piece.piece.composer.firstName
-              }}
-            </v-card-text>
-          </v-container>
+            <v-container class="pa-0 ma-0" v-if="index < 2">
+              <v-card-subtitle
+                class="font-weight-bold text-darkBlue text-body-2 pl-0 ml-0"
+              >
+                {{ piece.piece.title }}
+              </v-card-subtitle>
+              <v-card-text
+                class="text-blue font-weight-semi-bold pl-0 ml-0 pt-1"
+                v-if="piece.piece.composer.lastName"
+              >
+                {{
+                  piece.piece.composer.lastName
+                    ? piece.piece.composer.lastName +
+                      ", " +
+                      piece.piece.composer.firstName
+                    : piece.piece.composer.firstName
+                }}
+              </v-card-text>
+            </v-container>
+          </div>
         </v-col>
         <!-- buttons -->
         <v-col cols="2">
@@ -190,6 +202,7 @@ function signupHasFeedbackByFaculty() {
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+          @click="feedbackDialog = true"
         >
           {{ signupHasFeedbackByFaculty() ? "Edit Feedback" : "Add Feedback" }}
         </v-btn>
@@ -197,17 +210,25 @@ function signupHasFeedbackByFaculty() {
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+          @click="gradeDialog = true"
         >
           {{ props.signup.pass == null ? "Add Grade" : "Edit Grade" }}
         </v-btn>
       </v-row>
     </v-card-text>
   </v-card>
-  <v-dialog v-model="dialog" persistent max-width="1050px">
+  <v-dialog v-model="feedbackDialog" persistent max-width="1050px">
     <FacultyCreateCritiqueDialog
       :signup="props.signup"
-      @closeDialogEvent="dialog = false"
+      @closeDialogEvent="closeDialogs()"
     >
     </FacultyCreateCritiqueDialog>
+  </v-dialog>
+  <v-dialog v-model="gradeDialog" persistent max-width="800px">
+    <FacultyGradeCritiqueDialog
+      :signup="props.signup"
+      @closeDialogEvent="closeDialogs()"
+    >
+    </FacultyGradeCritiqueDialog>
   </v-dialog>
 </template>
