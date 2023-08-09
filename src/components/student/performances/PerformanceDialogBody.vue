@@ -32,7 +32,7 @@ const props = defineProps({
         :key="critique.id"
       >
         <v-expansion-panel-title class="text-darkBlue font-weight-bold">
-          >{{ critique.userRole.user.firstName }}
+          {{ critique.userRole.user.firstName }}
           {{ critique.userRole.user.lastName }}</v-expansion-panel-title
         >
         <v-expansion-panel-text>

@@ -23,6 +23,13 @@ function openDialog(piece) {
 function closePerformanceDialog() {
   viewCritique.value = false;
 }
+function hasCritiques(piece) {
+  if (piece.critiques.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
 </script>
 
 <template>
@@ -87,7 +94,7 @@ function closePerformanceDialog() {
       </v-row>
     </v-card-title>
     <v-card-text class="pt-4 pb-0">
-      <v-row class="pb-0 mb-0">
+      <v-row class="pb-6 mb-0">
         <v-col cols="12" class="mb-0 pb-0">
           <v-row>
             <v-col cols="4">
@@ -214,14 +221,19 @@ function closePerformanceDialog() {
                     {{ eventSignupPiece.piece.composer.lastName }}
                   </v-card-text>
                 </v-col>
-                <v-col cols="3">
+                <v-col
+                  v-if="hasCritiques(eventSignupPiece)"
+                  cols="3"
+                  min-width="95"
+                >
                   <v-btn
                     flat
                     size="small"
+                    :min-width="95"
                     class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
                     @click="openDialog(eventSignupPiece)"
                   >
-                    View Critique
+                    Critiques
                   </v-btn>
                 </v-col>
               </v-row>

@@ -28,7 +28,7 @@ async function getPerformances() {
     "desc"
   ).then((response) => {
     performances.value = [];
-    console.log(response.data);
+
     response.data.forEach((studentInstrument) => {
       studentInstrument.studentInstrumentSignups.forEach(
         (studentInstrumentSignup) => {
