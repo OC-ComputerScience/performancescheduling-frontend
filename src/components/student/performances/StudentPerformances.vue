@@ -39,7 +39,7 @@ async function getPerformances() {
   });
 
   filteredPerformances.value = performances.value;
-  console.log(performances.value);
+
   buildSemesterList();
   buildInstrumentList();
 }
