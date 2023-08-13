@@ -37,7 +37,9 @@ async function retrieveData() {
 
   await StudentInstrumentDataService.getStudentInstrumentSignupsByUserRoleId(
     loginStore.currentRole.id,
-    new Date()
+    new Date(),
+    "GTE",
+    "asc"
   )
     .then((response) => {
       signups.value = response.data;
@@ -126,19 +128,19 @@ onMounted(async () => {
           <v-card-title class="font-weight-semi-bold text-maroon text-h5">
             Events I'm Signed up For
           </v-card-title>
-          <v-card-text>
+          <v-card-text
+            v-for="studentInstrument in signups"
+            :key="studentInstrument.id"
+          >
             <EventSignupAndAvailabilityItem
-              v-for="signup of signups"
-              :key="signup.id"
-              :event-data="signup.studentInstrumentSignups[0].eventSignup.event"
-              :event-signup-data="
-                signup.studentInstrumentSignups[0].eventSignup
-              "
-              :student-instrument-signup-data="
-                signup.studentInstrumentSignups[0]
-              "
+              v-for="studentInstrumentSignup in studentInstrument.studentInstrumentSignups"
+              :key="studentInstrumentSignup.id"
+              :event-data="studentInstrumentSignup.eventSignup.event"
+              :event-signup-data="studentInstrumentSignup.eventSignup"
+              :student-instrument-signup-data="studentInstrumentSignup"
               :is-signup="true"
-            ></EventSignupAndAvailabilityItem>
+            >
+            </EventSignupAndAvailabilityItem>
           </v-card-text>
         </v-card>
       </v-col>
