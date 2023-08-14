@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import { useLoginStore } from "../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
-import { get24HourTimeString } from "../../composables/timeFormatter";
+//import { get24HourTimeString } from "../../composables/timeFormatter";
 import AvailabilityDataService from "../../services/AvailabilityDataService";
 
 const emits = defineEmits([
@@ -25,6 +25,8 @@ const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
 
 const selectedStartTime = ref(get12HourTimeStringFromString(props.availabilityData.startTime));
+console.log('availability data', props.availabilityData)
+console.log('selected start time', selectedStartTime)
 const selectedEndTime = ref(get12HourTimeStringFromString(props.availabilityData.endTime));
 const selectTimesStart = ref([]);
 const selectTimesEnd = ref([]);
@@ -205,11 +207,22 @@ onMounted(() => {
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
           v-model="selectedStartTime"
-          :items="selectTimesStart"
           return-object
+          :items="selectTimesEnd"
           :rules="[(v) => !!v || 'This field is required']"
         >
-        </v-select>
+        <!-- <div v-for="availability in availabilityData">
+          <v-select
+            color="darkBlue"
+            variant="plain"
+            class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            v-model="selectedStartTime"
+            :items="availability.length <= 1 ? availability[0].startTime : availability"
+            return-object
+            :rules="[(v) => !!v || 'This field is required']"
+          > -->
+          </v-select>
+        <!-- </div> -->
 
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           End Time

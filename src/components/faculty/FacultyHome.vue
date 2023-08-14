@@ -20,7 +20,6 @@ const notifications = ref([]);
 const students = ref([]);
 const availabilities = ref([]);
 const groupedAvailabilities = {};
-//const eventAvailabilities = ref([]);
 const upcomingEvents = ref([]);
 
 async function retrieveData() {
@@ -69,12 +68,6 @@ async function retrieveData() {
       }
     }
 
-    // for (const eventId of Object.keys(groupedAvailabilities)) {
-    //     eventAvailabilities[eventId].value.push(groupedAvailabilities[eventId]);
-    //   }
-
-    // console.log("events availabilities", eventAvailabilities)
-
     //Put the values of the loop list into an availabilities list with "normal" indexes
     availabilities.value = Object.values(groupedAvailabilities);
   })
@@ -89,6 +82,35 @@ async function retrieveData() {
     .catch((e) => {
       console.log(e);
     });
+}
+
+async function refreshAvailability(){
+  await AvailabilityDataService.getByUserRole(currentRole.value.id)
+  .then((response) => {
+
+    const localAvailabilities ={};
+    
+    //Iterate through list of availabilities to group them by eventId
+    for (let i = 0; i < response.data.length; i++) {
+      const availability = response.data[i];
+      const eventId = availability.eventId;
+      
+      //Index will be the eventId value
+      if (!localAvailabilities[eventId]) {
+        localAvailabilities[eventId] = [availability];
+      } else {
+        localAvailabilities[eventId].push(availability);
+      }
+    }
+
+    //Put the values of the loop list into an availabilities list with "normal" indexes
+    availabilities.value = Object.values(localAvailabilities);
+
+    groupedAvailabilities = localAvailabilities;
+  })
+  .catch((e) => {
+    console.log(e);
+  });
 }
 
 watch(currentRole, async () => {
@@ -164,6 +186,7 @@ onMounted(async () => {
               :key="availability[0].id"
               :event-data="availability[0].event"
               :availability-data="availability.length <= 1 ? availability[0] : availability"
+              @refreshAvailabilitiesEvent="refreshAvailability"
             ></EventAvailabilityItem>
           </v-card-text>
         </v-card>
@@ -180,6 +203,7 @@ onMounted(async () => {
               :event-data="event"
               :role-id="currentRole.roleId"
               :availability-data="groupedAvailabilities[event.id]"
+              @refreshAvailabilitiesEvent="refreshAvailability"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>

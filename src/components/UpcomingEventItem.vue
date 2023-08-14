@@ -137,11 +137,10 @@ function handleClick() {
     <v-card-actions class="pt-0 mt-0">
       <!-- Signup/Availability Button -->
       <v-btn
-      v-if="!(availabilityData != undefined && (roleId == 2 || roleId == 4))"
         flat
         size="small"
         class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
-        @click="handleClick"
+        @click="handleClick()"
       >
         {{
           roleId == 1

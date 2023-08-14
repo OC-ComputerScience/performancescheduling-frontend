@@ -11,37 +11,13 @@ const props = defineProps({
 
 const emits = defineEmits(["refreshAvailabilitiesEvent"]);
 
-const addOrEditAvailabilityDialog = ref(false);
+const addAvailabilityDialog = ref(false);
+const openAvailabilityDialog = ref(false);
 
 function closeAvailabilityDialog() {
-  addOrEditAvailabilityDialog.value = false;
+  addAvailabilityDialog.value = false;
+  openAvailabilityDialog.value = false;
 }
-
-// async function refreshAvailabilities() {
-//   await AvailabilityDataService.getByUserRole(currentRole.value.id)
-//     .then((response) => {
-//       const groupedAvailabilities = {};
-    
-//     //Iterate through list of availabilities to group them by eventId
-//     for (let i = 0; i < response.data.length; i++) {
-//       const availability = response.data[i];
-//       const eventId = availability.eventId;
-      
-//       //Index will be the eventId value
-//       if (!groupedAvailabilities[eventId]) {
-//         groupedAvailabilities[eventId] = [availability];
-//       } else {
-//         groupedAvailabilities[eventId].push(availability);
-//       }
-//     }
-
-//     //Put the values of the loop list into an availabilities list with "normal" indexes
-//     props.availabilityData = Object.values(groupedAvailabilities);
-//   })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// }
 
 onMounted(async () => {});
 </script>
@@ -94,23 +70,36 @@ onMounted(async () => {});
     </v-card-title>
    
     <v-card-actions class="pt-0 mt-2">
+      <!-- Add Availability Button -->
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-semi-bold ml-auto bg-orange text-none"
+        @click="addAvailabilityDialog = true, openAvailabilityDialog = true"
+      >
+        Add availability
+      </v-btn>
       <!-- Edit Availability Button -->
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
-        @click="addOrEditAvailabilityDialog = true"
+        class="font-weight-semi-bold mr-2 bg-blue text-none"
+        @click="openAvailabilityDialog = true"
       >
-        Edit availability
+        Edit
       </v-btn>
     </v-card-actions>
   </v-card>
 
-  <v-dialog v-model="addOrEditAvailabilityDialog" persistent max-width="600px">
+  <v-dialog v-model="openAvailabilityDialog" persistent max-width="600px">
     <AvailabilityDialogBody
-      :is-edit="true"
-      :availability-data="availabilityData"
+      :is-edit="addAvailabilityDialog ? false : true"
+      :availability-data="addAvailabilityDialog ? { startTime: null, endTime: null } : availabilityData"
+      :event-data="eventData"
       @updateAvailabilityEvent="
+        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+      "
+      @addAvailabilityEvent="
         closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
       "
       @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
