@@ -22,7 +22,12 @@ const props = defineProps({
 });
 
 const editedPieceData = ref(Object.assign({}, props.pieceData));
+editedPieceData.value.composer.fullName = composerName(
+  editedPieceData.value.composer
+);
 const form = ref(null);
+const composers = ref([]);
+addFullName();
 
 //add Piece
 async function addPiece() {
@@ -39,6 +44,25 @@ async function addPiece() {
   });
 }
 
+function addFullName() {
+  composers.value = props.composersData;
+  composers.value.forEach((composer) => {
+    composer.fullName = composerName(composer);
+  });
+}
+
+function composerName(composer) {
+  let comma = ", ";
+  if (
+    composer.firstName === null ||
+    composer.firstName === "" ||
+    composer.lastName === "" ||
+    composer.lastName == ""
+  ) {
+    comma = "";
+  }
+  return composer.lastName + comma + composer.firstName;
+}
 // Update the piece's roles
 
 async function updatePiece() {
@@ -103,7 +127,7 @@ function similarPieceCheck(piece) {
               {{ editedPieceData.title }}
             </v-card-title>
             <v-card-title class="text-weight-semi-bold pt-1 pb-0">
-              {{ editedPieceData.composer.lastName }}
+              {{ editedPieceData.composer.fullName }}
             </v-card-title>
           </v-col>
           <v-spacer></v-spacer>
@@ -177,39 +201,10 @@ function similarPieceCheck(piece) {
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
             v-model="editedPieceData.composerId"
-            :items="composersData"
-            item-title="lastName"
+            :items="composers"
+            item-title="fullName"
             item-value="id"
           >
-            <template v-slot:item="{ item, props: { onClick } }">
-              <v-list-item
-                v-if="
-                  item.raw.firstName != null &&
-                  item.raw.firstName.length != 0 &&
-                  item.raw.lastName != null &&
-                  item.raw.lastName.length != 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.lastName }}, {{ item.raw.firstName }}
-              </v-list-item>
-              <v-list-item
-                v-else-if="
-                  item.raw.lastname == null || item.raw.lastname.length == 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.firstName }}
-              </v-list-item>
-              <v-list-item
-                v-else-if="
-                  item.raw.lastName == null || item.raw.lastName.length == 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.lastName }}
-              </v-list-item>
-            </template>
           </v-autocomplete>
         </v-col>
       </v-row>
@@ -236,7 +231,7 @@ function similarPieceCheck(piece) {
         <v-btn
           v-if="props.isEdit && props.isAdmin"
           flat
-          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white flatChipBorder"
           :class="
             props.pieceData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
           "
@@ -247,6 +242,21 @@ function similarPieceCheck(piece) {
           "
         >
           {{ props.pieceData.status === "Disabled" ? "Enable" : "Disable" }}
+        </v-btn>
+        <v-btn
+          v-if="
+            props.isEdit &&
+            props.isAdmin &&
+            props.pieceData.status === 'Pending'
+          "
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white flatChipBorder"
+          :class="
+            props.pieceData.status === 'Pendng' ? 'bg-darkBlue' : 'bg-maroon'
+          "
+          @click="emits('enablePieceEvent')"
+        >
+          Enable
         </v-btn>
       </v-card-actions>
     </v-form>

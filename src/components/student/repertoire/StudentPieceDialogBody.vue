@@ -24,6 +24,10 @@ const props = defineProps({
 });
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
+if (props.isEdit)
+  editedStudentPieceData.value.piece.composer.fullName = composerName(
+    editedStudentPieceData.value.piece.composer
+  );
 const form = ref(null);
 const pieces = ref([]);
 const semesters = ref([]);
@@ -138,9 +142,13 @@ function setPiece(id) {
 }
 
 function checkDuplicateStudentPiece() {
-  console.log(editedStudentPieceData.value);
-  console.log(props.studentPieces);
-  const duplicatePiece = props.studentPieces.find((piece) => {
+  let pieceList = props.studentPieces;
+  if (props.isEdit) {
+    pieceList = pieceList.filter((piece) => {
+      return piece.id !== editedStudentPieceData.value.id;
+    });
+  }
+  const duplicatePiece = pieceList.find((piece) => {
     return (
       piece.pieceId === editedStudentPieceData.value.pieceId &&
       piece.semesterId === editedStudentPieceData.value.semesterId &&
@@ -214,7 +222,7 @@ onMounted(async () => {
           </v-card-subtitle>
           <v-text-field
             v-if="props.isEdit"
-            v-model="editedStudentPieceData.piece.composer.lastName"
+            v-model="editedStudentPieceData.piece.composer.fullName"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -262,7 +270,7 @@ onMounted(async () => {
           ></v-text-field>
           <v-select
             v-if="!props.isEdit"
-            placeholder="Select a Compoers then select from the list of pieces"
+            placeholder="Select a Composer then select from the list of pieces"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"

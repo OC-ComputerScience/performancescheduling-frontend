@@ -66,7 +66,7 @@ function searchAndFilterList() {
   filterStudentPieces();
 }
 
-const statusFilterOptions = ["Active", "Disabled", "Pending"];
+const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
 const semesterFilterSelection = ref(null);
 
@@ -90,6 +90,7 @@ function clearFilters() {
   currentPage.value = 1;
   filteredStudentPieces.value = studentpieces.value;
   statusFilterSelection.value = null;
+  semesterFilterSelection.value = null;
   searchInput.value = "";
 }
 
@@ -183,7 +184,9 @@ onMounted(async () => {
               Apply Filters
             </v-btn>
             <v-btn
-              v-if="statusFilterSelection != null"
+              v-if="
+                statusFilterSelection != null || semesterFilterSelection != null
+              "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
             >
