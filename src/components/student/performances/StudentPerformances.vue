@@ -1,104 +1,109 @@
 <script setup>
-import { useLoginStore } from "../../stores/LoginStore.js";
 import { ref, onMounted, computed } from "vue";
-
+import StudentInstrumentDataService from "../../../services/StudentInstrumentDataService.js";
 import StudentPerformanceCard from "./StudentPerformanceCard.vue";
-import EventSignupDataService from "./../../services/EventSignupDataService";
+import { useLoginStore } from "../../../stores/LoginStore.js";
 
-const loginStore = useLoginStore();
 const performances = ref([]);
 const filteredPerformances = ref([]);
-
-async function getStudentEvents() {
-  await EventSignupDataService.getByStudent(loginStore.user.userId)
-    .then((response) => {
-      performances.value = response.data;
-      filteredPerformances.value = response.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-
-// Filtering
 const filterMenuBool = ref(false);
 
+const loginStore = useLoginStore();
+
+// Filter options
 const semesterFilterOptions = ref([]);
+const semesterFilterSelection = ref(null);
 const instrumentFilterOptions = ref([]);
-const eventTypeFilterOptions = ref([]);
+const instrumentFilterSelection = ref(null);
 
-const semesterFilterSelection = ref([]);
-const instrumentFilterSelection = ref([]);
-const eventTypeFilterSelection = ref([]);
+// Pagination
+const currentPage = ref(1);
+const perPage = 9;
 
-// These 3 functions work the same as it did before, just more concise.
-// Finds the unique semesters, instruments, and event types from the list of performances
-function getSemesterFilterOptions() {
-  semesterFilterOptions.value = [
-    ...new Map(
-      performances.value.map((p) => [p.event.semester.id, p.event.semester])
-    ).values(),
-  ];
+async function getPerformances() {
+  await StudentInstrumentDataService.getStudentInstrumentSignupsByUserRoleId(
+    loginStore.currentRole.id,
+    new Date(),
+    "LTE",
+    "desc"
+  ).then((response) => {
+    performances.value = [];
+
+    response.data.forEach((studentInstrument) => {
+      studentInstrument.studentInstrumentSignups.forEach(
+        (studentInstrumentSignup) => {
+          performances.value.push(studentInstrumentSignup);
+        }
+      );
+    });
+  });
+
+  filteredPerformances.value = performances.value;
+
+  buildSemesterList();
+  buildInstrumentList();
 }
 
-function getInstrumentFilterOptions() {
-  instrumentFilterOptions.value = [
-    ...new Map(
-      performances.value.map((p) => [
-        p.studentInstrumentSignups[0].studentInstrument.instrument.id,
-        p.studentInstrumentSignups[0].studentInstrument.instrument,
-      ])
-    ).values(),
-  ];
+function buildSemesterList() {
+  semesterFilterOptions.value = [];
+  performances.value.forEach((performance) => {
+    if (
+      !semesterFilterOptions.value.some(function callback(item) {
+        return item.name == performance.eventSignup.event.semester.name;
+      })
+    ) {
+      semesterFilterOptions.value.push({
+        id: performance.eventSignup.event.semesterId,
+        name: performance.eventSignup.event.semester.name,
+      });
+    }
+  });
+}
+function buildInstrumentList() {
+  instrumentFilterOptions.value = [];
+  performances.value.forEach((performance) => {
+    if (
+      !instrumentFilterOptions.value.some(function callback(item) {
+        return item.name == performance.studentInstrument.instrument.name;
+      })
+    ) {
+      instrumentFilterOptions.value.push({
+        id: performance.studentInstrument.instrument.id,
+        name: performance.studentInstrument.instrument.name,
+      });
+    }
+  });
 }
 
-function getEventTypeFilterOptions() {
-  eventTypeFilterOptions.value = [
-    ...new Map(
-      performances.value.map((p) => [p.event.eventType.id, p.event.eventType])
-    ).values(),
-  ];
+async function refreshPerformances() {
+  await getPerformances();
+  filterPerformances();
 }
 
 function filterPerformances() {
   filteredPerformances.value = performances.value;
-
-  // Filter by semester
-  if (semesterFilterSelection.value.length != 0) {
+  if (semesterFilterSelection.value != null) {
     filteredPerformances.value = performances.value.filter(
-      (p) => p.event.semester.id === semesterFilterSelection.value.id
+      (performance) =>
+        performance.eventSignup.event.semesterId ===
+        semesterFilterSelection.value.id
     );
   }
-
-  // Filter by instrument
-  if (instrumentFilterSelection.value.length != 0) {
+  if (instrumentFilterSelection.value != null) {
     filteredPerformances.value = filteredPerformances.value.filter(
-      (p) =>
-        p.studentInstrumentSignups[0].studentInstrument.instrument.id ===
+      (performance) =>
+        performance.studentInstrument.instrument.id ===
         instrumentFilterSelection.value.id
     );
   }
-
-  // Filter by event type
-  if (eventTypeFilterSelection.value.length != 0) {
-    filteredPerformances.value = filteredPerformances.value.filter(
-      (p) => p.event.eventType.id === eventTypeFilterSelection.value.id
-    );
-  }
 }
 
-// Clears all filters and returns to page 1
 function clearFilters() {
+  currentPage.value = 1;
   filteredPerformances.value = performances.value;
-  semesterFilterSelection.value = [];
-  instrumentFilterSelection.value = [];
-  eventTypeFilterSelection.value = [];
+  semesterFilterSelection.value = null;
+  instrumentFilterSelection.value = null;
 }
-
-// Pagination
-
-const currentPage = ref(1);
-const perPage = 15;
 
 const currentPageData = computed(() => {
   return filteredPerformances.value.slice(
@@ -108,16 +113,15 @@ const currentPageData = computed(() => {
 });
 
 onMounted(async () => {
-  await getStudentEvents();
-  getSemesterFilterOptions();
-  getInstrumentFilterOptions();
-  getEventTypeFilterOptions();
+  refreshPerformances();
 });
 </script>
+
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
       <h1 class="text-maroon font-weight-bold text-h3">Performances</h1>
+
       <v-menu v-model="filterMenuBool" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
           <v-btn
@@ -146,9 +150,12 @@ onMounted(async () => {
                   v-model="semesterFilterSelection"
                   :items="semesterFilterOptions"
                   item-title="name"
+                  item-value="id"
                   return-object
                 ></v-select>
               </v-list-item>
+            </v-list>
+            <v-list class="pa-0 ma-0">
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Instrument
                 <v-select
@@ -158,18 +165,7 @@ onMounted(async () => {
                   v-model="instrumentFilterSelection"
                   :items="instrumentFilterOptions"
                   item-title="name"
-                  return-object
-                ></v-select>
-              </v-list-item>
-              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
-                Event Type
-                <v-select
-                  color="darkBlue"
-                  variant="underlined"
-                  class="font-weight-medium text-darkBlue pt-0 mt-0"
-                  v-model="eventTypeFilterSelection"
-                  :items="eventTypeFilterOptions"
-                  item-title="type"
+                  item-value="id"
                   return-object
                 ></v-select>
               </v-list-item>
@@ -183,11 +179,7 @@ onMounted(async () => {
               Apply Filters
             </v-btn>
             <v-btn
-              v-if="
-                semesterFilterSelection.length != 0 ||
-                instrumentFilterSelection.length != 0 ||
-                eventTypeFilterSelection.length != 0
-              "
+              v-if="semesterFilterSelection"
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
             >
@@ -197,11 +189,7 @@ onMounted(async () => {
         </v-card>
       </v-menu>
       <v-btn
-        v-if="
-          semesterFilterSelection.length != 0 ||
-          instrumentFilterSelection.length != 0 ||
-          eventTypeFilterSelection.length != 0
-        "
+        v-if="semesterFilterSelection || instrumentFilterSelection"
         size="medium"
         color="maroon"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
@@ -215,13 +203,19 @@ onMounted(async () => {
         <v-card class="pa-5 mainCardBorder">
           <v-row>
             <v-col
-              v-for="performance in currentPageData"
-              :key="performance.id"
-              cols="12"
+              cols="6"
+              sm="12"
+              lg="6"
+              v-for="studentInstrumentSignup in currentPageData"
+              :key="studentInstrumentSignup.id"
             >
               <StudentPerformanceCard
-                :performance="performance"
-              ></StudentPerformanceCard>
+                :key="studentInstrumentSignup.id"
+                :event-data="studentInstrumentSignup.eventSignup.event"
+                :event-signup-data="studentInstrumentSignup.eventSignup"
+                :student-instrument-signup-data="studentInstrumentSignup"
+              >
+              </StudentPerformanceCard>
             </v-col>
           </v-row>
         </v-card>

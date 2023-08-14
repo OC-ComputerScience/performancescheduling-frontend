@@ -2,7 +2,7 @@
 import MainNav from "../components/MainNav.vue";
 
 import StudentHome from "../components/student/StudentHome.vue";
-import StudentPerformances from "../components/student/StudentPerformances.vue";
+import StudentPerformances from "../components/student/performances/StudentPerformances.vue";
 // import StudentSettings from "../components/student/StudentSettings.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
@@ -18,6 +18,14 @@ import MaintainInstruments from "../components/admin/maintain/instruments/Mainta
 import MaintainComposers from "../components/admin/maintain/composers/MaintainComposers.vue";
 import MaintainPieces from "../components/admin/maintain/pieces/MaintainPieces.vue";
 import MaintainLocations from "../components/admin/maintain/locations/MaintainLocations.vue";
+
+import { useRoute } from "vue-router";
+
+import { computed } from "vue";
+
+const route = useRoute();
+const fullPath = computed(() => route.path);
+console.log("fullPath.value: ", fullPath);
 </script>
 
 <template>
@@ -26,54 +34,39 @@ import MaintainLocations from "../components/admin/maintain/locations/MaintainLo
       <v-col class="bg-lightGray">
         <MainNav></MainNav>
         <!-- Student pages -->
-        <StudentHome
-          v-if="this.$route.fullPath === '/studentHome'"
-        ></StudentHome>
+        <StudentHome v-if="fullPath === '/studentHome'"></StudentHome>
         <!-- <StudentSettings
-          v-if="this.$route.fullPath === '/studentSettings'"
+          v-if="fullPath === '/studentSettings'"
         ></StudentSettings> -->
         <StudentPerformances
-          v-if="this.$route.fullPath === '/studentPerformances'"
+          v-if="fullPath === '/studentPerformances'"
         ></StudentPerformances>
         <!-- Faculty/Accompanist pages -->
         <FacultyHome
-          v-if="
-            this.$route.fullPath === '/facultyHome' ||
-            this.$route.fullPath === '/accompanistHome'
-          "
+          v-if="fullPath === '/facultyHome' || fullPath === '/accompanistHome'"
         >
         </FacultyHome>
         <!-- Admin pages -->
-        <AdminHome v-if="this.$route.fullPath === '/adminHome'"> </AdminHome>
-        <MaintainUsers
-          v-if="this.$route.fullPath === '/adminUsers'"
-        ></MaintainUsers>
+        <AdminHome v-if="fullPath === '/adminHome'"> </AdminHome>
+        <MaintainUsers v-if="fullPath === '/adminUsers'"></MaintainUsers>
         <MaintainComposers
-          v-if="this.$route.fullPath === '/adminComposers'"
+          v-if="fullPath === '/adminComposers'"
         ></MaintainComposers>
         <MaintainEventTypes
-          v-if="this.$route.fullPath === '/adminEventTypes'"
+          v-if="fullPath === '/adminEventTypes'"
         ></MaintainEventTypes>
-        <MaintainLevels
-          v-if="this.$route.fullPath === '/adminLevels'"
-        ></MaintainLevels>
-        <MaintainMajors
-          v-if="this.$route.fullPath === '/adminMajors'"
-        ></MaintainMajors>
+        <MaintainLevels v-if="fullPath === '/adminLevels'"></MaintainLevels>
+        <MaintainMajors v-if="fullPath === '/adminMajors'"></MaintainMajors>
         <MaintainSemesters
-          v-if="this.$route.fullPath === '/adminSemesters'"
+          v-if="fullPath === '/adminSemesters'"
         ></MaintainSemesters>
-        <MaintainEvents
-          v-if="this.$route.fullPath === '/adminEvents'"
-        ></MaintainEvents>
+        <MaintainEvents v-if="fullPath === '/adminEvents'"></MaintainEvents>
         <MaintainInstruments
-          v-if="this.$route.fullPath === '/adminInstruments'"
+          v-if="fullPath === '/adminInstruments'"
         ></MaintainInstruments>
-        <MaintainPieces
-          v-if="this.$route.fullPath === '/adminPieces'"
-        ></MaintainPieces>
+        <MaintainPieces v-if="fullPath === '/adminPieces'"></MaintainPieces>
         <MaintainLocations
-          v-if="this.$route.fullPath === '/adminLocations'"
+          v-if="fullPath === '/adminLocations'"
         ></MaintainLocations>
       </v-col>
     </v-row>
