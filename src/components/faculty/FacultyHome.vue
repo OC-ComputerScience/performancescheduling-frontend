@@ -1,7 +1,7 @@
 <script setup>
 import { useLoginStore } from "../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 
 
 import UserNotificationDataService from "../../services/UserNotificationDataService.js";
@@ -117,6 +117,11 @@ watch(currentRole, async () => {
   await retrieveData(); 
 });
 
+//Filter upcoming events without availability
+const filteredEvents = computed(() => {  
+  return upcomingEvents.value.filter(event => !groupedAvailabilities[event.id]);
+});
+
 onMounted(async () => {
   await retrieveData();
 });
@@ -198,7 +203,7 @@ onMounted(async () => {
           </v-card-title>
           <v-card-text>
             <UpcomingEventItem
-              v-for="event of upcomingEvents"
+              v-for="event of filteredEvents"
               :key="event.id"
               :event-data="event"
               :role-id="currentRole.roleId"
