@@ -22,12 +22,18 @@ const props = defineProps({
   studentpieceData: { type: [Object], required: true },
   studentPieces: { type: [Array], required: true },
 });
+
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
+let addForSemester = false;
 if (props.isEdit)
   editedStudentPieceData.value.piece.composer.fullName = composerName(
     editedStudentPieceData.value.piece.composer
   );
+if (!props.isEdit) {
+  if (editedStudentPieceData.value.semesterId != null) addForSemester = true;
+}
+
 const form = ref(null);
 const pieces = ref([]);
 const semesters = ref([]);
@@ -293,6 +299,7 @@ onMounted(async () => {
             item-title="name"
             item-value="id"
             variant="plain"
+            :readonly="addForSemester ? true : false"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () =>
@@ -309,6 +316,7 @@ onMounted(async () => {
             item-title="instrument.name"
             item-value="id"
             variant="plain"
+            :readonly="addForSemester ? true : false"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () =>

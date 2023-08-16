@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import PieceDataService from "../../../../services/PieceDataService";
+import ComposerDataService from "../../../../services/ComposerDataService";
 
 import { compareTwoStrings } from "string-similarity";
 
@@ -18,16 +19,18 @@ const props = defineProps({
   isAdmin: { type: [Boolean], required: true },
   pieceData: { type: [Object], required: true },
   piecesData: { type: [Array] },
-  composersData: { type: [Array] },
 });
 
 const editedPieceData = ref(Object.assign({}, props.pieceData));
-editedPieceData.value.composer.fullName = composerName(
-  editedPieceData.value.composer
-);
+if (props.isEdit)
+  editedPieceData.value.composer.fullName = composerName(
+    editedPieceData.value.composer
+  );
+
 const form = ref(null);
 const composers = ref([]);
-addFullName();
+
+getComposers();
 
 //add Piece
 async function addPiece() {
@@ -44,11 +47,18 @@ async function addPiece() {
   });
 }
 
-function addFullName() {
-  composers.value = props.composersData;
-  composers.value.forEach((composer) => {
-    composer.fullName = composerName(composer);
-  });
+async function getComposers() {
+  await ComposerDataService.getAll("lastName")
+    .then((response) => {
+      composers.value = response.data;
+
+      composers.value.forEach((composer) => {
+        composer.fullName = composerName(composer);
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 function composerName(composer) {

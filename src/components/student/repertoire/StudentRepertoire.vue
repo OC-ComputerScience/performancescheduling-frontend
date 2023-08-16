@@ -262,7 +262,6 @@ onMounted(async () => {
         studentIntstrumentId: null,
         status: 'Active',
       }"
-      :student-id="loginStore.currentRole.userId"
       :student-pieces="studentpieces"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="

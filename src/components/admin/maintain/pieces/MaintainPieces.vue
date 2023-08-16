@@ -233,7 +233,6 @@ onMounted(async () => {
         status: 'Active',
       }"
       :pieces-data="pieces"
-      :composers-data="composers"
       @closeAddPieceDialogEvent="addPieceDialog = false"
       @addPieceSuccessEvent="(addPieceDialog = false), refreshPieces()"
     ></PieceDialogBody>

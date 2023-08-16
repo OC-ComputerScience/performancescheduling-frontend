@@ -25,7 +25,6 @@ import { computed } from "vue";
 
 const route = useRoute();
 const fullPath = computed(() => route.path);
-console.log("fullPath.value: ", fullPath);
 </script>
 
 <template>
