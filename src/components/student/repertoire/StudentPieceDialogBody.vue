@@ -41,7 +41,8 @@ const studentInstruments = ref([]);
 const composers = ref([]);
 const composerId = ref(null);
 const filteredPieces = ref([]);
-const createOrEditPieceDialog = ref(false);
+const editPieceDialog = ref(false);
+const createPieceDialog = ref(false);
 
 //add StudentPiece
 async function addStudentPiece() {
@@ -123,10 +124,12 @@ async function getStudentInstrument() {
     });
 }
 function closePieceDialog() {
-  createOrEditPieceDialog.value = false;
+  editPieceDialog.value = false;
+  createPieceDialog.value = false;
 }
 async function updatePieceSuccess() {
-  createOrEditPieceDialog.value = false;
+  editPieceDialog.value = false;
+  createPieceDialog.value = false;
   await PieceDataService.get(editedStudentPieceData.value.piece.id)
     .then((response) => {
       editedStudentPieceData.value.piece.literalTranslation =
@@ -330,7 +333,14 @@ onMounted(async () => {
         <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="createOrEditPieceDialog = true"
+          @click="createPieceDialog = true"
+        >
+          Add Piece
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          @click="editPieceDialog = true"
         >
           Edit Piece
         </v-btn>
@@ -375,13 +385,31 @@ onMounted(async () => {
       </v-card-actions>
     </v-form>
   </v-card>
-  <v-dialog v-model="createOrEditPieceDialog" persistent max-width="600px">
+  <v-dialog v-model="editPieceDialog" persistent max-width="600px">
     <PieceDialogBody
       :is-edit="true"
       :is-admin="false"
       :piece-data="editedStudentPieceData.piece"
+      :pieces-data="pieces"
       @closePieceDialogEvent="closePieceDialog"
       @updatePieceSuccessEvent="closePieceDialog, updatePieceSuccess()"
+    ></PieceDialogBody>
+  </v-dialog>
+  <v-dialog v-model="createPieceDialog" persistent max-width="600px">
+    <PieceDialogBody
+      :is-edit="false"
+      :is-admin="true"
+      :piece-data="{
+        id: null,
+        title: null,
+        originalLanguage: null,
+        poeticTranslation: null,
+        literalTranslation: null,
+        status: 'Pending',
+      }"
+      :pieces-data="pieces"
+      @closeAddPieceDialogEvent="createPieceDialog = false"
+      @addPieceSuccessEvent="(createPieceDialog = false), getPieces()"
     ></PieceDialogBody>
   </v-dialog>
 </template>
