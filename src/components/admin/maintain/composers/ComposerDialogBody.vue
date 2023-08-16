@@ -15,6 +15,7 @@ const emits = defineEmits([
 
 const props = defineProps({
   isEdit: { type: [Boolean], required: true },
+  isAdmin: { type: [Boolean], required: true },
   composerData: { type: [Object], required: true },
   composersData: { type: [Array] },
 });
@@ -240,7 +241,7 @@ function emptyNameCheck(composer) {
         <v-btn
           v-if="props.isEdit"
           flat
-          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white flatChipBorder"
           :class="
             props.composerData.status === 'Disabled'
               ? 'bg-darkBlue'
@@ -253,6 +254,23 @@ function emptyNameCheck(composer) {
           "
         >
           {{ props.composerData.status === "Disabled" ? "Enable" : "Disable" }}
+        </v-btn>
+        <v-btn
+          v-if="
+            props.isEdit &&
+            props.isAdmin &&
+            props.composerData.status === 'Pending'
+          "
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          :class="
+            props.composerData.status === 'Pending'
+              ? 'bg-darkBlue'
+              : 'bg-maroon'
+          "
+          @click="emits('enableComposerEvent')"
+        >
+          Enable
         </v-btn>
       </v-card-actions>
     </v-form>

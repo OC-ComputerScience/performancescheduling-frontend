@@ -88,6 +88,7 @@ async function enableComposer(composer) {
   <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
     <ComposerDialogBody
       :is-edit="true"
+      :is-admin="true"
       :composer-data="composerData"
       @closeComposerDialogEvent="closeComposerDialog"
       @updateComposerSuccessEvent="

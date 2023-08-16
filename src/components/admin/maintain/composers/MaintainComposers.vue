@@ -209,6 +209,7 @@ onMounted(async () => {
   <v-dialog v-model="addComposerDialog" persistent max-width="600px">
     <ComposerDialogBody
       :is-edit="false"
+      :is-admin="true"
       :composer-data="{
         id: null,
         firstName: null,
