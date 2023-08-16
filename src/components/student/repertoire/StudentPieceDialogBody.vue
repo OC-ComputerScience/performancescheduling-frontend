@@ -7,6 +7,7 @@ import PieceDataService from "./../../../services/PieceDataService";
 import StudentInstrumentDataService from "./../../../services/StudentInstrumentDataService";
 import { useLoginStore } from "./../../../stores/LoginStore.js";
 import PieceDialogBody from "./../../admin/maintain/pieces/PieceDialogBody.vue";
+import ComposerDialogBody from "./../../admin/maintain/composers/ComposerDialogBody.vue";
 
 const emits = defineEmits([
   "addStudentPieceSuccessEvent",
@@ -43,6 +44,7 @@ const composerId = ref(null);
 const filteredPieces = ref([]);
 const editPieceDialog = ref(false);
 const createPieceDialog = ref(false);
+const addComposerDialog = ref(false);
 
 //add StudentPiece
 async function addStudentPiece() {
@@ -87,6 +89,7 @@ async function getPieces() {
   await PieceDataService.getAll("title", "ASC")
     .then((response) => {
       pieces.value = response.data;
+      filterPieces();
     })
     .catch((err) => {
       console.log(err);
@@ -347,6 +350,13 @@ onMounted(async () => {
         <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          @click="addComposerDialog = true"
+        >
+          Add Composer
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
           @click="props.isEdit ? updateStudentPiece() : addStudentPiece()"
         >
           {{ props.isEdit ? "Save" : "Add" }}
@@ -411,5 +421,22 @@ onMounted(async () => {
       @closeAddPieceDialogEvent="createPieceDialog = false"
       @addPieceSuccessEvent="(createPieceDialog = false), getPieces()"
     ></PieceDialogBody>
+  </v-dialog>
+  <v-dialog v-model="addComposerDialog" persistent max-width="600px">
+    <ComposerDialogBody
+      :is-edit="false"
+      :composer-data="{
+        id: null,
+        firstName: null,
+        lastName: null,
+        dateOfBirth: null,
+        dateOfDeath: null,
+        nationality: null,
+        status: 'Pending',
+      }"
+      :composers-data="composers"
+      @closeAddComposerDialogEvent="addComposerDialog = false"
+      @addComposerSuccessEvent="(addComposerDialog = false), getComposers()"
+    ></ComposerDialogBody>
   </v-dialog>
 </template>
