@@ -23,7 +23,6 @@ const groupedAvailabilities = {};
 const upcomingEvents = ref([]);
 
 async function retrieveData() {
-  console.log("loginStore", currentRole)
   await UserNotificationDataService.getByUserRole(currentRole.value.id)
   .then((response) => {
       notifications.value = response.data;
@@ -124,6 +123,7 @@ const filteredEvents = computed(() => {
 
 onMounted(async () => {
   await retrieveData();
+  console.log(availabilities)
 });
 </script>
 

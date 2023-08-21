@@ -24,7 +24,10 @@ const form = ref(null);
 const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
 
+//I have to make a for loop to get all start and end time
+//const selectedStartTime = ref(get12HourTimeStringFromString(props.availabilityData.startTime));
 const selectedStartTime = ref([]);
+//const selectedEndTime = ref(get12HourTimeStringFromString(props.availabilityData.endTime));
 const selectedEndTime = ref([]);
 
 //These both const will store all the start/end times possibilities for the availability
@@ -85,7 +88,6 @@ async function updateSelectedStartTime() {
 
 async function updateSelectedEndTime() {
   if(Array.isArray(props.availabilityData)){
-
     for(let i=0; i<props.availabilityData.length;i++){
       await AvailabilityDataService.update({
         id: props.availabilityData[i].id,
@@ -105,22 +107,27 @@ async function updateSelectedEndTime() {
   }
 }
 
-async function deleteAvailability(index) {
+async function deleteAvailability() {
   if(Array.isArray(props.availabilityData)){
-      await AvailabilityDataService.remove(props.availabilityData[index].id)
-      .catch((err) => {
+    console.log('first remove availability', props.availabilityData.id)
+      await AvailabilityDataService.remove({
+        id: props.availabilityData[selectedStartTime.id].id
+      }).catch((err) => {
         console.log(err);
       });
   }
   else{
-    await AvailabilityDataService.remove(props.availabilityData.id)
-    .catch((err) => {
+    console.log('remove availability', props.availabilityData.id)
+    await AvailabilityDataService.remove({
+      id: props.availabilityData.id
+    }).catch((err) => {
       console.log(err);
     });
   }
 }
 
 async function setAvailabilityTimes(){
+  console.log('HERE AVAILABLE', props.availabilityData)
   if(Array.isArray(props.availabilityData)){
     for(let i=0; i<props.availabilityData.length;i++){
       selectedStartTime.value.push(get12HourTimeStringFromString(props.availabilityData[i].startTime))
@@ -136,13 +143,9 @@ async function setAvailabilityTimes(){
 
 // Organizing time to be displayed when select the start and end time
 async function setTimeBoundaries(){  
-    // Starts with event start time and goes until event end time
     const startTime = parseTimeString(props.eventData.startTime);
     const endTime = parseTimeString(props.eventData.endTime);
     const interval = 15;
-
-    console.log("start time", props.eventData.startTime)
-    console.log("end time", endTime)
 
     // Put times into an array
     while (isTimeBefore(startTime, endTime)) {
@@ -159,6 +162,7 @@ async function setTimeBoundaries(){
     endTimeBoundaries.value.push(formatTimeString(endTime));
   }
     console.log('end timessss', endTimeBoundaries)
+    console.log('availability boundaries', props.availabilityData)
 
 
 // Convert the time to string, excluding the seconds
@@ -199,8 +203,10 @@ function convertToMilitaryFormat(timeString) {
 }
 
 onMounted(() => {
+  console.log('availability mounted 1', props.availabilityData)
   setTimeBoundaries();
   setAvailabilityTimes();
+  console.log('availability mounted 2', props.availabilityData)
 });
 
 </script>
@@ -223,14 +229,14 @@ onMounted(() => {
         <div v-if="availabilityData.length > 1" v-for="(time,index) in selectedStartTime">
 
           <div class="d-flex justify-center align-center">
-            <v-card-subtitle class="pl-0 pb-2 font-weight-bold text-darkBlue" style="font-size: 18px;">
+            <!-- <v-card-subtitle class="pl-0 pb-2 font-weight-bold text-darkBlue">
                 Availability {{ index+1 }}
-            </v-card-subtitle>
+            </v-card-subtitle> -->
             <v-btn
               flat
               size="small"
               class="font-weight-semi-bold mt-0 mb-3 mr-2 ml-auto text-none text-white bg-red flatChipBorder"
-              @click="deleteAvailability(index)"
+              @click="deleteAvailability()"
             >
               Delete
             </v-btn>
@@ -242,19 +248,22 @@ onMounted(() => {
             <v-select
               color="darkBlue"
               variant="plain"
-              class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 my-0 mb-4"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
               v-model="selectedStartTime[index]"
               :items="startTimeBoundaries"
               return-object
               :rules="[(v) => !!v || 'This field is required']"
             ></v-select>
-            <v-card-subtitle class="ml-5 pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+          </div>
+
+          <div class="d-flex align-center">
+            <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
               End Time:
             </v-card-subtitle>
             <v-select
               color="darkBlue"
               variant="plain"
-              class="font-weight-bold text-blue bg-white flatCardBorder pl-4 pr-2 my-0 mb-4"
+              class="font-weight-bold text-blue pt-0 mt-0 ml-2 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
               v-model="selectedEndTime[index]"
               :items="endTimeBoundaries"
               return-object
@@ -266,19 +275,9 @@ onMounted(() => {
           </div>
 
         <div v-else>
-          <div class="d-flex justify-center align-center">
-            <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-              Start Time
-            </v-card-subtitle>
-            <v-btn
-                flat
-                size="small"
-                class="font-weight-semi-bold mt-0 mb-3 mr-2 ml-auto text-none text-white bg-red flatChipBorder"
-                @click="deleteAvailability()"
-              >
-                Delete
-              </v-btn>
-          </div>
+          <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+            Start Time
+          </v-card-subtitle>
           <v-select
             color="darkBlue"
             variant="plain"
@@ -304,16 +303,23 @@ onMounted(() => {
         </div>
       </v-card-text>
       <v-card-actions>
+        <v-btn v-if="availabilityData.length = 1 && props.isEdit"
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-red flatChipBorder"
+          @click="deleteAvailability()"
+        >
+          Delete
+        </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          class="font-weight-semi-bold mt-0 text-none text-white bg-teal flatChipBorder"
           @click="props.isEdit ? updateAvailability() : addAvailability()"
         >
           {{ props.isEdit ? "Save" : "Add" }}
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-2 mr-auto text-none text-white bg-blue flatChipBorder"
           @click="emits('closeAvailabilityDialogEvent')"
         >
           Cancel
