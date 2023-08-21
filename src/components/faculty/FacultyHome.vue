@@ -3,7 +3,6 @@ import { useLoginStore } from "../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
 import { ref, onMounted, watch, computed } from "vue";
 
-
 import UserNotificationDataService from "../../services/UserNotificationDataService.js";
 import EventDataService from "../../services/EventDataService.js";
 import AvailabilityDataService from "../../services/AvailabilityDataService.js";
@@ -19,60 +18,63 @@ const { currentRole } = storeToRefs(loginStore);
 const notifications = ref([]);
 const students = ref([]);
 const availabilities = ref([]);
-const groupedAvailabilities = {};
+const groupedAvailabilities = ref([]);
 const upcomingEvents = ref([]);
 
 async function retrieveData() {
   await UserNotificationDataService.getByUserRole(currentRole.value.id)
-  .then((response) => {
+    .then((response) => {
       notifications.value = response.data;
     })
     .catch((e) => {
       console.log(e);
     });
-  
-  if (currentRole.value.role.role == 'Faculty'){
-    await StudentInstrumentDataService.getStudentsForInstructorId(currentRole.value.id)
-    .then((response) => {
-      students.value = response.data;
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+
+  if (currentRole.value.role.role == "Faculty") {
+    await StudentInstrumentDataService.getStudentsForInstructorId(
+      currentRole.value.id
+    )
+      .then((response) => {
+        students.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
 
-  if (currentRole.value.role.role == 'Accompanist'){
-    await StudentInstrumentDataService.getStudentsForAccompanistId(currentRole.value.id)
-    .then((response) => {
-      students.value = response.data;
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  if (currentRole.value.role.role == "Accompanist") {
+    await StudentInstrumentDataService.getStudentsForAccompanistId(
+      currentRole.value.id
+    )
+      .then((response) => {
+        students.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
 
   await AvailabilityDataService.getByUserRole(currentRole.value.id)
-  .then((response) => {
-    
-    //Iterate through list of availabilities to group them by eventId
-    for (let i = 0; i < response.data.length; i++) {
-      const availability = response.data[i];
-      const eventId = availability.eventId;
-      
-      //Index will be the eventId value
-      if (!groupedAvailabilities[eventId]) {
-        groupedAvailabilities[eventId] = [availability];
-      } else {
-        groupedAvailabilities[eventId].push(availability);
-      }
-    }
+    .then((response) => {
+      //Iterate through list of availabilities to group them by eventId
+      for (let i = 0; i < response.data.length; i++) {
+        const availability = response.data[i];
+        const eventId = availability.eventId;
 
-    //Put the values of the loop list into an availabilities list with "normal" indexes
-    availabilities.value = Object.values(groupedAvailabilities);
-  })
-  .catch((e) => {
-    console.log(e);
-  });
+        //Index will be the eventId value
+        if (!groupedAvailabilities.value[eventId]) {
+          groupedAvailabilities.value[eventId] = [availability];
+        } else {
+          groupedAvailabilities.value[eventId].push(availability);
+        }
+      }
+
+      //Put the values of the loop list into an availabilities list with "normal" indexes
+      availabilities.value = Object.values(groupedAvailabilities.value);
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 
   await EventDataService.getGTEDateForFaculty(new Date())
     .then((response) => {
@@ -83,42 +85,43 @@ async function retrieveData() {
     });
 }
 
-async function refreshAvailability(){
+async function refreshAvailability() {
   await AvailabilityDataService.getByUserRole(currentRole.value.id)
-  .then((response) => {
+    .then((response) => {
+      const localAvailabilities = {};
 
-    const localAvailabilities ={};
-    
-    //Iterate through list of availabilities to group them by eventId
-    for (let i = 0; i < response.data.length; i++) {
-      const availability = response.data[i];
-      const eventId = availability.eventId;
-      
-      //Index will be the eventId value
-      if (!localAvailabilities[eventId]) {
-        localAvailabilities[eventId] = [availability];
-      } else {
-        localAvailabilities[eventId].push(availability);
+      //Iterate through list of availabilities to group them by eventId
+      for (let i = 0; i < response.data.length; i++) {
+        const availability = response.data[i];
+        const eventId = availability.eventId;
+
+        //Index will be the eventId value
+        if (!localAvailabilities[eventId]) {
+          localAvailabilities[eventId] = [availability];
+        } else {
+          localAvailabilities[eventId].push(availability);
+        }
       }
-    }
 
-    //Put the values of the loop list into an availabilities list with "normal" indexes
-    availabilities.value = Object.values(localAvailabilities);
+      //Put the values of the loop list into an availabilities list with "normal" indexes
+      availabilities.value = Object.values(localAvailabilities);
 
-    groupedAvailabilities = localAvailabilities;
-  })
-  .catch((e) => {
-    console.log(e);
-  });
+      groupedAvailabilities.value = localAvailabilities;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 }
 
 watch(currentRole, async () => {
-  await retrieveData(); 
+  await retrieveData();
 });
 
 //Filter upcoming events without availability
-const filteredEvents = computed(() => {  
-  return upcomingEvents.value.filter(event => !groupedAvailabilities[event.id]);
+const filteredEvents = computed(() => {
+  return upcomingEvents.value.filter(
+    (event) => !groupedAvailabilities.value[event.id]
+  );
 });
 
 onMounted(async () => {
@@ -190,7 +193,9 @@ onMounted(async () => {
               v-for="availability in availabilities"
               :key="availability[0].id"
               :event-data="availability[0].event"
-              :availability-data="availability.length <= 1 ? availability[0] : availability"
+              :availability-data="
+                availability.length <= 1 ? availability[0] : availability
+              "
               @refreshAvailabilitiesEvent="refreshAvailability"
             ></EventAvailabilityItem>
           </v-card-text>
