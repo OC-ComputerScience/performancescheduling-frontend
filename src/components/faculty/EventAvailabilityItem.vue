@@ -93,15 +93,23 @@ onMounted(async () => {});
     </v-card-actions>
   </v-card>
 
+  <!--Availability Data only gets the current availability to display on the dialog box. Therefore, if I have to add
+  an availability to an event that already has previous availabilities there, I won't be able to check them in that
+  add dialog, so I cannot check if that availability was conflicting with previous ones. That is why we have
+  complete-availability-data-->
   <v-dialog v-model="openAvailabilityDialog" persistent max-width="600px">
     <AvailabilityDialogBody
       :is-edit="addAvailabilityDialog ? false : true"
       :availability-data="addAvailabilityDialog ? { startTime: null, endTime: null } : availabilityData"
+      :complete-availability-data="availabilityData"
       :event-data="eventData"
       @updateAvailabilityEvent="
         closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
       "
       @addAvailabilityEvent="
+        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+      "
+      @deleteAvailabilityEvent="
         closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
       "
       @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
