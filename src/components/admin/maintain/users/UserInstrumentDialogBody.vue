@@ -8,6 +8,8 @@ import InstrumentDataService from "../../../../services/InstrumentDataService";
 const emits = defineEmits([
   "closeAddInstrumentDialog",
   "addInstrumentSuccessEvent",
+  "updateInstrumentSuccessEvent",
+  "closeUserInstrumentDialogEvent",
 ]);
 
 const props = defineProps({
@@ -64,7 +66,10 @@ async function getAllInstructors() {
 async function getAllAccompanists() {
   await UserRoleDataService.getRolesForRoleId(4)
     .then((response) => {
-      accompanists.value = response.data;
+      accompanists.value = [
+        { id: null, user: { firstName: "", lastName: "" } },
+        ...response.data,
+      ];
     })
     .catch((err) => {
       console.log(err);
@@ -73,7 +78,6 @@ async function getAllAccompanists() {
 
 async function addInstrument() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await StudentInstrumentDataService.create({
         privateHours: privateHours.value,
@@ -81,7 +85,10 @@ async function addInstrument() {
         studentRoleId: props.studentInstrumentData.studentRoleId,
         instrumentId: selectedInstrument.value.id,
         instructorRoleId: selectedInstructor.value.id,
-        accompanistRoleId: selectedAccompanist.value.id,
+        accompanistRoleId:
+          selectedAccompanist.value != null
+            ? selectedAccompanist.value.id
+            : null,
         levelId: editedLevel.value.id,
       })
         .then(() => {
@@ -96,7 +103,6 @@ async function addInstrument() {
 
 async function updateInstrument() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await updateSelectedInstructor();
       await updateSelectedAccompanist();
@@ -130,7 +136,8 @@ async function updateSelectedAccompanist() {
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
-      accompanistRoleId: selectedAccompanist.value.id,
+      accompanistRoleId:
+        selectedAccompanist.value != null ? selectedAccompanist.value.id : null,
     }).catch((err) => {
       console.log(err);
     });
@@ -248,7 +255,6 @@ onMounted(async () => {
           :item-title="(item) => item.user.firstName + ' ' + item.user.lastName"
           item-value="id"
           return-object
-          :rules="[(v) => !!v || 'This field is required']"
         >
         </v-select>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
