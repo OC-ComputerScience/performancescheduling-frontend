@@ -11,8 +11,6 @@ const props = defineProps({
 
 const emits = defineEmits(["refreshAvailabilitiesEvent"]);
 
-console.log('availability data event', props.availabilityData)
-
 const addAvailabilityDialog = ref(false);
 const openAvailabilityDialog = ref(false);
 

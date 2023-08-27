@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useLoginStore } from "../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
@@ -15,14 +15,10 @@ const emits = defineEmits([
 
 const props = defineProps({
   availabilityData: { type: [Object], required: true },
-  completeAvailabilityData: { type: [Object], required: true },
+  completeAvailabilityData: { type: [Object], required: false },
   eventData: { type: [Object], required: false },
   isEdit: { type: [Boolean], required: true },
 });
-
-console.log("availability data", props.availabilityData)
-console.log("complete data", props.completeAvailabilityData)
-console.log("event data", props.eventData)
 
 const form = ref(null);
 
@@ -32,7 +28,8 @@ const { currentRole } = storeToRefs(loginStore);
 const arrayStartTime = ref([]);
 const arrayEndTime = ref([]);
 const AvailabilityNoError = ref(true);
-const deleteAvailabilityDialog = ref(false)
+const deleteAvailabilityDialog = ref(false);
+const isEventNotReady = ref(false);
 
 //These both const will store all the start/end times possibilities for the availability
 const startTimeBoundaries = ref([]);
@@ -51,11 +48,11 @@ async function initializeCurrentVariables(index){
 async function checkAvailability(){
   AvailabilityNoError.value = true;
 
-  if(!((Array.isArray(props.completeAvailabilityData) && props.isEdit))){
+  if(!(Array.isArray(props.completeAvailabilityData) && props.isEdit)){
     currentStartTime.value=arrayStartTime.value
     currentEndTime.value=arrayEndTime.value
   } 
-console.log('start time current', currentStartTime)
+
   //converting the current start and end time
   const start = ref(get24HourTimeString(currentStartTime.value))
   const end = ref(get24HourTimeString(currentEndTime.value))
@@ -68,8 +65,8 @@ console.log('start time current', currentStartTime)
     }
     //start and end time cannot overlap already set availabilities
     for(let i=0; i<props.completeAvailabilityData.length;i++){
-      const originalStartTime = get24HourTimeString(props.completeAvailabilityData[i].startTime);
-      const originalEndTime = get24HourTimeString(props.completeAvailabilityData[i].endTime);
+      const originalStartTime = props.completeAvailabilityData[i].startTime;
+      const originalEndTime = props.completeAvailabilityData[i].endTime;
       if(i!=currentIndex.value){
         if ((start.value >= originalStartTime) && (start.value <= originalEndTime)
             || (end.value >= originalStartTime) && (end.value <= originalEndTime)){  
@@ -171,24 +168,29 @@ async function updateEndTime() {
 }
 
 async function deleteAvailability(index) {
-  if(Array.isArray(props.availabilityData)){
-      await AvailabilityDataService.remove(props.availabilityData[index].id)
-      .then(() => {
-          emits("deleteAvailabilityEvent");
-        })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-  else{
-    await AvailabilityDataService.remove(props.availabilityData.id)
-    .then(() => {
-          emits("deleteAvailabilityEvent");
-        })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
+    if(props.eventData.isReady){
+      isEventNotReady.value = true;
+    }
+    else{
+      if(Array.isArray(props.availabilityData)){
+          await AvailabilityDataService.remove(props.availabilityData[index].id)
+          .then(() => {
+              emits("deleteAvailabilityEvent");
+            })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      else{
+        await AvailabilityDataService.remove(props.availabilityData.id)
+        .then(() => {
+              emits("deleteAvailabilityEvent");
+            })
+        .catch((err) => {
+          console.log(err);
+        });
+      }
+    }
 }
 
 async function setAvailabilityTimes(){
@@ -202,7 +204,6 @@ async function setAvailabilityTimes(){
     arrayStartTime.value = get12HourTimeStringFromString(props.availabilityData.startTime);
     arrayEndTime.value = get12HourTimeStringFromString(props.availabilityData.endTime);
   }
-  console.log('array start time', arrayStartTime)
 }
 
 // Organizing time to be displayed when select the start and end time
@@ -225,12 +226,11 @@ async function setTimeBoundaries(){
       }
     }
     endTimeBoundaries.value.push(formatTimeString(endTime));
-    console.log('here 1', currentStartTime)
     if(currentStartTime.value != null){
-      console.log('here 2')
       while (isTimeBefore(endTimeBoundaries.value[0], currentStartTime.value)){
         endTimeBoundaries.value.shift();
       }
+      endTimeBoundaries.value.shift();
     }
   }
 
@@ -271,9 +271,23 @@ function convertToMilitaryFormat(timeString) {
   return timeString;
 }
 
-//not working
-watch(currentStartTime, async () => {
-  await setTimeBoundaries();
+const filteredEndTimeOptions = computed(() => {
+  if (arrayStartTime.value) {
+    if(Array.isArray(props.completeAvailabilityData) && props.isEdit){
+      if(currentStartTime.value.length!=0){
+        return endTimeBoundaries.value.filter(
+          endTime => get24HourTimeString(endTime) > get24HourTimeString(currentStartTime.value)
+        );
+      }
+    }
+    else{
+      return endTimeBoundaries.value.filter(
+        endTime => get24HourTimeString(endTime) > get24HourTimeString(arrayStartTime.value)
+      );
+    }
+  } else {
+    return endTimeBoundaries.value;
+  }
 });
 
 onMounted(() => {
@@ -320,11 +334,12 @@ onMounted(() => {
             <v-select
               color="darkBlue"
               variant="plain"
-              class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 my-0 mb-4"
+              class="font-weight-bold text-blue bg-white flatCardBorder pl-4 pr-2 my-0 mx-0 mb-4"
               v-model="arrayStartTime[index]"
               :items="startTimeBoundaries"
               return-object
               :rules="[(v) => !!v || 'This field is required']"
+              @change="initializeCurrentVariables(index)"
             ></v-select>
             <v-card-subtitle class="ml-5 pl-0 pb-2 font-weight-semi-bold text-darkBlue">
               End Time:
@@ -334,7 +349,7 @@ onMounted(() => {
               variant="plain"
               class="font-weight-bold text-blue bg-white flatCardBorder pl-4 pr-2 my-0 mb-4"
               v-model="arrayEndTime[index]"
-              :items="endTimeBoundaries"
+              :items="filteredEndTimeOptions"
               return-object
               :rules="[(v) => !!v || 'This field is required']"
             >
@@ -350,10 +365,11 @@ onMounted(() => {
             </v-card-subtitle>
             <v-select
               color="white"
-              class="font-weight-bold text-blue flatCardBorder pl-4 pr-2 my-0 mx-0"
+              variant="plain"
+              class="font-weight-bold text-blue bg-white flatCardBorder pl-4 pr-2 my-0 mx-0 mb-4"
               v-model="arrayStartTime"
-              return-object
               :items="startTimeBoundaries"
+              return-object
               :rules="[(v) => !!v || 'This field is required']"
             ></v-select>
             <v-card-subtitle class="ml-5 pl-0 pb-2 font-weight-semi-bold text-darkBlue">
@@ -362,10 +378,10 @@ onMounted(() => {
             <v-select
               color="darkBlue"
               variant="plain"
-              class="font-weight-bold text-blue bg-white flatCardBorder pl-4 pr-2 my-0 mb-4"
+              class="font-weight-bold text-blue bg-white flatCardBorder pl-4 pr-2 my-0 mx-0 mb-4"
               v-model="arrayEndTime"
               return-object
-              :items="endTimeBoundaries"
+              :items="filteredEndTimeOptions"
               :rules="[(v) => !!v || 'This field is required']"
             >
             </v-select>
@@ -419,10 +435,25 @@ onMounted(() => {
             Cancel</v-btn>
           <v-btn
             flat
-            class="font-weight-semi-bold mt-4 ml-2 mr-aut0 text-none text-white bg-maroon flatChipBorder" 
+            class="font-weight-semi-bold mt-4 ml-2 mr-auto text-none text-white bg-maroon flatChipBorder" 
             @click="deleteAvailability(currentIndex)">
             Delete</v-btn>
         </v-card-actions>
-  </v-card>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="isEventNotReady" max-width="500">
+    <v-card class="pa-2 bg-lightBlue flatCardBorder">
+      <v-card-title class="pt-0 mt-0 text-blue font-weight-bold text-h6">Cannot Delete</v-card-title>
+        <v-card-text class="font-weight-semi-bold text-darkBlue">
+          This event is already visible for students. Please contact the admin if you want to change your availability time.
+        </v-card-text>
+        <v-card-actions>
+          <v-btn                 
+            flat
+            class="font-weight-semi-bold mt-4 ml-2 ml-auto text-none text-white bg-blue flatChipBorder" 
+            @click="isEventNotReady = false; deleteAvailabilityDialog = false">
+            Back</v-btn>
+        </v-card-actions>
+    </v-card>
   </v-dialog>
 </template>

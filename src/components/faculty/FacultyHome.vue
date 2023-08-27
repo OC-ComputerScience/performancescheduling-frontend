@@ -126,7 +126,6 @@ const filteredEvents = computed(() => {
 
 onMounted(async () => {
   await retrieveData();
-  console.log(availabilities)
 });
 </script>
 
