@@ -77,7 +77,7 @@ async function updateStudentPiece() {
   });
 }
 async function getSemesters() {
-  await SemesterDataService.getAll("name")
+  await SemesterDataService.getAll("name", false)
     .then((response) => {
       semesters.value = response.data;
     })
@@ -204,7 +204,7 @@ onMounted(async () => {
             cols="auto"
             class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
           >
-            {{ props.isEdit ? "Edit" : "Add" }} Repertiore Piece
+            {{ props.isEdit ? "Edit" : "Add" }} Repertoire Piece
           </v-col>
           <v-spacer></v-spacer>
           <v-col v-if="props.isEdit" cols="auto" class="pt-0 mt-0">
@@ -334,22 +334,26 @@ onMounted(async () => {
       </v-row>
       <v-card-actions>
         <v-btn
+          v-if="!props.isEdit"
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          color="blue"
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
           @click="createPieceDialog = true"
         >
           Add Piece
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          color="blue"
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
           @click="editPieceDialog = true"
         >
           Edit Piece
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          v-if="!props.isEdit"
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
           @click="addComposerDialog = true"
         >
           Add Composer
@@ -363,7 +367,7 @@ onMounted(async () => {
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
           :class="props.isEdit ? '' : 'mr-auto'"
           @click="
             props.isEdit
