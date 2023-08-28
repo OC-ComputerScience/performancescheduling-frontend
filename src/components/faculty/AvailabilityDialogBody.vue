@@ -59,10 +59,7 @@ async function checkAvailability(){
  
   //if there is more than one availability for this event, availabilityData is an Array type
   if(Array.isArray(props.completeAvailabilityData)){
-    //start time cannot be greater or equal to end time
-    if(start.value >= end.value){
-      AvailabilityNoError.value = false;
-    }
+
     //start and end time cannot overlap already set availabilities
     for(let i=0; i<props.completeAvailabilityData.length;i++){
       const originalStartTime = props.completeAvailabilityData[i].startTime;
@@ -76,9 +73,6 @@ async function checkAvailability(){
 
   //if there is none or only one availability for this event
   else{
-    if(start.value >= end.value){
-      AvailabilityNoError.value = false;
-    }
     if (props.completeAvailabilityData != null && !props.isEdit){
       const originalStartTime = get24HourTimeString(props.completeAvailabilityData.startTime);
       const originalEndTime = get24HourTimeString(props.completeAvailabilityData.endTime);
@@ -389,7 +383,7 @@ onMounted(() => {
         </div>
         <div v-if="!AvailabilityNoError">            
             <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkRed">
-              Please enter a valid availability time frame
+              Error: Entered time slot overlaps with a previous selected availability time frame
             </v-card-subtitle>
           </div>
           <v-card-actions class="d-flex justify-center">
