@@ -59,11 +59,11 @@ function findSimilar(composer) {
       compareTwoStrings(
         c.firstName.toLowerCase(),
         composer.firstName.toLowerCase()
-      ) >= 0.85 &&
+      ) >= 0.7 &&
       compareTwoStrings(
         c.lastName.toLowerCase(),
         composer.lastName.toLowerCase()
-      ) >= 0.9
+      ) >= 0.8
     );
   });
   return similarComposers;
