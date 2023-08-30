@@ -204,14 +204,14 @@ function emptyNameCheck(composer) {
                 Date of Death
               </v-card-subtitle>
               <v-text-field
-                placeholder="YYYY"
+                placeholder="YYYY or Present"
                 v-model="editedComposerData.dateOfDeath"
                 variant="plain"
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
                 :rules="[
                   () =>
-                    /^$|[0-9]{4}$/.test(editedComposerData.dateOfDeath) ||
-                    'Must be YYYY',
+                    /^[0-9]{4}$|Present/.test(editedComposerData.dateOfDeath) ||
+                    'Must be YYYY or Present',
                 ]"
               ></v-text-field>
             </v-col>
