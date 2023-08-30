@@ -52,6 +52,9 @@ async function checkAvailability(){
     currentStartTime.value=arrayStartTime.value
     currentEndTime.value=arrayEndTime.value
   } 
+  Array.isArray(props.availabilityData) ? currentStartTime.value=arrayStartTime.value[currentIndex.value] : currentStartTime.value=arrayStartTime.value
+  Array.isArray(props.availabilityData) ? currentEndTime.value=arrayEndTime.value[currentIndex.value] : currentEndTime.value=arrayEndTime.value
+ 
 
   //converting the current start and end time
   const start = ref(get24HourTimeString(currentStartTime.value))
@@ -67,6 +70,7 @@ async function checkAvailability(){
       if(i!=currentIndex.value){
         if ((start.value >= originalStartTime) && (start.value <= originalEndTime)
             || (end.value >= originalStartTime) && (end.value <= originalEndTime)
+            || (start.value <= originalStartTime) && (end.value >= originalEndTime)
             || (start.value == originalStartTime)){  
           AvailabilityNoError.value = false;
           break;}}}
@@ -75,10 +79,12 @@ async function checkAvailability(){
   //if there is none or only one availability for this event
   else{
     if (props.completeAvailabilityData != null && !props.isEdit){
-      const originalStartTime = get24HourTimeString(props.completeAvailabilityData.startTime);
-      const originalEndTime = get24HourTimeString(props.completeAvailabilityData.endTime);
+      const originalStartTime = props.completeAvailabilityData.startTime;
+      const originalEndTime = props.completeAvailabilityData.endTime;
       if ((start.value >= originalStartTime) && (start.value <= originalEndTime)
-            || (end.value >= originalStartTime) && (end.value <= originalEndTime)){
+            || (end.value >= originalStartTime) && (end.value <= originalEndTime)
+            || (start.value <= originalStartTime) && (end.value >= originalEndTime)
+            || (start.value == originalStartTime)){
         AvailabilityNoError.value = false;}}
   }
 
@@ -124,7 +130,7 @@ async function updateStartTime() {
     for(let i=0; i<props.availabilityData.length;i++){
       await AvailabilityDataService.update({
         id: props.availabilityData[i].id,
-        startTime: convertToMilitaryFormat(arrayStartTime.value[i])
+        startTime: get24HourTimeString(arrayStartTime.value[i])
       }).catch((err) => {
         console.log(err);
       });
@@ -133,7 +139,7 @@ async function updateStartTime() {
   else{
     await AvailabilityDataService.update({
       id: props.availabilityData.id,
-      startTime: convertToMilitaryFormat(arrayStartTime.value)
+      startTime: get24HourTimeString(arrayStartTime.value)
     }).catch((err) => {
       console.log(err);
     });
@@ -146,7 +152,7 @@ async function updateEndTime() {
     for(let i=0; i<props.availabilityData.length;i++){
       await AvailabilityDataService.update({
         id: props.availabilityData[i].id,
-        endTime: convertToMilitaryFormat(arrayEndTime.value[i])
+        endTime: get24HourTimeString(arrayEndTime.value[i])
       }).catch((err) => {
         console.log(err);
       });
@@ -155,7 +161,7 @@ async function updateEndTime() {
   else{
     await AvailabilityDataService.update({
       id: props.availabilityData.id,
-      endTime: convertToMilitaryFormat(arrayEndTime.value)
+      endTime: get24HourTimeString(arrayEndTime.value)
     }).catch((err) => {
       console.log(err);
     });
@@ -334,7 +340,6 @@ onMounted(() => {
               :items="startTimeBoundaries"
               return-object
               :rules="[(v) => !!v || 'This field is required']"
-              @change="initializeCurrentVariables(index)"
             ></v-select>
             <v-card-subtitle class="ml-5 pl-0 pb-2 font-weight-semi-bold text-darkBlue">
               End Time:
