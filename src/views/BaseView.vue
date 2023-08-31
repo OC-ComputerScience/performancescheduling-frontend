@@ -3,7 +3,7 @@ import MainNav from "../components/MainNav.vue";
 
 import StudentHome from "../components/student/StudentHome.vue";
 import StudentPerformances from "../components/student/performances/StudentPerformances.vue";
-// import StudentSettings from "../components/student/StudentSettings.vue";
+import StudentRepertoire from "../components/student/repertoire/StudentRepertoire.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
 
@@ -25,7 +25,6 @@ import { computed } from "vue";
 
 const route = useRoute();
 const fullPath = computed(() => route.path);
-console.log("fullPath.value: ", fullPath);
 </script>
 
 <template>
@@ -41,6 +40,9 @@ console.log("fullPath.value: ", fullPath);
         <StudentPerformances
           v-if="fullPath === '/studentPerformances'"
         ></StudentPerformances>
+        <StudentRepertoire
+          v-if="this.$route.fullPath === '/studentRepertoire'"
+        ></StudentRepertoire>
         <!-- Faculty/Accompanist pages -->
         <FacultyHome
           v-if="fullPath === '/facultyHome' || fullPath === '/accompanistHome'"

@@ -13,6 +13,9 @@ class PieceDataService {
   create(data) {
     return http.post(this.baseUrl, data);
   }
+  get(id) {
+    return http.get(this.baseUrl + id);
+  }
 
   remove(id) {
     return http.delete(this.baseUrl + id);

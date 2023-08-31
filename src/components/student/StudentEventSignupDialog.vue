@@ -16,6 +16,7 @@ import StudentInstrumentSignupDataService from "../../services/StudentInstrument
 import UserRoleDataService from "../../services/UserRoleDataService.js";
 import UserNotificationDataService from "../../services/UserNotificationDataService.js";
 import EventSignupPieceDataService from "../../services/EventSignupPieceDataService.js";
+import StudentPieceDialogBody from "../student/repertoire/StudentPieceDialogBody.vue";
 
 const emits = defineEmits(["closeDialogEvent"]);
 const props = defineProps({
@@ -53,6 +54,7 @@ const existingSignup = ref(null);
 const confimationDialog = ref(false);
 const otherSignupDialog = ref(false);
 const dialogMessage = ref("");
+const addStudentPieceDialog = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
 
@@ -90,7 +92,26 @@ async function getData() {
     .catch((e) => {
       console.log(e);
     });
+  await getStudentPieces();
 
+  await MajorDataService.getById(loginStore.currentRole.majorId)
+    .then((response) => {
+      isMusicMajor.value = response.data.isMusicMajor;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await EventSignupDataService.getByEvent(props.eventData.id)
+    .then((response) => {
+      existingSignups.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
+async function getStudentPieces() {
   await StudentPieceDataService.getByUser(loginStore.user.userId)
     .then((response) => {
       studentPieces.value = response.data.filter(
@@ -109,24 +130,16 @@ async function getData() {
         }
         studentPiece.piece.composer.fullName = fullName;
       });
+      selectedStudentPieces.value = [];
+      console.log(studentPieces.value);
+      console.log(selectedStudentInstrument.value);
 
-      filteredStudentPieces.value = studentPieces.value;
-    })
-    .catch((e) => {
-      console.log(e);
-    });
-
-  await MajorDataService.getById(loginStore.currentRole.majorId)
-    .then((response) => {
-      isMusicMajor.value = response.data.isMusicMajor;
-    })
-    .catch((e) => {
-      console.log(e);
-    });
-
-  await EventSignupDataService.getByEvent(props.eventData.id)
-    .then((response) => {
-      existingSignups.value = response.data;
+      studentInstrumentStudentPieces.value = studentPieces.value.filter(
+        (studentPiece) =>
+          studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
+      );
+      searchStudentPieces();
+      filteredStudentPieces.value = studentInstrumentStudentPieces.value;
     })
     .catch((e) => {
       console.log(e);
@@ -718,6 +731,7 @@ onMounted(async () => {
               Musical Selection
             </v-row>
             <v-row>
+              <!-- take out search
               <v-col cols="6" class="pl-0">
                 <input
                   type="text"
@@ -731,15 +745,19 @@ onMounted(async () => {
                   hide-details
                 />
               </v-col>
-              <v-col cols="5">
+              -->
+              <v-col cols="6">
                 <v-btn
                   class="font-weight-bold text-none"
                   color="blue"
-                  @click="emits('openDialogEvent')"
+                  @click="addStudentPieceDialog = true"
                 >
                   Add To Repertoire
                 </v-btn>
               </v-col>
+            </v-row>
+            <v-row>
+              Only lists pieces from current semester and current instrument
             </v-row>
             <v-row class="mt-5">
               <v-col cols="11" class="pl-0">
@@ -1023,6 +1041,24 @@ onMounted(async () => {
         >
       </v-card-actions>
     </v-card>
+  </v-dialog>
+  <v-dialog v-model="addStudentPieceDialog" persistent max-width="600px">
+    <StudentPieceDialogBody
+      :is-edit="false"
+      :studentpiece-data="{
+        id: null,
+        pieceId: null,
+        semesterId: eventData.semesterId,
+        studentInstrumentId: selectedStudentInstrument.id,
+        status: 'Active',
+      }"
+      :student-id="loginStore.currentRole.userId"
+      :student-pieces="studentPieces"
+      @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
+      @addStudentPieceSuccessEvent="
+        (addStudentPieceDialog = false), getStudentPieces()
+      "
+    ></StudentPieceDialogBody>
   </v-dialog>
   <v-snackbar
     v-model="snackbar.show"

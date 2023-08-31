@@ -223,6 +223,7 @@ onMounted(async () => {
   <v-dialog v-model="addPieceDialog" persistent max-width="600px">
     <PieceDialogBody
       :is-edit="false"
+      :is-admin="true"
       :piece-data="{
         id: null,
         title: null,
@@ -232,7 +233,6 @@ onMounted(async () => {
         status: 'Active',
       }"
       :pieces-data="pieces"
-      :composers-data="composers"
       @closeAddPieceDialogEvent="addPieceDialog = false"
       @addPieceSuccessEvent="(addPieceDialog = false), refreshPieces()"
     ></PieceDialogBody>
