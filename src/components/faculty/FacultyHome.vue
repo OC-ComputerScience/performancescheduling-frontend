@@ -1,229 +1,228 @@
+<script setup>
+import { useLoginStore } from "../../stores/LoginStore.js";
+import { storeToRefs } from "pinia";
+import { ref, onMounted, watch, computed } from "vue";
+
+import UserNotificationDataService from "../../services/UserNotificationDataService.js";
+import EventDataService from "../../services/EventDataService.js";
+import AvailabilityDataService from "../../services/AvailabilityDataService.js";
+import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
+import UpcomingEventItem from "../UpcomingEventItem.vue";
+import NotificationItem from "../NotificationItem.vue";
+import CurrentStudentsItem from "./CurrentStudentsItem.vue";
+import EventAvailabilityItem from "./EventAvailabilityItem.vue";
+
+const loginStore = useLoginStore();
+const { currentRole } = storeToRefs(loginStore);
+
+const notifications = ref([]);
+const students = ref([]);
+const availabilities = ref([]);
+const groupedAvailabilities = ref([]);
+const upcomingEvents = ref([]);
+
+async function retrieveData() {
+  await UserNotificationDataService.getByUserRole(currentRole.value.id)
+    .then((response) => {
+      notifications.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  if (currentRole.value.role.role == "Faculty") {
+    await StudentInstrumentDataService.getStudentsForInstructorId(
+      currentRole.value.id
+    )
+      .then((response) => {
+        students.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  if (currentRole.value.role.role == "Accompanist") {
+    await StudentInstrumentDataService.getStudentsForAccompanistId(
+      currentRole.value.id
+    )
+      .then((response) => {
+        students.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  await AvailabilityDataService.getByUserRole(currentRole.value.id)
+    .then((response) => {
+      //Iterate through list of availabilities to group them by eventId
+      for (let i = 0; i < response.data.length; i++) {
+        const availability = response.data[i];
+        const eventId = availability.eventId;
+
+        //Index will be the eventId value
+        if (!groupedAvailabilities.value[eventId]) {
+          groupedAvailabilities.value[eventId] = [availability];
+        } else {
+          groupedAvailabilities.value[eventId].push(availability);
+        }
+      }
+
+      //Put the values of the loop list into an availabilities list with "normal" indexes
+      availabilities.value = Object.values(groupedAvailabilities.value);
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  await EventDataService.getGTEDateForFaculty(new Date())
+    .then((response) => {
+      upcomingEvents.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
+async function refreshAvailability() {
+  await AvailabilityDataService.getByUserRole(currentRole.value.id)
+    .then((response) => {
+      const localAvailabilities = {};
+
+      //Iterate through list of availabilities to group them by eventId
+      for (let i = 0; i < response.data.length; i++) {
+        const availability = response.data[i];
+        const eventId = availability.eventId;
+
+        //Index will be the eventId value
+        if (!localAvailabilities[eventId]) {
+          localAvailabilities[eventId] = [availability];
+        } else {
+          localAvailabilities[eventId].push(availability);
+        }
+      }
+
+      //Put the values of the loop list into an availabilities list with "normal" indexes
+      availabilities.value = Object.values(localAvailabilities);
+
+      groupedAvailabilities.value = localAvailabilities;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
+watch(currentRole, async () => {
+  await retrieveData();
+});
+
+//Filter upcoming events without availability
+const filteredEvents = computed(() => {
+  return upcomingEvents.value.filter(
+    (event) => !groupedAvailabilities.value[event.id]
+  );
+});
+
+onMounted(async () => {
+  await retrieveData();
+});
+</script>
+
 <template>
-  <v-card>
-    <v-card-title>
-      {{
-        "Welcome " + userRole.title + " " + user.fName + " " + user.lName + "!"
-      }}
-    </v-card-title>
-  </v-card>
-  <v-container>
-    <v-row>
-      <v-col cols="3" v-if="userRole.isInstructor">
-        <v-card>
-          <v-card-title align="center"> Your Students </v-card-title>
-          <v-divider></v-divider>
-          <v-card-title
-            align="center"
-            v-for="(student, index) in students"
-            :key="index"
-          >
-            <v-menu open-on-hover>
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  variant="text"
-                  @click="viewStuRep(student.id)"
-                  v-bind="props"
-                >
-                  {{ student.fName + " " + student.lName }}
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title>
-                  <v-avatar v-if="student.picture">
-                    <v-img :src="student.picture"></v-img
-                  ></v-avatar>
-                  {{ student.fName + " " + student.lName }}
-                </v-card-title>
-                <v-divider></v-divider>
-                <v-card-text>
-                  <div v-if="student.userRoles[0].stuMajor">
-                    {{ "Major: " + student.userRoles[0].stuMajor }}
-                  </div>
-                  {{ "Contact: " + student.email }}
-                  <v-divider></v-divider>
-                  <div v-for="stuInstrument in student.userRoles[0].student">
-                    {{ stuInstrument.instrument.name }}
-                    <div v-if="stuInstrument.level">
-                      {{ "Vocal level: " + stuInstrument.level }}
-                    </div>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-menu>
-            <v-divider v-if="index < students.length - 1"></v-divider>
+  <v-container fluid class="fill-height bg-lightGray pa-4">
+    <v-row class="fill-height pa-0 ma-0">
+      <v-col cols="12" lg="3" class="ma-0 pa-4">
+        <v-row class="fill-height ma-0">
+          <v-col cols="12" class="pa-0 ma-0 pb-4">
+            <v-card class="fill-height mainCardBorder pa-2">
+              <v-card-title
+                class="font-weight-semi-bold text-blue text-h5 pb-0"
+              >
+                {{ notifications.length }} Notification{{
+                  notifications.length > 0
+                    ? notifications.length > 1
+                      ? "s"
+                      : ""
+                    : "s"
+                }}
+              </v-card-title>
+              <v-card-text class="pt-0">
+                <NotificationItem
+                  v-for="notification of notifications"
+                  :key="notification.id"
+                  :notification-data="notification"
+                ></NotificationItem>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" class="pa-0 ma-0 pt-4">
+            <v-card class="fill-height mainCardBorder pa-2">
+              <v-row>
+                <v-col cols="auto">
+                  <v-card-title
+                    class="font-weight-semi-bold text-darkBlue text-h5"
+                  >
+                    Current Students
+                  </v-card-title>
+                </v-col>
+              </v-row>
+              <v-card-text>
+                <CurrentStudentsItem
+                  v-for="student of students"
+                  :key="student.id"
+                  :students-data="student"
+                ></CurrentStudentsItem>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
+        <v-card class="fill-height mainCardBorder pa-2">
+          <v-card-title>
+            <v-row class="pa-2">
+              <p class="font-weight-semi-bold text-darkBlue text-h5">
+                Events I'm Available For
+              </p>
+            </v-row>
           </v-card-title>
+          <v-card-text>
+            <EventAvailabilityItem
+              v-for="availability in availabilities"
+              :key="availability[0].id"
+              :event-data="availability[0].event"
+              :availability-data="
+                availability.length <= 1 ? availability[0] : availability
+              "
+              @refreshAvailabilitiesEvent="refreshAvailability"
+            ></EventAvailabilityItem>
+          </v-card-text>
         </v-card>
       </v-col>
-      <v-col>
-        <v-card>
-          <v-card-title> Event Tasks: </v-card-title>
-          <v-divider></v-divider>
-          <div v-for="(event, index) in events" :key="index">
-            <v-card-title>
-              <div class="d-flex justify-space-between">
-                {{ this.formatDate(event.date) }} | {{ event.type }}
-                <v-banner-text
-                  color="darkB"
-                  v-if="this.compareDates(event.date) == 0"
-                >
-                  TODAY!
-                </v-banner-text>
-                <v-btn
-                  color="primary"
-                  @click="viewCrit()"
-                  v-if="compareDates(event.date) < 0"
-                >
-                  View Critiques
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  @click="createCrit(event.id)"
-                  v-else-if="compareDates(event.date) == 0"
-                >
-                  Create Critiques
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  @click="
-                    eventId = event.id;
-                    showDialog = true;
-                  "
-                  v-else
-                >
-                  Create Availability
-                </v-btn>
-              </div>
-            </v-card-title>
-            <v-divider inset></v-divider>
-          </div>
+      <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
+        <v-card class="fill-height mainCardBorder pa-2">
+          <v-card-title class="font-weight-semi-bold text-orange text-h5">
+            Upcoming Events
+          </v-card-title>
+          <v-card-text>
+            <UpcomingEventItem
+              v-for="event of filteredEvents"
+              :key="event.id"
+              :event-data="event"
+              :role-id="currentRole.roleId"
+              :availability-data="groupedAvailabilities[event.id]"
+              @refreshAvailabilitiesEvent="refreshAvailability"
+            ></UpcomingEventItem>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog v-model="showDialog" :style="{ width: '875px' }" class="mx-auto">
-    <AvailabilityPopUp
-      :event-id="eventId"
-      :user-id="user.userId"
-      @closeDialog="showDialog = false"
-    ></AvailabilityPopUp>
-  </v-dialog>
 </template>
-<script>
-import EventDataService from "../../services/EventDataService";
-import SemesterDataService from "../../services/SemesterDataService";
-import UserRoleDataService from "../../services/UserRoleDataService";
-import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
-import AvailabilityPopUp from "./AvailabilityPopUp.vue";
-import { mapStores } from "pinia";
-import { useLoginStore } from "../../stores/LoginStore.js";
-export default {
-  name: "facultyHome",
-  data: () => ({
-    events: [],
-    eventId: null,
-    id: {},
-    semester: {},
-    showDialog: false,
-    students: {},
-    user: {},
-    userRole: {},
-  }),
-  async created() {},
-  computed: {
-    ...mapStores(useLoginStore),
-  },
-  methods: {
-    viewCrit() {
-      this.$router.push({ path: "facultyViewCritiques" });
-    },
-    viewStuRep() {
-      this.$router.push({ path: "facultyViewRepertoire" });
-    },
-    createCrit(id) {
-      // FIX?
-      Utils.setStore("eventId", id);
-      this.$router.push({ path: "facultyCreateCritiques" });
-    },
-    async getStudents() {
-      StudentInstrumentDataService.getStudentsForInstructorId(this.userRole.id)
-        .then((response) => {
-          this.students = response.data;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    async retrieveAllEvents() {
-      await EventDataService.getAll()
-        .then((response) => {
-          this.events = response.data;
-          this.events.forEach((obj) => (obj.title = obj.date));
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    async getCurrentSemester() {
-      this.currentDate = new Date();
-      let dateString = this.currentDate.toISOString().substring(0, 10);
-      await SemesterDataService.getCurrent(dateString)
-        .then((response) => {
-          this.semester = response.data[0];
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    async getEvents() {
-      await EventDataService.getBySemester(this.semester.id)
-        .then((response) => {
-          this.events = response.data;
-          this.events.sort(function (a, b) {
-            if (a.date > b.date) {
-              return -1;
-            } else {
-              return 1;
-            }
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    formatDate(date) {
-      if (date === null || date === undefined) {
-        return date;
-      }
-      return new Date(date).toLocaleDateString("us-US", {
-        month: "long",
-        day: "numeric",
-        timeZone: "UTC",
-      });
-    },
-    compareDates(input) {
-      const today = new Date();
-      const todayString = `${today.getFullYear()}-${(today.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}`;
 
-      if (input > todayString) {
-        return 1;
-      } else if (input == todayString) {
-        return 0;
-      } else {
-        return -1;
-      }
-    },
-  },
-  async mounted() {
-    await this.getCurrentSemester();
-    await this.getEvents();
-    this.userRole = this.loginStore.currentRole;
-
-    // if (this.userRole.isInstructor) {
-    //   await this.getStudents();
-    // }
-  },
-  components: { AvailabilityPopUp },
-};
-</script>
+<style scoped>
+* {
+  font-family: Poppins, sans-serif !important;
+}
+</style>
