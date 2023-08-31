@@ -1,4 +1,5 @@
 <script setup>
+//This code will be cleaned up after we have time to do it. Don't focus on the mess here :)
 import { ref, onMounted, computed } from "vue";
 import { useLoginStore } from "../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
@@ -389,7 +390,7 @@ onMounted(() => {
         </div>
         <div v-if="!AvailabilityNoError">            
             <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-red" style="white-space: normal; word-wrap: break-word;">
-              Error: Entered time slot overlaps with a previous selected availability time
+              Time slot overlaps with the time for a previous selected availability
             </v-card-subtitle>
           </div>
           <v-card-actions class="d-flex justify-center">
