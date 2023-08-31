@@ -41,7 +41,7 @@ const fullPath = computed(() => route.path);
           v-if="fullPath === '/studentPerformances'"
         ></StudentPerformances>
         <StudentRepertoire
-          v-if="this.$route.fullPath === '/studentRepertoire'"
+          v-if="fullPath === '/studentRepertoire'"
         ></StudentRepertoire>
         <!-- Faculty/Accompanist pages -->
         <FacultyHome
