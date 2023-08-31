@@ -5,7 +5,7 @@ import { useLoginStore } from "../../stores/LoginStore.js";
 import UserNotificationDataService from "../../services/UserNotificationDataService.js";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
 import EventDataService from "../../services/EventDataService.js";
-import EventSignupAndAvailabilityItem from "../EventSignupAndAvailabilityItem.vue";
+import EventSignupItem from "./EventSignupItem.vue";
 import UpcomingEventItem from "../UpcomingEventItem.vue";
 import InstrumentItem from "./InstrumentItem.vue";
 import NotificationItem from "../NotificationItem.vue";
@@ -132,7 +132,7 @@ onMounted(async () => {
             v-for="studentInstrument in signups"
             :key="studentInstrument.id"
           >
-            <EventSignupAndAvailabilityItem
+            <EventSignupItem
               v-for="studentInstrumentSignup in studentInstrument.studentInstrumentSignups"
               :key="studentInstrumentSignup.id"
               :event-data="studentInstrumentSignup.eventSignup.event"
@@ -140,7 +140,7 @@ onMounted(async () => {
               :student-instrument-signup-data="studentInstrumentSignup"
               :is-signup="true"
             >
-            </EventSignupAndAvailabilityItem>
+            </EventSignupItem>
           </v-card-text>
         </v-card>
       </v-col>
