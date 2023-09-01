@@ -173,6 +173,7 @@ function endDateCheck() {
         </v-card-text>
       </v-card-actions>
       <v-card-actions>
+        <v-spacer></v-spacer>
         <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
