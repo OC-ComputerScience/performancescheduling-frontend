@@ -173,6 +173,7 @@ function endDateCheck() {
         </v-card-text>
       </v-card-actions>
       <v-card-actions>
+        <v-spacer></v-spacer>
         <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
@@ -182,7 +183,7 @@ function endDateCheck() {
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
           :class="props.isEdit ? '' : 'mr-auto'"
           @click="
             props.isEdit
