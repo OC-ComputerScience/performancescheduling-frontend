@@ -41,7 +41,7 @@ async function getLevels() {
 const instrumentOptions = ref([]);
 
 async function getInstruments() {
-  await InstrumentDataService.getAll()
+  await InstrumentDataService.getAll("name")
     .then((response) => {
       instrumentOptions.value = response.data;
     })
@@ -56,7 +56,7 @@ const accompanists = ref([]);
 async function getAllInstructors() {
   await UserRoleDataService.getRolesForRoleId(2)
     .then((response) => {
-      instructors.value = response.data;
+      instructors.value = _sortUsers(response.data)
     })
     .catch((err) => {
       console.log(err);
@@ -68,12 +68,27 @@ async function getAllAccompanists() {
     .then((response) => {
       accompanists.value = [
         { id: null, user: { firstName: "", lastName: "" } },
-        ...response.data,
+        ..._sortUsers(response.data),
       ];
     })
     .catch((err) => {
       console.log(err);
     });
+}
+
+function _sortUsers(users) {
+  return users.sort((a, b) => {
+    const nameA = a.user.lastName.toUpperCase();
+    const nameB = b.user.lastName.toUpperCase();
+
+    if (nameA > nameB) {
+      return 1;
+    }
+    if (nameA < nameB) {
+      return -1;
+    }
+    return 0;
+  });
 }
 
 async function addInstrument() {
@@ -132,7 +147,7 @@ async function updateSelectedAccompanist() {
   if (
     props.studentInstrumentData.accompanistRoleId === null ||
     selectedAccompanist.value.id !=
-      props.studentInstrumentData.accompanistRoleId
+    props.studentInstrumentData.accompanistRoleId
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
@@ -200,8 +215,8 @@ onMounted(async () => {
               class="font-weight-bold mt-0 text-none bg-white flatChipBorder"
               :class="
                 studentInstrumentData.status === 'Active'
-                  ? 'text-teal'
-                  : 'text-maroon'
+              ? 'text-teal'
+              : 'text-maroon'
               "
             >
               {{ studentInstrumentData.status }}
@@ -307,19 +322,19 @@ onMounted(async () => {
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
             props.studentInstrumentData.status === 'Disabled'
-              ? 'bg-darkBlue'
-              : 'bg-maroon'
-          "
+            ? 'bg-darkBlue'
+            : 'bg-maroon'
+            "
           @click="
-            props.studentInstrumentData.status === 'Disabled'
-              ? emits('enableStudentInstrumentEvent')
-              : emits('disableStudentInstrumentEvent')
-          "
+    props.studentInstrumentData.status === 'Disabled'
+      ? emits('enableStudentInstrumentEvent')
+      : emits('disableStudentInstrumentEvent')
+    "
         >
           {{
             props.studentInstrumentData.status === "Disabled"
-              ? "Enable"
-              : "Disable"
+            ? "Enable"
+            : "Disable"
           }}
         </v-btn>
       </v-card-actions>
