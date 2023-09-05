@@ -427,10 +427,10 @@ onMounted(async () => {
         <v-spacer></v-spacer>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
           @click="closeDialog()"
         >
-          Close
+          Save
         </v-btn>
       </v-card-actions>
     </v-form>

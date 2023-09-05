@@ -33,13 +33,13 @@ function closeDialogs() {
         <!-- timeslot -->
         <v-col cols="2">
           <v-card-title
-            class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h5"
+            class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h6"
           >
             {{ "Timeslot" }}
           </v-card-title>
           <v-row>
             <v-card-subtitle
-              class="text-darkBlue text-body-2 font-weight-bold mt-6"
+              class="text-darkBlue text-body-1 font-weight-bold mt-6"
             >
               {{
                 get12HourTimeStringFromString(props.signup.startTime) +
@@ -52,7 +52,7 @@ function closeDialogs() {
         <!-- student(s) -->
         <v-col cols="2">
           <v-card-title
-            class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h5"
+            class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h6"
           >
             {{
               props.signup.studentInstrumentSignups.length > 1
@@ -67,7 +67,7 @@ function closeDialogs() {
           >
             <v-col class="pl-0 ml-0">
               <v-card-subtitle
-                class="text-darkBlue mb-0 text-body-2 font-weight-bold pl-0 ml-0"
+                class="text-darkBlue mb-0 text-body-1 font-weight-bold pl-0 ml-0"
               >
                 {{
                   studentInstrumentSignup.studentInstrument.studentRole.user
@@ -89,12 +89,12 @@ function closeDialogs() {
         <!-- instructor/accompanist -->
         <v-col cols="2">
           <v-card-title
-            class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h5"
+            class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h6"
           >
             Instructor
           </v-card-title>
           <v-card-subtitle
-            class="text-darkBlue mb-0 text-body-2 font-weight-bold pl-0 ml-0"
+            class="text-darkBlue mb-0 text-body-1 font-weight-bold pl-0 ml-0"
           >
             {{
               props.signup.studentInstrumentSignups[0].instructorRoleSignup.user
@@ -111,12 +111,12 @@ function closeDialogs() {
             "
           >
             <v-card-title
-              class="font-weight-bold text-maroon pl-0 ml-0 py-0 mt-5 text-h5"
+              class="font-weight-bold text-maroon pl-0 ml-0 py-0 mt-5 text-h6"
             >
               Accompanist
             </v-card-title>
             <v-card-subtitle
-              class="text-darkBlue mb-0 text-body-2 font-weight-bold pl-0 ml-0"
+              class="text-darkBlue mb-0 text-body-1 font-weight-bold pl-0 ml-0"
             >
               {{
                 props.signup.studentInstrumentSignups[0].accompanistRoleSignup
@@ -131,7 +131,7 @@ function closeDialogs() {
         <!-- pieces -->
         <v-col cols="4">
           <v-card-title
-            class="font-weight-bold text-maroon pl-0 ml-0 pt-0 mt-0 text-h5"
+            class="font-weight-bold text-maroon pl-0 ml-0 pt-0 mt-0 text-h6"
           >
             Musical Selection
           </v-card-title>
@@ -141,7 +141,7 @@ function closeDialogs() {
           >
             <v-container class="pa-0 ma-0" v-if="index < 2">
               <v-card-subtitle
-                class="font-weight-bold text-darkBlue text-body-2 pl-0 ml-0"
+                class="font-weight-bold text-darkBlue text-body-1 pl-0 ml-0"
               >
                 {{ piece.piece.title }}
               </v-card-subtitle>
@@ -201,7 +201,7 @@ function closeDialogs() {
         <v-btn
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="feedbackDialog = true"
         >
           {{ signupHasFeedbackByFaculty() ? "Edit Feedback" : "Add Feedback" }}
@@ -209,7 +209,7 @@ function closeDialogs() {
         <v-btn
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="gradeDialog = true"
         >
           {{ props.signup.pass == null ? "Add Grade" : "Edit Grade" }}

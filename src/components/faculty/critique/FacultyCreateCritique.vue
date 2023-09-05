@@ -12,17 +12,26 @@ const LoginStore = useLoginStore();
 const currentFaculty = ref({});
 //event variables
 const eventData = ref({});
+const event = ref({});
 const filteredSignups = ref([]);
 //filter variables
 const filterMenuBool = ref(false);
 const feedbackFilterArray = ["All", "Not Given", "Given"];
-const feedbackFilterSelection = ref("Not Given");
+const feedbackFilterSelection = ref("All");
 const gradeFilterArray = ["All", "Not Given", "Given"];
-const gradeFilterSelection = ref("Not Given");
+const gradeFilterSelection = ref("All");
 
 async function getData() {
   const eventId = router.currentRoute.value.query.eventId;
   currentFaculty.value = LoginStore.currentRole;
+
+  await EventDataService.getById(eventId)
+    .then((response) => {
+      event.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 
   await EventDataService.getStudentTimeslotsForEvent(eventId)
     .then((response) => {
@@ -80,8 +89,9 @@ onMounted(async () => {
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
       <h1 class="text-maroon font-weight-bold text-h3">
-        Faculty Event Critiques
+        {{ event.name }} Critiques
       </h1>
+
       <v-menu v-model="filterMenuBool" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
           <v-btn
@@ -153,6 +163,11 @@ onMounted(async () => {
         Clear filters
       </v-btn>
     </v-row>
+    <v-row class="ml-1"
+      ><v-text class="text-maroon font-weight-bold text-h5">
+        {{ event.date }}</v-text
+      ></v-row
+    >
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">
