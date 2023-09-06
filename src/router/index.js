@@ -39,6 +39,12 @@ const router = createRouter({
     {
       path: "/base",
       component: BaseView,
+      name: "studentInstruments",
+      alias: "/studentInstruments",
+    },
+    {
+      path: "/base",
+      component: BaseView,
       name: "studentPerformances",
       alias: "/studentPerformances",
     },

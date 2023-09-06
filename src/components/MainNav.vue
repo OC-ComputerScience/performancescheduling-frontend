@@ -31,6 +31,11 @@ const menus = [
     roles: [1],
   },
   {
+    link: "studentInstruments",
+    text: "Instruments",
+    roles: [1],
+  },
+  {
     link: "facultyHome",
     text: "Home",
     roles: [2],
