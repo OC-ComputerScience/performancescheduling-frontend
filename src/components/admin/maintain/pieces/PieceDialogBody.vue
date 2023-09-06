@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import PieceDataService from "../../../../services/PieceDataService";
 import ComposerDataService from "../../../../services/ComposerDataService";
-
 import { compareTwoStrings } from "string-similarity";
 
 const emits = defineEmits([
@@ -20,7 +19,8 @@ const props = defineProps({
   pieceData: { type: [Object], required: true },
   piecesData: { type: [Array] },
 });
-
+console.log("isAdmin:" + props.isAdmin);
+console.log("isEdmin:" + props.isEdit);
 const editedPieceData = ref(Object.assign({}, props.pieceData));
 if (props.isEdit)
   editedPieceData.value.composer.fullName = composerName(
@@ -205,7 +205,7 @@ function similarPieceCheck(piece) {
           </v-card-subtitle>
 
           <v-autocomplete
-            v-if="props.isAdmin"
+            :readonly="props.isAdmin"
             placeholder="Start typing the composer's last name"
             color="darkBlue"
             variant="plain"

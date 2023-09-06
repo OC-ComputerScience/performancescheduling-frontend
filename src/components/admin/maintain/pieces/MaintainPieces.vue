@@ -4,6 +4,11 @@ import PieceDataService from "./../../../../services/PieceDataService";
 import ComposerDataService from "./../../../../services/ComposerDataService";
 import MaintainPieceCard from "./MaintainPieceCard.vue";
 import PieceDialogBody from "./PieceDialogBody.vue";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
+
+const loginStore = useLoginStore();
+const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
+console.log(isAdmin);
 
 const addPieceDialog = ref(false);
 
@@ -223,14 +228,14 @@ onMounted(async () => {
   <v-dialog v-model="addPieceDialog" persistent max-width="600px">
     <PieceDialogBody
       :is-edit="false"
-      :is-admin="true"
+      :is-admin="isAdmin"
       :piece-data="{
         id: null,
         title: null,
         originalLanguage: null,
         poeticTranslation: null,
         literalTranslation: null,
-        status: 'Active',
+        status: isAdmin ? 'Active' : 'Pending',
       }"
       :pieces-data="pieces"
       @closeAddPieceDialogEvent="addPieceDialog = false"
