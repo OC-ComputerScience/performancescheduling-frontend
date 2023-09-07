@@ -46,9 +46,13 @@ function searchAndFilterList() {
   // If the search input is empty, return the full list, otherwise filter
   if (searchInput.value != "")
     filteredPieces.value = filteredPieces.value.filter((piece) =>
-      (piece.title.toLowerCase() + " " + piece.title)
-        .toLowerCase()
-        .includes(searchInput.value.toLowerCase())
+      (
+        piece.title.toLowerCase() +
+        " " +
+        piece.composer.firstName.toLowerCase() +
+        " " +
+        piece.composer.lastName.toLowerCase()
+      ).includes(searchInput.value.toLowerCase())
     );
 
   filterPieces();
