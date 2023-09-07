@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
+import { storeToRefs } from "pinia";
 import RoleDataService from "../../../../services/RoleDataService";
 import MajorDataService from "../../../../services/MajorDataService";
 import UserInstrumentCard from "./UserInstrumentCard.vue";
@@ -22,6 +24,9 @@ const props = defineProps({
   userRoles: { type: [Array], required: true },
   isEdit: { type: [Boolean], required: true },
 });
+
+const loginStore = useLoginStore();
+const { currentRole } = storeToRefs(loginStore);
 
 const form = ref(null);
 
@@ -314,6 +319,7 @@ async function refreshStudentInstruments() {
 onMounted(async () => {
   await getAllRoles();
   await getAllMajors();
+  await refreshStudentInstruments();
 });
 </script>
 
@@ -537,7 +543,7 @@ onMounted(async () => {
                 <v-card-subtitle
                   class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
                 >
-                  Private Hours
+                  Total Private Hours
                 </v-card-subtitle>
                 <v-text-field
                   type="number"
@@ -604,7 +610,7 @@ onMounted(async () => {
           Cancel
         </v-btn>
         <v-btn
-          v-if="props.isEdit"
+          v-if="props.isEdit && (currentRole.role.role == 'Admin')"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
