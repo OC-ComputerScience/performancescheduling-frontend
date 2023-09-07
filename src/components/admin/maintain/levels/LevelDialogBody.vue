@@ -122,8 +122,7 @@ async function updateLevel() {
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
+          class="font-weight-semi-bold ml-4 mt-0 text-none text-white bg-red flatChipBorder"
           @click="
             props.isEdit
               ? emits('closeLevelDialogEvent')
