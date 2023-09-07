@@ -21,6 +21,7 @@ const props = defineProps({
   userData: { type: [Object], required: true },
   userRoles: { type: [Array], required: true },
   isEdit: { type: [Boolean], required: true },
+  isAdmin: { type: [Boolean], required: true },
 });
 
 const form = ref(null);
@@ -449,6 +450,7 @@ onMounted(async () => {
               item-value="id"
               multiple
               return-object
+              :readonly="!props.isAdmin"
             >
               <template v-slot:selection="{ item }">
                 <v-chip
@@ -604,7 +606,7 @@ onMounted(async () => {
           Cancel
         </v-btn>
         <v-btn
-          v-if="props.isEdit"
+          v-if="props.isEdit && props.isAdmin"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
