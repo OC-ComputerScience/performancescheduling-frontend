@@ -50,6 +50,18 @@ function hasCritiques(piece) {
               <v-card-subtitle class="font-weight-semi-bold text-maroon">
                 {{ eventData.semester.name }}
               </v-card-subtitle>
+              <v-card-subtitle
+                class="font-weight-semi-bold text-darkblue mt-4 text-h6"
+              >
+                {{
+                  studentInstrumentSignupData.studentInstrument.studentRole.user
+                    .firstName
+                }}
+                {{
+                  studentInstrumentSignupData.studentInstrument.studentRole.user
+                    .lastName
+                }}
+              </v-card-subtitle>
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="mt-0 pt-2 mr-0 pr-0">
@@ -103,6 +115,7 @@ function hasCritiques(piece) {
                   Performance Info
                 </v-card-title>
               </v-row>
+
               <v-row class="pl-2 pt-0 mt-0">
                 <v-col cols="1" align-self="center">
                   <v-avatar size="30" color="lightBlue">

@@ -6,6 +6,7 @@ import StudentPerformances from "../components/student/performances/StudentPerfo
 import StudentRepertoire from "../components/student/repertoire/StudentRepertoire.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
+import FacultyPerformances from "../components/faculty/FacultyPerformances.vue";
 
 import AdminHome from "../components/admin/AdminHome.vue";
 import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue";
@@ -48,6 +49,9 @@ const fullPath = computed(() => route.path);
           v-if="fullPath === '/facultyHome' || fullPath === '/accompanistHome'"
         >
         </FacultyHome>
+        <FacultyPerformances v-if="fullPath === '/facultyPerformances'">
+        </FacultyPerformances>
+
         <!-- Admin pages -->
         <AdminHome v-if="fullPath === '/adminHome'"> </AdminHome>
         <MaintainUsers v-if="fullPath === '/adminUsers'"></MaintainUsers>
