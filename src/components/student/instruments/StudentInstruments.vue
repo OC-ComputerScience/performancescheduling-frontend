@@ -37,6 +37,8 @@ async function refreshStudentInstruments() {
 function filterStudentInstruments() {
   // Filter by status
   if (statusFilterSelection.value) {
+    currentPage.value = 1;
+    filteredStudentInstruments.value = studentinstruments.value;
     filteredStudentInstruments.value = filteredStudentInstruments.value.filter(
       (studentinstrument) =>
         studentinstrument.status === statusFilterSelection.value
@@ -110,7 +112,7 @@ onMounted(async () => {
           </v-card-text>
           <v-card-actions class="px-4 pb-4">
             <v-btn
-              @click="searchAndFilterList(), (filterMenuBool = false)"
+              @click="filterStudentInstruments(), (filterMenuBool = false)"
               class="bg-teal text-white font-weight-bold text-none innerCardBorder"
             >
               Apply Filters
