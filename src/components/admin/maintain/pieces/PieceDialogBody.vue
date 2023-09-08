@@ -19,8 +19,7 @@ const props = defineProps({
   pieceData: { type: [Object], required: true },
   piecesData: { type: [Array] },
 });
-console.log("isAdmin:" + props.isAdmin);
-console.log("isEdmin:" + props.isEdit);
+
 const editedPieceData = ref(Object.assign({}, props.pieceData));
 if (props.isEdit)
   editedPieceData.value.composer.fullName = composerName(

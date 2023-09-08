@@ -8,7 +8,6 @@ import { useLoginStore } from "../../../../stores/LoginStore.js";
 
 const loginStore = useLoginStore();
 const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
-console.log(isAdmin);
 
 const addPieceDialog = ref(false);
 

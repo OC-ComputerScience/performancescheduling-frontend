@@ -6,8 +6,7 @@ import { useLoginStore } from "../../../../stores/LoginStore.js";
 
 const loginStore = useLoginStore();
 const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
-console.log(isAdmin);
-console.log(loginStore.currentRole.roleId);
+
 const emits = defineEmits(["closePieceDialog", "refreshPiecesEvent"]);
 
 defineProps({
