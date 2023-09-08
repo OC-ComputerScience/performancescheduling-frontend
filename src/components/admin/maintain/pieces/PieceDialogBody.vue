@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import PieceDataService from "../../../../services/PieceDataService";
 import ComposerDataService from "../../../../services/ComposerDataService";
-
 import { compareTwoStrings } from "string-similarity";
 
 const emits = defineEmits([
@@ -205,7 +204,7 @@ function similarPieceCheck(piece) {
           </v-card-subtitle>
 
           <v-autocomplete
-            v-if="props.isAdmin"
+            :readonly="props.isAdmin"
             placeholder="Start typing the composer's last name"
             color="darkBlue"
             variant="plain"
