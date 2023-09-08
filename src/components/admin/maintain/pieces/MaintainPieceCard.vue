@@ -72,7 +72,7 @@ async function enablePiece(piece) {
       <v-btn
         flat
         size="small"
-        class="font-weight-bold mt-0 mr-2 text-none text-blue bg-white flatChipBorder"
+        class="font-weight-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
         @click="createOrEditDialog = true"
       >
         Edit
