@@ -76,7 +76,7 @@ onMounted(async () => {});
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold text-none text-darkBlue bg-white flatChipBorder"
+            class="font-weight-semi-bold text-none text-white bg-blue flatChipBorder"
             @click="addOrEditInstrumentDialog = true"
           >
             Edit
