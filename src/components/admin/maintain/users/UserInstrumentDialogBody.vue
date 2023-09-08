@@ -53,42 +53,27 @@ async function getInstruments() {
 const instructors = ref([]);
 const accompanists = ref([]);
 
-async function getAllInstructors() {
-  await UserRoleDataService.getRolesForRoleId(2)
+function getAllInstructors() {
+  UserRoleDataService.getRolesForRoleId(2, 'lastName,firstName')
     .then((response) => {
-      instructors.value = _sortUsers(response.data)
+      instructors.value = response.data
     })
     .catch((err) => {
       console.log(err);
     });
 }
 
-async function getAllAccompanists() {
-  await UserRoleDataService.getRolesForRoleId(4)
+function getAllAccompanists() {
+  UserRoleDataService.getRolesForRoleId(4, 'lastName,firstName')
     .then((response) => {
       accompanists.value = [
         { id: null, user: { firstName: "", lastName: "" } },
-        ..._sortUsers(response.data),
+        ...response.data,
       ];
     })
     .catch((err) => {
       console.log(err);
     });
-}
-
-function _sortUsers(users) {
-  return users.sort((a, b) => {
-    const nameA = a.user.lastName.toUpperCase();
-    const nameB = b.user.lastName.toUpperCase();
-
-    if (nameA > nameB) {
-      return 1;
-    }
-    if (nameA < nameB) {
-      return -1;
-    }
-    return 0;
-  });
 }
 
 async function addInstrument() {
