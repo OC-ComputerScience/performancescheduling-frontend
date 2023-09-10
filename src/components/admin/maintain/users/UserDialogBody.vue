@@ -130,7 +130,6 @@ const editedFacultyTitle = ref(isFaculty.value ? facultyRole.title : null);
 
 async function addUser() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await UserDataService.create(editedUserData.value)
         .then(async (response) => {
@@ -159,7 +158,6 @@ async function addUser() {
 // update the user's data
 async function updateUser() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await updateUserRoles();
 
@@ -551,6 +549,7 @@ onMounted(async () => {
                   variant="plain"
                   class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
                   v-model="editedStudentHours"
+                  readonly
                   :rules="[(v) => !!v || 'This field is required']"
                 >
                 </v-text-field>
