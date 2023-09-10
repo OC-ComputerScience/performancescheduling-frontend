@@ -336,6 +336,7 @@ onMounted(async () => {
         </v-col>
       </v-row>
       <v-card-actions>
+        <v-spacer/>
         <v-btn
           v-if="!props.isEdit"
           flat
