@@ -133,7 +133,6 @@ async function addAvailability() {
 
 async function updateAvailability() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await updateStartTime();
       await updateEndTime();
