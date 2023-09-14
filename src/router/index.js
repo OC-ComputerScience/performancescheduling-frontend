@@ -61,6 +61,12 @@ const router = createRouter({
       name: "facultyStudents",
       alias: "/facultyStudents",
     },
+    {
+      path: "/base",
+      component: BaseView,
+      name: "facultyCreateCritique",
+      alias: "/facultyCreateCritique",
+    },
     // Accompanist Routes
     {
       path: "/base",
