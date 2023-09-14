@@ -50,7 +50,7 @@ const fullPath = computed(() => route.path);
         >
         </FacultyHome>
         <FacultyCreateCritique
-          v-if="this.$route.path === '/facultyCreateCritique'"
+          v-if="fullPath === '/facultyCreateCritique'"
         ></FacultyCreateCritique>
         <!-- Admin pages -->
         <AdminHome v-if="fullPath === '/adminHome'"> </AdminHome>

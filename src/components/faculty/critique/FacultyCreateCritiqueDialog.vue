@@ -26,10 +26,14 @@ async function changeSelectedPiece(piece) {
   }
 }
 
-async function closeDialog() {
+async function saveDialog() {
   if (await saveCritique()) {
     emits("closeDialogEvent");
   }
+}
+
+async function closeDialog() {
+  emits("closeDialogEvent");
 }
 
 async function saveCritique() {
@@ -187,7 +191,7 @@ onMounted(async () => {
   <v-card class="pa-2 flatCardBorder">
     <v-form ref="form" validate-on="input">
       <v-card-text>
-        <v-row class="mt-1">
+        <v-row class="mt-1 mb-4">
           <v-card-title class="font-weight-bold text-maroon text-h4">
             {{ studentNames }}
           </v-card-title>
@@ -291,7 +295,7 @@ onMounted(async () => {
                 class="font-weight-semi-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
                 @click="clearCritique()"
               >
-                Clear
+                Clear Current Critique
               </v-btn>
             </v-row>
 
@@ -428,9 +432,16 @@ onMounted(async () => {
         <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
-          @click="closeDialog()"
+          @click="saveDialog()"
         >
           Save
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          @click="closeDialog()"
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>
