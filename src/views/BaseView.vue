@@ -49,9 +49,13 @@ const fullPath = computed(() => route.path);
           v-if="fullPath === '/facultyHome' || fullPath === '/accompanistHome'"
         >
         </FacultyHome>
+
         <FacultyCreateCritique
           v-if="fullPath === '/facultyCreateCritique'"
         ></FacultyCreateCritique>
+
+        <MaintainPieces v-if="fullPath === '/facultyPieces'"></MaintainPieces>
+
         <!-- Admin pages -->
         <AdminHome v-if="fullPath === '/adminHome'"> </AdminHome>
         <MaintainUsers v-if="fullPath === '/adminUsers'"></MaintainUsers>
