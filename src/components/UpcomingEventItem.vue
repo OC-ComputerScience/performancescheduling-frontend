@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 import StudentEventSignupDialog from "./student/StudentEventSignupDialog.vue";
+import AvailabilityDialogBody from "./faculty/AvailabilityDialogBody.vue";
 
 const router = useRouter();
 const dialog = ref(false);
@@ -11,13 +12,24 @@ const dialog = ref(false);
 const props = defineProps({
   eventData: { type: [Object], required: true },
   roleId: { type: [Number], required: true },
+  availabilityData: { type: [Object], required: false },
 });
+
+const emits = defineEmits(["refreshAvailabilitiesEvent"]);
+
+const addOrEditAvailabilityDialog = ref(false);
+
+function closeAvailabilityDialog() {
+  addOrEditAvailabilityDialog.value = false;
+}
 
 function handleClick() {
   if (props.roleId == 3) {
     router.push({ path: "adminEvents" });
   } else if (props.roleId == 1) {
     dialog.value = true;
+  } else {
+    addOrEditAvailabilityDialog.value = true;
   }
 }
 </script>
@@ -30,7 +42,7 @@ function handleClick() {
           <v-row class="pa-0 ma-0">
             <v-col cols="auto" class="pa-0 ma-0">
               <!-- Event Name -->
-              <v-card-title class="font-weight-bold text-orange text-h4">
+              <v-card-title class="font-weight-bold text-orange text-h5">
                 {{ eventData.name }}
               </v-card-title>
               <v-card-subtitle
@@ -43,6 +55,7 @@ function handleClick() {
               <!-- Event Instrument Type -->
               <!-- TODO(@ethanimooney): Make this actually work -->
               <v-card-subtitle
+                v-if="roleId == 3 || roleId == 1"
                 class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
               >
                 {{
@@ -64,7 +77,7 @@ function handleClick() {
                 class="bg-darkBlue py-2 px-0 text-white mt-0"
               >
                 <v-card-subtitle
-                  v-if="eventData.isReady"
+                  v-if="(roleId == 3 || roleId == 1) && eventData.isReady"
                   class="font-weight-semi-bold"
                 >
                   {{
@@ -73,6 +86,20 @@ function handleClick() {
                       : eventData.eventSignups.length
                   }}
                   People Signed Up
+                </v-card-subtitle>
+                <v-card-subtitle
+                  size="small"
+                  v-if="roleId == 2 || roleId == 4"
+                  class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+                >
+                  {{
+                    eventData.eventType.instrumentType === "Both"
+                      ? "Vocal & Instrumental"
+                      : eventData.eventType.instrumentType === "Vocal"
+                      ? "Vocal"
+                      : "Instrumental"
+                  }}
+                  Event
                 </v-card-subtitle>
                 <v-card-subtitle
                   v-if="roleId == 3"
@@ -109,8 +136,8 @@ function handleClick() {
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
-        @click="handleClick"
+        class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+        @click="handleClick()"
       >
         {{
           roleId == 1
@@ -128,5 +155,21 @@ function handleClick() {
       @closeDialogEvent="dialog = false"
     >
     </student-event-signup-dialog>
+  </v-dialog>
+  <v-dialog v-model="addOrEditAvailabilityDialog" persistent max-width="600px">
+    <AvailabilityDialogBody
+      :is-edit="false"
+      :availability-data="
+        availabilityData ? availabilityData : { startTime: null, endTime: null }
+      "
+      :event-data="eventData"
+      @updateAvailabilityEvent="
+        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+      "
+      @addAvailabilityEvent="
+        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+      "
+      @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
+    ></AvailabilityDialogBody>
   </v-dialog>
 </template>

@@ -1,7 +1,7 @@
 <script setup>
-import { formatDate } from "../composables/dateFormatter";
-import { get12HourTimeStringFromString } from "../composables/timeFormatter";
-import { getHourWordFromNumber } from "../composables/timeFormatter";
+import { formatDate } from "../../composables/dateFormatter";
+import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
+import { getHourWordFromNumber } from "../../composables/timeFormatter";
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
@@ -19,7 +19,7 @@ const props = defineProps({
           <v-row class="pa-0 ma-0">
             <v-col cols="auto" class="pa-0 ma-0">
               <!-- Event Name -->
-              <v-card-title class="font-weight-bold text-maroon text-h4">
+              <v-card-title class="font-weight-bold text-maroon text-h5">
                 {{ eventData.name }}
               </v-card-title>
               <!-- Event Location -->
@@ -98,7 +98,9 @@ const props = defineProps({
               <v-card-subtitle
                 class="font-weight-semi-bold text-h6 text-darkBlue"
               >
-                Soprano
+                {{
+                  studentInstrumentSignupData.studentInstrument.instrument.name
+                }}
               </v-card-subtitle>
               <v-card-text class="text-weight-medium text-blue pt-1 pb-0">
                 Instrument

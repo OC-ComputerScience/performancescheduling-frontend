@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import PieceDataService from "../../../../services/PieceDataService";
-
+import ComposerDataService from "../../../../services/ComposerDataService";
 import { compareTwoStrings } from "string-similarity";
 
 const emits = defineEmits([
@@ -15,13 +15,21 @@ const emits = defineEmits([
 
 const props = defineProps({
   isEdit: { type: [Boolean], required: true },
+  isAdmin: { type: [Boolean], required: true },
   pieceData: { type: [Object], required: true },
   piecesData: { type: [Array] },
-  composersData: { type: [Array] },
 });
 
 const editedPieceData = ref(Object.assign({}, props.pieceData));
+if (props.isEdit)
+  editedPieceData.value.composer.fullName = composerName(
+    editedPieceData.value.composer
+  );
+
 const form = ref(null);
+const composers = ref([]);
+
+getComposers();
 
 //add Piece
 async function addPiece() {
@@ -38,9 +46,38 @@ async function addPiece() {
   });
 }
 
+async function getComposers() {
+  await ComposerDataService.getAll("lastName")
+    .then((response) => {
+      composers.value = response.data;
+
+      composers.value.forEach((composer) => {
+        composer.fullName = composerName(composer);
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+function composerName(composer) {
+  let comma = ", ";
+  if (
+    composer.firstName === null ||
+    composer.firstName === "" ||
+    composer.lastName === "" ||
+    composer.lastName == ""
+  ) {
+    comma = "";
+  }
+  return composer.lastName + comma + composer.firstName;
+}
 // Update the piece's roles
 
 async function updatePiece() {
+  if (!props.isAdmin) {
+    editedPieceData.value.status = "Pending";
+  }
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
       await PieceDataService.update(editedPieceData.value)
@@ -99,10 +136,11 @@ function similarPieceCheck(piece) {
               {{ editedPieceData.title }}
             </v-card-title>
             <v-card-title class="text-weight-semi-bold pt-1 pb-0">
-              {{ editedPieceData.composer.lastName }}
+              {{ editedPieceData.composer.fullName }}
             </v-card-title>
           </v-col>
-          <v-col v-if="props.isEdit" cols="auto" align-self="center">
+          <v-spacer></v-spacer>
+          <v-col v-if="props.isEdit" cols="auto">
             <v-chip
               label
               flat
@@ -159,76 +197,32 @@ function similarPieceCheck(piece) {
           ></v-textarea>
 
           <v-card-subtitle
+            v-if="props.isAdmin"
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
             Composer
           </v-card-subtitle>
+
           <v-autocomplete
+            :readonly="props.isAdmin"
             placeholder="Start typing the composer's last name"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
             v-model="editedPieceData.composerId"
-            :items="composersData"
-            item-title="lastName"
+            :items="composers"
+            item-title="fullName"
             item-value="id"
           >
-            <template v-slot:item="{ item, props: { onClick } }">
-              <v-list-item
-                v-if="
-                  item.raw.firstName != null &&
-                  item.raw.firstName.length != 0 &&
-                  item.raw.lastName != null &&
-                  item.raw.lastName.length != 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.lastName }}, {{ item.raw.firstName }}
-              </v-list-item>
-              <v-list-item
-                v-else-if="
-                  item.raw.lastname == null || item.raw.lastname.length == 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.firstName }}
-              </v-list-item>
-              <v-list-item
-                v-else-if="
-                  item.raw.lastName == null || item.raw.lastName.length == 0
-                "
-                @click="onClick"
-              >
-                {{ item.raw.lastName }}
-              </v-list-item>
-            </template>
           </v-autocomplete>
         </v-col>
       </v-row>
       <v-card-actions>
+        <v-spacer/>
         <v-btn
+          v-if="props.isEdit && props.isAdmin"
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updatePiece() : addPiece()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="
-            props.isEdit
-              ? emits('closePieceDialogEvent')
-              : emits('closeAddPieceDialogEvent')
-          "
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          v-if="props.isEdit"
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 mr-3 text-none text-white flatChipBorder"
           :class="
             props.pieceData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
           "
@@ -239,6 +233,40 @@ function similarPieceCheck(piece) {
           "
         >
           {{ props.pieceData.status === "Disabled" ? "Enable" : "Disable" }}
+        </v-btn>
+        <v-btn
+          v-if="
+            props.isEdit &&
+            props.isAdmin &&
+            props.pieceData.status === 'Pending'
+          "
+          flat
+          class="font-weight-semi-bold mt-0 mr-4 text-none text-white flatChipBorder"
+          :class="
+            props.pieceData.status === 'Pending' ? 'bg-darkBlue' : 'bg-maroon'
+          "
+          @click="emits('enablePieceEvent')"
+        >
+          Enable
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updatePiece() : addPiece()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closePieceDialogEvent')
+              : emits('closeAddPieceDialogEvent')
+          "
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>

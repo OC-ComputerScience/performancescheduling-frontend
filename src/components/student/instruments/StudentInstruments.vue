@@ -1,60 +1,47 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import ComposerDataService from "./../../../../services/ComposerDataService";
-import MaintainComposerCard from "./MaintainComposerCard.vue";
-import ComposerDialogBody from "./ComposerDialogBody.vue";
+import StudentInstrumentDataService from "./../../../services/StudentInstrumentDataService";
+import UserInstrumentDialogBody from "./../../admin/maintain/users/UserInstrumentDialogBody.vue";
+import UserInstrumentCard from "./../../admin/maintain/users/UserInstrumentCard.vue";
+import { useLoginStore } from "./../../../stores/LoginStore.js";
 
-const addComposerDialog = ref(false);
+const addStudentInstrumentDialog = ref(false);
+const loginStore = useLoginStore();
+// Student Instrument Data
+const studentinstruments = ref([]);
+const filteredStudentInstruments = ref([]);
 
-// Composer Data
-const composers = ref([]);
-const filteredComposers = ref([]);
-
-async function getComposers() {
-  await ComposerDataService.getAll("lastName", "firstName")
+async function getStudentInstruments() {
+  await StudentInstrumentDataService.getByUser(loginStore.currentRole.userId)
     .then((response) => {
-      composers.value = response.data;
-      filteredComposers.value = composers.value;
+      studentinstruments.value = response.data;
+      filteredStudentInstruments.value = studentinstruments.value;
     })
     .catch((err) => {
       console.log(err);
     });
 }
 
-async function refreshComposers() {
-  await getComposers();
-  await searchAndFilterList();
+const filterMenuBool = ref(false);
+
+const statusFilterOptions = ["Active", "Disabled"];
+const statusFilterSelection = ref(null);
+
+async function refreshStudentInstruments() {
+  await getStudentInstruments();
+  filterStudentInstruments();
 }
 
 // Filtering
 
-const filterMenuBool = ref(false);
-
-const searchInput = ref("");
-
-// Search filter
-// Filters the list of composers by first and last name, based on searchInput
-function searchAndFilterList() {
-  filteredComposers.value = composers.value;
-  // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value != "")
-    filteredComposers.value = filteredComposers.value.filter((composer) =>
-      (composer.firstName.toLowerCase() + " " + composer.lastName)
-        .toLowerCase()
-        .includes(searchInput.value.toLowerCase())
-    );
-
-  filterComposers();
-}
-
-const statusFilterOptions = ["Active", "Disabled", "Pending"];
-const statusFilterSelection = ref(null);
-
-function filterComposers() {
+function filterStudentInstruments() {
   // Filter by status
   if (statusFilterSelection.value) {
-    filteredComposers.value = filteredComposers.value.filter(
-      (composer) => composer.status === statusFilterSelection.value
+    currentPage.value = 1;
+    filteredStudentInstruments.value = studentinstruments.value;
+    filteredStudentInstruments.value = filteredStudentInstruments.value.filter(
+      (studentinstrument) =>
+        studentinstrument.status === statusFilterSelection.value
     );
   }
 }
@@ -62,9 +49,8 @@ function filterComposers() {
 // Clears all filters and returns to page 1
 function clearFilters() {
   currentPage.value = 1;
-  filteredComposers.value = composers.value;
+  filteredStudentInstruments.value = studentinstruments.value;
   statusFilterSelection.value = null;
-  searchInput.value = "";
 }
 
 // Pagination
@@ -73,33 +59,25 @@ const currentPage = ref(1);
 const perPage = 15;
 
 const currentPageData = computed(() => {
-  return filteredComposers.value.slice(
+  return filteredStudentInstruments.value.slice(
     (currentPage.value - 1) * perPage,
     currentPage.value * perPage
   );
 });
 
+function closeAddInstrumentDialog() {
+  addStudentInstrumentDialog.value = false;
+}
+
 onMounted(async () => {
-  await getComposers();
+  await getStudentInstruments();
 });
 </script>
 
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight">Composers</h1>
-
-      <input
-        type="text"
-        v-model="searchInput"
-        @input="searchAndFilterList"
-        class="ml-6 px-4 my-1 mainCardBorder text-blue bg-white font-weight-semi-bold"
-        style="outline: none"
-        append-icon="mdi-magnify"
-        placeholder="Search"
-        single-line
-        hide-details
-      />
+      <h1 class="text-maroon font-weight">Instruments</h1>
 
       <v-menu v-model="filterMenuBool" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
@@ -113,7 +91,7 @@ onMounted(async () => {
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter composers
+            Filter Instruments
           </v-btn>
         </template>
 
@@ -128,20 +106,21 @@ onMounted(async () => {
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
-                  return-object
                 ></v-select>
               </v-list-item>
             </v-list>
           </v-card-text>
           <v-card-actions class="px-4 pb-4">
             <v-btn
-              @click="searchAndFilterList(), (filterMenuBool = false)"
+              @click="filterStudentInstruments(), (filterMenuBool = false)"
               class="bg-teal text-white font-weight-bold text-none innerCardBorder"
             >
               Apply Filters
             </v-btn>
             <v-btn
-              v-if="statusFilterSelection != null"
+              v-if="
+                statusFilterSelection != null || semesterFilterSelection != null
+              "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
             >
@@ -163,9 +142,9 @@ onMounted(async () => {
         size="medium"
         color="blue"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
-        @click="addComposerDialog = true"
+        @click="addStudentInstrumentDialog = true"
       >
-        Add new composer
+        Add new Instrument
       </v-btn>
     </v-row>
     <v-row>
@@ -173,16 +152,16 @@ onMounted(async () => {
         <v-card class="pa-5 mainCardBorder">
           <v-row>
             <v-col
-              v-for="composer in currentPageData"
-              :key="composer.id"
+              v-for="studentinstrument in currentPageData"
+              :key="studentinstrument.id"
               cols="12"
               md="6"
               lg="4"
             >
-              <MaintainComposerCard
-                :composer-data="composer"
-                @refreshComposersEvent="refreshComposers()"
-              ></MaintainComposerCard>
+              <UserInstrumentCard
+                :student-instrument-data="studentinstrument"
+                @refreshStudentInstrumentsEvent="refreshStudentInstruments()"
+              ></UserInstrumentCard>
             </v-col>
           </v-row>
         </v-card>
@@ -195,9 +174,9 @@ onMounted(async () => {
             color="blue"
             class="font-weight-bold"
             :length="
-              filteredComposers.length % perPage == 0
-                ? filteredComposers.length / perPage
-                : Math.floor(filteredComposers.length / perPage) + 1
+              filteredStudentInstruments.length % perPage == 0
+                ? filteredStudentInstruments.length / perPage
+                : Math.floor(filteredStudentInstruments.length / perPage) + 1
             "
             :total-visible="7"
             v-model="currentPage"
@@ -206,22 +185,26 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog v-model="addComposerDialog" persistent max-width="600px">
-    <ComposerDialogBody
+  <v-dialog v-model="addStudentInstrumentDialog" persistent max-width="600px">
+    <UserInstrumentDialogBody
       :is-edit="false"
-      :is-admin="true"
-      :composer-data="{
+      :student-instrument-data="{
         id: null,
-        firstName: null,
-        lastName: null,
-        dateOfBirth: null,
-        dateOfDeath: null,
-        nationality: null,
         status: 'Active',
+        levelId: null,
+        studentRoleId: loginStore.currentRole.id,
+        instructorRoleId: null,
+        accompanistRoleId: null,
+        instrumentId: null,
+        instructorRole: null,
+        accompanistRole: null,
+        instrument: null,
+        level: null,
       }"
-      :composers-data="composers"
-      @closeAddComposerDialogEvent="addComposerDialog = false"
-      @addComposerSuccessEvent="(addComposerDialog = false), refreshComposers()"
-    ></ComposerDialogBody>
+      @addInstrumentSuccessEvent="
+        closeAddInstrumentDialog(), refreshStudentInstruments()
+      "
+      @closeUserInstrumentDialogEvent="closeAddInstrumentDialog"
+    ></UserInstrumentDialogBody>
   </v-dialog>
 </template>

@@ -1,12 +1,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import RoleDataService from "../../../../services/RoleDataService";
-import MajorDataService from "../../../../services/MajorDataService";
-import UserInstrumentCard from "./UserInstrumentCard.vue";
-import UserInstrumentDialogBody from "./UserInstrumentDialogBody.vue";
-import UserDataService from "../../../../services/UserDataService";
-import UserRoleDataService from "../../../../services/UserRoleDataService";
-import StudentInstrumentDataService from "../../../../services/StudentInstrumentDataService";
+import RoleDataService from "../../services/RoleDataService";
+import MajorDataService from "../../services/MajorDataService";
+import UserInstrumentCard from "../admin/maintain/users/UserInstrumentCard.vue";
+import UserInstrumentDialogBody from "../admin/maintain/users/UserInstrumentDialogBody.vue";
+import UserDataService from "../../services/UserDataService";
+import UserRoleDataService from "../../services/UserRoleDataService";
+import StudentInstrumentDataService from "../../services/StudentInstrumentDataService";
 
 const emits = defineEmits([
   "addUserSuccessEvent",
@@ -186,14 +186,12 @@ async function updateUser() {
 // After all roles have been checked, whatever is left in editedUserRoles is a new role,
 // so create it.
 async function updateUserRoles() {
-  const updateRoles = [...editedUserRoles.value] // copy of editUserRoles to use with splice, a destructive process
-
   for (let userRole of props.userRoles) {
     // If role exists in editedUserRoles, and is active, we don't need to do anything,
     // and it gets spliced out of editedUserRoles at the end of the if statement.
 
     // If role exists in editedUserRoles, and is disabled, enable it
-    if (updateRoles.some((eur) => eur.id === userRole.roleId)) {
+    if (editedUserRoles.value.some((eur) => eur.id === userRole.roleId)) {
       if (userRole.status === "Disabled") {
         userRole.status = "Active";
         await UserRoleDataService.update(userRole).catch((err) => {
@@ -208,17 +206,16 @@ async function updateUserRoles() {
       });
     }
 
-    
     // Find index of role to splice in editedUserRoles
-    let index = updateRoles.findIndex(
+    let index = editedUserRoles.value.findIndex(
       (eur) => eur.id === userRole.roleId
     );
     // Splice role from editedUserRoles
-    index != -1 ? updateRoles.splice(index, 1) : null;
+    index != -1 ? editedUserRoles.value.splice(index, 1) : null;
   }
 
   // Whatever is left in editedUserRoles is a new role, so create it
-  for (let editedUserRole of updateRoles) {
+  for (let editedUserRole of editedUserRoles.value) {
     await UserRoleDataService.create({
       userId: props.userData.id,
       roleId: editedUserRole.id,
@@ -587,8 +584,26 @@ onMounted(async () => {
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-spacer/>
-                <v-btn
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateUser() : addUser()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeUserDialogEvent')
+              : emits('closeAddUserDialogEvent')
+          "
+        >
+          Cancel
+        </v-btn>
+        <v-btn
           v-if="props.isEdit"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
@@ -602,25 +617,6 @@ onMounted(async () => {
           "
         >
           {{ props.userData.status === "Disabled" ? "Enable" : "Disable" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateUser() : addUser()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="
-            props.isEdit
-              ? emits('closeUserDialogEvent')
-              : emits('closeAddUserDialogEvent')
-          "
-        >
-          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>

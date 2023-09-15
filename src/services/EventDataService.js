@@ -18,6 +18,10 @@ class EventDataService {
     return http.put(this.baseUrl + `${data.id}`, data);
   }
 
+  getGTEDateForFaculty(date) {
+    return http.get(this.baseUrl + `date/${date}?role=Faculty`);
+  }
+
   getGTEDateForStudents(date) {
     return http.get(this.baseUrl + `date/${date}?role=Student`);
   }

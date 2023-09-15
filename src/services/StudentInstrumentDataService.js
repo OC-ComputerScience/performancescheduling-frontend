@@ -14,14 +14,31 @@ class StudentInstrumentDataService {
     return http.get(this.baseUrl + "userId/" + userId);
   }
 
-  getStudentInstrumentSignupsByUserRoleId(userRoleId, date) {
+  getStudentInstrumentSignupsByUserRoleId(
+    userRoleId,
+    date,
+    select,
+    order = "ASC"
+  ) {
     return http.get(
-      this.baseUrl + "instrumentSignups/" + userRoleId + "/" + date
+      this.baseUrl +
+        "instrumentSignups/" +
+        userRoleId +
+        "?date=" +
+        date +
+        "&select=" +
+        select +
+        "&order=" +
+        order
     );
   }
 
   getStudentsForInstructorId(instructorId) {
     return http.get(this.baseUrl + "instructorId/" + instructorId);
+  }
+
+  getStudentsForAccompanistId(accompanistId) {
+    return http.get(this.baseUrl + "accompanistId/" + accompanistId);
   }
 
   getStudentInstrumentsForStudentId(studentId) {

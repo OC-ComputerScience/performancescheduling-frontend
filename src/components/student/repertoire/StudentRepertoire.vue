@@ -1,34 +1,41 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import PieceDataService from "./../../../../services/PieceDataService";
-import ComposerDataService from "./../../../../services/ComposerDataService";
-import MaintainPieceCard from "./MaintainPieceCard.vue";
-import PieceDialogBody from "./PieceDialogBody.vue";
-import { useLoginStore } from "../../../../stores/LoginStore.js";
+import StudentPieceDataService from "./../../../services/StudentPieceDataService";
+import SemesterDataService from "./../../../services/SemesterDataService";
+import MaintainStudentPieceCard from "./MaintainStudentPieceCard.vue";
+import StudentPieceDialogBody from "./StudentPieceDialogBody.vue";
+import { useLoginStore } from "./../../../stores/LoginStore.js";
 
+const addStudentPieceDialog = ref(false);
 const loginStore = useLoginStore();
-const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
+// StudentStudentPiece Data
+const studentpieces = ref([]);
+const filteredStudentPieces = ref([]);
+const semesters = ref([]);
 
-const addPieceDialog = ref(false);
-
-// Piece Data
-const pieces = ref([]);
-const filteredPieces = ref([]);
-const composers = ref([]);
-
-async function getPieces() {
-  await PieceDataService.getAll("title")
+async function getStudentPieces() {
+  await StudentPieceDataService.getByUser(loginStore.currentRole.userId)
     .then((response) => {
-      pieces.value = response.data;
-      filteredPieces.value = pieces.value;
+      studentpieces.value = response.data;
+      filteredStudentPieces.value = studentpieces.value;
     })
     .catch((err) => {
       console.log(err);
     });
 }
 
-async function refreshPieces() {
-  await getPieces();
+async function getSemesters() {
+  await SemesterDataService.getAll("name", false)
+    .then((response) => {
+      semesters.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+async function refreshStudentPieces() {
+  await getStudentPieces();
   await searchAndFilterList();
 }
 
@@ -39,32 +46,41 @@ const filterMenuBool = ref(false);
 const searchInput = ref("");
 
 // Search filter
-// Filters the list of pieces by first and last name, based on searchInput
+// Filters the list of studentpieces by first and last name, based on searchInput
 function searchAndFilterList() {
-  filteredPieces.value = pieces.value;
+  filteredStudentPieces.value = studentpieces.value;
   // If the search input is empty, return the full list, otherwise filter
   if (searchInput.value != "")
-    filteredPieces.value = filteredPieces.value.filter((piece) =>
-      (
-        piece.title.toLowerCase() +
-        " " +
-        piece.composer.firstName.toLowerCase() +
-        " " +
-        piece.composer.lastName.toLowerCase()
-      ).includes(searchInput.value.toLowerCase())
+    filteredStudentPieces.value = filteredStudentPieces.value.filter(
+      (studentpiece) =>
+        studentpiece.piece.title
+          .toLowerCase()
+          .includes(searchInput.value.toLowerCase()) ||
+        (
+          studentpiece.piece.composer.lastName.toLowerCase() +
+          " " +
+          studentpiece.piece.composer.firstName.toLowerCase()
+        ).includes(searchInput.value.toLowerCase())
     );
 
-  filterPieces();
+  filterStudentPieces();
 }
 
-const statusFilterOptions = ["Active", "Disabled", "Pending"];
+const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
+const semesterFilterSelection = ref(null);
 
-function filterPieces() {
+function filterStudentPieces() {
   // Filter by status
   if (statusFilterSelection.value) {
-    filteredPieces.value = filteredPieces.value.filter(
-      (piece) => piece.status === statusFilterSelection.value
+    filteredStudentPieces.value = filteredStudentPieces.value.filter(
+      (studentpiece) => studentpiece.status === statusFilterSelection.value
+    );
+  }
+  if (semesterFilterSelection.value) {
+    filteredStudentPieces.value = filteredStudentPieces.value.filter(
+      (studentpiece) =>
+        studentpiece.semesterId === semesterFilterSelection.value
     );
   }
 }
@@ -72,8 +88,9 @@ function filterPieces() {
 // Clears all filters and returns to page 1
 function clearFilters() {
   currentPage.value = 1;
-  filteredPieces.value = pieces.value;
+  filteredStudentPieces.value = studentpieces.value;
   statusFilterSelection.value = null;
+  semesterFilterSelection.value = null;
   searchInput.value = "";
 }
 
@@ -83,31 +100,22 @@ const currentPage = ref(1);
 const perPage = 15;
 
 const currentPageData = computed(() => {
-  return filteredPieces.value.slice(
+  return filteredStudentPieces.value.slice(
     (currentPage.value - 1) * perPage,
     currentPage.value * perPage
   );
 });
-async function getComposers() {
-  await ComposerDataService.getAll("lastName")
-    .then((response) => {
-      composers.value = response.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
 
 onMounted(async () => {
-  await getPieces();
-  await getComposers();
+  await getStudentPieces();
+  await getSemesters();
 });
 </script>
 
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight">Pieces</h1>
+      <h1 class="text-maroon font-weight">Repertoire</h1>
 
       <input
         type="text"
@@ -133,7 +141,7 @@ onMounted(async () => {
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter pieces
+            Filter Repertoire
           </v-btn>
         </template>
 
@@ -148,7 +156,22 @@ onMounted(async () => {
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
-                  return-object
+                ></v-select>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+          <v-card-text>
+            <v-list class="pa-0 ma-0">
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Semester
+                <v-select
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="semesterFilterSelection"
+                  :items="semesters"
+                  item-title="name"
+                  item-value="id"
                 ></v-select>
               </v-list-item>
             </v-list>
@@ -161,7 +184,9 @@ onMounted(async () => {
               Apply Filters
             </v-btn>
             <v-btn
-              v-if="statusFilterSelection != null"
+              v-if="
+                statusFilterSelection != null || semesterFilterSelection != null
+              "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
             >
@@ -183,9 +208,9 @@ onMounted(async () => {
         size="medium"
         color="blue"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
-        @click="addPieceDialog = true"
+        @click="addStudentPieceDialog = true"
       >
-        Add new piece
+        Add new Piece
       </v-btn>
     </v-row>
     <v-row>
@@ -193,18 +218,17 @@ onMounted(async () => {
         <v-card class="pa-5 mainCardBorder">
           <v-row>
             <v-col
-              v-for="piece in currentPageData"
-              :key="piece.id"
+              v-for="studentpiece in currentPageData"
+              :key="studentpiece.id"
               cols="12"
               md="6"
               lg="4"
             >
-              <MaintainPieceCard
-                :piece-data="piece"
-                :pieces-data="pieces"
-                :composers-data="composers"
-                @refreshPiecesEvent="refreshPieces()"
-              ></MaintainPieceCard>
+              <MaintainStudentPieceCard
+                :studentpiece-data="studentpiece"
+                :student-pieces="studentpieces"
+                @refreshStudentPiecesEvent="refreshStudentPieces()"
+              ></MaintainStudentPieceCard>
             </v-col>
           </v-row>
         </v-card>
@@ -217,9 +241,9 @@ onMounted(async () => {
             color="blue"
             class="font-weight-bold"
             :length="
-              filteredPieces.length % perPage == 0
-                ? filteredPieces.length / perPage
-                : Math.floor(filteredPieces.length / perPage) + 1
+              filteredStudentPieces.length % perPage == 0
+                ? filteredStudentPieces.length / perPage
+                : Math.floor(filteredStudentPieces.length / perPage) + 1
             "
             :total-visible="7"
             v-model="currentPage"
@@ -228,21 +252,21 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog v-model="addPieceDialog" persistent max-width="600px">
-    <PieceDialogBody
+  <v-dialog v-model="addStudentPieceDialog" persistent max-width="600px">
+    <StudentPieceDialogBody
       :is-edit="false"
-      :is-admin="isAdmin"
-      :piece-data="{
+      :studentpiece-data="{
         id: null,
-        title: null,
-        originalLanguage: null,
-        poeticTranslation: null,
-        literalTranslation: null,
-        status: isAdmin ? 'Active' : 'Pending',
+        pieceId: null,
+        semesterId: null,
+        studentIntstrumentId: null,
+        status: 'Active',
       }"
-      :pieces-data="pieces"
-      @closeAddPieceDialogEvent="addPieceDialog = false"
-      @addPieceSuccessEvent="(addPieceDialog = false), refreshPieces()"
-    ></PieceDialogBody>
+      :student-pieces="studentpieces"
+      @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
+      @addStudentPieceSuccessEvent="
+        (addStudentPieceDialog = false), refreshStudentPieces()
+      "
+    ></StudentPieceDialogBody>
   </v-dialog>
 </template>

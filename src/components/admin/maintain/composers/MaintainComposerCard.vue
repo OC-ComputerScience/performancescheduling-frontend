@@ -78,7 +78,7 @@ async function enableComposer(composer) {
       <v-btn
         flat
         size="small"
-        class="font-weight-bold mt-0 ml-4 mr-2 text-none text-blue bg-white flatChipBorder"
+        class="font-weight-bold mt-0 ml-4 mr-2 text-none text-white bg-blue flatChipBorder"
         @click="createOrEditDialog = true"
       >
         Edit
@@ -88,6 +88,7 @@ async function enableComposer(composer) {
   <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
     <ComposerDialogBody
       :is-edit="true"
+      :is-admin="true"
       :composer-data="composerData"
       @closeComposerDialogEvent="closeComposerDialog"
       @updateComposerSuccessEvent="
