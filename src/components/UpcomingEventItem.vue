@@ -12,7 +12,7 @@ const dialog = ref(false);
 const props = defineProps({
   eventData: { type: [Object], required: true },
   roleId: { type: [Number], required: true },
-  availabilityData: { type: [Object], required: false }
+  availabilityData: { type: [Object], required: false },
 });
 
 const emits = defineEmits(["refreshAvailabilitiesEvent"]);
@@ -28,8 +28,7 @@ function handleClick() {
     router.push({ path: "adminEvents" });
   } else if (props.roleId == 1) {
     dialog.value = true;
-  }
-  else{
+  } else {
     addOrEditAvailabilityDialog.value = true;
   }
 }
@@ -93,14 +92,14 @@ function handleClick() {
                   v-if="roleId == 2 || roleId == 4"
                   class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
                 >
-                {{
-                  eventData.eventType.instrumentType === "Both"
-                    ? "Vocal & Instrumental"
-                    : eventData.eventType.instrumentType === "Vocal"
-                    ? "Vocal"
-                    : "Instrumental"
-                }}
-                Event
+                  {{
+                    eventData.eventType.instrumentType === "Both"
+                      ? "Vocal & Instrumental"
+                      : eventData.eventType.instrumentType === "Vocal"
+                      ? "Vocal"
+                      : "Instrumental"
+                  }}
+                  Event
                 </v-card-subtitle>
                 <v-card-subtitle
                   v-if="roleId == 3"
@@ -137,7 +136,7 @@ function handleClick() {
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
+        class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
         @click="handleClick()"
       >
         {{
@@ -160,7 +159,9 @@ function handleClick() {
   <v-dialog v-model="addOrEditAvailabilityDialog" persistent max-width="600px">
     <AvailabilityDialogBody
       :is-edit="false"
-      :availability-data="availabilityData ? availabilityData : { startTime: null, endTime: null }"
+      :availability-data="
+        availabilityData ? availabilityData : { startTime: null, endTime: null }
+      "
       :event-data="eventData"
       @updateAvailabilityEvent="
         closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')

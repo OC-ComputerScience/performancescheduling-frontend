@@ -186,12 +186,14 @@ async function updateUser() {
 // After all roles have been checked, whatever is left in editedUserRoles is a new role,
 // so create it.
 async function updateUserRoles() {
+  const updateRoles = [...editedUserRoles.value] // copy of editUserRoles to use with splice, a destructive process
+
   for (let userRole of props.userRoles) {
     // If role exists in editedUserRoles, and is active, we don't need to do anything,
     // and it gets spliced out of editedUserRoles at the end of the if statement.
 
     // If role exists in editedUserRoles, and is disabled, enable it
-    if (editedUserRoles.value.some((eur) => eur.id === userRole.roleId)) {
+    if (updateRoles.some((eur) => eur.id === userRole.roleId)) {
       if (userRole.status === "Disabled") {
         userRole.status = "Active";
         await UserRoleDataService.update(userRole).catch((err) => {
@@ -206,16 +208,17 @@ async function updateUserRoles() {
       });
     }
 
+    
     // Find index of role to splice in editedUserRoles
-    let index = editedUserRoles.value.findIndex(
+    let index = updateRoles.findIndex(
       (eur) => eur.id === userRole.roleId
     );
     // Splice role from editedUserRoles
-    index != -1 ? editedUserRoles.value.splice(index, 1) : null;
+    index != -1 ? updateRoles.splice(index, 1) : null;
   }
 
   // Whatever is left in editedUserRoles is a new role, so create it
-  for (let editedUserRole of editedUserRoles.value) {
+  for (let editedUserRole of updateRoles) {
     await UserRoleDataService.create({
       userId: props.userData.id,
       roleId: editedUserRole.id,
