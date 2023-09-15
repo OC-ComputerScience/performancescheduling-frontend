@@ -4,6 +4,7 @@ import MainNav from "../components/MainNav.vue";
 import StudentHome from "../components/student/StudentHome.vue";
 import StudentPerformances from "../components/student/performances/StudentPerformances.vue";
 import StudentRepertoire from "../components/student/repertoire/StudentRepertoire.vue";
+import StudentInstruments from "../components/student/instruments/StudentInstruments.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
 import FacultyCreateCritique from "../components/faculty/critique/FacultyCreateCritique.vue";
@@ -41,6 +42,10 @@ const fullPath = computed(() => route.path);
         <StudentPerformances
           v-if="fullPath === '/studentPerformances'"
         ></StudentPerformances>
+        <StudentInstruments
+          v-if="fullPath === '/studentInstruments'"
+        ></StudentInstruments>
+
         <StudentRepertoire
           v-if="fullPath === '/studentRepertoire'"
         ></StudentRepertoire>
