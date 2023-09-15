@@ -131,8 +131,6 @@ async function getStudentPieces() {
         studentPiece.piece.composer.fullName = fullName;
       });
       selectedStudentPieces.value = [];
-      console.log(studentPieces.value);
-      console.log(selectedStudentInstrument.value);
 
       studentInstrumentStudentPieces.value = studentPieces.value.filter(
         (studentPiece) =>

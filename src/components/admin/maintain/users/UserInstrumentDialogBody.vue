@@ -10,6 +10,8 @@ const emits = defineEmits([
   "addInstrumentSuccessEvent",
   "updateInstrumentSuccessEvent",
   "closeUserInstrumentDialogEvent",
+  "disableStudentInstrumentEvent",
+  "enableStudentInstrumentEvent",
 ]);
 
 const props = defineProps({
@@ -197,11 +199,11 @@ onMounted(async () => {
               label
               flat
               size="small"
-              class="font-weight-bold mt-0 text-none bg-white flatChipBorder"
+              class="font-weight-bold mt-0 text-white flatChipBorder"
               :class="
                 studentInstrumentData.status === 'Active'
-              ? 'text-teal'
-              : 'text-maroon'
+                  ? 'bg-teal'
+                  : 'bg-maroon'
               "
             >
               {{ studentInstrumentData.status }}
@@ -286,21 +288,7 @@ onMounted(async () => {
         </v-text-field>
       </v-card-text>
       <v-card-actions>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateInstrument() : addInstrument()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="emits('closeUserInstrumentDialogEvent')"
-        >
-          Cancel
-        </v-btn>
+        <v-spacer></v-spacer>
         <v-btn
           v-if="props.isEdit"
           flat
@@ -321,6 +309,21 @@ onMounted(async () => {
             ? "Enable"
             : "Disable"
           }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateInstrument() : addInstrument()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="emits('closeUserInstrumentDialogEvent')"
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>
