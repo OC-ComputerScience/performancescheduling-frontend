@@ -587,26 +587,8 @@ onMounted(async () => {
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateUser() : addUser()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="
-            props.isEdit
-              ? emits('closeUserDialogEvent')
-              : emits('closeAddUserDialogEvent')
-          "
-        >
-          Cancel
-        </v-btn>
-        <v-btn
+        <v-spacer/>
+                <v-btn
           v-if="props.isEdit"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
@@ -620,6 +602,25 @@ onMounted(async () => {
           "
         >
           {{ props.userData.status === "Disabled" ? "Enable" : "Disable" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateUser() : addUser()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeUserDialogEvent')
+              : emits('closeAddUserDialogEvent')
+          "
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>
