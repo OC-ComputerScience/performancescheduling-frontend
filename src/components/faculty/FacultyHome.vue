@@ -172,6 +172,7 @@ onMounted(async () => {
                   v-for="student of students"
                   :key="student.id"
                   :students-data="student"
+                  @refreshUsersEvent="retrieveData()"
                 ></CurrentStudentsItem>
               </v-card-text>
             </v-card>
