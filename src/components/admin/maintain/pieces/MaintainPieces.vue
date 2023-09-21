@@ -4,6 +4,10 @@ import PieceDataService from "./../../../../services/PieceDataService";
 import ComposerDataService from "./../../../../services/ComposerDataService";
 import MaintainPieceCard from "./MaintainPieceCard.vue";
 import PieceDialogBody from "./PieceDialogBody.vue";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
+
+const loginStore = useLoginStore();
+const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
 
 const addPieceDialog = ref(false);
 
@@ -41,9 +45,13 @@ function searchAndFilterList() {
   // If the search input is empty, return the full list, otherwise filter
   if (searchInput.value != "")
     filteredPieces.value = filteredPieces.value.filter((piece) =>
-      (piece.title.toLowerCase() + " " + piece.title)
-        .toLowerCase()
-        .includes(searchInput.value.toLowerCase())
+      (
+        piece.title.toLowerCase() +
+        " " +
+        piece.composer.firstName.toLowerCase() +
+        " " +
+        piece.composer.lastName.toLowerCase()
+      ).includes(searchInput.value.toLowerCase())
     );
 
   filterPieces();
@@ -223,14 +231,14 @@ onMounted(async () => {
   <v-dialog v-model="addPieceDialog" persistent max-width="600px">
     <PieceDialogBody
       :is-edit="false"
-      :is-admin="true"
+      :is-admin="isAdmin"
       :piece-data="{
         id: null,
         title: null,
         originalLanguage: null,
         poeticTranslation: null,
         literalTranslation: null,
-        status: 'Active',
+        status: isAdmin ? 'Active' : 'Pending',
       }"
       :pieces-data="pieces"
       @closeAddPieceDialogEvent="addPieceDialog = false"

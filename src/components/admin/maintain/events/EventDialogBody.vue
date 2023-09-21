@@ -298,29 +298,12 @@ function timeCheck(time) {
         </v-card-text>
       </v-card-actions>
       <v-card-actions>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateEvent() : addEvent()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="
-            props.isEdit
-              ? emits('closeEventDialogEvent')
-              : emits('closeAddEventDialogEvent')
-          "
-        >
-          Cancel
-        </v-btn>
+        <v-spacer/>
+        <!--Unready/Ready-->
         <v-btn
           v-if="props.isEdit"
           flat
-          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white flatChipBorder"
           :class="props.eventData.isReady ? 'bg-maroon' : 'bg-darkBlue'"
           @click="
             props.eventData.isReady
@@ -329,6 +312,30 @@ function timeCheck(time) {
           "
         >
           {{ props.eventData.isReady ? "Unready" : "Ready" }}
+        </v-btn>
+      <!--Delete-->
+        
+        <!--Update/Add Event-->
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white flatChipBorder"
+          :class="props.isEdit ? 'bg-teal' : 'bg-green'"
+          @click="props.isEdit ? updateEvent() : addEvent()"
+        >
+          {{ props.isEdit ? "Save Event" : "Add Event" }}
+        </v-btn>
+        <!--Cancel-->
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeEventDialogEvent')
+              : emits('closeAddEventDialogEvent')
+          "
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>
