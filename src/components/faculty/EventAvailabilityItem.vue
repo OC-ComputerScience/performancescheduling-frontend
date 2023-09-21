@@ -3,6 +3,9 @@ import { ref, onMounted } from "vue";
 import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
 import AvailabilityDialogBody from "./AvailabilityDialogBody.vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
@@ -17,6 +20,14 @@ const openAvailabilityDialog = ref(false);
 function closeAvailabilityDialog() {
   addAvailabilityDialog.value = false;
   openAvailabilityDialog.value = false;
+}
+
+function openCritique(eventId) {
+  router.push({ path: "facultyCreateCritique", query: { eventId: eventId } });
+}
+function okToCritique(eventDate) {
+  if (new Date(eventDate) <= new Date()) return true;
+  else return false;
 }
 
 onMounted(async () => {});
@@ -64,18 +75,28 @@ onMounted(async () => {});
               {{ get12HourTimeStringFromString(availabilityData.endTime) }}
             </v-card-subtitle>
           </div>
-
         </v-col>
       </v-row>
     </v-card-title>
-   
+
     <v-card-actions class="pt-0 mt-2">
+      <!-- Add Availability Button -->
+      <v-spacer></v-spacer>
+      <v-btn
+        v-if="okToCritique(eventData.date)"
+        flat
+        size="small"
+        class="font-weight-semi-bold mr-2 ml-auto bg-blue text-none"
+        @click="openCritique(eventData.id)"
+      >
+        Critique
+      </v-btn>
       <!-- Add Availability Button -->
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-auto bg-orange text-none"
-        @click="addAvailabilityDialog = true, openAvailabilityDialog = true"
+        class="font-weight-semi-bold ml-auto bg-blue text-none"
+        @click="(addAvailabilityDialog = true), (openAvailabilityDialog = true)"
       >
         Add availability
       </v-btn>
@@ -98,7 +119,11 @@ onMounted(async () => {});
   <v-dialog v-model="openAvailabilityDialog" persistent max-width="600px">
     <AvailabilityDialogBody
       :is-edit="addAvailabilityDialog ? false : true"
-      :availability-data="addAvailabilityDialog ? { startTime: null, endTime: null } : availabilityData"
+      :availability-data="
+        addAvailabilityDialog
+          ? { startTime: null, endTime: null }
+          : availabilityData
+      "
       :complete-availability-data="availabilityData"
       :event-data="eventData"
       @updateAvailabilityEvent="
@@ -114,4 +139,3 @@ onMounted(async () => {});
     ></AvailabilityDialogBody>
   </v-dialog>
 </template>
-

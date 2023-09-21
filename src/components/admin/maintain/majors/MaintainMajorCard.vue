@@ -74,11 +74,11 @@ async function enableMajor(major) {
         </v-col>
       </v-row>
     </v-card-title>
-    <v-card-actions>
+    <v-card-actions class="justify-end pr-4">
       <v-btn
         flat
         size="small"
-        class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
+        class="font-weight-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
         @click="createOrEditDialog = true"
       >
         Edit
