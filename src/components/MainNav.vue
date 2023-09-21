@@ -31,13 +31,13 @@ const menus = [
     roles: [1],
   },
   {
-    link: "facultyHome",
-    text: "Home",
-    roles: [2],
+    link: "studentInstruments",
+    text: "Instruments",
+    roles: [1],
   },
   {
-    link: "facultyPieces",
-    text: "Pieces",
+    link: "facultyHome",
+    text: "Home",
     roles: [2],
   },
   {
@@ -58,11 +58,6 @@ const menus = [
   {
     link: "accompanistHome",
     text: "Home",
-    roles: [4],
-  },
-  {
-    link: "accompanistPieces",
-    text: "Pieces",
     roles: [4],
   },
   {

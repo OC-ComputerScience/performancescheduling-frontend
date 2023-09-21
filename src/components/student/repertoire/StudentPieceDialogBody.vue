@@ -23,7 +23,6 @@ const props = defineProps({
   studentpieceData: { type: [Object], required: true },
   studentPieces: { type: [Array], required: true },
 });
-console.log(props.studentpieceData);
 
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
@@ -66,7 +65,6 @@ async function addStudentPiece() {
 // Update the studentpiece's roles
 
 async function updateStudentPiece() {
-  console.log(props.studentpieceData);
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
       await StudentPieceDataService.update(editedStudentPieceData.value)

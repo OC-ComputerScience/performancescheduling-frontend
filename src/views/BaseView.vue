@@ -4,9 +4,11 @@ import MainNav from "../components/MainNav.vue";
 import StudentHome from "../components/student/StudentHome.vue";
 import StudentPerformances from "../components/student/performances/StudentPerformances.vue";
 import StudentRepertoire from "../components/student/repertoire/StudentRepertoire.vue";
+import StudentInstruments from "../components/student/instruments/StudentInstruments.vue";
 
 import FacultyHome from "../components/faculty/FacultyHome.vue";
 import FacultyPerformances from "../components/faculty/FacultyPerformances.vue";
+import FacultyCreateCritique from "../components/faculty/critique/FacultyCreateCritique.vue";
 
 import AdminHome from "../components/admin/AdminHome.vue";
 import MaintainUsers from "../components/admin/maintain/users/MaintainUsers.vue";
@@ -41,6 +43,10 @@ const fullPath = computed(() => route.path);
         <StudentPerformances
           v-if="fullPath === '/studentPerformances'"
         ></StudentPerformances>
+        <StudentInstruments
+          v-if="fullPath === '/studentInstruments'"
+        ></StudentInstruments>
+
         <StudentRepertoire
           v-if="fullPath === '/studentRepertoire'"
         ></StudentRepertoire>
@@ -49,8 +55,15 @@ const fullPath = computed(() => route.path);
           v-if="fullPath === '/facultyHome' || fullPath === '/accompanistHome'"
         >
         </FacultyHome>
+        
         <FacultyPerformances v-if="fullPath === '/facultyPerformances'">
         </FacultyPerformances>
+
+        <FacultyCreateCritique
+          v-if="fullPath === '/facultyCreateCritique'"
+        ></FacultyCreateCritique>
+
+        <MaintainPieces v-if="fullPath === '/facultyPieces'"></MaintainPieces>
 
         <!-- Admin pages -->
         <AdminHome v-if="fullPath === '/adminHome'"> </AdminHome>
