@@ -187,7 +187,7 @@ function closeDialogs() {
             >
               {{
                 props.signup.pass == null
-                  ? "grade pending"
+                  ? "Grade pending"
                   : props.signup.pass
                   ? "Passed"
                   : "Failed"

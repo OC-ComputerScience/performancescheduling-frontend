@@ -1,9 +1,14 @@
 <script setup>
 import { ref } from "vue";
+import { useLoginStore } from "../../../stores/LoginStore.js";
+import { storeToRefs } from "pinia";
 import { formatDate } from "./../../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "./../../../composables/timeFormatter";
 import { getHourWordFromNumber } from "./../../../composables/timeFormatter";
 import PerformanceDialogBody from "./PerformanceDialogBody.vue";
+
+const loginStore = useLoginStore();
+const { currentRole } = storeToRefs(loginStore);
 
 PerformanceDialogBody;
 const viewCritique = ref(false);
@@ -50,6 +55,7 @@ function hasCritiques(piece) {
               <v-card-subtitle class="font-weight-semi-bold text-maroon">
                 {{ eventData.semester.name }}
               </v-card-subtitle>
+              <div v-if="currentRole.roleId == 2">
               <v-card-subtitle
                 class="font-weight-semi-bold text-darkblue mt-4 text-h6"
               >
@@ -62,6 +68,7 @@ function hasCritiques(piece) {
                     .lastName
                 }}
               </v-card-subtitle>
+            </div>
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="mt-0 pt-2 mr-0 pr-0">
@@ -100,6 +107,15 @@ function hasCritiques(piece) {
                   </v-col>
                 </v-row>
               </v-card>
+              <v-row>
+                <v-card-title class="font-weight-semi-bold text-maroon mt-5">
+                  Grade: {{ eventSignupData.pass == null
+                  ? "Grade pending"
+                  : eventSignupData.pass
+                  ? "Passed"
+                  : "Failed"}} 
+                </v-card-title>
+              </v-row>
             </v-col>
           </v-row>
         </v-col>
