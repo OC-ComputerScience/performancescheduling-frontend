@@ -447,6 +447,7 @@ onMounted(async () => {
               Roles
             </v-card-subtitle>
             <v-select
+              v-if="currentRole.role.role == 'Admin'"
               color="darkBlue"
               variant="plain"
               class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -468,6 +469,25 @@ onMounted(async () => {
                 </v-chip>
               </template>
             </v-select>
+
+            <v-text-field
+              v-if="currentRole.role.role == 'Faculty'"
+              color="darkBlue"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+              variant="plain"
+              readonly
+            >
+                <v-chip
+                  v-for="role in editedUserRoles"
+                  :key="role.id"
+                  label
+                  flat
+                  size="small"
+                  class="font-weight-bold text-none text-white flatChipBorder bg-blue"
+                >
+                  {{ role.role }}
+                </v-chip>
+            </v-text-field>
 
             <v-card-subtitle
               v-if="isFaculty"
