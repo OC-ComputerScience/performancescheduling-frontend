@@ -2,7 +2,11 @@
 import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
 import { getHourWordFromNumber } from "../../composables/timeFormatter";
+import StudentEventSignupEditDialog from "./StudentEventSignupEditDialog.vue";
+import { defineProps, defineEmits, ref } from "vue";
 
+const editSignUp = ref(false);
+const emits = defineEmits(["refreshEvents"]);
 const props = defineProps({
   eventData: { type: [Object], required: true },
   eventSignupData: { type: [Object], required: true },
@@ -209,9 +213,20 @@ const props = defineProps({
         flat
         size="small"
         class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+        @click="editSignUp = true"
       >
         Edit {{ isSignup ? "signup" : "availability" }}
       </v-btn>
     </v-card-actions>
   </v-card>
+  <v-dialog v-model="editSignUp" persistent max-width="1050px">
+    <StudentEventSignupEditDialog
+      :event-data="eventData"
+      :event-sign-up-data="eventSignupData"
+      :student-instrument-signup-data="studentInstrumentSignupData"
+      @closeDialogEvent="editSignUp = false"
+      @refreshEvent="emits('refreshEvent')"
+    >
+    </StudentEventSignupEditDialog>
+  </v-dialog>
 </template>

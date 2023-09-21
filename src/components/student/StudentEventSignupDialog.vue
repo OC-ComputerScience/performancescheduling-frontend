@@ -18,7 +18,7 @@ import UserNotificationDataService from "../../services/UserNotificationDataServ
 import EventSignupPieceDataService from "../../services/EventSignupPieceDataService.js";
 import StudentPieceDialogBody from "../student/repertoire/StudentPieceDialogBody.vue";
 
-const emits = defineEmits(["closeDialogEvent"]);
+const emits = defineEmits(["closeDialogEvent", "refreshEvents"]);
 const props = defineProps({
   eventData: { type: [Object], required: true },
 });
@@ -525,6 +525,7 @@ async function confirmSignup() {
         console.log(e);
       });
     });
+    emits("refreshEvents");
   }
 
   const studentInstrumentSignupData = {
