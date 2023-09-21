@@ -1,12 +1,42 @@
 <script setup>
-  import { ref } from "vue";
-  import StudentDialogBody from "./StudentDialogBody.vue";
+  import { ref, onMounted } from "vue";
+  import { useLoginStore } from "../../stores/LoginStore.js";
+  import { storeToRefs } from "pinia";
+  import UserDialogBody from "../admin/maintain/users/UserDialogBody.vue";
+  import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
+
+
+  const loginStore = useLoginStore();
+  const { currentRole } = storeToRefs(loginStore);
 
   const dialog = ref(false);
+  const userRole = ref({});
+
+  const emits = defineEmits(["closeUserDialog", "refreshUsersEvent"]);
 
   const props = defineProps({
     studentsData: { type: [Object], required: true },
   });
+
+  async function getStudentInstruments(){
+    await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
+    props.studentsData.id
+  )
+    .then((response) => {
+      userRole.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+
+  function closeUserDialog() {
+    dialog.value = false;
+  }
+
+  onMounted(async () => {
+  await getStudentInstruments();
+});
 </script>
 
   <template>
@@ -18,12 +48,14 @@
           </v-card-title>
         </v-col>
         <v-spacer></v-spacer>
-        <v-col cols="auto">
+        <div v-if="currentRole.role.role == 'Faculty'">
+          <v-col cols="auto">
 
-            <v-icon class="ma-3" icon="mdi-information" @click="dialog=true">
-            </v-icon>
+              <v-icon class="ma-3" icon="mdi-information" @click="dialog=true">
+              </v-icon>
 
-        </v-col>
+          </v-col>
+        </div>
       </v-row>
     </v-card>
     <v-dialog
@@ -32,14 +64,12 @@
     max-width="1200px"
     scrollable
   >
-    <StudentDialogBody
+    <UserDialogBody
       :is-edit="true"
-      :user-data="userData"
-      :user-roles="props.userRoles"
+      :user-data="studentsData"
+      :user-roles="studentsData.userRoles"
       @closeUserDialogEvent="closeUserDialog"
       @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
-      @disableUserEvent="closeUserDialog(), disableUser(userData)"
-      @enableUserEvent="closeUserDialog(), enableUser(userData)"
-    ></StudentDialogBody>
+    ></UserDialogBody>
   </v-dialog>
   </template>
