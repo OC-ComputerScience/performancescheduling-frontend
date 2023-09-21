@@ -5,9 +5,14 @@ import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 import StudentEventSignupDialog from "./student/StudentEventSignupDialog.vue";
 import AvailabilityDialogBody from "./faculty/AvailabilityDialogBody.vue";
+import EventDialogBody from "./admin/maintain/events/EventDialogBody.vue";
+import EventDataService from "../services/EventDataService";
+
+
 
 const router = useRouter();
 const dialog = ref(false);
+const createOrEditDialog = ref(false);
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
@@ -15,22 +20,46 @@ const props = defineProps({
   availabilityData: { type: [Object], required: false },
 });
 
-const emits = defineEmits(["refreshAvailabilitiesEvent"]);
+const emits = defineEmits(["refreshAvailabilitiesEvent", "refreshEventsEvent"]);
 
 const addOrEditAvailabilityDialog = ref(false);
 
 function closeAvailabilityDialog() {
   addOrEditAvailabilityDialog.value = false;
 }
-
+function closeEventDialog() {
+  createOrEditDialog.value = false;
+}
 function handleClick() {
   if (props.roleId == 3) {
-    router.push({ path: "adminEvents" });
+    createOrEditDialog.value = true;
+    //router.push({ path: "adminEvents" });
   } else if (props.roleId == 1) {
     dialog.value = true;
   } else {
     addOrEditAvailabilityDialog.value = true;
   }
+}
+async function readyEvent(event) {
+  event.isReady = true;
+  await EventDataService.update(event)
+    .then(() => {
+      emits("refreshEventsEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+async function unreadyEvent(event) {
+  event.isReady = false;
+  await EventDataService.update(event)
+    .then(() => {
+      emits("refreshEventsEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 </script>
 
@@ -171,5 +200,15 @@ function handleClick() {
       "
       @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
     ></AvailabilityDialogBody>
+  </v-dialog>
+  <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+    <EventDialogBody
+      :is-edit="true"
+      :event-data="eventData"
+      @closeEventDialogEvent="closeEventDialog"
+      @updateEventSuccessEvent="closeEventDialog(), emits('refreshEventsEvent')"
+      @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
+      @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
+    ></EventDialogBody>
   </v-dialog>
 </template>
