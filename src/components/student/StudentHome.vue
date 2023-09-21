@@ -156,7 +156,7 @@ onMounted(async () => {
               :key="event.id"
               :event-data="event"
               :role-id="loginStore.currentRole.roleId"
-              @refreshEvents="retrieveData"
+              @refreshEvents="retrieveData()"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>

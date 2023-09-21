@@ -22,8 +22,16 @@ const studentInstrumentSignup = ref(
   Object.assign({}, props.studentInstrumentSignupData)
 );
 const loginStore = useLoginStore();
-
-// event variable
+const accompianist =
+  studentInstrumentSignup.value.accompanistRoleSignup === null
+    ? "None"
+    : studentInstrumentSignup.value.accompanistRoleSignup.user.firstName +
+      " " +
+      studentInstrumentSignup.value.accompanistRoleSignup.user.lastName;
+const instructor =
+  studentInstrumentSignup.value.instructorRoleSignup.user.firstName +
+  " " +
+  studentInstrumentSignup.value.instructorRoleSignup.user.lastName;
 const eventTypeLabel = ref("");
 const errorMessage = ref("");
 
@@ -43,7 +51,7 @@ const selectedStudentPieces = ref([]);
 // confirmation dialog variables
 
 const confimationDialog = ref(false);
-const dialogMessage = ref("");
+
 const addStudentPieceDialog = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
@@ -129,11 +137,12 @@ async function deleteSignup() {
 
 async function saveSignup() {
   const studentInstrumentSignupData = {
-    id: studentInstrumentSignup.value.id,
+    id: studentInstrumentSignup.value.eventSignupId,
     isGroupEvent: groupSignup.value,
   };
+  console.log(groupSignup.value);
   // update student signup
-  await StudentInstrumentSignupDataService.update(studentInstrumentSignupData)
+  await EventSignupDataService.update(studentInstrumentSignupData)
     .then(() => {
       confimationDialog.value = false;
     })
@@ -215,9 +224,7 @@ onMounted(async () => {
           <v-col>
             <v-text-field
               label="Instructor"
-              v-model="
-                studentInstrumentSignup.instructorRoleSignup.user.firstName
-              "
+              v-model="instructor"
               text-label="Instructor"
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -227,9 +234,7 @@ onMounted(async () => {
           <v-col>
             <v-text-field
               label="Accompanist"
-              v-model="
-                studentInstrumentSignup.accompanistRoleSignup.user.firstName
-              "
+              v-model="accompianist"
               text-label="Accompanist"
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -300,7 +305,7 @@ onMounted(async () => {
               </div>
             </v-row>
             <v-row>
-              <v-card color="lightBlue" elevation="0">
+              <v-card color="white" elevation="0">
                 <v-card-text class="text-blue py-2 font-weight-bold text-h6">
                   <div>
                     {{
@@ -349,7 +354,7 @@ onMounted(async () => {
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-red text-white"
+            class="font-weight-semi-bold mr-2 mt-4 bg-red text-none"
             @click="emits('closeDialogEvent')"
           >
             Cancel
@@ -384,7 +389,7 @@ onMounted(async () => {
           @click="confimationDialog = false"
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-red text-white"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
           >Cancel</v-btn
         >
       </v-card-actions>

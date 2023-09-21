@@ -225,7 +225,7 @@ const props = defineProps({
       :event-sign-up-data="eventSignupData"
       :student-instrument-signup-data="studentInstrumentSignupData"
       @closeDialogEvent="editSignUp = false"
-      @refreshEvent="emits('refreshEvent')"
+      @refreshEvents="emits('refreshEvents')"
     >
     </StudentEventSignupEditDialog>
   </v-dialog>

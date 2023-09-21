@@ -15,7 +15,7 @@ const props = defineProps({
   availabilityData: { type: [Object], required: false },
 });
 
-const emits = defineEmits(["refreshAvailabilitiesEvent"]);
+const emits = defineEmits(["refreshAvailabilitiesEvent", "refreshEvents"]);
 
 const addOrEditAvailabilityDialog = ref(false);
 
@@ -153,6 +153,7 @@ function handleClick() {
     <student-event-signup-dialog
       :eventData="eventData"
       @closeDialogEvent="dialog = false"
+      @refreshEvents="emits('refreshEvents')"
     >
     </student-event-signup-dialog>
   </v-dialog>
