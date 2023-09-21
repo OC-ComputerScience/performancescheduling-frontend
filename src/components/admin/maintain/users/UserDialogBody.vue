@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
+import { storeToRefs } from "pinia";
 import RoleDataService from "../../../../services/RoleDataService";
 import MajorDataService from "../../../../services/MajorDataService";
 import UserInstrumentCard from "./UserInstrumentCard.vue";
@@ -23,6 +25,9 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
   isAdmin: { type: [Boolean], required: true },
 });
+
+const loginStore = useLoginStore();
+const { currentRole } = storeToRefs(loginStore);
 
 const form = ref(null);
 
@@ -591,7 +596,7 @@ onMounted(async () => {
       <v-card-actions>
         <v-spacer/>
                 <v-btn
-          v-if="props.isEdit"
+          v-if="props.isEdit && (currentRole.role.role == 'Admin')"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
