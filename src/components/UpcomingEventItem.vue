@@ -5,33 +5,61 @@ import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 import StudentEventSignupDialog from "./student/StudentEventSignupDialog.vue";
 import AvailabilityDialogBody from "./faculty/AvailabilityDialogBody.vue";
+import EventDialogBody from "./admin/maintain/events/EventDialogBody.vue";
+import EventDataService from "../services/EventDataService";
+
+
 
 const router = useRouter();
 const dialog = ref(false);
+const createOrEditDialog = ref(false);
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
   roleId: { type: [Number], required: true },
-  availabilityData: { type: [Object], required: false }
+  availabilityData: { type: [Object], required: false },
 });
 
-const emits = defineEmits(["refreshAvailabilitiesEvent"]);
+const emits = defineEmits(["refreshAvailabilitiesEvent", "refreshEventsEvent"]);
 
 const addOrEditAvailabilityDialog = ref(false);
 
 function closeAvailabilityDialog() {
   addOrEditAvailabilityDialog.value = false;
 }
-
+function closeEventDialog() {
+  createOrEditDialog.value = false;
+}
 function handleClick() {
   if (props.roleId == 3) {
-    router.push({ path: "adminEvents" });
+    createOrEditDialog.value = true;
+    //router.push({ path: "adminEvents" });
   } else if (props.roleId == 1) {
     dialog.value = true;
-  }
-  else{
+  } else {
     addOrEditAvailabilityDialog.value = true;
   }
+}
+async function readyEvent(event) {
+  event.isReady = true;
+  await EventDataService.update(event)
+    .then(() => {
+      emits("refreshEventsEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+async function unreadyEvent(event) {
+  event.isReady = false;
+  await EventDataService.update(event)
+    .then(() => {
+      emits("refreshEventsEvent");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 </script>
 
@@ -93,14 +121,14 @@ function handleClick() {
                   v-if="roleId == 2 || roleId == 4"
                   class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
                 >
-                {{
-                  eventData.eventType.instrumentType === "Both"
-                    ? "Vocal & Instrumental"
-                    : eventData.eventType.instrumentType === "Vocal"
-                    ? "Vocal"
-                    : "Instrumental"
-                }}
-                Event
+                  {{
+                    eventData.eventType.instrumentType === "Both"
+                      ? "Vocal & Instrumental"
+                      : eventData.eventType.instrumentType === "Vocal"
+                      ? "Vocal"
+                      : "Instrumental"
+                  }}
+                  Event
                 </v-card-subtitle>
                 <v-card-subtitle
                   v-if="roleId == 3"
@@ -137,7 +165,7 @@ function handleClick() {
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-auto mr-2 bg-orange text-none"
+        class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
         @click="handleClick()"
       >
         {{
@@ -160,7 +188,9 @@ function handleClick() {
   <v-dialog v-model="addOrEditAvailabilityDialog" persistent max-width="600px">
     <AvailabilityDialogBody
       :is-edit="false"
-      :availability-data="availabilityData ? availabilityData : { startTime: null, endTime: null }"
+      :availability-data="
+        availabilityData ? availabilityData : { startTime: null, endTime: null }
+      "
       :event-data="eventData"
       @updateAvailabilityEvent="
         closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
@@ -170,5 +200,15 @@ function handleClick() {
       "
       @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
     ></AvailabilityDialogBody>
+  </v-dialog>
+  <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+    <EventDialogBody
+      :is-edit="true"
+      :event-data="eventData"
+      @closeEventDialogEvent="closeEventDialog"
+      @updateEventSuccessEvent="closeEventDialog(), emits('refreshEventsEvent')"
+      @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
+      @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
+    ></EventDialogBody>
   </v-dialog>
 </template>

@@ -10,6 +10,8 @@ const emits = defineEmits([
   "addInstrumentSuccessEvent",
   "updateInstrumentSuccessEvent",
   "closeUserInstrumentDialogEvent",
+  "disableStudentInstrumentEvent",
+  "enableStudentInstrumentEvent",
 ]);
 
 const props = defineProps({
@@ -41,7 +43,7 @@ async function getLevels() {
 const instrumentOptions = ref([]);
 
 async function getInstruments() {
-  await InstrumentDataService.getAll()
+  await InstrumentDataService.getAll("name")
     .then((response) => {
       instrumentOptions.value = response.data;
     })
@@ -53,18 +55,18 @@ async function getInstruments() {
 const instructors = ref([]);
 const accompanists = ref([]);
 
-async function getAllInstructors() {
-  await UserRoleDataService.getRolesForRoleId(2)
+function getAllInstructors() {
+  UserRoleDataService.getRolesForRoleId(2, 'lastName,firstName')
     .then((response) => {
-      instructors.value = response.data;
+      instructors.value = response.data
     })
     .catch((err) => {
       console.log(err);
     });
 }
 
-async function getAllAccompanists() {
-  await UserRoleDataService.getRolesForRoleId(4)
+function getAllAccompanists() {
+  UserRoleDataService.getRolesForRoleId(4, 'lastName,firstName')
     .then((response) => {
       accompanists.value = [
         { id: null, user: { firstName: "", lastName: "" } },
@@ -132,7 +134,7 @@ async function updateSelectedAccompanist() {
   if (
     props.studentInstrumentData.accompanistRoleId === null ||
     selectedAccompanist.value.id !=
-      props.studentInstrumentData.accompanistRoleId
+    props.studentInstrumentData.accompanistRoleId
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
@@ -197,11 +199,11 @@ onMounted(async () => {
               label
               flat
               size="small"
-              class="font-weight-bold mt-0 text-none bg-white flatChipBorder"
+              class="font-weight-bold mt-0 text-white flatChipBorder"
               :class="
                 studentInstrumentData.status === 'Active'
-                  ? 'text-teal'
-                  : 'text-maroon'
+                  ? 'bg-teal'
+                  : 'bg-maroon'
               "
             >
               {{ studentInstrumentData.status }}
@@ -286,41 +288,42 @@ onMounted(async () => {
         </v-text-field>
       </v-card-text>
       <v-card-actions>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateInstrument() : addInstrument()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="emits('closeUserInstrumentDialogEvent')"
-        >
-          Cancel
-        </v-btn>
+        <v-spacer></v-spacer>
         <v-btn
           v-if="props.isEdit"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
             props.studentInstrumentData.status === 'Disabled'
-              ? 'bg-darkBlue'
-              : 'bg-maroon'
-          "
+            ? 'bg-darkBlue'
+            : 'bg-maroon'
+            "
           @click="
-            props.studentInstrumentData.status === 'Disabled'
-              ? emits('enableStudentInstrumentEvent')
-              : emits('disableStudentInstrumentEvent')
-          "
+    props.studentInstrumentData.status === 'Disabled'
+      ? emits('enableStudentInstrumentEvent')
+      : emits('disableStudentInstrumentEvent')
+    "
         >
           {{
             props.studentInstrumentData.status === "Disabled"
-              ? "Enable"
-              : "Disable"
+            ? "Enable"
+            : "Disable"
           }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateInstrument() : addInstrument()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="emits('closeUserInstrumentDialogEvent')"
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>
