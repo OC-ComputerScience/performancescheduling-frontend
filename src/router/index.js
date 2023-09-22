@@ -70,6 +70,12 @@ const router = createRouter({
     {
       path: "/base",
       component: BaseView,
+      name: "facultyPerformances",
+      alias: "/facultyPerformances",
+    },
+    {
+      path: "/base",
+      component: BaseView,
       name: "facultyCreateCritique",
       alias: "/facultyCreateCritique",
     },

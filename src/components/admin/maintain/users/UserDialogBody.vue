@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
+import { storeToRefs } from "pinia";
 import RoleDataService from "../../../../services/RoleDataService";
 import MajorDataService from "../../../../services/MajorDataService";
 import UserInstrumentCard from "./UserInstrumentCard.vue";
@@ -21,7 +23,11 @@ const props = defineProps({
   userData: { type: [Object], required: true },
   userRoles: { type: [Array], required: true },
   isEdit: { type: [Boolean], required: true },
+  isAdmin: { type: [Boolean], required: true },
 });
+
+const loginStore = useLoginStore();
+const { currentRole } = storeToRefs(loginStore);
 
 const form = ref(null);
 
@@ -125,7 +131,6 @@ const editedFacultyTitle = ref(isFaculty.value ? facultyRole.title : null);
 
 async function addUser() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await UserDataService.create(editedUserData.value)
         .then(async (response) => {
@@ -154,7 +159,6 @@ async function addUser() {
 // update the user's data
 async function updateUser() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await updateUserRoles();
 
@@ -317,6 +321,7 @@ async function refreshStudentInstruments() {
 onMounted(async () => {
   await getAllRoles();
   await getAllMajors();
+  await refreshStudentInstruments();
 });
 </script>
 
@@ -425,7 +430,7 @@ onMounted(async () => {
               Phone Number
             </v-card-subtitle>
             <v-text-field
-              placeholder="4051234567"
+              placeholder="4051111111"
               v-model="editedUserData.phoneNumber"
               variant="plain"
               class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -443,6 +448,7 @@ onMounted(async () => {
               Roles
             </v-card-subtitle>
             <v-select
+              v-if="currentRole.role.role == 'Admin'"
               color="darkBlue"
               variant="plain"
               class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -452,6 +458,7 @@ onMounted(async () => {
               item-value="id"
               multiple
               return-object
+              :readonly="!props.isAdmin"
             >
               <template v-slot:selection="{ item }">
                 <v-chip
@@ -464,6 +471,25 @@ onMounted(async () => {
                 </v-chip>
               </template>
             </v-select>
+
+            <v-text-field
+              v-if="currentRole.role.role == 'Faculty'"
+              color="darkBlue"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+              variant="plain"
+              readonly
+            >
+                <v-chip
+                  v-for="role in editedUserRoles"
+                  :key="role.id"
+                  label
+                  flat
+                  size="small"
+                  class="font-weight-bold text-none text-white flatChipBorder bg-blue"
+                >
+                  {{ role.role }}
+                </v-chip>
+            </v-text-field>
 
             <v-card-subtitle
               v-if="isFaculty"
@@ -540,7 +566,7 @@ onMounted(async () => {
                 <v-card-subtitle
                   class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
                 >
-                  Private Hours
+                  Total Private Hours
                 </v-card-subtitle>
                 <v-text-field
                   type="number"
@@ -548,6 +574,7 @@ onMounted(async () => {
                   variant="plain"
                   class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
                   v-model="editedStudentHours"
+                  readonly
                   :rules="[(v) => !!v || 'This field is required']"
                 >
                 </v-text-field>
@@ -589,7 +616,7 @@ onMounted(async () => {
       <v-card-actions>
         <v-spacer/>
                 <v-btn
-          v-if="props.isEdit"
+          v-if="props.isEdit && (currentRole.role.role == 'Admin')"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="

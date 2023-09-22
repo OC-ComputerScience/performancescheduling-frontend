@@ -604,10 +604,15 @@ watch(selectedStudentInstrument, async () => {
       console.log(e);
     });
 
-  selectedAccompanist.value = activeAccompanists.value.find(
-    (accompanist) =>
-      accompanist.id == selectedStudentInstrument.value.accompanistRole.id
-  );
+  if(selectedStudentInstrument.value.accompanistRole!=null){
+    selectedAccompanist.value = activeAccompanists.value.find(
+      (accompanist) =>
+        accompanist.id == selectedStudentInstrument.value.accompanistRole.id
+    );
+  }
+  else{
+    selectedAccompanist.value = null;
+  }
 
   // update student pieces
   selectedStudentPieces.value = [];

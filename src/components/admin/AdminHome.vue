@@ -85,6 +85,10 @@ async function retrieveData() {
     });
 }
 
+async function refreshEvents() {
+  await retrieveData();
+}
+
 onMounted(async () => {
   await retrieveData();
 });
@@ -128,6 +132,7 @@ onMounted(async () => {
               :key="event.id"
               :event-data="event"
               :role-id="loginStore.currentRole.roleId"
+              @refreshEventsEvent="refreshEvents()"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>

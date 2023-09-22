@@ -46,6 +46,11 @@ const menus = [
     roles: [2],
   },
   {
+    link: "facultyPerformances",
+    text: "Performances",
+    roles: [2],
+  },
+  {
     link: "adminHome",
     text: "Home",
     roles: [3],
