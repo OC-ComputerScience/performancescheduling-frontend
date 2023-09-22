@@ -22,7 +22,7 @@ const studentInstrumentSignup = ref(
   Object.assign({}, props.studentInstrumentSignupData)
 );
 const loginStore = useLoginStore();
-console.log(loginStore);
+
 const accompianist =
   studentInstrumentSignup.value.accompanistRoleSignup === null
     ? "None"
@@ -84,7 +84,7 @@ async function getStudentPieces() {
           selectedStudentPieces.value.push(studentPiece);
         }
       );
-      console.log(selectedStudentPieces.value);
+
       filteredStudentPieces.value = studentPieces.value;
     })
     .catch((e) => {
@@ -133,11 +133,16 @@ async function deleteSignup() {
 }
 
 async function saveSignup() {
+  if (selectedStudentPieces.value.length == 0) {
+    errorMessage.value =
+      "You must select atleast one piece before saving this signup.";
+    return;
+  }
   const studentInstrumentSignupData = {
     id: studentInstrumentSignup.value.eventSignupId,
     isGroupEvent: groupSignup.value,
   };
-  console.log(groupSignup.value);
+
   // update student signup
   await EventSignupDataService.update(studentInstrumentSignupData)
     .then(() => {
