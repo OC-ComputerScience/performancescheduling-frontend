@@ -20,7 +20,8 @@ const props = defineProps({
   availabilityData: { type: [Object], required: false },
 });
 
-const emits = defineEmits(["refreshAvailabilitiesEvent", "refreshEventsEvent"]);
+const emits = defineEmits(["refreshAvailabilitiesEvent", "refreshEvents"]);
+
 
 const addOrEditAvailabilityDialog = ref(false);
 
@@ -182,6 +183,7 @@ async function unreadyEvent(event) {
     <student-event-signup-dialog
       :eventData="eventData"
       @closeDialogEvent="dialog = false"
+      @refreshEvents="emits('refreshEvents')"
     >
     </student-event-signup-dialog>
   </v-dialog>

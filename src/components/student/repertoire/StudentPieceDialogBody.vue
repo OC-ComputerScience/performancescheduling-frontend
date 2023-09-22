@@ -23,6 +23,7 @@ const props = defineProps({
   studentpieceData: { type: [Object], required: true },
   studentPieces: { type: [Array], required: true },
 });
+console.log(props.studentpieceData);
 
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
@@ -334,7 +335,7 @@ onMounted(async () => {
         </v-col>
       </v-row>
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <v-btn
           v-if="!props.isEdit"
           flat
@@ -347,7 +348,7 @@ onMounted(async () => {
         <v-btn
           flat
           color="blue"
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
           @click="editPieceDialog = true"
         >
           Edit Piece
@@ -355,14 +356,14 @@ onMounted(async () => {
         <v-btn
           flat
           v-if="!props.isEdit"
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
           @click="addComposerDialog = true"
         >
           Add Composer
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
           @click="props.isEdit ? updateStudentPiece() : addStudentPiece()"
         >
           {{ props.isEdit ? "Save" : "Add" }}
