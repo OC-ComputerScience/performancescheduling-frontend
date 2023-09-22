@@ -22,6 +22,7 @@ const studentInstrumentSignup = ref(
   Object.assign({}, props.studentInstrumentSignupData)
 );
 const loginStore = useLoginStore();
+console.log(loginStore);
 const accompianist =
   studentInstrumentSignup.value.accompanistRoleSignup === null
     ? "None"
@@ -36,10 +37,6 @@ const eventTypeLabel = ref("");
 const errorMessage = ref("");
 
 const groupSignup = ref(studentInstrumentSignup.value.eventSignup.isGroupEvent);
-
-// student instrument variables
-
-const selectedStudentInstrument = ref(null);
 
 // student piece variables
 
@@ -69,7 +66,7 @@ async function getStudentPieces() {
           studentPiece.studentInstrumentId ===
             studentInstrumentSignup.value.studentInstrumentId
       );
-
+      selectedStudentPieces.value = [];
       studentPieces.value.forEach(function (studentPiece) {
         var fullName = "";
         if (studentPiece.piece.composer.lastName) {
@@ -403,10 +400,9 @@ onMounted(async () => {
         id: null,
         pieceId: null,
         semesterId: eventData.semesterId,
-        studentInstrumentId: selectedStudentInstrument.id,
+        studentInstrumentId: studentInstrumentSignup.studentInstrument.id,
         status: 'Active',
       }"
-      :student-id="loginStore.currentRole.userId"
       :student-pieces="studentPieces"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="
