@@ -91,7 +91,9 @@ async function addInstrument() {
           selectedAccompanist.value != null
             ? selectedAccompanist.value.id
             : null,
-        levelId: editedLevel.value.id,
+        levelId: editedLevel.value != null
+            ? editedLevel.value.id
+            : null,
       })
         .then(() => {
           emits("addInstrumentSuccessEvent");
@@ -153,7 +155,7 @@ async function updateLevel() {
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
-      levelId: editedLevel.value.id,
+      levelId: editedLevel.value != null ? editedLevel.value.id : null,
     }).catch((err) => {
       console.log(err);
     });
@@ -271,7 +273,6 @@ onMounted(async () => {
           :item-title="(item) => item.name"
           item-value="id"
           return-object
-          :rules="[(v) => !!v || 'This field is required']"
         >
         </v-select>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">

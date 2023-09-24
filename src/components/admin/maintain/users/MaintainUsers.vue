@@ -295,6 +295,7 @@ onMounted(async () => {
               <MaintainUserCard
                 :user-data="omit('userRoles', user)"
                 :user-roles="user.userRoles"
+                :is-admin="isAdmin"
                 @refreshUsersEvent="refreshUsers()"
               ></MaintainUserCard>
             </v-col>
