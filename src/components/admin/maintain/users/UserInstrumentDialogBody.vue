@@ -224,7 +224,7 @@ onMounted(async () => {
           :item-title="(item) => item.name"
           item-value="id"
           return-object
-          :disabled="props.isEdit"
+          :readonly="props.isEdit"
           :rules="[(v) => !!v || 'This field is required']"
         >
         </v-select>

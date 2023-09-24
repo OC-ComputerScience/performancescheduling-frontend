@@ -55,7 +55,7 @@ function hasCritiques(piece) {
               <v-card-subtitle class="font-weight-semi-bold text-maroon">
                 {{ eventData.semester.name }}
               </v-card-subtitle>
-              <div v-if="currentRole.roleId == 3">
+              <div v-if="currentRole.roleId == 2">
               <v-card-subtitle
                 class="font-weight-semi-bold text-darkblue mt-4 text-h6"
               >

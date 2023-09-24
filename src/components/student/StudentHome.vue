@@ -139,6 +139,7 @@ onMounted(async () => {
               :event-signup-data="studentInstrumentSignup.eventSignup"
               :student-instrument-signup-data="studentInstrumentSignup"
               :is-signup="true"
+              @refreshEvents="retrieveData"
             >
             </EventSignupItem>
           </v-card-text>
@@ -155,6 +156,7 @@ onMounted(async () => {
               :key="event.id"
               :event-data="event"
               :role-id="loginStore.currentRole.roleId"
+              @refreshEvents="retrieveData()"
             ></UpcomingEventItem>
           </v-card-text>
         </v-card>
