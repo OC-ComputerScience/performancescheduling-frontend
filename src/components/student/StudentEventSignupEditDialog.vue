@@ -93,14 +93,19 @@ async function getStudentPieces() {
 }
 
 function selectStudentPiece(studentPiece) {
+  console.log(studentPiece);
+  console.log(selectedStudentPieces.value);
   if (!isStudentPieceSelected(studentPiece)) {
     selectedStudentPieces.value.push(studentPiece);
   } else {
     selectedStudentPieces.value.splice(
-      selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id),
+      selectedStudentPieces.value.findIndex(
+        (x) => x.pieceId === studentPiece.pieceId
+      ),
       1
     );
   }
+  console.log(selectedStudentPieces.value);
 }
 
 function isStudentPieceSelected(studentPiece) {
