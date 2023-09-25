@@ -93,8 +93,6 @@ async function getStudentPieces() {
 }
 
 function selectStudentPiece(studentPiece) {
-  console.log(studentPiece);
-  console.log(selectedStudentPieces.value);
   if (!isStudentPieceSelected(studentPiece)) {
     selectedStudentPieces.value.push(studentPiece);
   } else {
@@ -105,7 +103,6 @@ function selectStudentPiece(studentPiece) {
       1
     );
   }
-  console.log(selectedStudentPieces.value);
 }
 
 function isStudentPieceSelected(studentPiece) {
