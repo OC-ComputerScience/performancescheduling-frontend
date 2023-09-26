@@ -162,7 +162,7 @@ onMounted(async () => {
           <v-btn
             flat
             size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+            class="font-weight-bold mt-6 ml-auto text-none text-white bg-blue flatChipBorder"
             @click="createOrEditDialog = true"
           >
             Edit
