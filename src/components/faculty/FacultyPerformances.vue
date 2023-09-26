@@ -174,6 +174,7 @@ onMounted(async () => {
                 :event-data="studentInstrumentSignup.eventSignup.event"
                 :event-signup-data="studentInstrumentSignup.eventSignup"
                 :student-instrument-signup-data="studentInstrumentSignup"
+                @dialogClosedEvent="getPerformances()"
               >
               </StudentPerformanceCard>
             </v-col>
