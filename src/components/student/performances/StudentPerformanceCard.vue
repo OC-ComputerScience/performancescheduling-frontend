@@ -6,13 +6,19 @@ import { formatDate } from "./../../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "./../../../composables/timeFormatter";
 import { getHourWordFromNumber } from "./../../../composables/timeFormatter";
 import PerformanceDialogBody from "./PerformanceDialogBody.vue";
+import FacultyCreateCritiqueDialog from "../../faculty/critique/FacultyCreateCritiqueDialog.vue";
+import FacultyGradeCritiqueDialog from "../../faculty/critique/FacultyGradeCritiqueDialog.vue";
 
 const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
+const emits = defineEmits(["dialogClosedEvent"]);
 
 PerformanceDialogBody;
 const viewCritique = ref(false);
 const pieceData = ref(null);
+const isCritiqued = ref(false);
+const gradeDialog = ref(false);
+const critiqueDialog = ref(false);
 
 const props = defineProps({
   eventData: { type: [Object], required: true },
@@ -25,13 +31,18 @@ function openDialog(piece) {
   viewCritique.value = true;
 }
 
-function closePerformanceDialog() {
+function closeDialogs() {
   viewCritique.value = false;
+  critiqueDialog.value = false;
+  gradeDialog.value = false;
+  emits("dialogClosedEvent");
 }
 function hasCritiques(piece) {
   if (piece.critiques.length > 0) {
+    isCritiqued.value = true;
     return true;
   } else {
+    isCritiqued.value = false;
     return false;
   }
 }
@@ -251,14 +262,13 @@ function hasCritiques(piece) {
                   </v-card-text>
                 </v-col>
                 <v-col
-                  v-if="hasCritiques(eventSignupPiece)"
+                v-if="hasCritiques(eventSignupPiece)"
                   cols="3"
                   min-width="95"
                 >
                   <v-btn
                     flat
                     size="small"
-                    :min-width="95"
                     class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
                     @click="openDialog(eventSignupPiece)"
                   >
@@ -267,6 +277,26 @@ function hasCritiques(piece) {
                 </v-col>
               </v-row>
             </v-col>
+            <v-btn
+              v-if="!isCritiqued"
+                flat
+                size="small"
+                :min-width="95"
+                class="font-weight-semi-bold ml-auto mr-2 bg-teal text-none text-white"
+                @click="critiqueDialog = true"
+              >
+              Add Critique
+            </v-btn>
+            <v-btn
+              v-if="eventSignupData.pass == null"
+                flat
+                size="small"
+                :min-width="95"
+                class="font-weight-semi-bold mr-2 bg-teal text-none text-white"
+                @click="gradeDialog = true"
+              >
+              Add Grade
+            </v-btn>
           </v-row>
         </v-col>
       </v-row>
@@ -276,7 +306,22 @@ function hasCritiques(piece) {
     <PerformanceDialogBody
       :event-name="eventData.name"
       :piece-data="pieceData"
-      @closePerformanceDialog="closePerformanceDialog"
+      @closePerformanceDialog="closeDialogs()"
     ></PerformanceDialogBody>
+  </v-dialog>
+  <v-dialog v-model="critiqueDialog" persistent max-width="1050px">
+    <FacultyCreateCritiqueDialog
+      :signup="props.studentInstrumentSignupData.eventSignup"
+      @closeDialogEvent="closeDialogs()"
+    >
+    </FacultyCreateCritiqueDialog>
+  </v-dialog>
+  <v-dialog v-model="gradeDialog" persistent max-width="800px">
+    <FacultyGradeCritiqueDialog
+      :signup="props.studentInstrumentSignupData.eventSignup"
+      :time="props.eventSignupData"
+      @closeDialogEvent="closeDialogs()"
+    >
+    </FacultyGradeCritiqueDialog>
   </v-dialog>
 </template>

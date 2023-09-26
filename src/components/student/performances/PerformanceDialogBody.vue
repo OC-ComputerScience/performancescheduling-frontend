@@ -1,5 +1,5 @@
 <script setup>
-const emits = defineEmits(["closePerformandceDialog"]);
+const emits = defineEmits(["closePerformanceDialog"]);
 
 const props = defineProps({
   eventName: { type: String, required: true },

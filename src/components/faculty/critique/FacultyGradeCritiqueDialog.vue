@@ -18,9 +18,9 @@ async function saveGrade(grade) {
 onMounted(async () => {
   let students = props.signup.studentInstrumentSignups.map(
     (stuSignup) =>
-      stuSignup.studentInstrument.studentRole.user.lastName +
+      stuSignup.studentInstrument.studentRole.user.firstName +
       " " +
-      stuSignup.studentInstrument.studentRole.user.firstName
+      stuSignup.studentInstrument.studentRole.user.lastName
   );
 
   if (students.length == 1) {
