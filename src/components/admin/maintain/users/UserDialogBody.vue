@@ -190,7 +190,7 @@ async function updateUser() {
 // After all roles have been checked, whatever is left in editedUserRoles is a new role,
 // so create it.
 async function updateUserRoles() {
-  const updateRoles = [...editedUserRoles.value] // copy of editUserRoles to use with splice, a destructive process
+  const updateRoles = [...editedUserRoles.value]; // copy of editUserRoles to use with splice, a destructive process
 
   for (let userRole of props.userRoles) {
     // If role exists in editedUserRoles, and is active, we don't need to do anything,
@@ -212,11 +212,8 @@ async function updateUserRoles() {
       });
     }
 
-    
     // Find index of role to splice in editedUserRoles
-    let index = updateRoles.findIndex(
-      (eur) => eur.id === userRole.roleId
-    );
+    let index = updateRoles.findIndex((eur) => eur.id === userRole.roleId);
     // Splice role from editedUserRoles
     index != -1 ? updateRoles.splice(index, 1) : null;
   }
@@ -458,7 +455,6 @@ onMounted(async () => {
               item-value="id"
               multiple
               return-object
-              :readonly="!props.isAdmin"
             >
               <template v-slot:selection="{ item }">
                 <v-chip
@@ -479,16 +475,16 @@ onMounted(async () => {
               variant="plain"
               readonly
             >
-                <v-chip
-                  v-for="role in editedUserRoles"
-                  :key="role.id"
-                  label
-                  flat
-                  size="small"
-                  class="font-weight-bold text-none text-white flatChipBorder bg-blue"
-                >
-                  {{ role.role }}
-                </v-chip>
+              <v-chip
+                v-for="role in editedUserRoles"
+                :key="role.id"
+                label
+                flat
+                size="small"
+                class="font-weight-bold text-none text-white flatChipBorder bg-blue"
+              >
+                {{ role.role }}
+              </v-chip>
             </v-text-field>
 
             <v-card-subtitle
@@ -614,9 +610,9 @@ onMounted(async () => {
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-spacer/>
-                <v-btn
-          v-if="props.isEdit && (currentRole.role.role == 'Admin')"
+        <v-spacer />
+        <v-btn
+          v-if="props.isEdit && currentRole.role.role == 'Admin'"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
