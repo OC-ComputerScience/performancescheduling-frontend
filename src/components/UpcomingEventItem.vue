@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 import StudentEventSignupDialog from "./student/StudentEventSignupDialog.vue";
@@ -8,9 +8,6 @@ import AvailabilityDialogBody from "./faculty/AvailabilityDialogBody.vue";
 import EventDialogBody from "./admin/maintain/events/EventDialogBody.vue";
 import EventDataService from "../services/EventDataService";
 
-
-
-const router = useRouter();
 const dialog = ref(false);
 const createOrEditDialog = ref(false);
 
@@ -21,7 +18,6 @@ const props = defineProps({
 });
 
 const emits = defineEmits(["refreshAvailabilitiesEvent", "refreshEvents"]);
-
 
 const addOrEditAvailabilityDialog = ref(false);
 
@@ -65,62 +61,29 @@ async function unreadyEvent(event) {
 </script>
 
 <template>
-  <v-card flat class="flatCardBorder bg-lightBlue mt-4">
-    <v-card-title class="pb-0 mb-0">
-      <v-row>
-        <v-col class="pl-0">
-          <v-row class="pa-0 ma-0">
-            <v-col cols="auto" class="pa-0 ma-0">
-              <!-- Event Name -->
-              <v-card-title class="font-weight-bold text-orange text-h5">
-                {{ eventData.name }}
-              </v-card-title>
-              <v-card-subtitle
-                v-if="roleId == 3"
-                class="mb-0 pb-0 font-weight-semi-bold"
-                :class="eventData.isReady ? 'text-green' : 'text-red'"
-              >
-                {{ eventData.isReady ? "Ready" : "Not Ready" }}
-              </v-card-subtitle>
-              <!-- Event Instrument Type -->
-              <!-- TODO(@ethanimooney): Make this actually work -->
-              <v-card-subtitle
-                v-if="roleId == 3 || roleId == 1"
-                class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
-              >
-                {{
-                  eventData.eventType.instrumentType === "Both"
-                    ? "Vocal & Instrumental"
-                    : eventData.eventType.instrumentType === "Vocal"
-                    ? "Vocal"
-                    : "Instrumental"
-                }}
-                Event
-              </v-card-subtitle>
-            </v-col>
-            <v-spacer></v-spacer>
-            <!-- Number of People Signed Up -->
-            <v-col cols="auto" class="mt-0 pt-2 mr-0 pr-0">
-              <v-card
-                flat
-                rounded="md"
-                class="bg-darkBlue py-2 px-0 text-white mt-0"
-              >
+  <div>
+    <v-card flat class="flatCardBorder bg-lightBlue mt-4">
+      <v-card-title class="pb-0 mb-0">
+        <v-row>
+          <v-col class="pl-0">
+            <v-row class="pa-0 ma-0">
+              <v-col cols="auto" class="pa-0 ma-0">
+                <!-- Event Name -->
+                <v-card-title class="font-weight-bold text-orange text-h5">
+                  {{ eventData.name }}
+                </v-card-title>
                 <v-card-subtitle
-                  v-if="(roleId == 3 || roleId == 1) && eventData.isReady"
-                  class="font-weight-semi-bold"
+                  v-if="roleId == 3"
+                  class="mb-0 pb-0 font-weight-semi-bold"
+                  :class="eventData.isReady ? 'text-green' : 'text-red'"
                 >
-                  {{
-                    eventData.eventSignups == null
-                      ? "0"
-                      : eventData.eventSignups.length
-                  }}
-                  People Signed Up
+                  {{ eventData.isReady ? "Ready" : "Not Ready" }}
                 </v-card-subtitle>
+                <!-- Event Instrument Type -->
+                <!-- TODO(@ethanimooney): Make this actually work -->
                 <v-card-subtitle
-                  size="small"
-                  v-if="roleId == 2 || roleId == 4"
-                  class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+                  v-if="roleId == 3 || roleId == 1"
+                  class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
                 >
                   {{
                     eventData.eventType.instrumentType === "Both"
@@ -131,86 +94,129 @@ async function unreadyEvent(event) {
                   }}
                   Event
                 </v-card-subtitle>
-                <v-card-subtitle
-                  v-if="roleId == 3"
-                  class="font-weight-semi-bold"
+              </v-col>
+              <v-spacer></v-spacer>
+              <!-- Number of People Signed Up -->
+              <v-col cols="auto" class="mt-0 pt-2 mr-0 pr-0">
+                <v-card
+                  flat
+                  rounded="md"
+                  class="bg-darkBlue py-2 px-0 text-white mt-0"
                 >
-                  {{
-                    eventData.availabilities == null
-                      ? "0"
-                      : eventData.availabilities.length
-                  }}
-                  Availability Set
-                </v-card-subtitle>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-card-title>
-    <!-- Event Date -->
-    <v-card-subtitle class="ml-1 mt-2 font-weight-semi-bold text-orange">
-      {{ formatDate(eventData.date) }}
-    </v-card-subtitle>
-    <!-- Event Time -->
-    <v-card-subtitle class="ml-1 font-weight-semi-bold text-orange">
-      {{ get12HourTimeStringFromString(eventData.startTime) }} -
-      {{ get12HourTimeStringFromString(eventData.endTime) }}
-    </v-card-subtitle>
-    <!-- Event Location (room name) -->
-    <v-card-subtitle class="ml-1 mb-0 pb-0 font-weight-semi-bold text-orange">
-      {{ eventData.location.roomName }}
-    </v-card-subtitle>
-    <v-card-actions class="pt-0 mt-0">
-      <!-- Signup/Availability Button -->
-      <v-btn
-        flat
-        size="small"
-        class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-        @click="handleClick()"
+                  <v-card-subtitle
+                    v-if="(roleId == 3 || roleId == 1) && eventData.isReady"
+                    class="font-weight-semi-bold"
+                  >
+                    {{
+                      eventData.eventSignups == null
+                        ? "0"
+                        : eventData.eventSignups.length
+                    }}
+                    People Signed Up
+                  </v-card-subtitle>
+                  <v-card-subtitle
+                    size="small"
+                    v-if="roleId == 2 || roleId == 4"
+                    class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+                  >
+                    {{
+                      eventData.eventType.instrumentType === "Both"
+                        ? "Vocal & Instrumental"
+                        : eventData.eventType.instrumentType === "Vocal"
+                        ? "Vocal"
+                        : "Instrumental"
+                    }}
+                    Event
+                  </v-card-subtitle>
+                  <v-card-subtitle
+                    v-if="roleId == 3"
+                    class="font-weight-semi-bold"
+                  >
+                    {{
+                      eventData.availabilities == null
+                        ? "0"
+                        : eventData.availabilities.length
+                    }}
+                    Availability Set
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-card-title>
+      <!-- Event Date -->
+      <v-card-subtitle class="ml-1 mt-2 font-weight-semi-bold text-orange">
+        {{ formatDate(eventData.date) }}
+      </v-card-subtitle>
+      <!-- Event Time -->
+      <v-card-subtitle class="ml-1 font-weight-semi-bold text-orange">
+        {{ get12HourTimeStringFromString(eventData.startTime) }} -
+        {{ get12HourTimeStringFromString(eventData.endTime) }}
+      </v-card-subtitle>
+      <!-- Event Location (room name) -->
+      <v-card-subtitle class="ml-1 mb-0 pb-0 font-weight-semi-bold text-orange">
+        {{ eventData.location.roomName }}
+      </v-card-subtitle>
+      <v-card-actions class="pt-0 mt-0">
+        <!-- Signup/Availability Button -->
+        <v-btn
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="handleClick()"
+        >
+          {{
+            roleId == 1
+              ? "Signup"
+              : roleId == 3
+              ? "Edit Event"
+              : "Add Availability"
+          }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+    <v-dialog v-model="dialog" persistent max-width="1050px">
+      <student-event-signup-dialog
+        :eventData="eventData"
+        @closeDialogEvent="dialog = false"
+        @refreshEvents="emits('refreshEvents')"
       >
-        {{
-          roleId == 1
-            ? "Signup"
-            : roleId == 3
-            ? "Edit Event"
-            : "Add Availability"
-        }}
-      </v-btn>
-    </v-card-actions>
-  </v-card>
-  <v-dialog v-model="dialog" persistent max-width="1050px">
-    <student-event-signup-dialog
-      :eventData="eventData"
-      @closeDialogEvent="dialog = false"
-      @refreshEvents="emits('refreshEvents')"
+      </student-event-signup-dialog>
+    </v-dialog>
+    <v-dialog
+      v-model="addOrEditAvailabilityDialog"
+      persistent
+      max-width="600px"
     >
-    </student-event-signup-dialog>
-  </v-dialog>
-  <v-dialog v-model="addOrEditAvailabilityDialog" persistent max-width="600px">
-    <AvailabilityDialogBody
-      :is-edit="false"
-      :availability-data="
-        availabilityData ? availabilityData : { startTime: null, endTime: null }
-      "
-      :event-data="eventData"
-      @updateAvailabilityEvent="
-        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
-      "
-      @addAvailabilityEvent="
-        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
-      "
-      @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
-    ></AvailabilityDialogBody>
-  </v-dialog>
-  <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
-    <EventDialogBody
-      :is-edit="true"
-      :event-data="eventData"
-      @closeEventDialogEvent="closeEventDialog"
-      @updateEventSuccessEvent="closeEventDialog(), emits('refreshEventsEvent')"
-      @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
-      @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
-    ></EventDialogBody>
-  </v-dialog>
+      <AvailabilityDialogBody
+        :is-edit="false"
+        :availability-data="
+          availabilityData
+            ? availabilityData
+            : { startTime: null, endTime: null }
+        "
+        :event-data="eventData"
+        @updateAvailabilityEvent="
+          closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+        "
+        @addAvailabilityEvent="
+          closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
+        "
+        @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
+      ></AvailabilityDialogBody>
+    </v-dialog>
+    <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
+      <EventDialogBody
+        :is-edit="true"
+        :event-data="eventData"
+        @closeEventDialogEvent="closeEventDialog"
+        @updateEventSuccessEvent="
+          closeEventDialog(), emits('refreshEventsEvent')
+        "
+        @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
+        @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
+      ></EventDialogBody>
+    </v-dialog>
+  </div>
 </template>

@@ -134,12 +134,14 @@ const router = createRouter({
       component: BaseView,
       name: "adminComposers",
       alias: "/adminComposers",
+      props: (route) => ({ query: route.query.q }),
     },
     {
       path: "/base",
       component: BaseView,
       name: "adminPieces",
       alias: "/adminPieces",
+      props: (route) => ({ query: route.query.q }),
     },
     {
       path: "/base",
