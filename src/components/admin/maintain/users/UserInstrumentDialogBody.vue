@@ -68,10 +68,7 @@ function getAllInstructors() {
 function getAllAccompanists() {
   UserRoleDataService.getRolesForRoleId(4, 'lastName,firstName')
     .then((response) => {
-      accompanists.value = [
-        { id: null, user: { firstName: "", lastName: "" } },
-        ...response.data,
-      ];
+      accompanists.value = response.data;
     })
     .catch((err) => {
       console.log(err);
@@ -81,6 +78,7 @@ function getAllAccompanists() {
 async function addInstrument() {
   form.value.validate().then(async (valid) => {
     if (valid.valid) {
+      console.log('here')
       await StudentInstrumentDataService.create({
         privateHours: privateHours.value,
         status: props.studentInstrumentData.status,
@@ -96,6 +94,8 @@ async function addInstrument() {
             : null,
       })
         .then(() => {
+          console.log('add instrument', selectedInstrument)
+          console.log('add level', props.studentInstrumentData.studentRoleId)
           emits("addInstrumentSuccessEvent");
         })
         .catch((err) => {
@@ -151,6 +151,7 @@ async function updateSelectedAccompanist() {
 async function updateLevel() {
   if (
     props.studentInstrumentData.levelId === null ||
+    editedLevel.value == null ||
     editedLevel.value.id != props.studentInstrumentData.levelId
   ) {
     await StudentInstrumentDataService.update({
@@ -251,6 +252,7 @@ onMounted(async () => {
           Accompanist
         </v-card-subtitle>
         <v-select
+          clearable
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -265,6 +267,7 @@ onMounted(async () => {
           Level
         </v-card-subtitle>
         <v-select
+          clearable
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
