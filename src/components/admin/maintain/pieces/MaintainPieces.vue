@@ -6,6 +6,13 @@ import MaintainPieceCard from "./MaintainPieceCard.vue";
 import PieceDialogBody from "./PieceDialogBody.vue";
 import { useLoginStore } from "../../../../stores/LoginStore.js";
 
+const props = defineProps({
+  query: {
+    type: String,
+    required: false,
+  },
+});
+
 const loginStore = useLoginStore();
 const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
 
@@ -26,7 +33,11 @@ async function getPieces() {
       console.log(err);
     });
 }
-
+function setStatusFilterSelection() {
+  if (props.query) {
+    statusFilterSelection.value = props.query;
+  }
+}
 async function refreshPieces() {
   await getPieces();
   await searchAndFilterList();
@@ -99,7 +110,8 @@ async function getComposers() {
 }
 
 onMounted(async () => {
-  await getPieces();
+  setStatusFilterSelection();
+  refreshPieces();
   await getComposers();
 });
 </script>

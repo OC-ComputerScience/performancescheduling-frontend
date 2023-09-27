@@ -190,7 +190,7 @@ async function updateUser() {
 // After all roles have been checked, whatever is left in editedUserRoles is a new role,
 // so create it.
 async function updateUserRoles() {
-  const updateRoles = [...editedUserRoles.value] // copy of editUserRoles to use with splice, a destructive process
+  const updateRoles = [...editedUserRoles.value]; // copy of editUserRoles to use with splice, a destructive process
 
   for (let userRole of props.userRoles) {
     // If role exists in editedUserRoles, and is active, we don't need to do anything,
@@ -212,11 +212,8 @@ async function updateUserRoles() {
       });
     }
 
-    
     // Find index of role to splice in editedUserRoles
-    let index = updateRoles.findIndex(
-      (eur) => eur.id === userRole.roleId
-    );
+    let index = updateRoles.findIndex((eur) => eur.id === userRole.roleId);
     // Splice role from editedUserRoles
     index != -1 ? updateRoles.splice(index, 1) : null;
   }
@@ -458,7 +455,6 @@ onMounted(async () => {
               item-value="id"
               multiple
               return-object
-              :readonly="!props.isAdmin"
             >
               <template v-slot:selection="{ item }">
                 <v-chip
@@ -479,16 +475,16 @@ onMounted(async () => {
               variant="plain"
               readonly
             >
-                <v-chip
-                  v-for="role in editedUserRoles"
-                  :key="role.id"
-                  label
-                  flat
-                  size="small"
-                  class="font-weight-bold text-none text-white flatChipBorder bg-blue"
-                >
-                  {{ role.role }}
-                </v-chip>
+              <v-chip
+                v-for="role in editedUserRoles"
+                :key="role.id"
+                label
+                flat
+                size="small"
+                class="font-weight-bold text-none text-white flatChipBorder bg-blue"
+              >
+                {{ role.role }}
+              </v-chip>
             </v-text-field>
 
             <v-card-subtitle
@@ -511,23 +507,6 @@ onMounted(async () => {
               v-if="isStudent"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >
-              Classification
-            </v-card-subtitle>
-            <v-select
-              v-if="isStudent"
-              color="darkBlue"
-              variant="plain"
-              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-              v-model="editedStudentClassification"
-              :items="classificationOptions"
-              :rules="[(v) => !!v || 'This field is required']"
-            >
-            </v-select>
-
-            <v-card-subtitle
-              v-if="isStudent"
-              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-            >
               Major
             </v-card-subtitle>
             <v-select
@@ -545,7 +524,24 @@ onMounted(async () => {
             </v-select>
 
             <v-row v-if="isStudent" class="pa-0 ma-0">
-              <v-col cols="12" lg="auto" class="pa-0 ma-0">
+              <v-col cols="6" class="pa-0 ma-0 mr-1">
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Classification
+                </v-card-subtitle>
+                <v-select
+                  color="darkBlue"
+                  variant="plain"
+                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4 width-50"
+                  v-model="editedStudentClassification"
+                  :items="classificationOptions"
+                  :rules="[(v) => !!v || 'This field is required']"
+                >
+                </v-select>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="6" lg="auto" class="pa-0 ma-o">
                 <v-card-subtitle
                   class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
                 >
@@ -557,24 +553,6 @@ onMounted(async () => {
                   variant="plain"
                   class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
                   v-model="editedStudentSemesters"
-                  :rules="[(v) => !!v || 'This field is required']"
-                >
-                </v-text-field>
-              </v-col>
-              <v-spacer></v-spacer>
-              <v-col cols="12" lg="auto" class="pa-0 ma-o">
-                <v-card-subtitle
-                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-                >
-                  Total Private Hours
-                </v-card-subtitle>
-                <v-text-field
-                  type="number"
-                  color="darkBlue"
-                  variant="plain"
-                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-                  v-model="editedStudentHours"
-                  readonly
                   :rules="[(v) => !!v || 'This field is required']"
                 >
                 </v-text-field>
@@ -614,9 +592,9 @@ onMounted(async () => {
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-spacer/>
-                <v-btn
-          v-if="props.isEdit && (currentRole.role.role == 'Admin')"
+        <v-spacer />
+        <v-btn
+          v-if="props.isEdit && currentRole.role.role == 'Admin'"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="

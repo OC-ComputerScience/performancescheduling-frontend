@@ -126,13 +126,12 @@ onMounted(async () => {
         </v-col>
       </v-row>
     </v-card-title>
-    <v-card-actions>
       <v-row class="pb-5 pl-2 pt-2">
         <v-col
           cols="auto"
           v-for="roleLabel in userRoleLabels"
           :key="roleLabel"
-          class="pb-0 pr-0"
+          class="pb-0 pr-1"
         >
           <v-chip
             label
@@ -158,18 +157,19 @@ onMounted(async () => {
             {{ instrumentLabel }}
           </v-chip>
         </v-col>
+      </v-row>
+        <v-card-actions>
         <v-spacer></v-spacer>
-        <v-col cols="auto" class="pb-0 pr-5">
+        <v-col cols="auto" class="pb-0">
           <v-btn
             flat
             size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+            class="font-weight-bold mt-0 mr-0 text-none text-white bg-blue flatChipBorder"
             @click="createOrEditDialog = true"
           >
             Edit
           </v-btn>
         </v-col>
-      </v-row>
     </v-card-actions>
   </v-card>
   <v-dialog

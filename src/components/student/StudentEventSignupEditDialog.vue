@@ -97,7 +97,9 @@ function selectStudentPiece(studentPiece) {
     selectedStudentPieces.value.push(studentPiece);
   } else {
     selectedStudentPieces.value.splice(
-      selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id),
+      selectedStudentPieces.value.findIndex(
+        (x) => x.pieceId === studentPiece.pieceId
+      ),
       1
     );
   }
