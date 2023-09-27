@@ -16,7 +16,6 @@ async function getStudentInstruments() {
     .then((response) => {
       studentinstruments.value = response.data;
       filteredStudentInstruments.value = studentinstruments.value;
-      console.log('get instruments', studentinstruments.value)
     })
     .catch((err) => {
       console.log(err);

@@ -78,7 +78,6 @@ function getAllAccompanists() {
 async function addInstrument() {
   form.value.validate().then(async (valid) => {
     if (valid.valid) {
-      console.log('here')
       await StudentInstrumentDataService.create({
         privateHours: privateHours.value,
         status: props.studentInstrumentData.status,
@@ -94,8 +93,6 @@ async function addInstrument() {
             : null,
       })
         .then(() => {
-          console.log('add instrument', selectedInstrument)
-          console.log('add level', props.studentInstrumentData.studentRoleId)
           emits("addInstrumentSuccessEvent");
         })
         .catch((err) => {
