@@ -52,6 +52,20 @@ async function getInstruments() {
     });
 }
 
+function checkInstrument(){
+  for (let i = 0; i < instrumentOptions.value.length; i++) {
+    if (selectedInstrument.value == instrumentOptions.value[i]){
+      if(instrumentOptions.value[i].type == "Vocal"){
+        return true;
+      }
+      else{
+        return false
+      }
+      break;
+    }
+  }
+}
+
 const instructors = ref([]);
 const accompanists = ref([]);
 
@@ -226,6 +240,7 @@ onMounted(async () => {
           return-object
           :readonly="props.isEdit"
           :rules="[(v) => !!v || 'This field is required']"
+          @change="checkInstrument()"
         >
         </v-select>
 
@@ -273,6 +288,7 @@ onMounted(async () => {
           :item-title="(item) => item.name"
           item-value="id"
           return-object
+          :rules="checkInstrument() ? [(v) => !!v || 'This field is required'] : []"
         >
         </v-select>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
