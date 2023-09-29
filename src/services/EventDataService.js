@@ -18,16 +18,25 @@ class EventDataService {
     return http.put(this.baseUrl + `${data.id}`, data);
   }
 
-  getGTEDateForFaculty(date) {
-    return http.get(this.baseUrl + `date/${date}?role=Faculty`);
+  getGTEDate(date, role, sortVar, ascending) {
+    var url = this.baseUrl + `date/${date}?role=${role}`;
+
+    if (sortVar != null) {
+      url += `&sortVar=${sortVar}&order=${ascending ? "ASC" : "DESC"}`;
+    }
+    return http.get(url);
   }
 
-  getGTEDateForStudents(date) {
-    return http.get(this.baseUrl + `date/${date}?role=Student`);
+  getGTEDateForFaculty(date, sortVar = null, ascending = true) {
+    return this.getGTEDate(date, 'Faculty', sortVar, ascending);
   }
 
-  getGTEDateForAdmins(date) {
-    return http.get(this.baseUrl + `date/${date}?role=Admin`);
+  getGTEDateForStudents(date, sortVar = null, ascending = true) {
+    return this.getGTEDate(date, 'Student', sortVar, ascending);
+  }
+
+  getGTEDateForAdmins(date, sortVar = null, ascending = true) {
+    return this.getGTEDate(date, 'Admin', sortVar, ascending);
   }
 
   create(data) {

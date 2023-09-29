@@ -53,7 +53,7 @@ async function retrieveData() {
       console.log(e);
     });
 
-  await EventDataService.getGTEDateForStudents(new Date())
+  await EventDataService.getGTEDateForStudents(new Date(), 'date')
     .then((response) => {
       upcomingEvents.value = response.data;
       relevantUpcomingEvents.value = upcomingEvents.value.filter((e) => {
