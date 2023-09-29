@@ -349,7 +349,7 @@ onMounted(async () => {
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-blue text-none"
+            class="font-weight-semi-bold mr-2 mt-4 bg-teal text-none"
             @click="saveSignup"
           >
             Save
