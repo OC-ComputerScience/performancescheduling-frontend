@@ -42,7 +42,7 @@
     "sass": "^1.63.6",
     "start-server-and-test": "^1.15.2",
     "vite": "^4.0.0",
-    "vite-plugin-vuetify": "^1.0.0-alpha.12",
+    "vite-plugin-vuetify": "^1.0.2",
     "vitest": "^0.25.6",
     "vue-cli-plugin-vuetify": "~2.5.8"
   },
