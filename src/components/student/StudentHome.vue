@@ -48,7 +48,7 @@ async function retrieveData() {
       console.log(e);
     });
 
-  await EventDataService.getGTEDateForStudents(new Date())
+  await EventDataService.getGTEDateForStudents(new Date(), 'date')
     .then((response) => {
       upcomingEvents.value = response.data;
       // TODO(@ethanimooney): Make it check the actual event types that the student needs once that is implemented.
