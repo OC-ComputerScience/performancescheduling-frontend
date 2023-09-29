@@ -18,7 +18,7 @@ import UserNotificationDataService from "../../services/UserNotificationDataServ
 import EventSignupPieceDataService from "../../services/EventSignupPieceDataService.js";
 import StudentPieceDialogBody from "../student/repertoire/StudentPieceDialogBody.vue";
 
-const emits = defineEmits(["closeDialogEvent"]);
+const emits = defineEmits(["closeDialogEvent", "refreshEvents"]);
 const props = defineProps({
   eventData: { type: [Object], required: true },
 });
@@ -131,8 +131,6 @@ async function getStudentPieces() {
         studentPiece.piece.composer.fullName = fullName;
       });
       selectedStudentPieces.value = [];
-      console.log(studentPieces.value);
-      console.log(selectedStudentInstrument.value);
 
       studentInstrumentStudentPieces.value = studentPieces.value.filter(
         (studentPiece) =>
@@ -527,6 +525,7 @@ async function confirmSignup() {
         console.log(e);
       });
     });
+    emits("refreshEvents");
   }
 
   const studentInstrumentSignupData = {
@@ -605,10 +604,15 @@ watch(selectedStudentInstrument, async () => {
       console.log(e);
     });
 
-  selectedAccompanist.value = activeAccompanists.value.find(
-    (accompanist) =>
-      accompanist.id == selectedStudentInstrument.value.accompanistRole.id
-  );
+  if(selectedStudentInstrument.value.accompanistRole!=null){
+    selectedAccompanist.value = activeAccompanists.value.find(
+      (accompanist) =>
+        accompanist.id == selectedStudentInstrument.value.accompanistRole.id
+    );
+  }
+  else{
+    selectedAccompanist.value = null;
+  }
 
   // update student pieces
   selectedStudentPieces.value = [];
@@ -962,18 +966,18 @@ onMounted(async () => {
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-lightMaroon text-maroon"
-            @click="emits('closeDialogEvent')"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            flat
-            size="small"
             class="font-weight-semi-bold mr-2 mt-4 bg-blue text-none"
             @click="openDialog"
           >
             Signup
+          </v-btn>
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold mr-2 mt-4 bg-red text-none"
+            @click="emits('closeDialogEvent')"
+          >
+            Cancel
           </v-btn>
         </v-row>
       </v-card-text>
@@ -997,7 +1001,7 @@ onMounted(async () => {
           @click="confimationDialog = false"
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-lightMaroon text-maroon"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
           >Cancel</v-btn
         >
         <v-btn
@@ -1026,19 +1030,20 @@ onMounted(async () => {
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          @click="otherSignupDialog = false"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-lightMaroon text-maroon"
-          >Cancel</v-btn
-        >
-        <v-btn
           @click="requestTimeslotFromStudent"
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           >Request This Timeslot</v-btn
         >
+        <v-btn
+          @click="otherSignupDialog = false"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+        >
+          Cancel
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -1052,7 +1057,6 @@ onMounted(async () => {
         studentInstrumentId: selectedStudentInstrument.id,
         status: 'Active',
       }"
-      :student-id="loginStore.currentRole.userId"
       :student-pieces="studentPieces"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="

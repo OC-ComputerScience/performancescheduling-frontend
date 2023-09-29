@@ -32,7 +32,24 @@ class StudentInstrumentDataService {
         order
     );
   }
-
+  getStudentInstrumentSignupsByFacultuyRoleId(
+    facultyRoleId,
+    date,
+    select,
+    order = "ASC"
+  ) {
+    return http.get(
+      this.baseUrl +
+        "instrumentSignups/faculty/" +
+        facultyRoleId +
+        "?date=" +
+        date +
+        "&select=" +
+        select +
+        "&order=" +
+        order
+    );
+  }
   getStudentsForInstructorId(instructorId) {
     return http.get(this.baseUrl + "instructorId/" + instructorId);
   }

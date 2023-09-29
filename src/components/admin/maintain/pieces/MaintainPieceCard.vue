@@ -2,6 +2,10 @@
 import { ref } from "vue";
 import PieceDialogBody from "./PieceDialogBody.vue";
 import PieceDataService from "../../../../services/PieceDataService.js";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
+
+const loginStore = useLoginStore();
+const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
 
 const emits = defineEmits(["closePieceDialog", "refreshPiecesEvent"]);
 
@@ -72,7 +76,7 @@ async function enablePiece(piece) {
       <v-btn
         flat
         size="small"
-        class="font-weight-bold mt-0 mr-2 text-none text-blue bg-white flatChipBorder"
+        class="font-weight-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
         @click="createOrEditDialog = true"
       >
         Edit
@@ -82,7 +86,7 @@ async function enablePiece(piece) {
   <v-dialog v-model="createOrEditDialog" persistent max-width="600px">
     <PieceDialogBody
       :is-edit="true"
-      :is-admin="true"
+      :is-admin="isAdmin"
       :piece-data="pieceData"
       :pieces-data="piecesData"
       :composers-data="composersData"

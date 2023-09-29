@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
+import { storeToRefs } from "pinia";
 import RoleDataService from "../../../../services/RoleDataService";
 import MajorDataService from "../../../../services/MajorDataService";
 import UserInstrumentCard from "./UserInstrumentCard.vue";
@@ -21,7 +23,11 @@ const props = defineProps({
   userData: { type: [Object], required: true },
   userRoles: { type: [Array], required: true },
   isEdit: { type: [Boolean], required: true },
+  isAdmin: { type: [Boolean], required: true },
 });
+
+const loginStore = useLoginStore();
+const { currentRole } = storeToRefs(loginStore);
 
 const form = ref(null);
 
@@ -125,7 +131,6 @@ const editedFacultyTitle = ref(isFaculty.value ? facultyRole.title : null);
 
 async function addUser() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await UserDataService.create(editedUserData.value)
         .then(async (response) => {
@@ -154,7 +159,6 @@ async function addUser() {
 // update the user's data
 async function updateUser() {
   form.value.validate().then(async (valid) => {
-    console.log(valid.valid);
     if (valid.valid) {
       await updateUserRoles();
 
@@ -186,12 +190,14 @@ async function updateUser() {
 // After all roles have been checked, whatever is left in editedUserRoles is a new role,
 // so create it.
 async function updateUserRoles() {
+  const updateRoles = [...editedUserRoles.value]; // copy of editUserRoles to use with splice, a destructive process
+
   for (let userRole of props.userRoles) {
     // If role exists in editedUserRoles, and is active, we don't need to do anything,
     // and it gets spliced out of editedUserRoles at the end of the if statement.
 
     // If role exists in editedUserRoles, and is disabled, enable it
-    if (editedUserRoles.value.some((eur) => eur.id === userRole.roleId)) {
+    if (updateRoles.some((eur) => eur.id === userRole.roleId)) {
       if (userRole.status === "Disabled") {
         userRole.status = "Active";
         await UserRoleDataService.update(userRole).catch((err) => {
@@ -207,15 +213,13 @@ async function updateUserRoles() {
     }
 
     // Find index of role to splice in editedUserRoles
-    let index = editedUserRoles.value.findIndex(
-      (eur) => eur.id === userRole.roleId
-    );
+    let index = updateRoles.findIndex((eur) => eur.id === userRole.roleId);
     // Splice role from editedUserRoles
-    index != -1 ? editedUserRoles.value.splice(index, 1) : null;
+    index != -1 ? updateRoles.splice(index, 1) : null;
   }
 
   // Whatever is left in editedUserRoles is a new role, so create it
-  for (let editedUserRole of editedUserRoles.value) {
+  for (let editedUserRole of updateRoles) {
     await UserRoleDataService.create({
       userId: props.userData.id,
       roleId: editedUserRole.id,
@@ -314,6 +318,7 @@ async function refreshStudentInstruments() {
 onMounted(async () => {
   await getAllRoles();
   await getAllMajors();
+  await refreshStudentInstruments();
 });
 </script>
 
@@ -422,7 +427,7 @@ onMounted(async () => {
               Phone Number
             </v-card-subtitle>
             <v-text-field
-              placeholder="4051234567"
+              placeholder="4051111111"
               v-model="editedUserData.phoneNumber"
               variant="plain"
               class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -440,6 +445,7 @@ onMounted(async () => {
               Roles
             </v-card-subtitle>
             <v-select
+              v-if="currentRole.role.role == 'Admin'"
               color="darkBlue"
               variant="plain"
               class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -462,6 +468,25 @@ onMounted(async () => {
               </template>
             </v-select>
 
+            <v-text-field
+              v-if="currentRole.role.role == 'Faculty'"
+              color="darkBlue"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+              variant="plain"
+              readonly
+            >
+              <v-chip
+                v-for="role in editedUserRoles"
+                :key="role.id"
+                label
+                flat
+                size="small"
+                class="font-weight-bold text-none text-white flatChipBorder bg-blue"
+              >
+                {{ role.role }}
+              </v-chip>
+            </v-text-field>
+
             <v-card-subtitle
               v-if="isFaculty"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
@@ -477,23 +502,6 @@ onMounted(async () => {
               class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
               :rules="[(v) => !!v || 'This field is required']"
             ></v-text-field>
-
-            <v-card-subtitle
-              v-if="isStudent"
-              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-            >
-              Classification
-            </v-card-subtitle>
-            <v-select
-              v-if="isStudent"
-              color="darkBlue"
-              variant="plain"
-              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-              v-model="editedStudentClassification"
-              :items="classificationOptions"
-              :rules="[(v) => !!v || 'This field is required']"
-            >
-            </v-select>
 
             <v-card-subtitle
               v-if="isStudent"
@@ -516,7 +524,24 @@ onMounted(async () => {
             </v-select>
 
             <v-row v-if="isStudent" class="pa-0 ma-0">
-              <v-col cols="12" lg="auto" class="pa-0 ma-0">
+              <v-col cols="6" class="pa-0 ma-0 mr-1">
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Classification
+                </v-card-subtitle>
+                <v-select
+                  color="darkBlue"
+                  variant="plain"
+                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4 width-50"
+                  v-model="editedStudentClassification"
+                  :items="classificationOptions"
+                  :rules="[(v) => !!v || 'This field is required']"
+                >
+                </v-select>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="6" lg="auto" class="pa-0 ma-o">
                 <v-card-subtitle
                   class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
                 >
@@ -528,23 +553,6 @@ onMounted(async () => {
                   variant="plain"
                   class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
                   v-model="editedStudentSemesters"
-                  :rules="[(v) => !!v || 'This field is required']"
-                >
-                </v-text-field>
-              </v-col>
-              <v-spacer></v-spacer>
-              <v-col cols="12" lg="auto" class="pa-0 ma-o">
-                <v-card-subtitle
-                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-                >
-                  Private Hours
-                </v-card-subtitle>
-                <v-text-field
-                  type="number"
-                  color="darkBlue"
-                  variant="plain"
-                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-                  v-model="editedStudentHours"
                   :rules="[(v) => !!v || 'This field is required']"
                 >
                 </v-text-field>
@@ -584,27 +592,9 @@ onMounted(async () => {
         </v-row>
       </v-card-text>
       <v-card-actions>
+        <v-spacer />
         <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateUser() : addUser()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="
-            props.isEdit
-              ? emits('closeUserDialogEvent')
-              : emits('closeAddUserDialogEvent')
-          "
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          v-if="props.isEdit"
+          v-if="props.isEdit && currentRole.role.role == 'Admin'"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
@@ -617,6 +607,25 @@ onMounted(async () => {
           "
         >
           {{ props.userData.status === "Disabled" ? "Enable" : "Disable" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateUser() : addUser()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeUserDialogEvent')
+              : emits('closeAddUserDialogEvent')
+          "
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>
