@@ -240,7 +240,7 @@ onMounted(() => {
           :class="activeLink === menu.link ? 'text-blue' : 'text-maroon'"
         >
           <v-btn
-            class="hidden-md-and-down mx-1 menu-link font-weight-bold"
+            class="hidden-md-and-down mx-1 mt-3 menu-link font-weight-bold"
             exact
             text
             :ripple="false"
