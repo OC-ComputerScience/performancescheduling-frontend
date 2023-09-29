@@ -4,6 +4,7 @@ import { useLoginStore } from "../../stores/LoginStore.js";
 
 import UserNotificationDataService from "../../services/UserNotificationDataService.js";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
+import UserInstrumentDialogBody from "../admin/maintain/users/UserInstrumentDialogBody.vue";
 import EventDataService from "../../services/EventDataService.js";
 import EventSignupItem from "./EventSignupItem.vue";
 import UpcomingEventItem from "../UpcomingEventItem.vue";
@@ -17,6 +18,7 @@ const instruments = ref([]);
 const signups = ref([]);
 const upcomingEvents = ref([]);
 const relevantUpcomingEvents = ref([]);
+const addInstrumentDialog = ref(false);
 
 async function retrieveData() {
   await UserNotificationDataService.getByUserRole(loginStore.currentRole.id)
@@ -27,13 +29,7 @@ async function retrieveData() {
       console.log(e);
     });
 
-  await StudentInstrumentDataService.getByUser(loginStore.user.userId)
-    .then((response) => {
-      instruments.value = response.data;
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  await getInstruments();
 
   await StudentInstrumentDataService.getStudentInstrumentSignupsByUserRoleId(
     loginStore.currentRole.id,
@@ -55,6 +51,24 @@ async function retrieveData() {
       relevantUpcomingEvents.value.concat(
         upcomingEvents.value.filter((e) => e.eventTypeId === 2)
       );
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
+function addInstrument() {
+  addInstrumentDialog.value = true;
+}
+
+function closeAddInstrumentDialog() {
+  addInstrumentDialog.value = false;
+}
+
+async function getInstruments() {
+  await StudentInstrumentDataService.getByUser(loginStore.user.userId)
+    .then((response) => {
+      instruments.value = response.data;
     })
     .catch((e) => {
       console.log(e);
@@ -106,7 +120,7 @@ onMounted(async () => {
                 </v-col>
                 <v-spacer></v-spacer>
                 <v-col cols="auto">
-                  <v-btn flat icon>
+                  <v-btn flat icon @click="addInstrument">
                     <v-icon class="text-darkBlue" icon="mdi-plus-circle">
                     </v-icon>
                   </v-btn>
@@ -164,5 +178,27 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-container>
+  <v-dialog v-model="addInstrumentDialog" persistent max-width="600px">
+    <UserInstrumentDialogBody
+      :is-edit="false"
+      :student-instrument-data="{
+        id: null,
+        status: 'Active',
+        levelId: null,
+        studentRoleId: loginStore.currentRole.id,
+        instructorRoleId: null,
+        accompanistRoleId: null,
+        instrumentId: null,
+        instructorRole: null,
+        accompanistRole: null,
+        instrument: null,
+        level: null,
+      }"
+      @addInstrumentSuccessEvent="
+        closeAddInstrumentDialog(), getInstruments()
+      "
+      @closeUserInstrumentDialogEvent="closeAddInstrumentDialog"
+    ></UserInstrumentDialogBody>
+  </v-dialog>
 </div>
 </template>
