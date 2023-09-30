@@ -53,16 +53,15 @@ async function getInstruments() {
 }
 
 function checkInstrument(){
-  for (let i = 0; i < instrumentOptions.value.length; i++) {
-    if (selectedInstrument.value.name == instrumentOptions.value[i].name){
-      if(instrumentOptions.value[i].type == "Vocal"){
-        return true;
-      }
-      else{
-        return false
-      }
-    }
-  }
+  if(selectedInstrument.value != null){
+    for (let i = 0; i < instrumentOptions.value.length; i++) {
+      if (selectedInstrument.value.name == instrumentOptions.value[i].name){
+        if(instrumentOptions.value[i].type == "Vocal"){
+          return true;
+        }
+        else{
+          return false
+        } } } }
 }
 
 const instructors = ref([]);
