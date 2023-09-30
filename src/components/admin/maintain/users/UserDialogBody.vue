@@ -458,7 +458,6 @@ onMounted(async () => {
               item-value="id"
               multiple
               return-object
-              :readonly="!props.isAdmin"
             >
               <template v-slot:selection="{ item }">
                 <v-chip
