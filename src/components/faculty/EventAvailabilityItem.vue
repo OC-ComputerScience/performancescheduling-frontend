@@ -80,7 +80,7 @@ onMounted(async () => {});
     </v-card-title>
 
     <v-card-actions class="pt-0 mt-2">
-      <!-- Add Availability Button -->
+      <!-- Add Critique Button -->
       <v-spacer></v-spacer>
       <v-btn
         v-if="okToCritique(eventData.date)"

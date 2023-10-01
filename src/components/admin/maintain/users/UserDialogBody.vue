@@ -23,7 +23,7 @@ const props = defineProps({
   userData: { type: [Object], required: true },
   userRoles: { type: [Array], required: true },
   isEdit: { type: [Boolean], required: true },
-  isAdmin: { type: [Boolean], required: true },
+  isAdmin: { type: [Boolean], required: false },
 });
 
 const loginStore = useLoginStore();
@@ -91,7 +91,7 @@ const editedStudentMajor = ref(isStudent.value ? studentRole.major : null);
 const majorOptions = ref([]);
 
 async function getAllMajors() {
-  await MajorDataService.getAll()
+  await MajorDataService.getAll('name')
     .then((response) => {
       majorOptions.value = response.data;
     })
@@ -458,7 +458,6 @@ onMounted(async () => {
               item-value="id"
               multiple
               return-object
-              :readonly="!props.isAdmin"
             >
               <template v-slot:selection="{ item }">
                 <v-chip
@@ -511,23 +510,6 @@ onMounted(async () => {
               v-if="isStudent"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >
-              Classification
-            </v-card-subtitle>
-            <v-select
-              v-if="isStudent"
-              color="darkBlue"
-              variant="plain"
-              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-              v-model="editedStudentClassification"
-              :items="classificationOptions"
-              :rules="[(v) => !!v || 'This field is required']"
-            >
-            </v-select>
-
-            <v-card-subtitle
-              v-if="isStudent"
-              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-            >
               Major
             </v-card-subtitle>
             <v-select
@@ -545,7 +527,24 @@ onMounted(async () => {
             </v-select>
 
             <v-row v-if="isStudent" class="pa-0 ma-0">
-              <v-col cols="12" lg="auto" class="pa-0 ma-0">
+              <v-col cols="6" class="pa-0 ma-0 mr-1">
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Classification
+                </v-card-subtitle>
+                <v-select
+                  color="darkBlue"
+                  variant="plain"
+                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4 width-50"
+                  v-model="editedStudentClassification"
+                  :items="classificationOptions"
+                  :rules="[(v) => !!v || 'This field is required']"
+                >
+                </v-select>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="6" lg="auto" class="pa-0 ma-o">
                 <v-card-subtitle
                   class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
                 >
@@ -557,24 +556,6 @@ onMounted(async () => {
                   variant="plain"
                   class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
                   v-model="editedStudentSemesters"
-                  :rules="[(v) => !!v || 'This field is required']"
-                >
-                </v-text-field>
-              </v-col>
-              <v-spacer></v-spacer>
-              <v-col cols="12" lg="auto" class="pa-0 ma-o">
-                <v-card-subtitle
-                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-                >
-                  Total Private Hours
-                </v-card-subtitle>
-                <v-text-field
-                  type="number"
-                  color="darkBlue"
-                  variant="plain"
-                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-                  v-model="editedStudentHours"
-                  readonly
                   :rules="[(v) => !!v || 'This field is required']"
                 >
                 </v-text-field>

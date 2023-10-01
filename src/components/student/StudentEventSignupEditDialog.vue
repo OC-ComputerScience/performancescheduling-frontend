@@ -97,7 +97,9 @@ function selectStudentPiece(studentPiece) {
     selectedStudentPieces.value.push(studentPiece);
   } else {
     selectedStudentPieces.value.splice(
-      selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id),
+      selectedStudentPieces.value.findIndex(
+        (x) => x.pieceId === studentPiece.pieceId
+      ),
       1
     );
   }
@@ -347,7 +349,7 @@ onMounted(async () => {
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-blue text-none"
+            class="font-weight-semi-bold mr-2 mt-4 bg-teal text-none"
             @click="saveSignup"
           >
             Save

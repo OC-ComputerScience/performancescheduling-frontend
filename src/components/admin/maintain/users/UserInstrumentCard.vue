@@ -49,6 +49,14 @@ onMounted(async () => {});
         </v-col>
         <v-col cols="auto" align-self="center">
           <v-chip
+            label
+            flat
+            size="small"
+            class="font-weight-semi-bold text-none text-white flatChipBorder bg-darkBlue mr-2"
+          >
+            Hours: {{ studentInstrumentData.privateHours }}
+          </v-chip>
+          <v-chip
             v-if="studentInstrumentData.level"
             label
             flat
@@ -70,17 +78,6 @@ onMounted(async () => {});
           >
             {{ studentInstrumentData.status }}
           </v-chip>
-        </v-col>
-        <v-spacer> </v-spacer>
-        <v-col cols="auto" align-self="center">
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-semi-bold text-none text-white bg-blue flatChipBorder"
-            @click="addOrEditInstrumentDialog = true"
-          >
-            Edit
-          </v-btn>
         </v-col>
       </v-row>
     </v-card-subtitle>
@@ -119,6 +116,17 @@ onMounted(async () => {});
             }}
           </v-card-text>
         </v-col>
+      </v-row>
+      <v-row>
+        <v-spacer/>
+        <v-btn
+          flat
+          size="small"
+          class="font-weight-semi-bold text-none text-white bg-blue flatChipBorder"
+          @click="addOrEditInstrumentDialog = true"
+        >
+          Edit
+        </v-btn>
       </v-row>
     </v-card-text>
   </v-card>
