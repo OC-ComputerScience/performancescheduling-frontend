@@ -343,7 +343,7 @@ function timeCheck(time) {
                 Student
               </v-card-subtitle>
               <v-autocomplete
-                placeholder="start typing a student's last name"
+                placeholder="Start typing a student's last name"
                 variant="plain"
                 v-model="editedEventData.privateUserRoleId"
                 :items="users"
