@@ -4,11 +4,8 @@ import { useLoginStore } from "../../stores/LoginStore.js";
 import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
 
-import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
 import StudentPieceDataService from "../../services/StudentPieceDataService.js";
 import EventSignupDataService from "../../services/EventSignupDataService.js";
-import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService.js";
-import UserRoleDataService from "../../services/UserRoleDataService.js";
 import EventSignupPieceDataService from "../../services/EventSignupPieceDataService.js";
 import StudentPieceDialogBody from "../student/repertoire/StudentPieceDialogBody.vue";
 
@@ -114,18 +111,9 @@ function isStudentPieceSelected(studentPiece) {
 }
 
 async function deleteSignup() {
-  await StudentInstrumentSignupDataService.remove(
-    studentInstrumentSignup.value.id
-  )
+  await EventSignupDataService.remove(studentInstrumentSignup.value.eventSignupId)
     .then(() => {
       confimationDialog.value = false;
-      // delete student pieces
-      selectedStudentPieces.value.forEach((studentPiece) => {
-        EventSignupPieceDataService.remove(studentPiece.id).catch((e) => {
-          console.log(e);
-        });
-      });
-
       emits("closeDialogEvent");
       emits("refreshEvents");
     })
