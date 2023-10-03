@@ -151,7 +151,6 @@ onMounted(async () => {
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Status
                 <v-select
-                  clearable
                   color="darkBlue"
                   variant="underlined"
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
@@ -166,7 +165,6 @@ onMounted(async () => {
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Semester
                 <v-select
-                  clearable
                   color="darkBlue"
                   variant="underlined"
                   class="font-weight-medium text-darkBlue pt-0 mt-0"

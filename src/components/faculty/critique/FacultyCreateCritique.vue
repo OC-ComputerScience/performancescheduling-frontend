@@ -112,7 +112,7 @@ onMounted(async () => {
           <v-card-text>
             <v-list class="pa-0 ma-0">
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
-                Your Critique
+                Your Feedback
                 <v-select
                   color="darkBlue"
                   variant="underlined"

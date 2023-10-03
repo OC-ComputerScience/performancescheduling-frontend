@@ -172,8 +172,8 @@ function closeDialogs() {
             >
               {{
                 signupHasFeedbackByFaculty()
-                  ? "Critique Given"
-                  : "Critique Pending"
+                  ? "Feedback Given"
+                  : "Feedback Pending"
               }}
             </v-chip>
           </v-row>
@@ -204,7 +204,7 @@ function closeDialogs() {
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="feedbackDialog = true"
         >
-          {{ signupHasFeedbackByFaculty() ? "Edit Critique" : "Add Critique" }}
+          {{ signupHasFeedbackByFaculty() ? "Edit Feedback" : "Add Feedback" }}
         </v-btn>
         <v-btn
           flat

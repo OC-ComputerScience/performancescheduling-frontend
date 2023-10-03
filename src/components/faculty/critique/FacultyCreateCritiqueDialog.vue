@@ -305,7 +305,7 @@ onMounted(async () => {
                 Accuracy
               </p>
               <v-radio-group v-model="critique.accuracyGrade" inline>
-                <v-radio label="Excellent" value="Excellent" color="green">
+                <v-radio label="Excelent" value="Excelent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
                 <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
@@ -323,7 +323,7 @@ onMounted(async () => {
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Balance</p>
               <v-radio-group v-model="critique.balanceGrade" inline>
-                <v-radio label="Excellent" value="Excellent" color="green">
+                <v-radio label="Excelent" value="Excelent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
                 <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
@@ -343,7 +343,7 @@ onMounted(async () => {
                 Deportment
               </p>
               <v-radio-group v-model="critique.deportmentGrade" inline>
-                <v-radio label="Excellent" value="Excellent" color="green">
+                <v-radio label="Excelent" value="Excelent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
                 <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
@@ -361,7 +361,7 @@ onMounted(async () => {
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Diction</p>
               <v-radio-group v-model="critique.dictionGrade" inline>
-                <v-radio label="Excellent" value="Excellent" color="green">
+                <v-radio label="Excelent" value="Excelent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
                 <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
@@ -381,7 +381,7 @@ onMounted(async () => {
                 Interpretation
               </p>
               <v-radio-group v-model="critique.interpretationGrade" inline>
-                <v-radio label="Excellent" value="Excellent" color="green">
+                <v-radio label="Excelent" value="Excelent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
                 <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
@@ -399,7 +399,7 @@ onMounted(async () => {
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Tone</p>
               <v-radio-group v-model="critique.toneGrade" inline>
-                <v-radio label="Excellent" value="Excellent" color="green">
+                <v-radio label="Excelent" value="Excelent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
                 <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>

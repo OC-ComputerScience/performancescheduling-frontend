@@ -8,7 +8,6 @@ const emits = defineEmits(["closeUserDialog", "refreshUsersEvent"]);
 const props = defineProps({
   userData: { type: [Object], required: true },
   userRoles: { type: [Array], required: true },
-  isAdmin: { type: [Boolean], required: true }
 });
 
 watch(
@@ -182,7 +181,6 @@ onMounted(async () => {
       :is-edit="true"
       :user-data="userData"
       :user-roles="props.userRoles"
-      :is-admin="props.isAdmin"
       @closeUserDialogEvent="closeUserDialog"
       @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
       @disableUserEvent="closeUserDialog(), disableUser(userData)"
