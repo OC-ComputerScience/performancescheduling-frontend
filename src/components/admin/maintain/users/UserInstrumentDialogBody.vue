@@ -52,6 +52,18 @@ async function getInstruments() {
     });
 }
 
+function checkInstrument(){
+  if(selectedInstrument.value != null){
+    for (let i = 0; i < instrumentOptions.value.length; i++) {
+      if (selectedInstrument.value.name == instrumentOptions.value[i].name){
+        if(instrumentOptions.value[i].type == "Vocal"){
+          return true;
+        }
+        else{
+          return false
+        } } } }
+}
+
 const instructors = ref([]);
 const accompanists = ref([]);
 
@@ -68,10 +80,7 @@ function getAllInstructors() {
 function getAllAccompanists() {
   UserRoleDataService.getRolesForRoleId(4, 'lastName,firstName')
     .then((response) => {
-      accompanists.value = [
-        { id: null, user: { firstName: "", lastName: "" } },
-        ...response.data,
-      ];
+      accompanists.value = response.data;
     })
     .catch((err) => {
       console.log(err);
@@ -91,7 +100,9 @@ async function addInstrument() {
           selectedAccompanist.value != null
             ? selectedAccompanist.value.id
             : null,
-        levelId: editedLevel.value.id,
+        levelId: editedLevel.value != null
+            ? editedLevel.value.id
+            : null,
       })
         .then(() => {
           emits("addInstrumentSuccessEvent");
@@ -149,11 +160,12 @@ async function updateSelectedAccompanist() {
 async function updateLevel() {
   if (
     props.studentInstrumentData.levelId === null ||
+    editedLevel.value == null ||
     editedLevel.value.id != props.studentInstrumentData.levelId
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
-      levelId: editedLevel.value.id,
+      levelId: editedLevel.value != null ? editedLevel.value.id : null,
     }).catch((err) => {
       console.log(err);
     });
@@ -226,6 +238,7 @@ onMounted(async () => {
           return-object
           :readonly="props.isEdit"
           :rules="[(v) => !!v || 'This field is required']"
+          @change="checkInstrument()"
         >
         </v-select>
 
@@ -249,6 +262,7 @@ onMounted(async () => {
           Accompanist
         </v-card-subtitle>
         <v-select
+          clearable
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -263,6 +277,7 @@ onMounted(async () => {
           Level
         </v-card-subtitle>
         <v-select
+          clearable
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -271,7 +286,7 @@ onMounted(async () => {
           :item-title="(item) => item.name"
           item-value="id"
           return-object
-          :rules="[(v) => !!v || 'This field is required']"
+          :rules="checkInstrument() ? [(v) => !!v || 'This field is required'] : []"
         >
         </v-select>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
