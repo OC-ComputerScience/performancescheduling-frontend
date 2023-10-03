@@ -303,7 +303,7 @@ function timeCheck(time) {
                 Event Type
               </v-card-subtitle>
               <v-select
-                placeholder="select an event type"
+                placeholder="Select an event type"
                 v-model="editedEventData.eventType"
                 :items="eventTypes"
                 item-title="type"
@@ -322,7 +322,7 @@ function timeCheck(time) {
                 Location
               </v-card-subtitle>
               <v-select
-                placeholder="select a location"
+                placeholder="Select a location"
                 v-model="editedEventData.location"
                 :items="locations"
                 item-title="roomName"
