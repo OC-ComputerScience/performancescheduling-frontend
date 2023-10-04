@@ -130,7 +130,7 @@ const props = defineProps({
     <v-card-actions>
       <v-btn
         flat
-        class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+        class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
         @click="emits('closePerformanceDialog')"
       >
         Close
