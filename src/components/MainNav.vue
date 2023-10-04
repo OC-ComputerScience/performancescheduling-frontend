@@ -60,11 +60,6 @@ const menus = [
     text: "Home",
     roles: [4],
   },
-  {
-    link: "accompanistStudents",
-    text: "Students",
-    roles: [4],
-  },
 ];
 const adminMenus = [
   {
@@ -134,7 +129,7 @@ const roleColors = [
   {
     roleId: 4,
     backgroundColor: "lightTeal",
-    textColor: "teal",
+    textColor: "black",
   },
 ];
 const roleColor = ref({});
@@ -399,7 +394,7 @@ onMounted(() => {
               >
                 <v-btn
                   color="lightTeal"
-                  :class="'mt-2 menu-button font-weight-bold text-teal'"
+                  :class="'mt-2 menu-button font-weight-bold text-black'"
                   density="comfortable"
                   elevation="0"
                   width="250px"
