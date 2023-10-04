@@ -5,6 +5,7 @@ import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
 
 import StudentPieceDataService from "../../services/StudentPieceDataService.js";
+import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService.js";
 import EventSignupDataService from "../../services/EventSignupDataService.js";
 import EventSignupPieceDataService from "../../services/EventSignupPieceDataService.js";
 import StudentPieceDialogBody from "../student/repertoire/StudentPieceDialogBody.vue";
@@ -111,7 +112,9 @@ function isStudentPieceSelected(studentPiece) {
 }
 
 async function deleteSignup() {
-  await EventSignupDataService.remove(studentInstrumentSignup.value.eventSignupId)
+  //Delete only the student instrument sign up if it is a group and more people are still signed up there
+  if(props.eventSignUpData.studentInstrumentSignups.length > 1){
+    await StudentInstrumentSignupDataService.remove(studentInstrumentSignup.value.id)
     .then(() => {
       confimationDialog.value = false;
       emits("closeDialogEvent");
@@ -120,6 +123,19 @@ async function deleteSignup() {
     .catch((e) => {
       console.log(e);
     });
+  }
+  //Delete the entire event sign up if there is only one person there
+  else{
+    await EventSignupDataService.remove(studentInstrumentSignup.value.eventSignupId)
+      .then(() => {
+        confimationDialog.value = false;
+        emits("closeDialogEvent");
+        emits("refreshEvents");
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
 }
 
 async function saveSignup() {
@@ -337,7 +353,7 @@ onMounted(async () => {
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-teal text-none"
+            class="font-weight-semi-bold mr-2 mt-4 bg-teal text-none text-white"
             @click="saveSignup"
           >
             Save
