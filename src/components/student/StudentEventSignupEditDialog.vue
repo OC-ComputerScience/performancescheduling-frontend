@@ -16,6 +16,7 @@ const props = defineProps({
   eventSignUpData: { type: [Object], required: true },
   studentInstrumentSignupData: { type: [Object], required: true },
 });
+console.log(props.eventData);
 const studentInstrumentSignup = ref(
   Object.assign({}, props.studentInstrumentSignupData)
 );
@@ -62,7 +63,8 @@ async function getStudentPieces() {
         (studentPiece) =>
           studentPiece.semesterId === props.eventData.semesterId &&
           studentPiece.studentInstrumentId ===
-            studentInstrumentSignup.value.studentInstrumentId
+            studentInstrumentSignup.value.studentInstrumentId &&
+          studentPiece.status === "Active"
       );
       selectedStudentPieces.value = [];
       studentPieces.value.forEach(function (studentPiece) {
@@ -77,12 +79,25 @@ async function getStudentPieces() {
         }
         studentPiece.piece.composer.fullName = fullName;
       });
+
       studentInstrumentSignup.value.eventSignup.eventSignupPieces.forEach(
         (studentPiece) => {
           selectedStudentPieces.value.push(studentPiece);
         }
       );
-
+      studentPieces.value.forEach((studentPiece) => {
+        if (
+          selectedStudentPieces.value.findIndex(
+            (x) => x.pieceId === studentPiece.pieceId
+          ) !== -1
+        ) {
+          studentPiece.isFirst = selectedStudentPieces.value.find(
+            (x) => x.pieceId === studentPiece.pieceId
+          ).isFirst;
+        } else {
+          studentPiece.isFirst = false;
+        }
+      });
       filteredStudentPieces.value = studentPieces.value;
     })
     .catch((e) => {
@@ -109,6 +124,26 @@ function isStudentPieceSelected(studentPiece) {
       (x) => x.pieceId === studentPiece.pieceId
     ) !== -1
   );
+}
+function setFirstPiece(clickedStudentPiece) {
+  clickedStudentPiece.isFirst = true;
+
+  filteredStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.pieceId != clickedStudentPiece.pieceId) {
+      studentPiece.isFirst = false;
+    }
+  });
+  selectedStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.pieceId != clickedStudentPiece.pieceId) {
+      studentPiece.isFirst = false;
+    } else {
+      studentPiece.isFirst = true;
+    }
+  });
+}
+
+function unSetFirstPiece(clickedStudentPiece) {
+  clickedStudentPiece.isFirst = false;
 }
 
 async function deleteSignup() {
@@ -144,6 +179,17 @@ async function saveSignup() {
       "You must select atleast one piece before saving this signup.";
     return;
   }
+  var haveFirstPiece = false;
+  selectedStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.isFirst) {
+      haveFirstPiece = true;
+    }
+  });
+
+  if (!haveFirstPiece && props.eventData.eventType.firstPiece) {
+    errorMessage.value = "Please select a first piece.";
+    return;
+  }
   const studentInstrumentSignupData = {
     id: studentInstrumentSignup.value.eventSignupId,
     isGroupEvent: groupSignup.value,
@@ -172,6 +218,7 @@ async function saveSignup() {
     const studentPieceData = {
       eventSignupId: props.eventSignUpData.id,
       pieceId: studentPiece.pieceId,
+      isFirst: studentPiece.isFirst,
     };
     EventSignupPieceDataService.create(studentPieceData).catch((e) => {
       console.log(e);
@@ -284,9 +331,8 @@ onMounted(async () => {
                         'bg-blue': isStudentPieceSelected(studentPiece),
                         'bg-white': !isStudentPieceSelected(studentPiece),
                       }"
-                      @click="selectStudentPiece(studentPiece)"
                     >
-                      <v-card-text>
+                      <v-card-text @click="selectStudentPiece(studentPiece)">
                         <v-row
                           no-gutters
                           class="text-blue font-weight-semi-bold"
@@ -295,10 +341,42 @@ onMounted(async () => {
                           }"
                         >
                           {{ studentPiece.piece.title }}
+                          {{ studentPiece.isFirst ? "(First Piece)" : "" }}
                         </v-row>
-                        <v-row no-gutters class="text-teal">
+                        <v-row
+                          no-gutters
+                          class="text-black"
+                          v-bind:class="{
+                            'text-white': isStudentPieceSelected(studentPiece),
+                          }"
+                        >
                           {{ studentPiece.piece.composer.fullName }}
                         </v-row>
+                      </v-card-text>
+                      <v-card-text
+                        class="mt-0 pt-0 pb-2"
+                        v-if="
+                          isStudentPieceSelected(studentPiece) &&
+                          eventData.eventType.firstPiece
+                        "
+                      >
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          size="small"
+                          v-if="studentPiece.isFirst"
+                          @click="unSetFirstPiece(studentPiece)"
+                        >
+                          UnSet First Piece
+                        </v-btn>
+                        <v-btn
+                          size="small"
+                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          v-if="!studentPiece.isFirst"
+                          @click="setFirstPiece(studentPiece)"
+                        >
+                          Set as First Piece
+                        </v-btn>
                       </v-card-text>
                     </v-card>
                   </v-list-item>

@@ -36,7 +36,7 @@ const selectedInstructor = ref(null);
 const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 // student piece variables
-const firstPieceId = ref("");
+
 const studentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
@@ -302,7 +302,7 @@ function openDialog() {
     }
   });
 
-  if (!haveFirstPiece) {
+  if (!haveFirstPiece && props.eventData.eventType.firstPiece) {
     errorMessage.value = "Please select a first piece.";
     return;
   }
@@ -748,21 +748,6 @@ onMounted(async () => {
               Musical Selection
             </v-row>
             <v-row>
-              <!-- take out search
-              <v-col cols="6" class="pl-0">
-                <input
-                  type="text"
-                  v-model="searchInput"
-                  @input="searchStudentPieces"
-                  class="pa-3 mainCardBorder text-blue bg-lightBlue font-weight-bold"
-                  style="outline: none"
-                  append-icon="mdi-magnify"
-                  placeholder="Search Repertoire"
-                  single-line
-                  hide-details
-                />
-              </v-col>
-              -->
               <v-col cols="6">
                 <v-btn
                   class="font-weight-bold text-none"
@@ -818,7 +803,10 @@ onMounted(async () => {
                       </v-card-text>
                       <v-card-text
                         class="mt-0 pt-0 pb-2"
-                        v-if="isStudentPieceSelected(studentPiece)"
+                        v-if="
+                          isStudentPieceSelected(studentPiece) &&
+                          eventData.eventType.firstPiece
+                        "
                       >
                         <v-spacer></v-spacer>
                         <v-btn
