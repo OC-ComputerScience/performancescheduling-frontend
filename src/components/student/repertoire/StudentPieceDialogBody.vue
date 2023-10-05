@@ -362,25 +362,6 @@ onMounted(async () => {
           Add Composer
         </v-btn>
         <v-btn
-          v-if="props.isEdit"
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
-          :class="
-            props.studentpieceData.status === 'Disabled'
-              ? 'bg-darkBlue'
-              : 'bg-maroon'
-          "
-          @click="
-            props.studentpieceData.status === 'Disabled'
-              ? emits('enableStudentPieceEvent')
-              : emits('disableStudentPieceEvent')
-          "
-        >
-          {{
-            props.studentpieceData.status === "Disabled" ? "Enable" : "Disable"
-          }}
-        </v-btn>
-        <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
           @click="props.isEdit ? updateStudentPiece() : addStudentPiece()"
@@ -398,6 +379,25 @@ onMounted(async () => {
           "
         >
           Cancel
+        </v-btn>
+        <v-btn
+          v-if="props.isEdit"
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          :class="
+            props.studentpieceData.status === 'Disabled'
+              ? 'bg-darkBlue'
+              : 'bg-maroon'
+          "
+          @click="
+            props.studentpieceData.status === 'Disabled'
+              ? emits('enableStudentPieceEvent')
+              : emits('disableStudentPieceEvent')
+          "
+        >
+          {{
+            props.studentpieceData.status === "Disabled" ? "Enable" : "Disable"
+          }}
         </v-btn>
       </v-card-actions>
     </v-form>

@@ -67,19 +67,19 @@ function hasCritiques(piece) {
                 {{ eventData.semester.name }}
               </v-card-subtitle>
               <div v-if="currentRole.roleId == 2">
-              <v-card-subtitle
-                class="font-weight-semi-bold text-darkblue mt-4 text-h6"
-              >
-                {{
-                  studentInstrumentSignupData.studentInstrument.studentRole.user
-                    .firstName
-                }}
-                {{
-                  studentInstrumentSignupData.studentInstrument.studentRole.user
-                    .lastName
-                }}
-              </v-card-subtitle>
-            </div>
+                <v-card-subtitle
+                  class="font-weight-semi-bold text-darkblue mt-4 text-h6"
+                >
+                  {{
+                    studentInstrumentSignupData.studentInstrument.studentRole
+                      .user.firstName
+                  }}
+                  {{
+                    studentInstrumentSignupData.studentInstrument.studentRole
+                      .user.lastName
+                  }}
+                </v-card-subtitle>
+              </div>
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="auto" class="mt-0 pt-2 mr-0 pr-0">
@@ -120,11 +120,14 @@ function hasCritiques(piece) {
               </v-card>
               <v-row>
                 <v-card-title class="font-weight-semi-bold text-maroon mt-5">
-                  Grade: {{ eventSignupData.pass == null
-                  ? "Grade pending"
-                  : eventSignupData.pass
-                  ? "Passed"
-                  : "Failed"}} 
+                  Grade:
+                  {{
+                    eventSignupData.pass == null
+                      ? "Grade pending"
+                      : eventSignupData.pass
+                      ? "Passed"
+                      : "Failed"
+                  }}
                 </v-card-title>
               </v-row>
             </v-col>
@@ -262,7 +265,7 @@ function hasCritiques(piece) {
                   </v-card-text>
                 </v-col>
                 <v-col
-                v-if="hasCritiques(eventSignupPiece)"
+                  v-if="hasCritiques(eventSignupPiece)"
                   cols="3"
                   min-width="95"
                 >
@@ -277,25 +280,38 @@ function hasCritiques(piece) {
                 </v-col>
               </v-row>
             </v-col>
+          </v-row>
+          <v-row>
+            <v-spacer></v-spacer>
             <v-btn
-              v-if="!isCritiqued"
-                flat
-                size="small"
-                :min-width="95"
-                class="font-weight-semi-bold ml-auto mr-2 bg-teal text-none text-white"
-                @click="critiqueDialog = true"
-              >
+              v-if="!isCritiqued && currentRole.roleId == 2"
+              flat
+              size="small"
+              :min-width="95"
+              class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none text-white"
+              @click="critiqueDialog = true"
+            >
               Add Critique
             </v-btn>
             <v-btn
-              v-if="eventSignupData.pass == null"
-                flat
-                size="small"
-                :min-width="95"
-                class="font-weight-semi-bold mr-2 bg-teal text-none text-white"
-                @click="gradeDialog = true"
-              >
+              v-if="eventSignupData.pass == null && currentRole.roleId == 2"
+              flat
+              size="small"
+              :min-width="95"
+              class="font-weight-semi-bold mr-2 bg-blue text-none text-white"
+              @click="gradeDialog = true"
+            >
               Add Grade
+            </v-btn>
+            <v-btn
+              v-if="eventSignupData.pass != null && currentRole.roleId == 2"
+              flat
+              size="small"
+              :min-width="95"
+              class="font-weight-semi-bold mr-2 bg-blue text-none text-white"
+              @click="gradeDialog = true"
+            >
+              Edit Grade
             </v-btn>
           </v-row>
         </v-col>

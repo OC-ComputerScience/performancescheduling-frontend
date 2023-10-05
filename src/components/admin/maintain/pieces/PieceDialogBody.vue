@@ -204,7 +204,6 @@ function similarPieceCheck(piece) {
           </v-card-subtitle>
 
           <v-autocomplete
-            :readonly="props.isAdmin"
             placeholder="Start typing the composer's last name"
             color="darkBlue"
             variant="plain"
@@ -218,7 +217,7 @@ function similarPieceCheck(piece) {
         </v-col>
       </v-row>
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <v-btn
           v-if="props.isEdit && props.isAdmin"
           flat

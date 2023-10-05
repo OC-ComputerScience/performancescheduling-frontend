@@ -79,6 +79,17 @@ onMounted(async () => {});
             {{ studentInstrumentData.status }}
           </v-chip>
         </v-col>
+        <v-spacer> </v-spacer>
+        <v-col cols="auto" align-self="center">
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold text-none text-white bg-blue flatChipBorder"
+            @click="addOrEditInstrumentDialog = true"
+          >
+            Edit
+          </v-btn>
+        </v-col>
       </v-row>
     </v-card-subtitle>
     <v-card-text class="pl-3">
@@ -116,17 +127,6 @@ onMounted(async () => {});
             }}
           </v-card-text>
         </v-col>
-      </v-row>
-      <v-row>
-        <v-spacer/>
-        <v-btn
-          flat
-          size="small"
-          class="font-weight-semi-bold text-none text-white bg-blue flatChipBorder"
-          @click="addOrEditInstrumentDialog = true"
-        >
-          Edit
-        </v-btn>
       </v-row>
     </v-card-text>
   </v-card>
