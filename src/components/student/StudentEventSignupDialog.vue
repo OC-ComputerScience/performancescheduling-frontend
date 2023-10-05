@@ -36,11 +36,12 @@ const selectedInstructor = ref(null);
 const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 // student piece variables
-const searchInput = ref("");
+const firstPieceId = ref("");
 const studentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
+
 // timeslot variables
 const isMusicMajor = ref(false);
 const timeslotLength = ref(0);
@@ -136,36 +137,21 @@ async function getStudentPieces() {
         (studentPiece) =>
           studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
       );
-      searchStudentPieces();
+
       filteredStudentPieces.value = studentInstrumentStudentPieces.value;
+      filteredStudentPieces.value.forEach((studentPiece) => {
+        studentPiece.isFirst = false;
+      });
     })
     .catch((e) => {
       console.log(e);
     });
 }
 
-function searchStudentPieces() {
-  filteredStudentPieces.value = studentInstrumentStudentPieces.value;
-  // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value === "") return;
-
-  filteredStudentPieces.value = filteredStudentPieces.value.filter(
-    (studentPiece) => {
-      return (
-        studentPiece.piece.title
-          .toLowerCase()
-          .includes(searchInput.value.toLowerCase()) ||
-        studentPiece.piece.composer.fullName
-          .toLowerCase()
-          .includes(searchInput.value.toLowerCase())
-      );
-    }
-  );
-}
-
 function selectStudentPiece(studentPiece) {
   if (!isStudentPieceSelected(studentPiece)) {
     selectedStudentPieces.value.push(studentPiece);
+    studentPiece.isFirst = false;
   } else {
     selectedStudentPieces.value.splice(
       selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id),
@@ -179,6 +165,20 @@ function isStudentPieceSelected(studentPiece) {
     selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id) !==
     -1
   );
+}
+
+function setFirstPiece(clickedStudentPiece) {
+  clickedStudentPiece.isFirst = true;
+
+  selectedStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.id != clickedStudentPiece.id) {
+      studentPiece.isFirst = false;
+    }
+  });
+}
+
+function unSetFirstPiece(clickedStudentPiece) {
+  clickedStudentPiece.isFirst = false;
 }
 
 function generateTimeslots() {
@@ -294,6 +294,19 @@ function openDialog() {
     errorMessage.value = "Please select at least one piece.";
     return;
   }
+
+  var haveFirstPiece = false;
+  selectedStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.isFirst) {
+      haveFirstPiece = true;
+    }
+  });
+
+  if (!haveFirstPiece) {
+    errorMessage.value = "Please select a first piece.";
+    return;
+  }
+
   if (selectedTimeslot.value == null) {
     errorMessage.value = "Please select a timeslot.";
     return;
@@ -520,8 +533,10 @@ async function confirmSignup() {
       const studentPieceData = {
         eventSignupId: eventSignupId,
         pieceId: studentPiece.pieceId,
+        isFirst: studentPiece.isFirst,
       };
       await EventSignupPieceDataService.create(studentPieceData).catch((e) => {
+
         console.log(e);
       });
     });
@@ -604,13 +619,12 @@ watch(selectedStudentInstrument, async () => {
       console.log(e);
     });
 
-  if(selectedStudentInstrument.value.accompanistRole!=null){
+  if (selectedStudentInstrument.value.accompanistRole != null) {
     selectedAccompanist.value = activeAccompanists.value.find(
       (accompanist) =>
         accompanist.id == selectedStudentInstrument.value.accompanistRole.id
     );
-  }
-  else{
+  } else {
     selectedAccompanist.value = null;
   }
 
@@ -620,7 +634,6 @@ watch(selectedStudentInstrument, async () => {
     (studentPiece) =>
       studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
   );
-  searchStudentPieces();
 
   getTimeslotLength();
 });
@@ -778,9 +791,11 @@ onMounted(async () => {
                         'bg-blue': isStudentPieceSelected(studentPiece),
                         'bg-white': !isStudentPieceSelected(studentPiece),
                       }"
-                      @click="selectStudentPiece(studentPiece)"
                     >
-                      <v-card-text>
+                      <v-card-text
+                        class="pb-2"
+                        @click="selectStudentPiece(studentPiece)"
+                      >
                         <v-row
                           no-gutters
                           class="text-blue font-weight-semi-bold"
@@ -789,10 +804,39 @@ onMounted(async () => {
                           }"
                         >
                           {{ studentPiece.piece.title }}
+                          {{ studentPiece.isFirst ? "(First Piece)" : "" }}
                         </v-row>
-                        <v-row no-gutters class="text-teal">
+                        <v-row
+                          no-gutters
+                          class="text-black"
+                          v-bind:class="{
+                            'text-white': isStudentPieceSelected(studentPiece),
+                          }"
+                        >
                           {{ studentPiece.piece.composer.fullName }}
                         </v-row>
+                      </v-card-text>
+                      <v-card-text
+                        class="mt-0 pt-0 pb-2"
+                        v-if="isStudentPieceSelected(studentPiece)"
+                      >
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          size="small"
+                          v-if="studentPiece.isFirst"
+                          @click="unSetFirstPiece(studentPiece)"
+                        >
+                          UnSet First Piece
+                        </v-btn>
+                        <v-btn
+                          size="small"
+                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          v-if="!studentPiece.isFirst"
+                          @click="setFirstPiece(studentPiece)"
+                        >
+                          Set as First Piece
+                        </v-btn>
                       </v-card-text>
                     </v-card>
                   </v-list-item>
