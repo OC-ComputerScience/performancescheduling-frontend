@@ -11,7 +11,7 @@ const LoginStore = useLoginStore();
 
 const feedbackDialog = ref(false);
 const gradeDialog = ref(false);
-
+console.log(props.signup.eventSignupPieces);
 function signupHasFeedbackByFaculty() {
   return props.signup.eventSignupPieces.some((signupPiece) =>
     signupPiece.critiques.some(
