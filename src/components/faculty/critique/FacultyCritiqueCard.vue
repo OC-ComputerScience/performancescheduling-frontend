@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useLoginStore } from "../../../stores/LoginStore";
 import { get12HourTimeStringFromString } from "../../../composables/timeFormatter";
 import FacultyCreateCritiqueDialog from "./FacultyCreateCritiqueDialog.vue";
@@ -11,7 +11,15 @@ const LoginStore = useLoginStore();
 
 const feedbackDialog = ref(false);
 const gradeDialog = ref(false);
+const eventSignupPieces = ref([]);
 console.log(props.signup.eventSignupPieces);
+
+function sortPieces() {
+  eventSignupPieces.value = props.signup.eventSignupPieces;
+  eventSignupPieces.value.sort((a, b) => {
+    return a.isFirst === b.isFirst ? 0 : a.isFirst > b.isFirst ? -1 : 1;
+  });
+}
 function signupHasFeedbackByFaculty() {
   return props.signup.eventSignupPieces.some((signupPiece) =>
     signupPiece.critiques.some(
@@ -25,6 +33,10 @@ function closeDialogs() {
   gradeDialog.value = false;
   emits("dialogClosedEvent");
 }
+
+onMounted(() => {
+  sortPieces();
+});
 </script>
 <template>
   <v-card color="lightMaroon" class="pa-2 flatCardBorder" elevation="0">
@@ -135,15 +147,13 @@ function closeDialogs() {
           >
             Musical Selection
           </v-card-title>
-          <div
-            v-for="(piece, index) in props.signup.eventSignupPieces"
-            :key="piece.id"
-          >
+          <div v-for="(piece, index) in eventSignupPieces" :key="piece.id">
             <v-container class="pa-0 ma-0" v-if="index < 2">
               <v-card-subtitle
                 class="font-weight-bold text-darkBlue text-body-1 pl-0 ml-0"
               >
                 {{ piece.piece.title }}
+                {{ piece.isFirst ? "(First Piece)" : "" }}
               </v-card-subtitle>
               <v-card-text
                 class="text-blue font-weight-semi-bold pl-0 ml-0 pt-1"
