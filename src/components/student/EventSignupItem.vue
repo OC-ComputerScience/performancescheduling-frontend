@@ -212,7 +212,7 @@ const props = defineProps({
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
+        class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
         @click="editSignUp = true"
       >
         Edit {{ isSignup ? "signup" : "availability" }}
