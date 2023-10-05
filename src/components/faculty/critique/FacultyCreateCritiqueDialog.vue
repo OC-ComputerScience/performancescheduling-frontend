@@ -19,6 +19,8 @@ function clearCritique() {
   critique.value = {};
 }
 
+const eventSignupPieces = ref([]);
+
 async function changeSelectedPiece(piece) {
   if (selectedStudentPiece.value.id != piece.id && (await saveCritique())) {
     selectedStudentPiece.value = piece;
@@ -172,8 +174,14 @@ onMounted(async () => {
     studentNames.value =
       students.slice(0, -1).join(", ") + ", and " + students.slice(-1);
   }
+  eventSignupPieces.value = props.signup.eventSignupPieces;
+  eventSignupPieces.value.sort((a, b) => {
+    return a.isFirst === b.isFirst ? 0 : a.isFirst > b.isFirst ? -1 : 1;
+  });
 
-  props.signup.eventSignupPieces.forEach(function (studentPiece) {
+  selectedStudentPiece.value = eventSignupPieces.value[0];
+
+  eventSignupPieces.value.forEach(function (studentPiece) {
     var fullName = "";
     if (studentPiece.piece.composer.lastName) {
       fullName = studentPiece.piece.composer.lastName;
@@ -220,8 +228,7 @@ onMounted(async () => {
                   class="overflow-y-auto bg-lightBlue"
                 >
                   <v-list-item
-                    v-for="(studentPiece, index) in props.signup
-                      .eventSignupPieces"
+                    v-for="(studentPiece, index) in eventSignupPieces"
                     :key="index"
                   >
                     <v-card
@@ -241,6 +248,7 @@ onMounted(async () => {
                           }"
                         >
                           {{ studentPiece.piece.title }}
+                          {{ studentPiece.isFirst ? "(First Piece)" : "" }}
                         </v-row>
                         <v-row no-gutters class="text-teal">
                           {{ studentPiece.piece.composer.fullName }}
