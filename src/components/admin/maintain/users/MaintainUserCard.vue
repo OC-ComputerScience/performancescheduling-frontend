@@ -52,16 +52,20 @@ async function fillRoleData() {
 // Fills instrument role labels, only is Student
 function fillInstrumentRoleLabels(instruments) {
   let isInstrumental = instruments.some(
-    (i) => i.instrument.type === "Instrument"
+    (i) => i.instrument.type === "Instrument" && i.status === "Active"
   );
-  let isVocal = instruments.some((i) => i.instrument.type === "Vocal");
+  let isVocal = instruments.some((i) => i.instrument.type === "Vocal" && i.status === "Active");
 
-  instrumentRoleLabels.value =
-    isInstrumental && isVocal
-      ? ["Instrumental", "Vocal"]
-      : isInstrumental && !isVocal
-      ? ["Instrumental"]
-      : ["Vocal"];
+
+  if(isInstrumental) instrumentRoleLabels.value.push("Instrumental")
+  if(isVocal) instrumentRoleLabels.value.push("Vocal")
+
+  // instrumentRoleLabels.value =
+  //   isInstrumental && isVocal
+  //     ? ["Instrumental", "Vocal"]
+  //     : isInstrumental && !isVocal
+  //     ? ["Instrumental"]
+  //     : ["Vocal"];
 }
 
 async function disableUser(user) {
@@ -181,7 +185,7 @@ onMounted(async () => {
       :is-edit="true"
       :user-data="userData"
       :user-roles="props.userRoles"
-      @closeUserDialogEvent="closeUserDialog"
+      @closeUserDialogEvent="closeUserDialog(), emits('refreshUsersEvent')"
       @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
       @disableUserEvent="closeUserDialog(), disableUser(userData)"
       @enableUserEvent="closeUserDialog(), enableUser(userData)"
