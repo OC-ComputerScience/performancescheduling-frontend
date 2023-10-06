@@ -373,6 +373,12 @@ onMounted(async () => {
               <v-textbox v-if="groupSignUp">
                 Students in Group : {{ studentsInSignup }}
               </v-textbox>
+              <v-textbox>
+                <v-row> Selected Pieces for Group: </v-row>
+                <v-row v-for="piece in selectedStudentPieces" class="ml-6">
+                  {{ piece.piece.title }}
+                </v-row>
+              </v-textbox>
             </v-row>
           </v-col>
         </v-row>
