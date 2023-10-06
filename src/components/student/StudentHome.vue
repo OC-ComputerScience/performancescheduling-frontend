@@ -92,7 +92,6 @@ async function retrieveData() {
 function hasInstrument(instrumentType) {
   var found = false;
   instruments.value.forEach((instrument) => {
-    console.log("here");
     if (
       instrument.instrument.type === instrumentType &&
       instrument.status === "Active"
