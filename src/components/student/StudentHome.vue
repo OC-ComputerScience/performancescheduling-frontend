@@ -30,11 +30,9 @@ async function retrieveData() {
 
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
-      response.data.forEach((instrument) => {
-        if (instrument.status === "Active") {
-          instruments.value.push(instrument);
-        }
-      });
+      instruments.value = response.data.filter(
+        (data) => data.status === "Active"
+      );
     })
     .catch((e) => {
       console.log(e);
