@@ -18,6 +18,10 @@ const props = defineProps({
   eventSignUpData: { type: [Object], required: true },
   studentInstrumentSignupData: { type: [Object], required: true },
 });
+
+const eventSignups = ref([]);
+const eventSignup = ref(null);
+const studentsInSignup = ref("");
 const studentInstrumentSignup = ref(
   Object.assign({}, props.studentInstrumentSignupData)
 );
@@ -55,6 +59,41 @@ const snackbar = ref({ show: false, color: "", message: "" });
 
 async function getData() {
   await getStudentPieces();
+  await getEventSignup();
+}
+
+async function getEventSignup() {
+  await EventSignupDataService.getByEvent(props.eventData.id)
+    .then((response) => {
+      eventSignups.value = response.data;
+      eventSignups.value.forEach((signUp) => {
+        if (signUp.id === props.eventSignUpData.id) eventSignup.value = signUp;
+      });
+
+      const exitingStudentsInSingup =
+        eventSignup.value.studentInstrumentSignups.map(
+          (x) =>
+            x.studentInstrument.studentRole.user.firstName +
+            " " +
+            x.studentInstrument.studentRole.user.lastName
+        );
+      studentsInSignup.value = "";
+      if (exitingStudentsInSingup.length == 1) {
+        studentsInSignup.value = exitingStudentsInSingup[0];
+      } else if (exitingStudentsInSingup.length == 2) {
+        //joins all with "and" but no commas
+        studentsInSignup.value = exitingStudentsInSingup.join(" and ");
+      } else {
+        //joins all with commas, but last one gets ", and"
+        studentsInSignup.value =
+          exitingStudentsInSingup.slice(0, -1).join(", ") +
+          ", and " +
+          exitingStudentsInSingup.slice(-1);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 }
 
 async function getStudentPieces() {
@@ -329,7 +368,11 @@ onMounted(async () => {
                 v-model="groupSignup"
                 label="Allow other students to signup with you"
                 class="text-body-1 font-weight-bold text-darkBlue"
+                readonly="eventSignup.length > 1"
               ></v-checkbox>
+              <v-textbox v-if="groupSignUp">
+                Students in Group : {{ studentsInSignup }}
+              </v-textbox>
             </v-row>
           </v-col>
         </v-row>

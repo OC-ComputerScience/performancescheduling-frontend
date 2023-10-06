@@ -604,13 +604,12 @@ watch(selectedStudentInstrument, async () => {
       console.log(e);
     });
 
-  if(selectedStudentInstrument.value.accompanistRole!=null){
+  if (selectedStudentInstrument.value.accompanistRole != null) {
     selectedAccompanist.value = activeAccompanists.value.find(
       (accompanist) =>
         accompanist.id == selectedStudentInstrument.value.accompanistRole.id
     );
-  }
-  else{
+  } else {
     selectedAccompanist.value = null;
   }
 
@@ -879,8 +878,7 @@ onMounted(async () => {
                         >
                           <v-icon
                             :icon="
-                              timeslot.existingSignup.studentInstrumentSignups
-                                .length > 1
+                              timeslot.existingSignup.isGroupEvent
                                 ? 'mdi-account-multiple'
                                 : 'mdi-account'
                             "
