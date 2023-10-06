@@ -439,6 +439,15 @@ onMounted(() => {
         </div>
         <v-card-actions class="d-flex justify-center">
           <v-spacer></v-spacer>
+          <div v-if="!Array.isArray(completeAvailabilityData) && isEdit">
+            <v-btn
+              flat
+              class="font-weight-semi-bold mt-0 ml-3 mr-4 text-none text-white bg-maroon flatChipBorder"
+              @click="deleteAvailabilityDialog = true"
+            >
+              Delete
+            </v-btn>
+          </div>
           <v-btn
             flat
             class="font-weight-semi-bold mt-0 text-none text-white bg-teal flatChipBorder"
@@ -453,15 +462,7 @@ onMounted(() => {
           >
             Cancel
           </v-btn>
-          <div v-if="!Array.isArray(completeAvailabilityData) && isEdit">
-            <v-btn
-              flat
-              class="font-weight-semi-bold mt-0 ml-3 mr-auto text-none text-white bg-maroon flatChipBorder"
-              @click="deleteAvailabilityDialog = true"
-            >
-              Delete
-            </v-btn>
-          </div>
+
         </v-card-actions>
       </v-card-text>
     </v-form>
@@ -480,14 +481,14 @@ onMounted(() => {
 
         <v-btn
           flat
-          class="font-weight-semi-bold mt-4 ml-2 mr-auto text-none text-white bg-maroon flatChipBorder"
+          class="font-weight-semi-bold mt-4 ml-2 mr-4 text-none text-white bg-maroon flatChipBorder"
           @click="deleteAvailability(currentIndex)"
         >
           Delete</v-btn
         >
         <v-btn
           flat
-          class="font-weight-semi-bold mt-4 ml-2 ml-auto text-none text-white bg-red flatChipBorder"
+          class="font-weight-semi-bold mt-4 ml-2 ml-4 text-none text-white bg-red flatChipBorder"
           @click="deleteAvailabilityDialog = false"
         >
           Cancel</v-btn
