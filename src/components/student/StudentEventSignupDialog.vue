@@ -76,27 +76,21 @@ async function getData() {
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
       if (props.eventData.eventType.instrumentType === "Instrument") {
-        response.data
-          .filter((data) => data.instrument.type === "Instrument")
-          .forEach((instrument) => {
-            if (instrument.status === "Active") {
-              instruments.value.push(instrument);
-            }
-          });
+        instruments.value = response.data.filter(
+          (data) =>
+            data.instrument.type === "Instrument" &&
+            data.instrument.status === "Active"
+        );
       } else if (props.eventData.eventType.instrumentType === "Vocal") {
-        response.data
-          .filter((data) => data.instrument.type === "Vocal")
-          .forEach((instrument) => {
-            if (instrument.status === "Active") {
-              instruments.value.push(instrument);
-            }
-          });
+        instruments.value = response.data.filter(
+          (data) =>
+            data.instrument.type === "Vocal" &&
+            data.instrument.status === "Active"
+        );
       } else {
-        response.data.forEach((instrument) => {
-          if (instrument.status === "Active") {
-            instruments.value.push(instrument);
-          }
-        });
+        instruments.value = response.data.filter(
+          (data) => data.instrument.status === "Active"
+        );
       }
 
       selectedStudentInstrument.value = instruments.value[0];
