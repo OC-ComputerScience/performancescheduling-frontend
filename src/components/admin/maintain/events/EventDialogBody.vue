@@ -169,7 +169,20 @@ function dateCheck() {
 }
 function timeCheck(time) {
   const pattern = new RegExp("[0-5]?[0-9]:[0-5][0-9][ap]m$");
-  return pattern.test(time) ? true : "Time must be in the format of 10:30am.";
+  const twelveHourPattern = new RegExp("^(0?[1-9]|1[0-2]):[0-5][0-9][ap]m$")
+
+  let isTimeValid;
+
+  if(pattern.test(time)) {
+    isTimeValid = true;
+    if(!twelveHourPattern.test(time)){
+      isTimeValid = "Time must be in 12 hour format."
+    }
+  } else {
+    isTimeValid = "Time must be in the format of 10:30am."
+  }
+
+  return isTimeValid;
 }
 </script>
 
