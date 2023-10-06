@@ -30,7 +30,11 @@ async function retrieveData() {
 
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
-      instruments.value = response.data;
+      response.data.forEach((instrument) => {
+        if (instrument.status === "Active") {
+          instruments.value.push(instrument);
+        }
+      });
     })
     .catch((e) => {
       console.log(e);
@@ -88,6 +92,7 @@ async function retrieveData() {
 function hasInstrument(instrumentType) {
   var found = false;
   instruments.value.forEach((instrument) => {
+    console.log("here");
     if (
       instrument.instrument.type === instrumentType &&
       instrument.status === "Active"
