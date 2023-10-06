@@ -70,7 +70,7 @@ async function getData() {
       console.log(err);
     });
 
-  await SemesterDataService.getAll("name", false)
+  await SemesterDataService.getAll("startDate", false)
     .then((response) => {
       semesters.value = response.data;
     })
