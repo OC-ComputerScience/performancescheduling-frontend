@@ -59,13 +59,6 @@ function fillInstrumentRoleLabels(instruments) {
 
   if(isInstrumental) instrumentRoleLabels.value.push("Instrumental")
   if(isVocal) instrumentRoleLabels.value.push("Vocal")
-
-  // instrumentRoleLabels.value =
-  //   isInstrumental && isVocal
-  //     ? ["Instrumental", "Vocal"]
-  //     : isInstrumental && !isVocal
-  //     ? ["Instrumental"]
-  //     : ["Vocal"];
 }
 
 async function disableUser(user) {
