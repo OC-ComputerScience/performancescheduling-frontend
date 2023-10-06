@@ -76,7 +76,7 @@ async function retrieveData() {
       console.log(e);
     });
 
-  await EventDataService.getGTEDateForFaculty(new Date(), 'date')
+  await EventDataService.getGTEDateForFaculty(new Date(), 'date,startTime')
     .then((response) => {
       upcomingEvents.value = response.data;
     })
