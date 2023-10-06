@@ -49,6 +49,14 @@ onMounted(async () => {});
         </v-col>
         <v-col cols="auto" align-self="center">
           <v-chip
+            label
+            flat
+            size="small"
+            class="font-weight-semi-bold text-none text-white flatChipBorder bg-darkBlue mr-2"
+          >
+            Hours: {{ studentInstrumentData.privateHours }}
+          </v-chip>
+          <v-chip
             v-if="studentInstrumentData.level"
             label
             flat
@@ -76,7 +84,7 @@ onMounted(async () => {});
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold text-none text-darkBlue bg-white flatChipBorder"
+            class="font-weight-semi-bold text-none text-white bg-blue flatChipBorder"
             @click="addOrEditInstrumentDialog = true"
           >
             Edit

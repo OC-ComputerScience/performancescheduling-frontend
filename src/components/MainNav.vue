@@ -31,18 +31,23 @@ const menus = [
     roles: [1],
   },
   {
+    link: "studentInstruments",
+    text: "Instruments",
+    roles: [1],
+  },
+  {
     link: "facultyHome",
     text: "Home",
     roles: [2],
   },
   {
-    link: "facultyPieces",
-    text: "Pieces",
+    link: "facultyStudents",
+    text: "Students",
     roles: [2],
   },
   {
-    link: "facultyStudents",
-    text: "Students",
+    link: "facultyPerformances",
+    text: "Performances",
     roles: [2],
   },
   {
@@ -53,11 +58,6 @@ const menus = [
   {
     link: "accompanistHome",
     text: "Home",
-    roles: [4],
-  },
-  {
-    link: "accompanistPieces",
-    text: "Pieces",
     roles: [4],
   },
   {
@@ -240,7 +240,7 @@ onMounted(() => {
           :class="activeLink === menu.link ? 'text-blue' : 'text-maroon'"
         >
           <v-btn
-            class="hidden-md-and-down mx-1 menu-link font-weight-bold"
+            class="hidden-md-and-down mx-1 mt-3 menu-link font-weight-bold"
             exact
             text
             :ripple="false"

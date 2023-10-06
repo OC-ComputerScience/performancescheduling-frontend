@@ -130,6 +130,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div>
   <v-container fluid class="fill-height bg-lightGray pa-4">
     <v-row class="fill-height pa-0 ma-0">
       <v-col cols="12" lg="3" class="ma-0 pa-4">
@@ -172,6 +173,7 @@ onMounted(async () => {
                   v-for="student of students"
                   :key="student.id"
                   :students-data="student"
+                  @refreshUsersEvent="retrieveData()"
                 ></CurrentStudentsItem>
               </v-card-text>
             </v-card>
@@ -219,6 +221,7 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </v-container>
+</div>
 </template>
 
 <style scoped>
