@@ -76,15 +76,27 @@ async function getData() {
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
       if (props.eventData.eventType.instrumentType === "Instrument") {
-        instruments.value = response.data.filter(
-          (data) => data.instrument.type === "Instrument"
-        );
+        response.data
+          .filter((data) => data.instrument.type === "Instrument")
+          .forEach((instrument) => {
+            if (instrument.status === "Active") {
+              instruments.value.push(instrument);
+            }
+          });
       } else if (props.eventData.eventType.instrumentType === "Vocal") {
-        instruments.value = response.data.filter(
-          (data) => data.instrument.type === "Vocal"
-        );
+        response.data
+          .filter((data) => data.instrument.type === "Vocal")
+          .forEach((instrument) => {
+            if (instrument.status === "Active") {
+              instruments.value.push(instrument);
+            }
+          });
       } else {
-        instruments.value = response.data;
+        response.data.forEach((instrument) => {
+          if (instrument.status === "Active") {
+            instruments.value.push(instrument);
+          }
+        });
       }
 
       selectedStudentInstrument.value = instruments.value[0];
@@ -604,13 +616,12 @@ watch(selectedStudentInstrument, async () => {
       console.log(e);
     });
 
-  if(selectedStudentInstrument.value.accompanistRole!=null){
+  if (selectedStudentInstrument.value.accompanistRole != null) {
     selectedAccompanist.value = activeAccompanists.value.find(
       (accompanist) =>
         accompanist.id == selectedStudentInstrument.value.accompanistRole.id
     );
-  }
-  else{
+  } else {
     selectedAccompanist.value = null;
   }
 
