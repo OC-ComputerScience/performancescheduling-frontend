@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUpdate } from "vue";
 
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
@@ -20,6 +20,7 @@ const props = defineProps({
 const emits = defineEmits(["refreshAvailabilitiesEvent", "refreshEvents"]);
 
 const addOrEditAvailabilityDialog = ref(false);
+const signupCount = ref(0);
 
 function closeAvailabilityDialog() {
   addOrEditAvailabilityDialog.value = false;
@@ -58,6 +59,17 @@ async function unreadyEvent(event) {
       console.log(err);
     });
 }
+
+function countSignUps() {
+  signupCount.value=0;
+  for(let i=0; i<props.eventData.eventSignups.length; i++){
+    signupCount.value += props.eventData.eventSignups[i].studentInstrumentSignups.length;
+  }
+}
+
+onBeforeUpdate(async () =>{
+  countSignUps();
+});
 </script>
 
 <template>
@@ -110,7 +122,7 @@ async function unreadyEvent(event) {
                     {{
                       eventData.eventSignups == null
                         ? "0"
-                        : eventData.eventSignups.length
+                        : signupCount
                     }}
                     People Signed Up
                   </v-card-subtitle>
