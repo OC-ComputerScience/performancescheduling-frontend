@@ -30,7 +30,9 @@ async function retrieveData() {
 
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
-      instruments.value = response.data;
+      instruments.value = response.data.filter(
+        (data) => data.status === "Active"
+      );
     })
     .catch((e) => {
       console.log(e);
