@@ -77,11 +77,10 @@ async function checkAvailability() {
       );
       if (i != currentIndex.value) {
         if (
-          (start.value >= originalStartTime &&
-            start.value <= originalEndTime) ||
-          (end.value >= originalStartTime && end.value <= originalEndTime) ||
+          (start.value >= originalStartTime && start.value < originalEndTime) ||
+          (end.value > originalStartTime && end.value <= originalEndTime) ||
           (start.value <= originalStartTime && end.value >= originalEndTime) ||
-          start.value == originalStartTime
+          (start.value == originalStartTime)
         ) {
           AvailabilityNoError.value = false;
           break;
