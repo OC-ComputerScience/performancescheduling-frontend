@@ -75,21 +75,19 @@ async function getData() {
 
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
+      console.log(response.data);
       if (props.eventData.eventType.instrumentType === "Instrument") {
         instruments.value = response.data.filter(
           (data) =>
-            data.instrument.type === "Instrument" &&
-            data.instrument.status === "Active"
+            data.instrument.type === "Instrument" && data.status === "Active"
         );
       } else if (props.eventData.eventType.instrumentType === "Vocal") {
         instruments.value = response.data.filter(
-          (data) =>
-            data.instrument.type === "Vocal" &&
-            data.instrument.status === "Active"
+          (data) => data.instrument.type === "Vocal" && data.status === "Active"
         );
       } else {
         instruments.value = response.data.filter(
-          (data) => data.instrument.status === "Active"
+          (data) => data.status === "Active"
         );
       }
 
