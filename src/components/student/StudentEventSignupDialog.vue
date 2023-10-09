@@ -75,7 +75,6 @@ async function getData() {
 
   await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
-      console.log(response.data);
       if (props.eventData.eventType.instrumentType === "Instrument") {
         instruments.value = response.data.filter(
           (data) =>
