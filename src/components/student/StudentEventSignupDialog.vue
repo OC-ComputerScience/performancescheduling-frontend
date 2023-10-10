@@ -77,14 +77,17 @@ async function getData() {
     .then((response) => {
       if (props.eventData.eventType.instrumentType === "Instrument") {
         instruments.value = response.data.filter(
-          (data) => data.instrument.type === "Instrument"
+          (data) =>
+            data.instrument.type === "Instrument" && data.status === "Active"
         );
       } else if (props.eventData.eventType.instrumentType === "Vocal") {
         instruments.value = response.data.filter(
-          (data) => data.instrument.type === "Vocal"
+          (data) => data.instrument.type === "Vocal" && data.status === "Active"
         );
       } else {
-        instruments.value = response.data;
+        instruments.value = response.data.filter(
+          (data) => data.status === "Active"
+        );
       }
 
       selectedStudentInstrument.value = instruments.value[0];
@@ -604,13 +607,12 @@ watch(selectedStudentInstrument, async () => {
       console.log(e);
     });
 
-  if(selectedStudentInstrument.value.accompanistRole!=null){
+  if (selectedStudentInstrument.value.accompanistRole != null) {
     selectedAccompanist.value = activeAccompanists.value.find(
       (accompanist) =>
         accompanist.id == selectedStudentInstrument.value.accompanistRole.id
     );
-  }
-  else{
+  } else {
     selectedAccompanist.value = null;
   }
 
