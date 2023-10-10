@@ -519,16 +519,15 @@ async function confirmSignup() {
         console.log(e);
       });
 
-    selectedStudentPieces.value.forEach((studentPiece) => {
+    selectedStudentPieces.value.forEach(async(studentPiece) => {
       const studentPieceData = {
         eventSignupId: eventSignupId,
         pieceId: studentPiece.pieceId,
       };
-      EventSignupPieceDataService.create(studentPieceData).catch((e) => {
+      await EventSignupPieceDataService.create(studentPieceData).catch((e) => {
         console.log(e);
       });
     });
-    emits("refreshEvents");
   }
 
   const studentInstrumentSignupData = {
@@ -548,6 +547,7 @@ async function confirmSignup() {
     .catch((e) => {
       console.log(e);
     });
+  emits("refreshEvents");
 }
 
 async function confirmTimeslotAvailable() {

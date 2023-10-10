@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onBeforeUpdate } from "vue";
 
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
@@ -17,9 +17,14 @@ const props = defineProps({
   availabilityData: { type: [Object], required: false },
 });
 
-const emits = defineEmits(["refreshAvailabilitiesEvent", "refreshEvents"]);
+const emits = defineEmits([
+  "refreshAvailabilitiesEvent", 
+  "refreshEvents",
+  "readyEventEvent",
+  "unreadyEventEvent",]);
 
 const addOrEditAvailabilityDialog = ref(false);
+const signupCount = ref(0);
 
 function closeAvailabilityDialog() {
   addOrEditAvailabilityDialog.value = false;
@@ -41,7 +46,7 @@ async function readyEvent(event) {
   event.isReady = true;
   await EventDataService.update(event)
     .then(() => {
-      emits("refreshEventsEvent");
+      emits("refreshEvents");
     })
     .catch((err) => {
       console.log(err);
@@ -52,12 +57,23 @@ async function unreadyEvent(event) {
   event.isReady = false;
   await EventDataService.update(event)
     .then(() => {
-      emits("refreshEventsEvent");
+      emits("refreshEvents");
     })
     .catch((err) => {
       console.log(err);
     });
 }
+
+function countSignUps() {
+  signupCount.value=0;
+  for(let i=0; i<props.eventData.eventSignups.length; i++){
+    signupCount.value += props.eventData.eventSignups[i].studentInstrumentSignups.length;
+  }
+}
+
+onBeforeUpdate(async () =>{
+  countSignUps();
+});
 </script>
 
 <template>
@@ -110,7 +126,7 @@ async function unreadyEvent(event) {
                     {{
                       eventData.eventSignups == null
                         ? "0"
-                        : eventData.eventSignups.length
+                        : signupCount
                     }}
                     People Signed Up
                   </v-card-subtitle>
@@ -159,6 +175,22 @@ async function unreadyEvent(event) {
         {{ eventData.location.roomName }}
       </v-card-subtitle>
       <v-card-actions class="pt-0 mt-0">
+        <v-spacer></v-spacer>
+        <!--Unready/Ready-->
+        <v-btn
+          v-if="roleId==3"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-4 text-none text-white flatChipBorder"
+          :class="props.eventData.isReady ? 'bg-maroon' : 'bg-darkBlue'"
+          @click="
+            props.eventData.isReady
+              ? unreadyEvent(eventData)
+              : readyEvent(eventData)
+          "
+        >
+          {{ props.eventData.isReady ? "Unready" : "Ready" }}
+        </v-btn>
         <!-- Signup/Availability Button -->
         <v-btn
           flat
@@ -212,7 +244,7 @@ async function unreadyEvent(event) {
         :event-data="eventData"
         @closeEventDialogEvent="closeEventDialog"
         @updateEventSuccessEvent="
-          closeEventDialog(), emits('refreshEventsEvent')
+          closeEventDialog(), emits('refreshEvents')
         "
         @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
         @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
