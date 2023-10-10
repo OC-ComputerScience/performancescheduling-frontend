@@ -52,6 +52,8 @@ export function get24HourTimeString(t) {
   const modifier = t.slice(-2);
   let [hours, minutes] = t.slice(0, -2).split(":");
 
+  minutes = minutes.substring(0, 2);
+
   if (hours === "12") {
     hours = "00";
   }
