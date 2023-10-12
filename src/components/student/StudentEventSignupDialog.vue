@@ -908,7 +908,7 @@ onMounted(async () => {
                           <v-icon
                             :icon="
                               timeslot.existingSignup.studentInstrumentSignups
-                                .length > 1
+                                .length > 0
                                 ? 'mdi-account-multiple'
                                 : 'mdi-account'
                             "
