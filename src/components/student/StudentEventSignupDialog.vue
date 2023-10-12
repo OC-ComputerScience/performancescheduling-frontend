@@ -629,11 +629,7 @@ watch(selectedStudentInstrument, async () => {
   }
 
   // update student pieces
-  selectedStudentPieces.value = [];
-  studentInstrumentStudentPieces.value = studentPieces.value.filter(
-    (studentPiece) =>
-      studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
-  );
+  getStudentPieces();
 
   getTimeslotLength();
 });
