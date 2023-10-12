@@ -925,7 +925,7 @@ onMounted(async () => {
                             :color="
                               selectedTimeslot == timeslot
                                 ? 'blue'
-                                : 'lightMaroon'
+                                : 'white'
                             "
                             v-if="timeslot.existingSignup != undefined"
                           ></v-icon>
