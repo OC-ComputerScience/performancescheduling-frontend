@@ -238,6 +238,7 @@ onMounted(() => {
             class="hidden-md-and-down mx-1 menu-link font-weight-bold"
             exact
             text
+            height="50"
             :ripple="false"
             @click="changeComp(menu.link)"
           >
@@ -284,7 +285,6 @@ onMounted(() => {
           Log back in
         </v-btn>
       </div>
-      <v-icon class="mt-3 mr-5" color="maroon" icon="mdi-bell"></v-icon>
       <v-menu
         bottom
         min-width="250px"
