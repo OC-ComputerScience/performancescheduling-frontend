@@ -529,7 +529,7 @@ async function confirmSignup() {
         console.log(e);
       });
 
-    selectedStudentPieces.value.forEach(async(studentPiece) => {
+    selectedStudentPieces.value.forEach(async (studentPiece) => {
       const studentPieceData = {
         eventSignupId: eventSignupId,
         pieceId: studentPiece.pieceId,
@@ -907,7 +907,8 @@ onMounted(async () => {
                           <v-icon
                             :icon="
                               timeslot.existingSignup.studentInstrumentSignups
-                                .length > 0
+                                .length > 0 &&
+                              timeslot.existingSignup.isGroupEvent
                                 ? 'mdi-account-multiple'
                                 : 'mdi-account'
                             "
