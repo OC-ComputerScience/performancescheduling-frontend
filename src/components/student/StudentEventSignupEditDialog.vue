@@ -16,7 +16,6 @@ const props = defineProps({
   eventSignUpData: { type: [Object], required: true },
   studentInstrumentSignupData: { type: [Object], required: true },
 });
-console.log(props.eventData);
 const studentInstrumentSignup = ref(
   Object.assign({}, props.studentInstrumentSignupData)
 );

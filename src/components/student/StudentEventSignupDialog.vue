@@ -535,8 +535,7 @@ async function confirmSignup() {
         pieceId: studentPiece.pieceId,
         isFirst: studentPiece.isFirst,
       };
-      await EventSignupPieceDataService.create(studentPieceData).catch((e) => {
-
+      EventSignupPieceDataService.create(studentPieceData).catch((e) => {
         console.log(e);
       });
     });
