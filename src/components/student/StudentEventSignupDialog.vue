@@ -271,8 +271,17 @@ function getChipClass(timeslot) {
   }
 
   // if the timeslot is already reserved
-  if (timeslot.existingSignup != undefined) {
+  if (
+    timeslot.existingSignup != undefined &&
+    !timeslot.existingSignup.isGroupEvent
+  ) {
     return "bg-maroon text-white pl-1";
+  }
+  if (
+    timeslot.existingSignup != undefined &&
+    timeslot.existingSignup.isGroupEvent
+  ) {
+    return "bg-darkTeal text-white pl-1";
   }
 
   // if the timeslot would not provide enough time for the student
