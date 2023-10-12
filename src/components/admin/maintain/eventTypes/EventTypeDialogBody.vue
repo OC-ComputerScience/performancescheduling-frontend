@@ -189,14 +189,26 @@ async function updateEventType() {
                   v-model="editedEventTypeData.isPrivate"
                 >
                 </v-checkbox>
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  First Piece Required
+                </v-card-subtitle>
+                <v-checkbox
+                  color="darkBlue"
+                  label="First Piece"
+                  class="font-weight-bold text-blue mt-3"
+                  v-model="editedEventTypeData.firstPiece"
+                >
+                </v-checkbox>
               </v-col>
             </v-row>
           </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-spacer/>
-        
+        <v-spacer />
+
         <v-btn
           v-if="props.isEdit"
           flat
@@ -224,7 +236,7 @@ async function updateEventType() {
         <v-btn
           flat
           class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto' "
+          :class="props.isEdit ? '' : 'mr-auto'"
           @click="
             props.isEdit
               ? emits('closeEventTypeDialogEvent')

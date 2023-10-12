@@ -18,6 +18,7 @@ export default createVuetify({
           lightMaroon: "#F2DFE1",
           teal: "#78C1B6",
           lightTeal: "#CEE4E1",
+          darkTeal: "#004D40",
           blue: "#3272AA",
           lightBlue: "#D7E1E9",
           darkBlue: "#1A465F",

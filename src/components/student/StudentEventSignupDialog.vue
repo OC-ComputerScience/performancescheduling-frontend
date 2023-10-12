@@ -36,11 +36,12 @@ const selectedInstructor = ref(null);
 const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 // student piece variables
-const searchInput = ref("");
+
 const studentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
+
 // timeslot variables
 const isMusicMajor = ref(false);
 const timeslotLength = ref(0);
@@ -139,36 +140,21 @@ async function getStudentPieces() {
         (studentPiece) =>
           studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
       );
-      searchStudentPieces();
+
       filteredStudentPieces.value = studentInstrumentStudentPieces.value;
+      filteredStudentPieces.value.forEach((studentPiece) => {
+        studentPiece.isFirst = false;
+      });
     })
     .catch((e) => {
       console.log(e);
     });
 }
 
-function searchStudentPieces() {
-  filteredStudentPieces.value = studentInstrumentStudentPieces.value;
-  // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value === "") return;
-
-  filteredStudentPieces.value = filteredStudentPieces.value.filter(
-    (studentPiece) => {
-      return (
-        studentPiece.piece.title
-          .toLowerCase()
-          .includes(searchInput.value.toLowerCase()) ||
-        studentPiece.piece.composer.fullName
-          .toLowerCase()
-          .includes(searchInput.value.toLowerCase())
-      );
-    }
-  );
-}
-
 function selectStudentPiece(studentPiece) {
   if (!isStudentPieceSelected(studentPiece)) {
     selectedStudentPieces.value.push(studentPiece);
+    studentPiece.isFirst = false;
   } else {
     selectedStudentPieces.value.splice(
       selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id),
@@ -182,6 +168,20 @@ function isStudentPieceSelected(studentPiece) {
     selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id) !==
     -1
   );
+}
+
+function setFirstPiece(clickedStudentPiece) {
+  clickedStudentPiece.isFirst = true;
+
+  selectedStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.id != clickedStudentPiece.id) {
+      studentPiece.isFirst = false;
+    }
+  });
+}
+
+function unSetFirstPiece(clickedStudentPiece) {
+  clickedStudentPiece.isFirst = false;
 }
 
 function generateTimeslots() {
@@ -274,8 +274,17 @@ function getChipClass(timeslot) {
   }
 
   // if the timeslot is already reserved
-  if (timeslot.existingSignup != undefined) {
+  if (
+    timeslot.existingSignup != undefined &&
+    !timeslot.existingSignup.isGroupEvent
+  ) {
     return "bg-maroon text-white pl-1";
+  }
+  if (
+    timeslot.existingSignup != undefined &&
+    timeslot.existingSignup.isGroupEvent
+  ) {
+    return "bg-darkTeal text-white pl-1";
   }
 
   // if the timeslot would not provide enough time for the student
@@ -297,6 +306,19 @@ function openDialog() {
     errorMessage.value = "Please select at least one piece.";
     return;
   }
+
+  var haveFirstPiece = false;
+  selectedStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.isFirst) {
+      haveFirstPiece = true;
+    }
+  });
+
+  if (!haveFirstPiece && props.eventData.eventType.firstPiece) {
+    errorMessage.value = "Please select a first piece.";
+    return;
+  }
+
   if (selectedTimeslot.value == null) {
     errorMessage.value = "Please select a timeslot.";
     return;
@@ -519,12 +541,13 @@ async function confirmSignup() {
         console.log(e);
       });
 
-    selectedStudentPieces.value.forEach(async(studentPiece) => {
+    selectedStudentPieces.value.forEach(async (studentPiece) => {
       const studentPieceData = {
         eventSignupId: eventSignupId,
         pieceId: studentPiece.pieceId,
+        isFirst: studentPiece.isFirst,
       };
-      await EventSignupPieceDataService.create(studentPieceData).catch((e) => {
+      EventSignupPieceDataService.create(studentPieceData).catch((e) => {
         console.log(e);
       });
     });
@@ -617,12 +640,7 @@ watch(selectedStudentInstrument, async () => {
   }
 
   // update student pieces
-  selectedStudentPieces.value = [];
-  studentInstrumentStudentPieces.value = studentPieces.value.filter(
-    (studentPiece) =>
-      studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
-  );
-  searchStudentPieces();
+  getStudentPieces();
 
   getTimeslotLength();
 });
@@ -737,21 +755,6 @@ onMounted(async () => {
               Musical Selection
             </v-row>
             <v-row>
-              <!-- take out search
-              <v-col cols="6" class="pl-0">
-                <input
-                  type="text"
-                  v-model="searchInput"
-                  @input="searchStudentPieces"
-                  class="pa-3 mainCardBorder text-blue bg-lightBlue font-weight-bold"
-                  style="outline: none"
-                  append-icon="mdi-magnify"
-                  placeholder="Search Repertoire"
-                  single-line
-                  hide-details
-                />
-              </v-col>
-              -->
               <v-col cols="6">
                 <v-btn
                   class="font-weight-bold text-none"
@@ -780,9 +783,11 @@ onMounted(async () => {
                         'bg-blue': isStudentPieceSelected(studentPiece),
                         'bg-white': !isStudentPieceSelected(studentPiece),
                       }"
-                      @click="selectStudentPiece(studentPiece)"
                     >
-                      <v-card-text>
+                      <v-card-text
+                        class="pb-2"
+                        @click="selectStudentPiece(studentPiece)"
+                      >
                         <v-row
                           no-gutters
                           class="text-blue font-weight-semi-bold"
@@ -791,10 +796,42 @@ onMounted(async () => {
                           }"
                         >
                           {{ studentPiece.piece.title }}
+                          {{ studentPiece.isFirst ? "(First Piece)" : "" }}
                         </v-row>
-                        <v-row no-gutters class="text-teal">
+                        <v-row
+                          no-gutters
+                          class="text-black"
+                          v-bind:class="{
+                            'text-white': isStudentPieceSelected(studentPiece),
+                          }"
+                        >
                           {{ studentPiece.piece.composer.fullName }}
                         </v-row>
+                      </v-card-text>
+                      <v-card-text
+                        class="mt-0 pt-0 pb-2"
+                        v-if="
+                          isStudentPieceSelected(studentPiece) &&
+                          eventData.eventType.firstPiece
+                        "
+                      >
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          size="small"
+                          v-if="studentPiece.isFirst"
+                          @click="unSetFirstPiece(studentPiece)"
+                        >
+                          UnSet First Piece
+                        </v-btn>
+                        <v-btn
+                          size="small"
+                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          v-if="!studentPiece.isFirst"
+                          @click="setFirstPiece(studentPiece)"
+                        >
+                          Set as First Piece
+                        </v-btn>
                       </v-card-text>
                     </v-card>
                   </v-list-item>
@@ -882,7 +919,8 @@ onMounted(async () => {
                           <v-icon
                             :icon="
                               timeslot.existingSignup.studentInstrumentSignups
-                                .length > 1
+                                .length > 0 &&
+                              timeslot.existingSignup.isGroupEvent
                                 ? 'mdi-account-multiple'
                                 : 'mdi-account'
                             "
@@ -890,7 +928,7 @@ onMounted(async () => {
                             :color="
                               selectedTimeslot == timeslot
                                 ? 'blue'
-                                : 'lightMaroon'
+                                : 'white'
                             "
                             v-if="timeslot.existingSignup != undefined"
                           ></v-icon>
