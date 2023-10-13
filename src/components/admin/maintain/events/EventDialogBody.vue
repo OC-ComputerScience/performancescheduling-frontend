@@ -184,6 +184,23 @@ function timeCheck(time) {
 
   return isTimeValid;
 }
+
+function checkEndTimeAfterStart(startTime, endTime){
+  if(startTime?.length > 4 && endTime?.length > 4){
+    const start = new Date("2000-01-01T" + get24HourTimeString(startTime));
+    const end = new Date("2000-01-01T" + get24HourTimeString(endTime));
+
+    if(start.getTime() < end.getTime()){
+      return true;
+    }
+    else{
+      return "End time must be after start time"
+    }
+  }
+  else{
+    return false;
+  }
+}
 </script>
 
 <template>
@@ -304,6 +321,7 @@ function timeCheck(time) {
                 :rules="[
                   () => !!editedEventData.endTime || 'This field is required',
                   timeCheck(editedEventData.endTime),
+                  checkEndTimeAfterStart(editedEventData.startTime, editedEventData.endTime),
                 ]"
               ></v-text-field>
             </v-col>
