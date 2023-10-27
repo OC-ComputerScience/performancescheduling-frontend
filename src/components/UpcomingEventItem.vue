@@ -98,7 +98,7 @@ onBeforeUpdate(async () =>{
                 <!-- Event Instrument Type -->
                 <!-- TODO(@ethanimooney): Make this actually work -->
                 <v-card-subtitle
-                  v-if="roleId == 3 || roleId == 1"
+                  v-if="roleId == 3 || roleId == 1 || roleId == 2 || roleId == 4"
                   class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
                 >
                   {{
@@ -120,7 +120,7 @@ onBeforeUpdate(async () =>{
                   class="bg-darkBlue py-2 px-0 text-white mt-0"
                 >
                   <v-card-subtitle
-                    v-if="(roleId == 3 || roleId == 1) && eventData.isReady"
+                    v-if="(roleId == 3 || roleId == 1 || roleId == 2 || roleId == 4) && eventData.isReady"
                     class="font-weight-semi-bold"
                   >
                     {{
@@ -130,7 +130,7 @@ onBeforeUpdate(async () =>{
                     }}
                     People Signed Up
                   </v-card-subtitle>
-                  <v-card-subtitle
+                  <!--<v-card-subtitle
                     size="small"
                     v-if="roleId == 2 || roleId == 4"
                     class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
@@ -144,6 +144,7 @@ onBeforeUpdate(async () =>{
                     }}
                     Event
                   </v-card-subtitle>
+                  -->
                   <v-card-subtitle
                     v-if="roleId == 3"
                     class="font-weight-semi-bold"
