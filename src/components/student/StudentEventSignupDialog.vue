@@ -467,7 +467,6 @@ async function requestTimeslotsFromAdmin() {
     });
   });
 
-  snackbar.value = true;
   snackbar.value.show = true;
   snackbar.value.color = "success";
   snackbar.value.message = "Request sent";
@@ -492,7 +491,6 @@ async function requestAvailabilityFromUserRole(userRole) {
     console.log(e);
   });
 
-  snackbar.value = true;
   snackbar.value.show = true;
   snackbar.value.color = "success";
   snackbar.value.message = "Request sent";
