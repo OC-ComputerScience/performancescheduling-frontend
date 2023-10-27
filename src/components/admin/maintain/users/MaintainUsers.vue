@@ -10,6 +10,8 @@ const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
 
 const addUserDialog = ref(false);
 
+const dataLoaded = ref(false);
+
 // User Data
 const users = ref([]);
 const filteredUsers = ref([]);
@@ -18,6 +20,7 @@ if (!isAdmin.value) {
 }
 
 async function getUsers() {
+  dataLoaded.value = false;
   await UserDataService.getAllWithRolesAndStudentInstruments("lastName")
     .then((response) => {
       users.value = response.data;
@@ -25,6 +28,9 @@ async function getUsers() {
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      dataLoaded.value = true;
     });
 }
 
@@ -284,7 +290,7 @@ onMounted(async () => {
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">
-          <v-row>
+          <v-row v-if="dataLoaded">
             <v-col
               v-for="user in currentPageData"
               :key="user.id"
