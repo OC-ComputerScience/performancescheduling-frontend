@@ -17,18 +17,18 @@ const router = createRouter({
       component: BaseView,
       name: "base",
     },
+    {
+      path: "/base",
+      component: BaseView,
+      name: "userSettings",
+      alias: "/userSettings",
+    },
     // Student Routes
     {
       path: "/base",
       component: BaseView,
       name: "studentHome",
       alias: "/studentHome",
-    },
-    {
-      path: "/base",
-      component: BaseView,
-      name: "studentSettings",
-      alias: "/studentSettings",
     },
     {
       path: "/base",

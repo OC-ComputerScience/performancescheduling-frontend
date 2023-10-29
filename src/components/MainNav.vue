@@ -186,6 +186,7 @@ function updateActiveLink() {
   }, 1);
 }
 function changeRole(newRole) {
+  userRoles.value = loginStore.user.roles;
   loginStore.currentRole = userRoles.value.find((obj) => {
     return obj.roleId === newRole;
   });
@@ -411,7 +412,7 @@ onMounted(() => {
                 density="comfortable"
                 elevation="0"
                 width="250px"
-                @click="changeComp('studentSettings')"
+                @click="changeComp('userSettings')"
               >
                 <template v-slot:prepend>
                   <v-icon></v-icon>

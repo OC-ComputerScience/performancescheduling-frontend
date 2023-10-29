@@ -1,5 +1,6 @@
 <script setup>
 import MainNav from "../components/MainNav.vue";
+import UserSettings from "../components/UserSettings.vue"
 
 import StudentHome from "../components/student/StudentHome.vue";
 import StudentPerformances from "../components/student/performances/StudentPerformances.vue";
@@ -43,11 +44,11 @@ const props = defineProps({
       <v-row class="fill-height">
         <v-col class="bg-lightGray">
           <MainNav></MainNav>
+          <UserSettings
+          v-if="fullPath === '/userSettings'"
+        ></UserSettings>
           <!-- Student pages -->
           <StudentHome v-if="fullPath === '/studentHome'"></StudentHome>
-          <!-- <StudentSettings
-          v-if="fullPath === '/studentSettings'"
-        ></StudentSettings> -->
           <StudentPerformances
             v-if="fullPath === '/studentPerformances'"
           ></StudentPerformances>
@@ -61,7 +62,7 @@ const props = defineProps({
           <!-- Faculty/Accompanist pages -->
           <FacultyHome
             v-if="
-              fullPath === '/facultyHome' || fullPath === '/accompanistHome'
+              fullPath === '/facultyHome' || (fullPath === '/accompanistHome')
             "
           >
           </FacultyHome>
