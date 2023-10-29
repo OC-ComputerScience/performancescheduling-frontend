@@ -16,7 +16,7 @@ const pendingItems = ref([]);
 const upcomingEvents = ref([]);
 
 async function retrieveData() {
-  await EventDataService.getGTEDateForAdmins(new Date())
+  await EventDataService.getGTEDateForAdmins(new Date(),  'date,startTime')
     .then((response) => {
       upcomingEvents.value = response.data;
     })

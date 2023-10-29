@@ -54,9 +54,21 @@ async function retrieveData() {
       });
   }
 
+  refreshAvailability();
+
+  await EventDataService.getGTEDateForFaculty(new Date(), 'date,startTime')
+    .then((response) => {
+      upcomingEvents.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
+
+async function refreshAvailability() {
   await AvailabilityDataService.getByUserRole(currentRole.value.id)
     .then((response) => {
-      groupedAvailabilities.value = [];
+      groupedAvailabilities.value.length = 0;
       //Iterate through list of availabilities to group them by eventId
       for (let i = 0; i < response.data.length; i++) {
         const availability = response.data[i];
@@ -70,48 +82,29 @@ async function retrieveData() {
         }
       }
 
+      // This cannot be sorted on the backend because it is reorganized in the code above
+      groupedAvailabilities.value.sort(sortAvailabilities);
+
       //Put the values of the loop list into an availabilities list with "normal" indexes
       availabilities.value = Object.values(groupedAvailabilities.value);
     })
     .catch((e) => {
       console.log(e);
     });
-
-  await EventDataService.getGTEDateForFaculty(new Date())
-    .then((response) => {
-      upcomingEvents.value = response.data;
-    })
-    .catch((e) => {
-      console.log(e);
-    });
 }
 
-async function refreshAvailability() {
-  await AvailabilityDataService.getByUserRole(currentRole.value.id)
-    .then((response) => {
-      const localAvailabilities = {};
+function sortAvailabilities(a, b) {
+  const aDate = new Date(a[0].event.date);
+  const bDate = new Date(b[0].event.date);
 
-      //Iterate through list of availabilities to group them by eventId
-      for (let i = 0; i < response.data.length; i++) {
-        const availability = response.data[i];
-        const eventId = availability.eventId;
+  const dateCompare = aDate - bDate;
+  if (dateCompare !== 0) {
+    return dateCompare;
+  }
 
-        //Index will be the eventId value
-        if (!localAvailabilities[eventId]) {
-          localAvailabilities[eventId] = [availability];
-        } else {
-          localAvailabilities[eventId].push(availability);
-        }
-      }
-
-      //Put the values of the loop list into an availabilities list with "normal" indexes
-      availabilities.value = Object.values(localAvailabilities);
-
-      groupedAvailabilities.value = localAvailabilities;
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  const aStartTime = a[0].event.startTime;
+  const bStartTime = b[0].event.startTime;
+  return aStartTime.localeCompare(bStartTime);
 }
 
 watch(currentRole, async () => {
@@ -121,7 +114,7 @@ watch(currentRole, async () => {
 //Filter upcoming events without availability
 const filteredEvents = computed(() => {
   return upcomingEvents.value.filter(
-    (event) => !groupedAvailabilities.value[event.id]
+    (event) => !groupedAvailabilities.value.some(availability => availability[0].event.id === event.id)
   );
 });
 
@@ -139,22 +132,22 @@ onMounted(async () => {
             <v-col cols="12" class="pa-0 ma-0 pb-4">
               <v-card class="fill-height mainCardBorder pa-2">
                 <v-card-title
-                  class="font-weight-semi-bold text-blue text-h5 pb-0"
-                >
+                class="font-weight-semi-bold text-blue text-h5 pb-0"
+              >
                   {{ notifications.length }} Notification{{
                     notifications.length > 0
-                      ? notifications.length > 1
-                        ? "s"
-                        : ""
-                      : "s"
+                    ? notifications.length > 1
+                      ? "s"
+                      : ""
+                    : "s"
                   }}
                 </v-card-title>
                 <v-card-text class="pt-0">
                   <NotificationItem
-                    v-for="notification of notifications"
-                    :key="notification.id"
+                  v-for="notification of notifications"
+                  :key="notification.id"
                     :notification-data="notification"
-                  ></NotificationItem>
+                ></NotificationItem>
                 </v-card-text>
               </v-card>
             </v-col>
@@ -163,19 +156,19 @@ onMounted(async () => {
                 <v-row>
                   <v-col cols="auto">
                     <v-card-title
-                      class="font-weight-semi-bold text-darkBlue text-h5"
-                    >
+                    class="font-weight-semi-bold text-darkBlue text-h5"
+                  >
                       Current Students
                     </v-card-title>
                   </v-col>
                 </v-row>
                 <v-card-text>
                   <CurrentStudentsItem
-                    v-for="student of students"
-                    :key="student.id"
-                    :students-data="student"
+                  v-for="student of students"
+                  :key="student.id"
+                  :students-data="student"
                     @refreshUsersEvent="retrieveData()"
-                  ></CurrentStudentsItem>
+                ></CurrentStudentsItem>
                 </v-card-text>
               </v-card>
             </v-col>
@@ -192,14 +185,14 @@ onMounted(async () => {
             </v-card-title>
             <v-card-text>
               <EventAvailabilityItem
-                v-for="availability in availabilities"
-                :key="availability[0].id"
+              v-for="availability in availabilities"
+              :key="availability[0].id"
                 :event-data="availability[0].event"
-                :availability-data="
-                  availability.length <= 1 ? availability[0] : availability
-                "
-                @refreshAvailabilitiesEvent="refreshAvailability"
-              ></EventAvailabilityItem>
+              :availability-data="
+                availability.length <= 1 ? availability[0] : availability
+                  "
+              @refreshAvailabilitiesEvent="refreshAvailability"
+            ></EventAvailabilityItem>
             </v-card-text>
           </v-card>
         </v-col>
@@ -210,13 +203,13 @@ onMounted(async () => {
             </v-card-title>
             <v-card-text>
               <UpcomingEventItem
-                v-for="event of filteredEvents"
-                :key="event.id"
-                :event-data="event"
+              v-for="event of filteredEvents"
+              :key="event.id"
+              :event-data="event"
                 :role-id="currentRole.roleId"
-                :availability-data="groupedAvailabilities[event.id]"
+              :availability-data="groupedAvailabilities[event.id]"
                 @refreshAvailabilitiesEvent="refreshAvailability"
-              ></UpcomingEventItem>
+            ></UpcomingEventItem>
             </v-card-text>
           </v-card>
         </v-col>
