@@ -14,7 +14,15 @@ export const useLoginStore = defineStore(
       }
     }
 
-    return { user, currentRole, setUser };
+    function setRoles(roles) {
+      user.value.roles = roles;
+      var id = currentRole.value.id
+      user.value.roles.forEach((r) => {
+        if(id == r.id){
+          currentRole.value = r
+        }})
+    }
+    return { user, currentRole, setUser, setRoles };
   },
   { persist: true }
 );

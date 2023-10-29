@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUpdate } from "vue";
+import { ref, onBeforeUpdate } from "vue";
 
 import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
