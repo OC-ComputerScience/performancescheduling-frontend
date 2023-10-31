@@ -7,14 +7,13 @@ import UserDataService from "../services/UserDataService";
 import UserRoleDataService from "../services/UserRoleDataService";
 import router from "../router";
 
-
 const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
 
 const form = ref(null);
 
 const userData = ref(Object.assign({}, currentRole.value.user));
-const userRoles =ref([]);
+const userRoles = ref([]);
 
 const isStudent = ref(currentRole.value.role.role == "Student");
 
@@ -22,7 +21,9 @@ const isFaculty = ref(currentRole.value.role.role == "Faculty");
 
 const editedUserData = ref(Object.assign({}, userData.value));
 
-const editedStudentMajor = ref(isStudent.value ? currentRole.value.major : null);
+const editedStudentMajor = ref(
+  isStudent.value ? currentRole.value.major : null
+);
 
 const majorOptions = ref([]);
 
@@ -30,15 +31,14 @@ async function getUserData() {
   await UserRoleDataService.getRolesForUser(currentRole.value.userId)
     .then((response) => {
       userRoles.value = response.data;
-      }
-    )
+    })
     .catch((err) => {
       console.log(err);
     });
 }
 
 async function getAllMajors() {
-  await MajorDataService.getAll()
+  await MajorDataService.getAll("name")
     .then((response) => {
       majorOptions.value = response.data;
     })
@@ -56,14 +56,16 @@ const classificationOptions = ref([
   "Sophomore",
   "Junior",
   "Senior",
-  "Graduate"
+  "Graduate",
 ]);
 
 const editedStudentSemesters = ref(
   isStudent.value ? currentRole.value.studentSemesters : null
 );
 
-const editedFacultyTitle = ref(isFaculty.value ? currentRole.value.title : null);
+const editedFacultyTitle = ref(
+  isFaculty.value ? currentRole.value.title : null
+);
 
 // Update the user's roles, then
 // if isStudent, update the student's major, classification, semesters, and hours, then
@@ -72,7 +74,6 @@ const editedFacultyTitle = ref(isFaculty.value ? currentRole.value.title : null)
 async function updateUser() {
   form.value.validate().then(async (valid) => {
     if (valid.valid) {
-
       if (isStudent.value) {
         await updateStudentMajor();
         await updateStudentClassification();
@@ -88,7 +89,7 @@ async function updateUser() {
       await updatePhoneNumber();
       await updateHonorific();
       await updateTitle();
-      await UserDataService.update(editedUserData.value); 
+      await UserDataService.update(editedUserData.value);
       await getUserData();
 
       loginStore.setRoles(userRoles.value);
@@ -129,7 +130,8 @@ async function updateStudentClassification() {
   // If the editedStudentClassification is different from the currentRole.value's classification, update it
   if (
     currentRole.value.studentClassification === null ||
-    editedStudentClassification.value !== currentRole.value.studentClassification
+    editedStudentClassification.value !==
+      currentRole.value.studentClassification
   ) {
     await UserRoleDataService.update({
       id: currentRole.value.id,
@@ -143,8 +145,10 @@ async function updateStudentClassification() {
 // If the user's semesters have changed, update it
 async function updateStudentSemesters() {
   // If the editedStudentSemesters is different from the currentRole.value's semesters, update it
-  if (currentRole.value.studentSemesters === null || 
-    editedStudentSemesters.value !== currentRole.value.studentSemesters) {
+  if (
+    currentRole.value.studentSemesters === null ||
+    editedStudentSemesters.value !== currentRole.value.studentSemesters
+  ) {
     await UserRoleDataService.update({
       id: currentRole.value.id,
       studentSemesters: editedStudentSemesters.value,
@@ -256,7 +260,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-container fluid class=" bg-lightGray pa-4 pl-16 pr-16">
+  <v-container fluid class="bg-lightGray pa-4 pl-16 pr-16">
     <v-card class="pa-2 flatCardBorder">
       <v-form ref="form" validate-on="input">
         <v-card-title>
@@ -289,7 +293,6 @@ onMounted(async () => {
                   ></v-text-field>
                 </v-col>
                 <v-col class="pa-0 ma-0">
-
                   <v-card-subtitle
                     class="pl-0 pb-2 mt-2 font-weight-semi-bold text-darkBlue"
                   >
@@ -441,8 +444,7 @@ onMounted(async () => {
                     :rules="[(v) => !!v || 'This field is required']"
                   ></v-text-field>
                 </v-col>
-                <v-row 
-                :class="isFaculty ? 'ml-8 my-6 ' : ''">
+                <v-row :class="isFaculty ? 'ml-8 my-6 ' : ''">
                   <v-col class="d-flex" cols="4">
                     <v-checkbox
                       v-model="editedUserData.textStatus"
