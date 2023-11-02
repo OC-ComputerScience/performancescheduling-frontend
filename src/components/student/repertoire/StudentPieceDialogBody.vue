@@ -23,7 +23,6 @@ const props = defineProps({
   studentpieceData: { type: [Object], required: true },
   studentPieces: { type: [Array], required: true },
 });
-console.log(props.studentpieceData);
 
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
