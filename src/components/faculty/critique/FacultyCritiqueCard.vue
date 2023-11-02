@@ -12,7 +12,6 @@ const LoginStore = useLoginStore();
 const feedbackDialog = ref(false);
 const gradeDialog = ref(false);
 const eventSignupPieces = ref([]);
-console.log(props.signup.eventSignupPieces);
 
 function sortPieces() {
   eventSignupPieces.value = props.signup.eventSignupPieces;
