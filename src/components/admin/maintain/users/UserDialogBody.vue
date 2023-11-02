@@ -91,7 +91,7 @@ const editedStudentMajor = ref(isStudent.value ? studentRole.major : null);
 const majorOptions = ref([]);
 
 async function getAllMajors() {
-  await MajorDataService.getAll()
+  await MajorDataService.getAll("name")
     .then((response) => {
       majorOptions.value = response.data;
     })
@@ -421,23 +421,43 @@ onMounted(async () => {
               ]"
             ></v-text-field>
 
-            <v-card-subtitle
-              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-            >
-              Phone Number
-            </v-card-subtitle>
-            <v-text-field
-              placeholder="4051111111"
-              v-model="editedUserData.phoneNumber"
-              variant="plain"
-              class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-              :rules="[
-                (v) => !!v || 'This field is required',
-                (v) => /^[0-9]+$/.test(v) || 'Must contain only numbers',
-                (v) => (!!v && v.length >= 10) || 'Number too short',
-                (v) => (!!v && v.length <= 10) || 'Number too long',
-              ]"
-            ></v-text-field>
+            <v-row class="pa-0 ma-0">
+              <v-col cols="6" class="pa-0 ma-0 mr-1">
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Phone Number
+                </v-card-subtitle>
+                <v-text-field
+                  placeholder="4051111111"
+                  v-model="editedUserData.phoneNumber"
+                  variant="plain"
+                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4 width-50"
+                  :rules="[
+                    (v) => !!v || 'This field is required',
+                    (v) => /^[0-9]+$/.test(v) || 'Must contain only numbers',
+                    (v) => (!!v && v.length >= 10) || 'Number too short',
+                    (v) => (!!v && v.length <= 10) || 'Number too long',
+                  ]"
+                ></v-text-field>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col cols="5" class="pa-0">
+                <v-card-subtitle
+                    class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                    Honorific
+                  </v-card-subtitle>
+                  <v-text-field
+                    color="darkBlue"
+                    variant="plain"
+                    class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+                    v-model="editedUserData.honorific"
+                    :rules="[(v) => !!v || 'This field is required']"
+                  >
+                  </v-text-field>
+              </v-col>
+            </v-row>
 
             <v-card-subtitle
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
@@ -556,6 +576,23 @@ onMounted(async () => {
                   :rules="[(v) => !!v || 'This field is required']"
                 >
                 </v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-row class="mt-0">
+              <v-col cols="8" class="d-flex pa-0 mt-0">
+                <v-checkbox
+                  v-model="editedUserData.textStatus"
+                  label="Text Opt In"
+                  class="font-weight-semi-bold text-darkBlue ml-5"
+                >
+                </v-checkbox>
+                <v-checkbox
+                  v-model="editedUserData.emailStatus"
+                  label="Email Opt In"
+                  class="font-weight-semi-bold text-darkBlue mr-5"
+                >
+                </v-checkbox>
               </v-col>
             </v-row>
           </v-col>
