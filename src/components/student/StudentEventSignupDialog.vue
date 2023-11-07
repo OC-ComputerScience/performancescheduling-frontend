@@ -1080,12 +1080,12 @@ onMounted(async () => {
         {{ dialogMessage }}
       </v-card-text>
       <v-card-text v-if="existingSignup != null">
-        <v-row>These group pieces have been selected: </v-row>
+        <v-row>These are the group pieces: </v-row>
         <v-row
           v-for="studentPiece in selectedTimeslot.existingSignup
             .eventSignupPieces"
         >
-          <div class="text-h8 font-weight-semi-bold text-blue">
+          <div class="mt-2 ml-3 text-h8 font-weight-semi-bold text-blue">
             {{ studentPiece.piece.title }} ({{
               studentPiece.piece.composer.firstName
             }}
@@ -1096,13 +1096,6 @@ onMounted(async () => {
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          @click="confimationDialog = false"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
-          >Cancel</v-btn
-        >
-        <v-btn
           @click="confirmSignup"
           flat
           size="small"
@@ -1111,6 +1104,13 @@ onMounted(async () => {
           <div v-if="existingSignup == null">Confirm</div>
           <div v-else>Confirm Group Signup</div>
         </v-btn>
+        <v-btn
+          @click="confimationDialog = false"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+          >Cancel</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
