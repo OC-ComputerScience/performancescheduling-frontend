@@ -302,6 +302,7 @@ function openDialog() {
     errorMessage.value = "Please select an instrument.";
     return;
   }
+  // add check for group signup
   if (selectedStudentPieces.value.length == 0) {
     errorMessage.value = "Please select at least one piece.";
     return;
@@ -924,9 +925,7 @@ onMounted(async () => {
                             "
                             size="small"
                             :color="
-                              selectedTimeslot == timeslot
-                                ? 'blue'
-                                : 'white'
+                              selectedTimeslot == timeslot ? 'blue' : 'white'
                             "
                             v-if="timeslot.existingSignup != undefined"
                           ></v-icon>
@@ -1032,6 +1031,21 @@ onMounted(async () => {
         style="white-space: pre"
       >
         {{ dialogMessage }}
+      </v-card-text>
+      <v-card-text v-if="existingSignups != null">
+        These pieces will be automaticall added to your repertoire:
+        <v-row v-for="studentPiece in selectedStudentPieces">
+          <v-col cols="6">
+            <div class="text-h8 font-weight-semi-bold text-blue">
+              {{ studentPiece.piece.title }}
+            </div>
+          </v-col>
+          <v-col cols="6">
+            <div class="text-h8 font-weight-semi-bold text-blue">
+              {{ studentPiece.piece.composer.fullName }}
+            </div>
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
