@@ -11,6 +11,8 @@ const filterMenuBool = ref(false);
 const loginStore = useLoginStore();
 const facultyId = loginStore.currentRole.id;
 
+const temp = ref([]);
+
 // Filter options
 const semesterFilterOptions = ref([]);
 const semesterFilterSelection = ref(null);
@@ -27,11 +29,12 @@ async function getPerformances() {
     "desc"
   ).then((response) => {
     performances.value = [];
-
+    //console.log(response);
     response.data.forEach((studentInstrument) => {
       studentInstrument.studentInstrumentSignups.forEach(
         (studentInstrumentSignup) => {
-          performances.value.push(studentInstrumentSignup);
+          if (studentInstrumentSignup.instructorRoleId === facultyId)
+            performances.value.push(studentInstrumentSignup);
         }
       );
     });
