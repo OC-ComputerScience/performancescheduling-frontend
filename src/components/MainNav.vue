@@ -141,6 +141,7 @@ const roleColor = ref({});
 
 function getUserRoles() {
   userRoles.value = loginStore.user.roles;
+  console.log(userRoles.value);
 }
 function goToHome() {
   if (loginStore.currentRole.roleId == 1) {
