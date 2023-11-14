@@ -87,10 +87,6 @@ const adminMenus = [
     text: "Pieces",
   },
   {
-    link: "adminEvaluations",
-    text: "Evaluations",
-  },
-  {
     link: "adminMajors",
     text: "Majors",
   },

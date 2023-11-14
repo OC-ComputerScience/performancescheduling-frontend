@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useLoginStore } from "../../../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
 import RoleDataService from "../../../../services/RoleDataService";
@@ -16,14 +16,13 @@ const emits = defineEmits([
   "closeUserDialogEvent",
   "updateUserSuccessEvent",
   "disableUserEvent",
-  "enableUserEvent",
+  "enableUserEvent"
 ]);
 
 const props = defineProps({
   userData: { type: [Object], required: true },
   userRoles: { type: [Array], required: true },
   isEdit: { type: [Boolean], required: true },
-  isAdmin: { type: [Boolean], required: true },
 });
 
 const loginStore = useLoginStore();
@@ -41,28 +40,6 @@ function closeAddInstrumentDialog() {
   addInstrumentDialog.value = false;
 }
 
-const isStudent = ref(
-  props.isEdit
-    ? props.userRoles.some((ur) => ur.roleId === 1 && ur.status === "Active")
-    : false
-);
-
-const studentRole = isStudent.value
-  ? props.userRoles.find((ur) => ur.roleId === 1)
-  : null;
-
-const isFaculty = ref(
-  props.isEdit
-    ? props.userRoles.some((ur) => ur.roleId === 2 && ur.status === "Active")
-    : false
-);
-
-const facultyRole = isFaculty.value
-  ? props.userRoles.find((ur) => ur.roleId === 2)
-  : null;
-
-const editedUserData = ref(Object.assign({}, props.userData));
-
 const editedUserRoles = ref(
   props.isEdit
     ? props.userRoles
@@ -73,6 +50,27 @@ const editedUserRoles = ref(
         })
     : []
 );
+
+const isStudent = ref(false);
+const isFaculty = ref(false);
+
+function checkRoles(){
+  isStudent.value = editedUserRoles.value.some((ur) => ur.id === 1 && ur.status === "Active")
+
+  isFaculty.value = editedUserRoles.value.some((ur) => ur.id === 2 && ur.status === "Active")
+};
+
+checkRoles();
+
+const studentRole = isStudent.value
+  ? props.userRoles.find((ur) => ur.roleId === 1)
+  : null;
+
+const facultyRole = isFaculty.value
+  ? props.userRoles.find((ur) => ur.roleId === 2)
+  : null;
+
+const editedUserData = ref(Object.assign({}, props.userData));
 
 const roleOptions = ref([]);
 
@@ -135,10 +133,15 @@ async function addUser() {
       await UserDataService.create(editedUserData.value)
         .then(async (response) => {
           for (let editedUserRole of editedUserRoles.value) {
+            const majorId = isStudent.value ? editedStudentMajor.value.id : null            
             await UserRoleDataService.create({
               userId: response.data.id,
               roleId: editedUserRole.id,
               status: "Active",
+              majorId: majorId,
+              studentClassification: editedStudentClassification.value,
+              studentSemesters: editedStudentSemesters.value,
+              title: editedFacultyTitle.value,
             }).catch((err) => {
               console.log(err);
             });
@@ -315,10 +318,19 @@ async function refreshStudentInstruments() {
     });
 }
 
+watch(editedUserRoles, () => {
+  console.log("watch");
+    checkRoles();
+  },
+  { deep: true }
+);
+
 onMounted(async () => {
   await getAllRoles();
   await getAllMajors();
-  await refreshStudentInstruments();
+  if (props.isEdit && isStudent.value){
+    await refreshStudentInstruments();
+  }
 });
 </script>
 
@@ -596,7 +608,7 @@ onMounted(async () => {
               </v-col>
             </v-row>
           </v-col>
-          <v-col v-if="isStudent">
+          <v-col v-if="isStudent && props.isEdit">
             <v-row class="pb-2">
               <v-col cols="auto" align-self="center">
                 <v-card-subtitle
