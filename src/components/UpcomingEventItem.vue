@@ -18,10 +18,11 @@ const props = defineProps({
 });
 
 const emits = defineEmits([
-  "refreshAvailabilitiesEvent", 
+  "refreshAvailabilitiesEvent",
   "refreshEvents",
   "readyEventEvent",
-  "unreadyEventEvent",]);
+  "unreadyEventEvent",
+]);
 
 const addOrEditAvailabilityDialog = ref(false);
 const signupCount = ref(0);
@@ -65,13 +66,14 @@ async function unreadyEvent(event) {
 }
 
 function countSignUps() {
-  signupCount.value=0;
-  for(let i=0; i<props.eventData.eventSignups.length; i++){
-    signupCount.value += props.eventData.eventSignups[i].studentInstrumentSignups.length;
+  signupCount.value = 0;
+  for (let i = 0; i < props.eventData.eventSignups.length; i++) {
+    signupCount.value +=
+      props.eventData.eventSignups[i].studentInstrumentSignups.length;
   }
 }
 
-onBeforeUpdate(async () =>{
+onBeforeUpdate(async () => {
   countSignUps();
 });
 </script>
@@ -123,11 +125,7 @@ onBeforeUpdate(async () =>{
                     v-if="(roleId == 3 || roleId == 1) && eventData.isReady"
                     class="font-weight-semi-bold"
                   >
-                    {{
-                      eventData.eventSignups == null
-                        ? "0"
-                        : signupCount
-                    }}
+                    {{ eventData.eventSignups == null ? "0" : signupCount }}
                     People Signed Up
                   </v-card-subtitle>
                   <v-card-subtitle
@@ -178,7 +176,7 @@ onBeforeUpdate(async () =>{
         <v-spacer></v-spacer>
         <!--Unready/Ready-->
         <v-btn
-          v-if="roleId==3"
+          v-if="roleId == 3"
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-4 text-none text-white flatChipBorder"
@@ -243,9 +241,7 @@ onBeforeUpdate(async () =>{
         :is-edit="true"
         :event-data="eventData"
         @closeEventDialogEvent="closeEventDialog"
-        @updateEventSuccessEvent="
-          closeEventDialog(), emits('refreshEvents')
-        "
+        @updateEventSuccessEvent="closeEventDialog(), emits('refreshEvents')"
         @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
         @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
       ></EventDialogBody>
