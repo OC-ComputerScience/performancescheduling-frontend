@@ -16,7 +16,7 @@ const pendingItems = ref([]);
 const upcomingEvents = ref([]);
 
 async function retrieveData() {
-  await EventDataService.getGTEDateForAdmins(new Date(),  'date,startTime')
+  await EventDataService.getGTEDateForAdmins(new Date(), "date,startTime")
     .then((response) => {
       upcomingEvents.value = response.data;
     })
@@ -133,7 +133,7 @@ onMounted(async () => {
                 :key="event.id"
                 :event-data="event"
                 :role-id="loginStore.currentRole.roleId"
-                @refreshEventsEvent="refreshEvents()"
+                @refreshEvents="refreshEvents()"
               ></UpcomingEventItem>
             </v-card-text>
           </v-card>
