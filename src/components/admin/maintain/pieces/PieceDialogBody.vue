@@ -112,7 +112,7 @@ function similarPieceCheck(piece) {
 
   return similarPieceNames.length == 0
     ? true
-    : "There are very simialr existing pieces: " + similarPieceNames;
+    : "There are very similar existing pieces: " + similarPieceNames;
 }
 </script>
 

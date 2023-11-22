@@ -4,6 +4,11 @@ import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
 import AvailabilityDialogBody from "./AvailabilityDialogBody.vue";
 import { useRouter } from "vue-router";
+import { useLoginStore } from "../../stores/LoginStore.js";
+import { storeToRefs } from "pinia";
+
+const loginStore = useLoginStore();
+const { currentRole } = storeToRefs(loginStore);
 
 const router = useRouter();
 
@@ -83,7 +88,7 @@ onMounted(async () => {});
       <!-- Add Critique Button -->
       <v-spacer></v-spacer>
       <v-btn
-        v-if="okToCritique(eventData.date)"
+        v-if="okToCritique(eventData.date) && currentRole.role.role == 'Faculty'"
         flat
         size="small"
         class="font-weight-semi-bold mr-2 ml-auto bg-blue text-none"

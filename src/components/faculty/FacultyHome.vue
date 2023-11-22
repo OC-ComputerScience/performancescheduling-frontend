@@ -111,7 +111,6 @@ function sortAvailabilities(a, b) {
 }
 
 function sortAvailabilityTimes(a, b) {
-
   const aStartTime = a.startTime;
   const bStartTime = b.startTime;
   return aStartTime.localeCompare(bStartTime);
