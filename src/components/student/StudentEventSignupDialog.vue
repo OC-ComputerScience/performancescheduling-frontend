@@ -302,7 +302,7 @@ function openDialog() {
     errorMessage.value = "Please select an instrument.";
     return;
   }
-  // add check for group signup
+
   if (selectedStudentPieces.value.length == 0) {
     errorMessage.value = "Please select at least one piece.";
     return;
@@ -323,6 +323,27 @@ function openDialog() {
   if (selectedTimeslot.value == null) {
     errorMessage.value = "Please select a timeslot.";
     return;
+  }
+
+  // if group then check for selected pieces
+  var selectStatus = true;
+  if (selectedTimeslot.value.existingSignup != null) {
+    selectedTimeslot.value.existingSignup.eventSignupPieces.forEach((piece) => {
+      if (
+        selectedStudentPieces.value.findIndex(
+          (x) => x.pieceId === piece.pieceId
+        ) === -1
+      ) {
+        selectStatus = false;
+
+        errorMessage.value =
+          "Please select all pieces that are already in the group signup.";
+        return;
+      }
+    });
+    if (selectStatus == false) {
+      return;
+    }
   }
 
   // reset error message
@@ -988,11 +1009,37 @@ onMounted(async () => {
             </v-row>
             <v-row no-gutters>
               <v-checkbox
+                v-if="
+                  selectedTimeslot != null &&
+                  selectedTimeslot.existingSignup == null
+                "
                 v-model="groupSignup"
                 label="Allow other students to signup with you"
                 class="text-body-1 font-weight-bold text-darkBlue"
               ></v-checkbox>
             </v-row>
+            <v-card-text
+              v-if="
+                selectedTimeslot != null &&
+                selectedTimeslot.existingSignup != null
+              "
+            >
+              <v-row
+                >These group pieces should be in your repertoire and
+                selected:</v-row
+              >
+              <v-row
+                v-for="studentPiece in selectedTimeslot.existingSignup
+                  .eventSignupPieces"
+              >
+                <div class="text-h8 font-weight-semi-bold text-blue">
+                  {{ studentPiece.piece.title }} ({{
+                    studentPiece.piece.composer.firstName
+                  }}
+                  {{ studentPiece.piece.composer.lastName }})
+                </div>
+              </v-row>
+            </v-card-text>
           </v-col>
         </v-row>
         <v-row no-gutters>
@@ -1032,19 +1079,18 @@ onMounted(async () => {
       >
         {{ dialogMessage }}
       </v-card-text>
-      <v-card-text v-if="existingSignups != null">
-        These pieces will be automaticall added to your repertoire:
-        <v-row v-for="studentPiece in selectedStudentPieces">
-          <v-col cols="6">
-            <div class="text-h8 font-weight-semi-bold text-blue">
-              {{ studentPiece.piece.title }}
-            </div>
-          </v-col>
-          <v-col cols="6">
-            <div class="text-h8 font-weight-semi-bold text-blue">
-              {{ studentPiece.piece.composer.fullName }}
-            </div>
-          </v-col>
+      <v-card-text>
+        <v-row>These group pieces have been selected: </v-row>
+        <v-row
+          v-for="studentPiece in selectedTimeslot.existingSignup
+            .eventSignupPieces"
+        >
+          <div class="text-h8 font-weight-semi-bold text-blue">
+            {{ studentPiece.piece.title }} ({{
+              studentPiece.piece.composer.firstName
+            }}
+            {{ studentPiece.piece.composer.lastName }})
+          </div>
         </v-row>
       </v-card-text>
       <v-card-actions>
