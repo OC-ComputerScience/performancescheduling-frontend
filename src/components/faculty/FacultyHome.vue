@@ -116,7 +116,6 @@ function sortAvailabilityTimes(a, b) {
   return aStartTime.localeCompare(bStartTime);
 }
 
-
 watch(currentRole, async () => {
   await retrieveData();
 });
