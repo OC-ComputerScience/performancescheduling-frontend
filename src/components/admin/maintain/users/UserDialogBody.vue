@@ -165,13 +165,13 @@ async function updateUser() {
     if (valid.valid) {
       await updateUserRoles();
 
-      if (isStudent.value) {
+      if (isStudent.value && studentRole != null){
         await updateStudentMajor();
         await updateStudentClassification();
         await updateStudentSemesters();
       }
 
-      if (isFaculty.value) {
+      if (isFaculty.value && facultyRole != null) {
         await updateFacultyTitle();
       }
 
@@ -222,11 +222,16 @@ async function updateUserRoles() {
   }
 
   // Whatever is left in editedUserRoles is a new role, so create it
+  const majorId = isStudent.value ? editedStudentMajor.value.id : null;
   for (let editedUserRole of updateRoles) {
     await UserRoleDataService.create({
       userId: props.userData.id,
       roleId: editedUserRole.id,
       status: "Active",
+      majorId: majorId,
+      studentClassification: editedStudentClassification.value,
+      studentSemesters: editedStudentSemesters.value,
+      title: editedFacultyTitle.value,
     }).catch((err) => {
       console.log(err);
     });
@@ -319,7 +324,6 @@ async function refreshStudentInstruments() {
 }
 
 watch(editedUserRoles, () => {
-  console.log("watch");
     checkRoles();
   },
   { deep: true }
@@ -608,7 +612,7 @@ onMounted(async () => {
               </v-col>
             </v-row>
           </v-col>
-          <v-col v-if="isStudent && props.isEdit">
+          <v-col v-if="isStudent && props.isEdit && studentRole != null">
             <v-row class="pb-2">
               <v-col cols="auto" align-self="center">
                 <v-card-subtitle
