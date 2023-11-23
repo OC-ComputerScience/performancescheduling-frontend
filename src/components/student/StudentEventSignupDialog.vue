@@ -61,7 +61,7 @@ const snackbar = ref({ show: false, color: "", message: "" });
 
 async function getData() {
   // due to the watch statements, accompanists must be gotten before student instruments
-  await UserRoleDataService.getRolesForRoleId(4)
+  await UserRoleDataService.getRolesForRoleId(4, 'lastName,firstName')
     .then((response) => {
       activeAccompanists.value = response.data;
       activeAccompanists.value.map(
@@ -74,7 +74,7 @@ async function getData() {
       console.log(err);
     });
 
-  await StudentInstrumentDataService.getByUser(loginStore.user.userId)
+    await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
       if (props.eventData.eventType.instrumentType === "Instrument") {
         instruments.value = response.data.filter(
@@ -467,7 +467,6 @@ async function requestTimeslotsFromAdmin() {
     });
   });
 
-  snackbar.value = true;
   snackbar.value.show = true;
   snackbar.value.color = "success";
   snackbar.value.message = "Request sent";
@@ -492,7 +491,6 @@ async function requestAvailabilityFromUserRole(userRole) {
     console.log(e);
   });
 
-  snackbar.value = true;
   snackbar.value.show = true;
   snackbar.value.color = "success";
   snackbar.value.message = "Request sent";

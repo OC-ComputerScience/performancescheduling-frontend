@@ -84,6 +84,9 @@ async function refreshAvailability() {
 
       // This cannot be sorted on the backend because it is reorganized in the code above
       groupedAvailabilities.value.sort(sortAvailabilities);
+      groupedAvailabilities.value.forEach((avail) => {
+        avail.sort(sortAvailabilityTimes)
+      })
 
       //Put the values of the loop list into an availabilities list with "normal" indexes
       availabilities.value = Object.values(groupedAvailabilities.value);
@@ -104,6 +107,12 @@ function sortAvailabilities(a, b) {
 
   const aStartTime = a[0].event.startTime;
   const bStartTime = b[0].event.startTime;
+  return aStartTime.localeCompare(bStartTime);
+}
+
+function sortAvailabilityTimes(a, b) {
+  const aStartTime = a.startTime;
+  const bStartTime = b.startTime;
   return aStartTime.localeCompare(bStartTime);
 }
 

@@ -85,7 +85,7 @@ function similarComposerCheck(composer) {
 
   return similarComposers == 0
     ? true
-    : "This are very simialr existing composers: " + similarComposerNames;
+    : "This are very similar existing composers: " + similarComposerNames;
 }
 
 function emptyNameCheck(composer) {
