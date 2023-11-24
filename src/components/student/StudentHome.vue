@@ -53,7 +53,7 @@ async function retrieveData() {
       console.log(e);
     });
 
-  await EventDataService.getGTEDateForStudents(new Date(), 'date,startTime')
+  await EventDataService.getGTEDateForStudents(new Date(), "date,startTime")
     .then((response) => {
       upcomingEvents.value = response.data;
       relevantUpcomingEvents.value = upcomingEvents.value.filter((e) => {
@@ -118,7 +118,6 @@ async function getInstruments() {
     });
 }
 
-
 onMounted(async () => {
   await retrieveData();
 });
@@ -148,6 +147,7 @@ onMounted(async () => {
                     v-for="notification of notifications"
                     :key="notification.id"
                     :notification-data="notification"
+                    @refreshNotices="retrieveData"
                   ></NotificationItem>
                 </v-card-text>
               </v-card>
@@ -222,27 +222,27 @@ onMounted(async () => {
         </v-col>
       </v-row>
     </v-container>
-      <v-dialog v-model="addInstrumentDialog" persistent max-width="600px">
-    <UserInstrumentDialogBody
-      :is-edit="false"
-      :student-instrument-data="{
-        id: null,
-        status: 'Active',
-        levelId: null,
-        studentRoleId: loginStore.currentRole.id,
-        instructorRoleId: null,
-        accompanistRoleId: null,
-        instrumentId: null,
-        instructorRole: null,
-        accompanistRole: null,
-        instrument: null,
-        level: null,
-      }"
-      @addInstrumentSuccessEvent="
-        closeAddInstrumentDialog(), getInstruments()
-      "
-      @closeUserInstrumentDialogEvent="closeAddInstrumentDialog"
-    ></UserInstrumentDialogBody>
-  </v-dialog>
+    <v-dialog v-model="addInstrumentDialog" persistent max-width="600px">
+      <UserInstrumentDialogBody
+        :is-edit="false"
+        :student-instrument-data="{
+          id: null,
+          status: 'Active',
+          levelId: null,
+          studentRoleId: loginStore.currentRole.id,
+          instructorRoleId: null,
+          accompanistRoleId: null,
+          instrumentId: null,
+          instructorRole: null,
+          accompanistRole: null,
+          instrument: null,
+          level: null,
+        }"
+        @addInstrumentSuccessEvent="
+          closeAddInstrumentDialog(), getInstruments()
+        "
+        @closeUserInstrumentDialogEvent="closeAddInstrumentDialog"
+      ></UserInstrumentDialogBody>
+    </v-dialog>
   </div>
 </template>
