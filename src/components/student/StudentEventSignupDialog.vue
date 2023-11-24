@@ -1079,7 +1079,7 @@ onMounted(async () => {
       >
         {{ dialogMessage }}
       </v-card-text>
-      <v-card-text>
+      <v-card-text v-if="existingSignup != null">
         <v-row>These group pieces have been selected: </v-row>
         <v-row
           v-for="studentPiece in selectedTimeslot.existingSignup
