@@ -736,7 +736,7 @@ onMounted(async () => {
         </v-row>
         <v-row class="mt-6">
           <v-col>
-            <v-select
+            <v-autocomplete
               label="Instrument"
               v-model="selectedStudentInstrument"
               :items="instruments"
@@ -744,7 +744,7 @@ onMounted(async () => {
               variant="plain"
               return-object
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
           <v-col>
             <v-text-field
@@ -757,7 +757,7 @@ onMounted(async () => {
             ></v-text-field
           ></v-col>
           <v-col>
-            <v-select
+            <v-autocomplete
               clearable
               label="Accompanist"
               v-model="selectedAccompanist"
@@ -766,7 +766,7 @@ onMounted(async () => {
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
               return-object
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
         </v-row>
         <v-row class="ml-1">
