@@ -735,7 +735,7 @@ onMounted(async () => {
             ></v-text-field
           ></v-col>
           <v-col>
-            <v-select
+            <v-autocomplete
               clearable
               label="Accompanist"
               v-model="selectedAccompanist"
@@ -744,7 +744,7 @@ onMounted(async () => {
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
               return-object
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
         </v-row>
         <v-row class="ml-1">
