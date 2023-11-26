@@ -415,7 +415,7 @@ function requestTimeslotFromStudent() {
     const data = {
       text: `${loginStore.user.firstName} ${
         loginStore.user.lastName
-      } has requested your timeslot for ${formatDate(
+      } has requested your timeslot for ${props.eventData.name} on ${formatDate(
         props.eventData.date
       )} (${new Date(props.eventData.date).toLocaleDateString("default", {
         weekday: "long",
@@ -476,7 +476,7 @@ async function requestAvailabilityFromUserRole(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you enter availability for ${formatDate(
+    } has requested you enter availability for ${props.eventData.name} on ${formatDate(
       props.eventData.date
     )} (${new Date(props.eventData.date).toLocaleDateString("default", {
       weekday: "long",
