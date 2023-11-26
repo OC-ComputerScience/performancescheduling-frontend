@@ -329,7 +329,6 @@ onMounted(async () => {
   <v-dialog v-model="addUserDialog" persistent max-width="600px">
     <UserDialogBody
       :is-edit="false"
-      :is-admin="isAdmin"
       :user-data="{
         id: null,
         firstName: null,
