@@ -21,7 +21,6 @@ async function getEvent() {
     .catch((e) => {
       console.log(e);
     });
-  console.log(eventData.value);
 }
 async function clearNotification() {
   editedNotificationData.value.isCompleted = true;
