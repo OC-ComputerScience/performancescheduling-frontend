@@ -1080,12 +1080,12 @@ onMounted(async () => {
         {{ dialogMessage }}
       </v-card-text>
       <v-card-text v-if="existingSignup != null">
-        <v-row>These group pieces have been selected: </v-row>
+        <v-row>These are the group pieces: </v-row>
         <v-row
           v-for="studentPiece in selectedTimeslot.existingSignup
             .eventSignupPieces"
         >
-          <div class="text-h8 font-weight-semi-bold text-blue">
+          <div class="mt-2 ml-3 text-h8 font-weight-semi-bold text-blue">
             {{ studentPiece.piece.title }} ({{
               studentPiece.piece.composer.firstName
             }}
