@@ -379,7 +379,8 @@ onMounted(async () => {
                   >
                     Major
                   </v-card-subtitle>
-                  <v-select
+                  <v-autocomplete
+                    clearable
                     color="darkBlue"
                     variant="plain"
                     class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4 mr-4"
@@ -390,7 +391,7 @@ onMounted(async () => {
                     return-object
                     :rules="[(v) => !!v || 'This field is required']"
                   >
-                  </v-select>
+                  </v-autocomplete>
                 </v-col>
                 <v-col class="pa-0 ma-0 mr-1">
                   <v-card-subtitle

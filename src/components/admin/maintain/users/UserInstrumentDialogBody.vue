@@ -215,7 +215,7 @@ onMounted(async () => {
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Instrument
         </v-card-subtitle>
-        <v-select
+        <v-autocomplete
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -227,12 +227,13 @@ onMounted(async () => {
           :readonly="props.isEdit"
           :rules="[(v) => !!v || 'This field is required']"
         >
-        </v-select>
+        </v-autocomplete>
 
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Instructor
         </v-card-subtitle>
-        <v-select
+        <v-autocomplete
+          clearable
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -243,12 +244,13 @@ onMounted(async () => {
           return-object
           :rules="[(v) => !!v || 'This field is required']"
         >
-        </v-select>
+        </v-autocomplete>
 
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Accompanist
         </v-card-subtitle>
-        <v-select
+        <v-autocomplete
+          clearable
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -258,7 +260,7 @@ onMounted(async () => {
           item-value="id"
           return-object
         >
-        </v-select>
+        </v-autocomplete>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Level
         </v-card-subtitle>
