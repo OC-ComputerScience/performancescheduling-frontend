@@ -1096,13 +1096,6 @@ onMounted(async () => {
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          @click="confimationDialog = false"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
-          >Cancel</v-btn
-        >
-        <v-btn
           @click="confirmSignup"
           flat
           size="small"
@@ -1111,6 +1104,13 @@ onMounted(async () => {
           <div v-if="existingSignup == null">Confirm</div>
           <div v-else>Confirm Group Signup</div>
         </v-btn>
+        <v-btn
+          @click="confimationDialog = false"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+          >Cancel</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
