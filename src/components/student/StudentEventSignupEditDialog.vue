@@ -455,7 +455,7 @@ onMounted(async () => {
       </v-card-title>
       <v-card-text
         class="text-h8 font-weight-semi-bold text-blue"
-        style="white-space: pre"
+        style="white-space: normal; word-wrap: break-word"
       >
         Are you sure you want to delete this signup? This action cannot be
         undone.

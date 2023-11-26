@@ -302,6 +302,7 @@ function openDialog() {
     errorMessage.value = "Please select an instrument.";
     return;
   }
+
   if (selectedStudentPieces.value.length == 0) {
     errorMessage.value = "Please select at least one piece.";
     return;
@@ -322,6 +323,27 @@ function openDialog() {
   if (selectedTimeslot.value == null) {
     errorMessage.value = "Please select a timeslot.";
     return;
+  }
+
+  // if group then check for selected pieces
+  var selectStatus = true;
+  if (selectedTimeslot.value.existingSignup != null) {
+    selectedTimeslot.value.existingSignup.eventSignupPieces.forEach((piece) => {
+      if (
+        selectedStudentPieces.value.findIndex(
+          (x) => x.pieceId === piece.pieceId
+        ) === -1
+      ) {
+        selectStatus = false;
+
+        errorMessage.value =
+          "Please select all pieces that are already in the group signup.";
+        return;
+      }
+    });
+    if (selectStatus == false) {
+      return;
+    }
   }
 
   // reset error message
@@ -714,7 +736,7 @@ onMounted(async () => {
         </v-row>
         <v-row class="mt-6">
           <v-col>
-            <v-select
+            <v-autocomplete
               label="Instrument"
               v-model="selectedStudentInstrument"
               :items="instruments"
@@ -722,7 +744,7 @@ onMounted(async () => {
               variant="plain"
               return-object
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
           <v-col>
             <v-text-field
@@ -924,9 +946,7 @@ onMounted(async () => {
                             "
                             size="small"
                             :color="
-                              selectedTimeslot == timeslot
-                                ? 'blue'
-                                : 'white'
+                              selectedTimeslot == timeslot ? 'blue' : 'white'
                             "
                             v-if="timeslot.existingSignup != undefined"
                           ></v-icon>
@@ -989,11 +1009,37 @@ onMounted(async () => {
             </v-row>
             <v-row no-gutters>
               <v-checkbox
+                v-if="
+                  selectedTimeslot != null &&
+                  selectedTimeslot.existingSignup == null
+                "
                 v-model="groupSignup"
                 label="Allow other students to signup with you"
                 class="text-body-1 font-weight-bold text-darkBlue"
               ></v-checkbox>
             </v-row>
+            <v-card-text
+              v-if="
+                selectedTimeslot != null &&
+                selectedTimeslot.existingSignup != null
+              "
+            >
+              <v-row
+                >These group pieces should be in your repertoire and
+                selected:</v-row
+              >
+              <v-row
+                v-for="studentPiece in selectedTimeslot.existingSignup
+                  .eventSignupPieces"
+              >
+                <div class="text-h8 font-weight-semi-bold text-blue">
+                  {{ studentPiece.piece.title }} ({{
+                    studentPiece.piece.composer.firstName
+                  }}
+                  {{ studentPiece.piece.composer.lastName }})
+                </div>
+              </v-row>
+            </v-card-text>
           </v-col>
         </v-row>
         <v-row no-gutters>
@@ -1033,15 +1079,22 @@ onMounted(async () => {
       >
         {{ dialogMessage }}
       </v-card-text>
+      <v-card-text v-if="existingSignup != null">
+        <v-row>These are the group pieces: </v-row>
+        <v-row
+          v-for="studentPiece in selectedTimeslot.existingSignup
+            .eventSignupPieces"
+        >
+          <div class="mt-2 ml-3 text-h8 font-weight-semi-bold text-blue">
+            {{ studentPiece.piece.title }} ({{
+              studentPiece.piece.composer.firstName
+            }}
+            {{ studentPiece.piece.composer.lastName }})
+          </div>
+        </v-row>
+      </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn
-          @click="confimationDialog = false"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
-          >Cancel</v-btn
-        >
         <v-btn
           @click="confirmSignup"
           flat
@@ -1051,6 +1104,13 @@ onMounted(async () => {
           <div v-if="existingSignup == null">Confirm</div>
           <div v-else>Confirm Group Signup</div>
         </v-btn>
+        <v-btn
+          @click="confimationDialog = false"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+          >Cancel</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
