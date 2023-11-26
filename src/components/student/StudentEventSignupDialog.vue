@@ -415,7 +415,7 @@ function requestTimeslotFromStudent() {
     const data = {
       text: `${loginStore.user.firstName} ${
         loginStore.user.lastName
-      } has requested your timeslot for ${formatDate(
+      } has requested your timeslot for ${props.eventData.name} on ${formatDate(
         props.eventData.date
       )} (${new Date(props.eventData.date).toLocaleDateString("default", {
         weekday: "long",
@@ -476,7 +476,7 @@ async function requestAvailabilityFromUserRole(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you enter availability for ${formatDate(
+    } has requested you enter availability for ${props.eventData.name} on ${formatDate(
       props.eventData.date
     )} (${new Date(props.eventData.date).toLocaleDateString("default", {
       weekday: "long",
@@ -735,7 +735,7 @@ onMounted(async () => {
             ></v-text-field
           ></v-col>
           <v-col>
-            <v-select
+            <v-autocomplete
               clearable
               label="Accompanist"
               v-model="selectedAccompanist"
@@ -744,7 +744,7 @@ onMounted(async () => {
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
               return-object
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
         </v-row>
         <v-row class="ml-1">
