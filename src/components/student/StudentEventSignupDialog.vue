@@ -36,12 +36,10 @@ const selectedInstructor = ref(null);
 const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 // student piece variables
-
 const studentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
-
 // timeslot variables
 const isMusicMajor = ref(false);
 const timeslotLength = ref(0);
@@ -56,6 +54,7 @@ const confimationDialog = ref(false);
 const otherSignupDialog = ref(false);
 const dialogMessage = ref("");
 const addStudentPieceDialog = ref(false);
+const requestConfDialog = ref(false);
 //const sendTimeSlotRequestDialog = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
@@ -890,8 +889,7 @@ onMounted(async () => {
                     (selectedAccompanist == null ||
                       accompanistAvailability.length > 0)
                   "
-                  @click="selectedAccompanist == null ? requestAdditionalTimeslots(selectedInstructor) 
-                  : (requestAdditionalTimeslots(selectedInstructor), requestAdditionalTimeslots(selectedAccompanist))"
+                  @click="requestConfDialog = true"
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
@@ -1152,6 +1150,40 @@ onMounted(async () => {
         (addStudentPieceDialog = false), getStudentPieces()
       "
     ></StudentPieceDialogBody>
+  </v-dialog>
+  <v-dialog v-model="requestConfDialog" max-width="500">
+    <v-card class="pa-2 bg-lightBlue flatCardBorder">
+      <v-card-title class="pt-0 mt-0 text-blue font-weight-bold text-h5"
+        >Confirm Request
+      </v-card-title>
+      <v-card-text v-if="selectedAccompanist != null" class="font-weight-semi-bold text-darkBlue">
+        You are requesting additional time slots to {{ selectedInstructor.user.firstName }} {{ selectedInstructor.user.lastName }} 
+        and {{ selectedAccompanist.user.firstName }} {{ selectedAccompanist.user.lastName }}. Do you want to proceed?
+      </v-card-text>
+      <v-card-text v-else class="font-weight-semi-bold text-darkBlue">
+        You are requesting additional time slots to {{ selectedInstructor.user.firstName }} 
+        {{ selectedInstructor.user.lastName }}. Do you want to proceed?
+        
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          flat
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click=" (requestAdditionalTimeslots(selectedInstructor), emits('closeDialogEvent'), sendTimeSlotRequestDialog = false),
+          selectedAccompanist != null ?  requestAdditionalTimeslots(selectedAccompanist) : null"
+        >
+          Confirm</v-btn
+        >
+        <v-btn
+          flat
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+          @click="sendTimeSlotRequestDialog = false"
+        >
+          Cancel</v-btn
+        >
+      </v-card-actions>
+    </v-card>
   </v-dialog>
   <v-snackbar
     v-model="snackbar.show"
