@@ -55,7 +55,9 @@ const otherSignupDialog = ref(false);
 const dialogMessage = ref("");
 const addStudentPieceDialog = ref(false);
 const requestConfDialog = ref(false);
-//const sendTimeSlotRequestDialog = ref(false);
+const timeSlotRequest = ref(false);
+const instructorAvailRequest = ref(false);
+const accompAvailRequest = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
 
@@ -463,8 +465,8 @@ async function requestAdditionalTimeslots(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you create more timeslots for ${formatDate(
-      props.eventData.date
+    } has requested you create more timeslots for ${props.eventData.name} on 
+    ${formatDate(props.eventData.date
     )} (${new Date(props.eventData.date).toLocaleDateString("default", {
       weekday: "long",
       timeZone: "UTC",
@@ -889,7 +891,7 @@ onMounted(async () => {
                     (selectedAccompanist == null ||
                       accompanistAvailability.length > 0)
                   "
-                  @click="requestConfDialog = true"
+                  @click="requestConfDialog = true, timeSlotRequest = true"
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
@@ -958,9 +960,7 @@ onMounted(async () => {
                         <v-btn
                           class="font-weight-bold text-none px-5"
                           color="blue"
-                          @click="
-                            requestAvailabilityFromUserRole(selectedInstructor)
-                          "
+                          @click="requestConfDialog = true, instructorAvailRequest = true"
                         >
                           Request availability
                         </v-btn>
@@ -984,9 +984,7 @@ onMounted(async () => {
                         <v-btn
                           class="font-weight-bold text-none px-5"
                           color="blue"
-                          @click="
-                            requestAvailabilityFromUserRole(selectedAccompanist)
-                          "
+                          @click="requestConfDialog = true, accompAvailRequest = true"
                         >
                           Request availability
                         </v-btn>
@@ -1156,32 +1154,30 @@ onMounted(async () => {
       <v-card-title class="pt-0 mt-0 text-blue font-weight-bold text-h5"
         >Confirm Request
       </v-card-title>
-      <v-card-text v-if="selectedAccompanist != null" class="font-weight-semi-bold text-darkBlue">
-        You are requesting additional time slots to {{ selectedInstructor.user.firstName }} {{ selectedInstructor.user.lastName }} 
-        and {{ selectedAccompanist.user.firstName }} {{ selectedAccompanist.user.lastName }}. Do you want to proceed?
-      </v-card-text>
-      <v-card-text v-else class="font-weight-semi-bold text-darkBlue">
-        You are requesting additional time slots to {{ selectedInstructor.user.firstName }} 
-        {{ selectedInstructor.user.lastName }}. Do you want to proceed?
-        
+      <v-card-text class="font-weight-semi-bold text-darkBlue">
+        Are you sure you want to send this request?
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
           flat
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          @click=" (requestAdditionalTimeslots(selectedInstructor), emits('closeDialogEvent'), sendTimeSlotRequestDialog = false),
-          selectedAccompanist != null ?  requestAdditionalTimeslots(selectedAccompanist) : null"
+          @click="requestConfDialog = false,
+          (timeSlotRequest && selectedAccompanist != null) 
+          ? (requestAdditionalTimeslots(selectedInstructor), requestAdditionalTimeslots(selectedAccompanist)) 
+          : instructorAvailRequest ? requestAvailabilityFromUserRole(selectedInstructor)
+          : accompAvailRequest ? requestAvailabilityFromUserRole(selectedAccompanist)
+          : requestAdditionalTimeslots(selectedInstructor)"
         >
-          Confirm</v-btn
-        >
+          Send
+        </v-btn>
         <v-btn
           flat
           class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
-          @click="sendTimeSlotRequestDialog = false"
+          @click="requestConfDialog = false"
         >
-          Cancel</v-btn
-        >
+          Cancel
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
