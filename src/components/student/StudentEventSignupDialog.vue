@@ -460,42 +460,7 @@ function requestTimeslotFromStudent() {
   snackbar.value.message = "Request sent";
 }
 
-// async function requestTimeslotsFromAdmin() {
-//   var admins = [];
-//   await UserRoleDataService.getRolesForRoleId(3)
-//     .then((response) => {
-//       admins = response.data;
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-
-//   admins.forEach((admin) => {
-//     const data = {
-//       text: `${loginStore.user.firstName} ${
-//         loginStore.user.lastName
-//       } has requested you create more timeslots for ${formatDate(
-//         props.eventData.date
-//       )} (${new Date(props.eventData.date).toLocaleDateString("default", {
-//         weekday: "long",
-//         timeZone: "UTC",
-//       })})`,
-//       data: `eventId=${props.eventData.id}`,
-//       isCompleted: false,
-//       userRoleId: admin.id,
-//       notificationId: 1,
-//     };
-//     UserNotificationDataService.create(data).catch((e) => {
-//       console.log(e);
-//     });
-//   });
-
-//   snackbar.value.show = true;
-//   snackbar.value.color = "success";
-//   snackbar.value.message = "Request sent";
-// }
-
-async function requestTimeslots(userRole) {
+async function requestAdditionalTimeslots(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
@@ -925,7 +890,8 @@ onMounted(async () => {
                     (selectedAccompanist == null ||
                       accompanistAvailability.length > 0)
                   "
-                  @click="requestTimeslots(selectedInstructor), requestTimeslots(selectedAccompanist)"
+                  @click="selectedAccompanist == null ? requestAdditionalTimeslots(selectedInstructor) 
+                  : (requestAdditionalTimeslots(selectedInstructor), requestAdditionalTimeslots(selectedAccompanist))"
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
