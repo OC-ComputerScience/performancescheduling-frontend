@@ -1164,10 +1164,10 @@ onMounted(async () => {
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="requestConfDialog = false,
           (timeSlotRequest && selectedAccompanist != null) 
-          ? (requestAdditionalTimeslots(selectedInstructor), requestAdditionalTimeslots(selectedAccompanist)) 
-          : instructorAvailRequest ? requestAvailabilityFromUserRole(selectedInstructor)
-          : accompAvailRequest ? requestAvailabilityFromUserRole(selectedAccompanist)
-          : requestAdditionalTimeslots(selectedInstructor)"
+          ? (requestAdditionalTimeslots(selectedInstructor), requestAdditionalTimeslots(selectedAccompanist), timeSlotRequest = false) 
+          : instructorAvailRequest ? (requestAvailabilityFromUserRole(selectedInstructor), instructorAvailRequest = false)
+          : accompAvailRequest ? (requestAvailabilityFromUserRole(selectedAccompanist), accompAvailRequest = false)
+          : (requestAdditionalTimeslots(selectedInstructor), timeSlotRequest = false)"
         >
           Send
         </v-btn>
