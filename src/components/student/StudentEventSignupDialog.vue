@@ -225,13 +225,15 @@ function withinAvailability(timeslotStart, timeslotEnd) {
   var isAvailable = instructorAvailability.value.some(
     (avail) => avail.startTime <= timeslotStart && avail.endTime >= timeslotEnd
   );
-
+  console.log('is available before', isAvailable)
   if (isAvailable && accompanistAvailability.value.length > 0) {
     isAvailable = accompanistAvailability.value.some(
       (avail) =>
         avail.startTime <= timeslotStart && avail.endTime >= timeslotEnd
     );
   }
+  console.log('accompanistAvailability after', accompanistAvailability.value)
+  console.log('is available after', isAvailable)
 
   return isAvailable;
 }
@@ -619,6 +621,7 @@ async function confirmTimeslotAvailable() {
 }
 
 watch(selectedStudentInstrument, async () => {
+  console.log('selected instructor', selectedInstructor.value)
   if (selectedStudentInstrument.value == null) {
     return;
   }
@@ -656,6 +659,8 @@ watch(selectedStudentInstrument, async () => {
   getStudentPieces();
 
   getTimeslotLength();
+
+  disableTimeslots();
 });
 
 watch(selectedAccompanist, async () => {
