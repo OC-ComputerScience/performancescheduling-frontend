@@ -52,6 +52,7 @@ getEvent();
       >
         View {{ props.notificationData.data }}
       </v-btn> -->
+      <v-spacer></v-spacer>
       <v-btn
         flat
         size="small"

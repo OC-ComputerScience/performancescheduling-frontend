@@ -36,12 +36,10 @@ const selectedInstructor = ref(null);
 const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 // student piece variables
-
 const studentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
-
 // timeslot variables
 const isMusicMajor = ref(false);
 const timeslotLength = ref(0);
@@ -56,6 +54,10 @@ const confimationDialog = ref(false);
 const otherSignupDialog = ref(false);
 const dialogMessage = ref("");
 const addStudentPieceDialog = ref(false);
+const requestConfDialog = ref(false);
+const timeSlotRequest = ref(false);
+const instructorAvailRequest = ref(false);
+const accompAvailRequest = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
 
@@ -459,34 +461,23 @@ function requestTimeslotFromStudent() {
   snackbar.value.message = "Request sent";
 }
 
-async function requestTimeslotsFromAdmin() {
-  var admins = [];
-  await UserRoleDataService.getRolesForRoleId(3)
-    .then((response) => {
-      admins = response.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-  admins.forEach((admin) => {
-    const data = {
-      text: `${loginStore.user.firstName} ${
-        loginStore.user.lastName
-      } has requested you create more timeslots for ${formatDate(
-        props.eventData.date
-      )} (${new Date(props.eventData.date).toLocaleDateString("default", {
-        weekday: "long",
-        timeZone: "UTC",
-      })})`,
-      data: `eventId=${props.eventData.id}`,
-      isCompleted: false,
-      userRoleId: admin.id,
-      notificationId: 1,
-    };
-    UserNotificationDataService.create(data).catch((e) => {
-      console.log(e);
-    });
+async function requestAdditionalTimeslots(userRole) {
+  const data = {
+    text: `${loginStore.user.firstName} ${
+      loginStore.user.lastName
+    } has requested you create more timeslots for ${props.eventData.name} on 
+    ${formatDate(props.eventData.date
+    )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+      weekday: "long",
+      timeZone: "UTC",
+    })})`,
+    data: `eventId=${props.eventData.id}`,
+    isCompleted: false,
+    userRoleId: userRole.id,
+    notificationId: 1,
+  };
+  UserNotificationDataService.create(data).catch((e) => {
+    console.log(e);
   });
 
   snackbar.value.show = true;
@@ -902,7 +893,7 @@ onMounted(async () => {
                     (selectedAccompanist == null ||
                       accompanistAvailability.length > 0)
                   "
-                  @click="requestTimeslotsFromAdmin"
+                  @click="requestConfDialog = true, timeSlotRequest = true"
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
@@ -971,9 +962,7 @@ onMounted(async () => {
                         <v-btn
                           class="font-weight-bold text-none px-5"
                           color="blue"
-                          @click="
-                            requestAvailabilityFromUserRole(selectedInstructor)
-                          "
+                          @click="requestConfDialog = true, instructorAvailRequest = true"
                         >
                           Request availability
                         </v-btn>
@@ -997,9 +986,7 @@ onMounted(async () => {
                         <v-btn
                           class="font-weight-bold text-none px-5"
                           color="blue"
-                          @click="
-                            requestAvailabilityFromUserRole(selectedAccompanist)
-                          "
+                          @click="requestConfDialog = true, accompAvailRequest = true"
                         >
                           Request availability
                         </v-btn>
@@ -1164,6 +1151,38 @@ onMounted(async () => {
         (addStudentPieceDialog = false), getStudentPieces()
       "
     ></StudentPieceDialogBody>
+  </v-dialog>
+  <v-dialog v-model="requestConfDialog" max-width="500">
+    <v-card class="pa-2 bg-lightBlue flatCardBorder">
+      <v-card-title class="pt-0 mt-0 text-blue font-weight-bold text-h5"
+        >Confirm Request
+      </v-card-title>
+      <v-card-text class="font-weight-semi-bold text-darkBlue">
+        Are you sure you want to send this request?
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          flat
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="requestConfDialog = false,
+          (timeSlotRequest && selectedAccompanist != null) 
+          ? (requestAdditionalTimeslots(selectedInstructor), requestAdditionalTimeslots(selectedAccompanist), timeSlotRequest = false) 
+          : instructorAvailRequest ? (requestAvailabilityFromUserRole(selectedInstructor), instructorAvailRequest = false)
+          : accompAvailRequest ? (requestAvailabilityFromUserRole(selectedAccompanist), accompAvailRequest = false)
+          : (requestAdditionalTimeslots(selectedInstructor), timeSlotRequest = false)"
+        >
+          Send
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+          @click="requestConfDialog = false"
+        >
+          Cancel
+        </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
   <v-snackbar
     v-model="snackbar.show"
