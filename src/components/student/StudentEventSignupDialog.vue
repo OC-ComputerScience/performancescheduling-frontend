@@ -63,7 +63,7 @@ const snackbar = ref({ show: false, color: "", message: "" });
 
 async function getData() {
   // due to the watch statements, accompanists must be gotten before student instruments
-  await UserRoleDataService.getRolesForRoleId(4, 'lastName,firstName')
+  await UserRoleDataService.getRolesForRoleId(4, "lastName,firstName")
     .then((response) => {
       activeAccompanists.value = response.data;
       activeAccompanists.value.map(
@@ -76,7 +76,7 @@ async function getData() {
       console.log(err);
     });
 
-    await StudentInstrumentDataService.getByUser(loginStore.user.userId)
+  await StudentInstrumentDataService.getByUser(loginStore.user.userId)
     .then((response) => {
       if (props.eventData.eventType.instrumentType === "Instrument") {
         instruments.value = response.data.filter(
@@ -489,9 +489,11 @@ async function requestAvailabilityFromUserRole(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you enter availability for ${props.eventData.name} on ${formatDate(
+    } has requested you enter availability for ${
+      props.eventData.name
+    } on ${formatDate(props.eventData.date)} (${new Date(
       props.eventData.date
-    )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+    ).toLocaleDateString("default", {
       weekday: "long",
       timeZone: "UTC",
     })})`,
@@ -1008,7 +1010,8 @@ onMounted(async () => {
             <v-card-text
               v-if="
                 selectedTimeslot != null &&
-                selectedTimeslot.existingSignup != null
+                selectedTimeslot.existingSignup != null &&
+                selectedTimeslot.existingSignup.isGroupEvent
               "
             >
               <v-row
