@@ -331,7 +331,10 @@ function openDialog() {
 
   // if group then check for selected pieces
   var selectStatus = true;
-  if (selectedTimeslot.value.existingSignup != null) {
+  if (
+    selectedTimeslot.value.existingSignup != null &&
+    selectedTimeslot.value.existingSignup.isGroupEvent
+  ) {
     selectedTimeslot.value.existingSignup.eventSignupPieces.forEach((piece) => {
       if (
         selectedStudentPieces.value.findIndex(
@@ -468,8 +471,9 @@ async function requestAdditionalTimeslots(userRole) {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
     } has requested you create more timeslots for ${props.eventData.name} on 
-    ${formatDate(props.eventData.date
-    )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+    ${formatDate(props.eventData.date)} (${new Date(
+      props.eventData.date
+    ).toLocaleDateString("default", {
       weekday: "long",
       timeZone: "UTC",
     })})`,
@@ -898,7 +902,7 @@ onMounted(async () => {
                     (selectedAccompanist == null ||
                       accompanistAvailability.length > 0)
                   "
-                  @click="requestConfDialog = true, timeSlotRequest = true"
+                  @click="(requestConfDialog = true), (timeSlotRequest = true)"
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
@@ -967,7 +971,10 @@ onMounted(async () => {
                         <v-btn
                           class="font-weight-bold text-none px-5"
                           color="blue"
-                          @click="requestConfDialog = true, instructorAvailRequest = true"
+                          @click="
+                            (requestConfDialog = true),
+                              (instructorAvailRequest = true)
+                          "
                         >
                           Request availability
                         </v-btn>
@@ -991,7 +998,10 @@ onMounted(async () => {
                         <v-btn
                           class="font-weight-bold text-none px-5"
                           color="blue"
-                          @click="requestConfDialog = true, accompAvailRequest = true"
+                          @click="
+                            (requestConfDialog = true),
+                              (accompAvailRequest = true)
+                          "
                         >
                           Request availability
                         </v-btn>
@@ -1170,12 +1180,21 @@ onMounted(async () => {
         <v-btn
           flat
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          @click="requestConfDialog = false,
-          (timeSlotRequest && selectedAccompanist != null) 
-          ? (requestAdditionalTimeslots(selectedInstructor), requestAdditionalTimeslots(selectedAccompanist), timeSlotRequest = false) 
-          : instructorAvailRequest ? (requestAvailabilityFromUserRole(selectedInstructor), instructorAvailRequest = false)
-          : accompAvailRequest ? (requestAvailabilityFromUserRole(selectedAccompanist), accompAvailRequest = false)
-          : (requestAdditionalTimeslots(selectedInstructor), timeSlotRequest = false)"
+          @click="
+            (requestConfDialog = false),
+              timeSlotRequest && selectedAccompanist != null
+                ? (requestAdditionalTimeslots(selectedInstructor),
+                  requestAdditionalTimeslots(selectedAccompanist),
+                  (timeSlotRequest = false))
+                : instructorAvailRequest
+                ? (requestAvailabilityFromUserRole(selectedInstructor),
+                  (instructorAvailRequest = false))
+                : accompAvailRequest
+                ? (requestAvailabilityFromUserRole(selectedAccompanist),
+                  (accompAvailRequest = false))
+                : (requestAdditionalTimeslots(selectedInstructor),
+                  (timeSlotRequest = false))
+          "
         >
           Send
         </v-btn>
