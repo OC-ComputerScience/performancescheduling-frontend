@@ -660,6 +660,8 @@ watch(selectedStudentInstrument, async () => {
   getStudentPieces();
 
   getTimeslotLength();
+
+  disableTimeslots();
 });
 
 watch(selectedAccompanist, async () => {
