@@ -48,6 +48,11 @@ async function retrieveData() {
   )
     .then((response) => {
       signups.value = response.data;
+
+      const signupsData = response.data;
+      signupsData[0].studentInstrumentSignups.sort(sortSignups);
+
+      signups.value = signupsData;
     })
     .catch((e) => {
       console.log(e);
@@ -87,6 +92,20 @@ async function retrieveData() {
     .catch((e) => {
       console.log(e);
     });
+}
+
+function sortSignups(a, b) {
+  const aDate = new Date(a.eventSignup.event.date);
+  const bDate = new Date(b.eventSignup.event.date);
+
+  const dateCompare = aDate - bDate;
+  if (dateCompare !== 0) {
+    return dateCompare;
+  }
+
+  const aStartTime = a.eventSignup.startTime;
+  const bStartTime = b.eventSignup.startTime;
+  return aStartTime.localeCompare(bStartTime);
 }
 
 function hasInstrument(instrumentType) {
