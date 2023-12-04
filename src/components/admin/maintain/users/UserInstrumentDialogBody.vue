@@ -175,8 +175,6 @@ async function updateLevel() {
 }
 
 async function updateSemester() {
-  console.log(selectedSemester.value);
-
   if (
     props.studentInstrumentData.semesterId === null ||
     selectedSemester.value.id != props.studentInstrumentData.semesterId
@@ -269,7 +267,7 @@ onMounted(async () => {
           item-value="id"
           variant="plain"
           return-object
-          class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          class="bg-white text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
           :rules="[() => !!selectedSemester || 'This field is required']"
         ></v-select>
 
