@@ -4,6 +4,7 @@ import { useLoginStore } from "../../stores/LoginStore.js";
 
 import UserNotificationDataService from "../../services/UserNotificationDataService.js";
 import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
+import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService.js";
 import UserInstrumentDialogBody from "../admin/maintain/users/UserInstrumentDialogBody.vue";
 import EventDataService from "../../services/EventDataService.js";
 import EventSignupItem from "./EventSignupItem.vue";
@@ -40,19 +41,13 @@ async function retrieveData() {
       console.log(e);
     });
 
-  await StudentInstrumentDataService.getStudentInstrumentSignupsByUserRoleId(
-    loginStore.currentRole.id,
-    new Date(),
-    "GTE",
-    "asc"
-  )
+    await StudentInstrumentSignupDataService.getByUserRoleId(
+      loginStore.currentRole.id,
+      new Date(),
+     "GTE",
+     "asc")
     .then((response) => {
       signups.value = response.data;
-
-      const signupsData = response.data;
-      signupsData[0].studentInstrumentSignups.sort(sortSignups);
-
-      signups.value = signupsData;
     })
     .catch((e) => {
       console.log(e);
@@ -92,20 +87,6 @@ async function retrieveData() {
     .catch((e) => {
       console.log(e);
     });
-}
-
-function sortSignups(a, b) {
-  const aDate = new Date(a.eventSignup.event.date);
-  const bDate = new Date(b.eventSignup.event.date);
-
-  const dateCompare = aDate - bDate;
-  if (dateCompare !== 0) {
-    return dateCompare;
-  }
-
-  const aStartTime = a.eventSignup.startTime;
-  const bStartTime = b.eventSignup.startTime;
-  return aStartTime.localeCompare(bStartTime);
 }
 
 function hasInstrument(instrumentType) {
@@ -207,11 +188,10 @@ onMounted(async () => {
               Events I'm Signed up For
             </v-card-title>
             <v-card-text
-              v-for="studentInstrument in signups"
-              :key="studentInstrument.id"
+              v-for="studentInstrumentSignup in signups"
+              :key="studentInstrumentSignup.id"
             >
               <EventSignupItem
-                v-for="studentInstrumentSignup in studentInstrument.studentInstrumentSignups"
                 :key="studentInstrumentSignup.id"
                 :event-data="studentInstrumentSignup.eventSignup.event"
                 :event-signup-data="studentInstrumentSignup.eventSignup"
