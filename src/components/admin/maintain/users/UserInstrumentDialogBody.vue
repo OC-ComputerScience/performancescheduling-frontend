@@ -72,10 +72,7 @@ function getAllInstructors() {
 function getAllAccompanists() {
   UserRoleDataService.getRolesForRoleId(4, "lastName,firstName")
     .then((response) => {
-      accompanists.value = [
-        { id: null, user: { firstName: "", lastName: "" } },
-        ...response.data,
-      ];
+      accompanists.value = response.data;
     })
     .catch((err) => {
       console.log(err);
