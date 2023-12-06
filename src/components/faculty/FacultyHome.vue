@@ -142,7 +142,7 @@ onMounted(async () => {
         <v-col cols="12" lg="3" class="ma-0 pa-4">
           <v-row class="fill-height ma-0">
             <v-col cols="12" class="pa-0 ma-0 pb-4">
-              <v-card class="fill-height mainCardBorder pa-2">
+              <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 400px; min-height: 400px;">
                 <v-card-title
                   class="font-weight-semi-bold text-blue text-h5 pb-0"
                 >
@@ -165,7 +165,7 @@ onMounted(async () => {
               </v-card>
             </v-col>
             <v-col cols="12" class="pa-0 ma-0 pt-4">
-              <v-card class="fill-height mainCardBorder pa-2">
+              <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 400px; min-height: 400px;">
                 <v-row>
                   <v-col cols="auto">
                     <v-card-title
@@ -188,7 +188,7 @@ onMounted(async () => {
           </v-row>
         </v-col>
         <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
             <v-card-title>
               <v-row class="pa-2">
                 <p class="font-weight-semi-bold text-darkBlue text-h5">
@@ -210,7 +210,7 @@ onMounted(async () => {
           </v-card>
         </v-col>
         <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
             <v-card-title class="font-weight-semi-bold text-orange text-h5">
               Upcoming Events
             </v-card-title>

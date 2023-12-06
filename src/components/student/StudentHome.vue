@@ -130,7 +130,7 @@ onMounted(async () => {
         <v-col cols="12" lg="3" class="ma-0 pa-4">
           <v-row class="fill-height ma-0">
             <v-col cols="12" class="pa-0 ma-0 pb-4">
-              <v-card class="fill-height mainCardBorder pa-2">
+              <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 400px; min-height: 400px;">
                 <v-card-title
                   class="font-weight-semi-bold text-blue text-h5 pb-0"
                 >
@@ -153,7 +153,7 @@ onMounted(async () => {
               </v-card>
             </v-col>
             <v-col cols="12" class="pa-0 ma-0 pt-4">
-              <v-card class="fill-height mainCardBorder pa-2">
+              <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 300px; min-height: 300px;">
                 <v-row>
                   <v-col cols="auto">
                     <v-card-title
@@ -163,12 +163,12 @@ onMounted(async () => {
                     </v-card-title>
                   </v-col>
                   <v-spacer></v-spacer>
-                  <v-col cols="auto">
-                    <v-btn flat icon @click="addInstrument">
-                      <v-icon class="text-darkBlue" icon="mdi-plus-circle">
+                  
+                    <v-btn class="mt-2" flat icon @click="addInstrument">
+                      <v-icon class="text-darkBlue" icon="mdi-plus-circle" size="large">
                       </v-icon>
                     </v-btn>
-                  </v-col>
+                  
                 </v-row>
 
                 <v-card-text>
@@ -183,7 +183,7 @@ onMounted(async () => {
           </v-row>
         </v-col>
         <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 740px; min-height: 740px;">
             <v-card-title class="font-weight-semi-bold text-maroon text-h5">
               Events I'm Signed up For
             </v-card-title>
@@ -205,7 +205,7 @@ onMounted(async () => {
           </v-card>
         </v-col>
         <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 740px; min-height: 740px;">
             <v-card-title class="font-weight-semi-bold text-orange text-h5">
               Upcoming Events
             </v-card-title>
