@@ -147,6 +147,7 @@ async function updateSelectedInstructor() {
 async function updateSelectedAccompanist() {
   if (
     props.studentInstrumentData.accompanistRoleId === null ||
+    selectedAccompanist.value == null ||
     selectedAccompanist.value.id !=
       props.studentInstrumentData.accompanistRoleId
   ) {
