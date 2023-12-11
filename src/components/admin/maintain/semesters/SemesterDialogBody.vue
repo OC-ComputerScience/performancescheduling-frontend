@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 
 import SemesterDataService from "../../../../services/SemesterDataService";
+import UserDataService from "../../../../services/UserDataService";
 import { formatDate } from "../../../../composables/dateFormatter";
 
 const emits = defineEmits([
@@ -19,6 +20,8 @@ const props = defineProps({
 });
 const form = ref(null);
 const editedSemesterData = ref(Object.assign({}, props.semesterData));
+const yesDisableStudents = ref(true);
+const users = ref([]);
 
 onMounted(() => {
   if (props.isEdit) {
@@ -45,6 +48,10 @@ async function addSemester() {
         .catch((err) => {
           console.log(err);
         });
+    if(yesDisableStudents.value){
+      disableAllStudents();
+    }
+
     }
   });
 }
@@ -83,6 +90,31 @@ function endDateCheck() {
   return pattern.test(editedSemesterData.value.endDate)
     ? true
     : "Date must be in the format of MM/DD/YYYY.";
+}
+
+async function disableAllStudents(){
+  await UserDataService.getAllWithRolesAndStudentInstruments("lastName", "ASC")
+    .then((response) => {
+      users.value = response.data;
+
+      users.value = users.value.filter((user) => {
+        return user.userRoles.some((role) => {
+          return role.role.role === "Student";
+        });
+      });
+
+      users.value.forEach((user) => {
+        UserDataService.update({
+          id: user.id,
+          status: "Disabled",
+        }).catch((err) => {
+          console.log(err);
+        });
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 </script>
 
@@ -157,6 +189,13 @@ function endDateCheck() {
               endDateCheck,
             ]"
           ></v-text-field>
+          <v-checkbox
+            v-if="!props.isEdit"
+            v-model="yesDisableStudents"
+            label="Disable all students"
+            class="font-weight-semi-bold text-darkBlue"
+          >
+          </v-checkbox>
         </v-card-text>
       </v-card-actions>
       <v-card-actions>
