@@ -50,12 +50,16 @@ class StudentInstrumentDataService {
         order
     );
   }
-  getStudentsForInstructorId(instructorId) {
-    return http.get(this.baseUrl + "instructorId/" + instructorId);
+  getStudentsForInstructorId(instructorId, active) {
+    return http.get(
+      this.baseUrl + "instructorId/" + instructorId + "?active=" + active
+    );
   }
 
-  getStudentsForAccompanistId(accompanistId) {
-    return http.get(this.baseUrl + "accompanistId/" + accompanistId);
+  getStudentsForAccompanistId(accompanistId, active) {
+    return http.get(
+      this.baseUrl + "accompanistId/" + accompanistId + "?active=" + active
+    );
   }
 
   getStudentInstrumentsForStudentId(studentId) {
