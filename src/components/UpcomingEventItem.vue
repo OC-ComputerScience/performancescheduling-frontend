@@ -100,7 +100,9 @@ onBeforeUpdate(async () => {
                 <!-- Event Instrument Type -->
                 <!-- TODO(@ethanimooney): Make this actually work -->
                 <v-card-subtitle
-                  v-if="roleId == 3 || roleId == 1 || roleId == 2 || roleId == 4"
+                  v-if="
+                    roleId == 3 || roleId == 1 || roleId == 2 || roleId == 4
+                  "
                   class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
                 >
                   {{
@@ -122,7 +124,13 @@ onBeforeUpdate(async () => {
                   class="bg-darkBlue py-2 px-0 text-white mt-0"
                 >
                   <v-card-subtitle
-                    v-if="(roleId == 3 || roleId == 1 || roleId == 2 || roleId == 4) && eventData.isReady"
+                    v-if="
+                      (roleId == 3 ||
+                        roleId == 1 ||
+                        roleId == 2 ||
+                        roleId == 4) &&
+                      eventData.isReady
+                    "
                     class="font-weight-semi-bold"
                   >
                     {{ eventData.eventSignups == null ? "0" : signupCount }}
@@ -144,7 +152,7 @@ onBeforeUpdate(async () => {
                   </v-card-subtitle>
                   -->
                   <v-card-subtitle
-                    v-if="roleId == 3"
+                    v-if="roleId == 3 || roleId == 2"
                     class="font-weight-semi-bold"
                   >
                     {{
