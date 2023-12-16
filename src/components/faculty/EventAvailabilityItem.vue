@@ -48,12 +48,12 @@ onMounted(async () => {});
           <v-row class="pa-0 ma-0">
             <v-col cols="auto" class="pa-0 ma-0">
               <!-- Event Name -->
-              <v-card-title class="font-weight-bold text-darkBlue text-h5">
+              <v-card-title class="font-weight-bold text-maroon text-h5">
                 {{ eventData.name }}
               </v-card-title>
 
               <v-card-subtitle
-                class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
+                class="pt-0 mt-0 font-weight-semi-bold text-maroon"
               >
                 {{
                   eventType.instrumentType === "Both"
@@ -86,17 +86,17 @@ onMounted(async () => {});
     <v-row>
       <v-col cols="5">
         <!-- Event Date -->
-        <v-card-subtitle class="ml-1 mt-2 font-weight-semi-bold text-darkBlue">
+        <v-card-subtitle class="ml-1 mt-2 font-weight-semi-bold text-maroon">
           {{ formatDate(eventData.date) }}
         </v-card-subtitle>
         <!-- Event Time -->
-        <v-card-subtitle class="ml-1 font-weight-semi-bold text-darkBlue">
+        <v-card-subtitle class="ml-1 font-weight-semi-bold text-maroon">
           {{ get12HourTimeStringFromString(eventData.startTime) }} -
           {{ get12HourTimeStringFromString(eventData.endTime) }}
         </v-card-subtitle>
         <!-- Event Location (room name) -->
         <v-card-subtitle
-          class="ml-1 mb-0 pb-0 font-weight-semi-bold text-darkBlue"
+          class="ml-1 mb-0 pb-0 font-weight-semi-bold text-maroon"
         >
           {{ eventData.location.roomName }}
         </v-card-subtitle>
@@ -112,14 +112,14 @@ onMounted(async () => {});
           <v-card-subtitle
             v-for="availability in availabilityData"
             :key="availability.id"
-            class="font-weight-semi-bold text-darkBlue"
+            class="font-weight-semi-bold text-maroon"
           >
             {{ get12HourTimeStringFromString(availability.startTime) }} -
             {{ get12HourTimeStringFromString(availability.endTime) }}
           </v-card-subtitle>
         </div>
         <div v-else>
-          <v-card-subtitle class="font-weight-semi-bold text-darkBlue">
+          <v-card-subtitle class="font-weight-semi-bold text-maroonls">
             {{ get12HourTimeStringFromString(availabilityData.startTime) }} -
             {{ get12HourTimeStringFromString(availabilityData.endTime) }}
           </v-card-subtitle>
