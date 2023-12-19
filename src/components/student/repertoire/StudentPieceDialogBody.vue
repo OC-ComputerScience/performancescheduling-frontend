@@ -23,7 +23,6 @@ const props = defineProps({
   studentpieceData: { type: [Object], required: true },
   studentPieces: { type: [Array], required: true },
 });
-console.log(props.studentpieceData);
 
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
@@ -66,7 +65,6 @@ async function addStudentPiece() {
 // Update the studentpiece's roles
 
 async function updateStudentPiece() {
-  console.log(props.studentpieceData);
   await form.value.validate().then(async (valid) => {
     if (valid.valid) {
       await StudentPieceDataService.update(editedStudentPieceData.value)
@@ -336,7 +334,7 @@ onMounted(async () => {
         </v-col>
       </v-row>
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <v-btn
           v-if="!props.isEdit"
           flat
@@ -349,7 +347,7 @@ onMounted(async () => {
         <v-btn
           flat
           color="blue"
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
           @click="editPieceDialog = true"
         >
           Edit Piece
@@ -357,29 +355,10 @@ onMounted(async () => {
         <v-btn
           flat
           v-if="!props.isEdit"
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
           @click="addComposerDialog = true"
         >
           Add Composer
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateStudentPiece() : addStudentPiece()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="
-            props.isEdit
-              ? emits('closeStudentPieceDialogEvent')
-              : emits('closeAddStudentPieceDialogEvent')
-          "
-        >
-          Cancel
         </v-btn>
         <v-btn
           v-if="props.isEdit"
@@ -399,6 +378,25 @@ onMounted(async () => {
           {{
             props.studentpieceData.status === "Disabled" ? "Enable" : "Disable"
           }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateStudentPiece() : addStudentPiece()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeStudentPieceDialogEvent')
+              : emits('closeAddStudentPieceDialogEvent')
+          "
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>

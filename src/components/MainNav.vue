@@ -31,18 +31,23 @@ const menus = [
     roles: [1],
   },
   {
+    link: "studentInstruments",
+    text: "Instruments",
+    roles: [1],
+  },
+  {
     link: "facultyHome",
     text: "Home",
     roles: [2],
   },
   {
-    link: "facultyPieces",
-    text: "Pieces",
+    link: "facultyStudents",
+    text: "Students",
     roles: [2],
   },
   {
-    link: "facultyStudents",
-    text: "Students",
+    link: "facultyPerformances",
+    text: "Performances",
     roles: [2],
   },
   {
@@ -53,16 +58,6 @@ const menus = [
   {
     link: "accompanistHome",
     text: "Home",
-    roles: [4],
-  },
-  {
-    link: "accompanistPieces",
-    text: "Pieces",
-    roles: [4],
-  },
-  {
-    link: "accompanistStudents",
-    text: "Students",
     roles: [4],
   },
 ];
@@ -90,10 +85,6 @@ const adminMenus = [
   {
     link: "adminPieces",
     text: "Pieces",
-  },
-  {
-    link: "adminEvaluations",
-    text: "Evaluations",
   },
   {
     link: "adminMajors",
@@ -134,7 +125,7 @@ const roleColors = [
   {
     roleId: 4,
     backgroundColor: "lightTeal",
-    textColor: "teal",
+    textColor: "black",
   },
 ];
 const roleColor = ref({});
@@ -192,6 +183,7 @@ function updateActiveLink() {
   }, 1);
 }
 function changeRole(newRole) {
+  userRoles.value = loginStore.user.roles;
   loginStore.currentRole = userRoles.value.find((obj) => {
     return obj.roleId === newRole;
   });
@@ -205,6 +197,16 @@ watch(currentRole, () => {
     goToHome();
     resetMenu();
   }
+});
+
+watch(
+  () => router.currentRoute.value.path,
+  async newId =>
+{
+  updateActiveLink();
+},
+{
+  immediate: true
 });
 
 onMounted(() => {
@@ -244,6 +246,7 @@ onMounted(() => {
             class="hidden-md-and-down mx-1 menu-link font-weight-bold"
             exact
             text
+            height="50"
             :ripple="false"
             @click="changeComp(menu.link)"
           >
@@ -290,7 +293,6 @@ onMounted(() => {
           Log back in
         </v-btn>
       </div>
-      <v-icon class="mt-3 mr-5" color="maroon" icon="mdi-bell"></v-icon>
       <v-menu
         bottom
         min-width="250px"
@@ -400,7 +402,7 @@ onMounted(() => {
               >
                 <v-btn
                   color="lightTeal"
-                  :class="'mt-2 menu-button font-weight-bold text-teal'"
+                  :class="'mt-2 menu-button font-weight-bold text-black'"
                   density="comfortable"
                   elevation="0"
                   width="250px"
@@ -417,7 +419,7 @@ onMounted(() => {
                 density="comfortable"
                 elevation="0"
                 width="250px"
-                @click="changeComp('studentSettings')"
+                @click="changeComp('userSettings')"
               >
                 <template v-slot:prepend>
                   <v-icon></v-icon>

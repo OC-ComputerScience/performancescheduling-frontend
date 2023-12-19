@@ -501,7 +501,8 @@ onMounted(async () => {
             >
               Major
             </v-card-subtitle>
-            <v-select
+            <v-autocomplete
+              clearable
               v-if="isStudent"
               color="darkBlue"
               variant="plain"
@@ -513,7 +514,7 @@ onMounted(async () => {
               return-object
               :rules="[(v) => !!v || 'This field is required']"
             >
-            </v-select>
+            </v-autocomplete>
 
             <v-row v-if="isStudent" class="pa-0 ma-0">
               <v-col cols="12" lg="auto" class="pa-0 ma-0">

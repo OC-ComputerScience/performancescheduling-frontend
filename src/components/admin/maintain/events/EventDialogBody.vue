@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import EventDataService from "../../../../services/EventDataService";
 import EventTypeDataService from "../../../../services/EventTypeDataService";
 import SemesterDataService from "../../../../services/SemesterDataService";
 import LocationDataService from "../../../../services/LocationDataService";
+import UserDataService from "../../../../services/UserDataService";
 import { formatDate } from "../../../../composables/dateFormatter";
 import {
   get12HourTimeStringFromString,
@@ -28,6 +29,17 @@ const editedEventData = ref(Object.assign({}, props.eventData));
 const semesters = ref([]);
 const eventTypes = ref([]);
 const locations = ref([]);
+const users = ref([]);
+const isPrivate = ref(false);
+
+watch(
+  editedEventData,
+  () => {
+    if (editedEventData.value.eventType != null)
+      isPrivate.value = editedEventData.value.eventType.isPrivate;
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   await getData();
@@ -44,8 +56,8 @@ onMounted(async () => {
     editedEventData.value.status = "Active";
     editedEventData.value.isReady = false;
     editedEventData.value.semester = semesters.value[0];
-    editedEventData.value.eventType = eventTypes.value[0];
-    editedEventData.value.location = locations.value[0];
+    editedEventData.value.eventType = null;
+    editedEventData.value.location = null;
   }
 });
 
@@ -58,7 +70,7 @@ async function getData() {
       console.log(err);
     });
 
-  await SemesterDataService.getAll("name", false)
+  await SemesterDataService.getAll("startDate", false)
     .then((response) => {
       semesters.value = response.data;
     })
@@ -69,6 +81,34 @@ async function getData() {
   await LocationDataService.getAll("roomName")
     .then((response) => {
       locations.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  await LocationDataService.getAll("roomName")
+    .then((response) => {
+      locations.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  await UserDataService.getAllWithRolesAndStudentInstruments("lastName", "ASC")
+    .then((response) => {
+      users.value = response.data;
+
+      users.value = users.value.filter((user) => {
+        return user.userRoles.some((role) => {
+          return role.role.role === "Student";
+        });
+      });
+
+      users.value.forEach((user) => {
+        user.fullName = user.firstName + " " + user.lastName;
+        user.roleId = user.userRoles.find(
+          (role) => role.role.role === "Student"
+        ).id;
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -129,7 +169,37 @@ function dateCheck() {
 }
 function timeCheck(time) {
   const pattern = new RegExp("[0-5]?[0-9]:[0-5][0-9][ap]m$");
-  return pattern.test(time) ? true : "Time must be in the format of 10:30am.";
+  const twelveHourPattern = new RegExp("^(0?[1-9]|1[0-2]):[0-5][0-9][ap]m$")
+
+  let isTimeValid;
+
+  if(pattern.test(time)) {
+    isTimeValid = true;
+    if(!twelveHourPattern.test(time)){
+      isTimeValid = "Time must be in 12 hour format."
+    }
+  } else {
+    isTimeValid = "Time must be in the format of 10:30am."
+  }
+
+  return isTimeValid;
+}
+
+function checkEndTimeAfterStart(startTime, endTime){
+  if(startTime?.length > 4 && endTime?.length > 4){
+    const start = new Date("2000-01-01T" + get24HourTimeString(startTime));
+    const end = new Date("2000-01-01T" + get24HourTimeString(endTime));
+
+    if(start.getTime() < end.getTime()){
+      return true;
+    }
+    else{
+      return "End time must be after start time"
+    }
+  }
+  else{
+    return false;
+  }
 }
 </script>
 
@@ -251,6 +321,7 @@ function timeCheck(time) {
                 :rules="[
                   () => !!editedEventData.endTime || 'This field is required',
                   timeCheck(editedEventData.endTime),
+                  checkEndTimeAfterStart(editedEventData.startTime, editedEventData.endTime),
                 ]"
               ></v-text-field>
             </v-col>
@@ -263,7 +334,7 @@ function timeCheck(time) {
                 Event Type
               </v-card-subtitle>
               <v-select
-                placeholder="Jury"
+                placeholder="Select an event type"
                 v-model="editedEventData.eventType"
                 :items="eventTypes"
                 item-title="type"
@@ -282,7 +353,7 @@ function timeCheck(time) {
                 Location
               </v-card-subtitle>
               <v-select
-                placeholder="Adams Recital Hall"
+                placeholder="Select a location"
                 v-model="editedEventData.location"
                 :items="locations"
                 item-title="roomName"
@@ -295,32 +366,38 @@ function timeCheck(time) {
               ></v-select>
             </v-col>
           </v-row>
+          <v-row v-if="isPrivate">
+            <v-col>
+              <v-card-subtitle
+                class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+              >
+                Student
+              </v-card-subtitle>
+              <v-autocomplete
+                placeholder="Start typing a student's last name"
+                variant="plain"
+                v-model="editedEventData.privateUserRoleId"
+                :items="users"
+                item-title="fullName"
+                item-value="roleId"
+                class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+                :rules="[
+                  () =>
+                    !!editedEventData.privateUserRoleId ||
+                    'This field is required',
+                ]"
+              ></v-autocomplete
+            ></v-col>
+          </v-row>
         </v-card-text>
       </v-card-actions>
       <v-card-actions>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateEvent() : addEvent()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="
-            props.isEdit
-              ? emits('closeEventDialogEvent')
-              : emits('closeAddEventDialogEvent')
-          "
-        >
-          Cancel
-        </v-btn>
+        <v-spacer />
+        <!--Unready/Ready-->
         <v-btn
           v-if="props.isEdit"
           flat
-          class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white flatChipBorder"
           :class="props.eventData.isReady ? 'bg-maroon' : 'bg-darkBlue'"
           @click="
             props.eventData.isReady
@@ -329,6 +406,30 @@ function timeCheck(time) {
           "
         >
           {{ props.eventData.isReady ? "Unready" : "Ready" }}
+        </v-btn>
+        <!--Delete-->
+
+        <!--Update/Add Event-->
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white flatChipBorder"
+          :class="props.isEdit ? 'bg-teal' : 'bg-teal'"
+          @click="props.isEdit ? updateEvent() : addEvent()"
+        >
+          {{ props.isEdit ? "Save Event" : "Add Event" }}
+        </v-btn>
+        <!--Cancel-->
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeEventDialogEvent')
+              : emits('closeAddEventDialogEvent')
+          "
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>

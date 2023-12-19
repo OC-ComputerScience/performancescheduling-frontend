@@ -18,7 +18,7 @@ import UserNotificationDataService from "../../services/UserNotificationDataServ
 import EventSignupPieceDataService from "../../services/EventSignupPieceDataService.js";
 import StudentPieceDialogBody from "../student/repertoire/StudentPieceDialogBody.vue";
 
-const emits = defineEmits(["closeDialogEvent"]);
+const emits = defineEmits(["closeDialogEvent", "refreshEvents"]);
 const props = defineProps({
   eventData: { type: [Object], required: true },
 });
@@ -36,7 +36,6 @@ const selectedInstructor = ref(null);
 const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 // student piece variables
-const searchInput = ref("");
 const studentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
@@ -55,12 +54,16 @@ const confimationDialog = ref(false);
 const otherSignupDialog = ref(false);
 const dialogMessage = ref("");
 const addStudentPieceDialog = ref(false);
+const requestConfDialog = ref(false);
+const timeSlotRequest = ref(false);
+const instructorAvailRequest = ref(false);
+const accompAvailRequest = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
 
 async function getData() {
   // due to the watch statements, accompanists must be gotten before student instruments
-  await UserRoleDataService.getRolesForRoleId(4)
+  await UserRoleDataService.getRolesForRoleId(4, "lastName,firstName")
     .then((response) => {
       activeAccompanists.value = response.data;
       activeAccompanists.value.map(
@@ -77,14 +80,17 @@ async function getData() {
     .then((response) => {
       if (props.eventData.eventType.instrumentType === "Instrument") {
         instruments.value = response.data.filter(
-          (data) => data.instrument.type === "Instrument"
+          (data) =>
+            data.instrument.type === "Instrument" && data.status === "Active"
         );
       } else if (props.eventData.eventType.instrumentType === "Vocal") {
         instruments.value = response.data.filter(
-          (data) => data.instrument.type === "Vocal"
+          (data) => data.instrument.type === "Vocal" && data.status === "Active"
         );
       } else {
-        instruments.value = response.data;
+        instruments.value = response.data.filter(
+          (data) => data.status === "Active"
+        );
       }
 
       selectedStudentInstrument.value = instruments.value[0];
@@ -131,43 +137,26 @@ async function getStudentPieces() {
         studentPiece.piece.composer.fullName = fullName;
       });
       selectedStudentPieces.value = [];
-      console.log(studentPieces.value);
-      console.log(selectedStudentInstrument.value);
 
       studentInstrumentStudentPieces.value = studentPieces.value.filter(
         (studentPiece) =>
           studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
       );
-      searchStudentPieces();
+
       filteredStudentPieces.value = studentInstrumentStudentPieces.value;
+      filteredStudentPieces.value.forEach((studentPiece) => {
+        studentPiece.isFirst = false;
+      });
     })
     .catch((e) => {
       console.log(e);
     });
 }
 
-function searchStudentPieces() {
-  filteredStudentPieces.value = studentInstrumentStudentPieces.value;
-  // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value === "") return;
-
-  filteredStudentPieces.value = filteredStudentPieces.value.filter(
-    (studentPiece) => {
-      return (
-        studentPiece.piece.title
-          .toLowerCase()
-          .includes(searchInput.value.toLowerCase()) ||
-        studentPiece.piece.composer.fullName
-          .toLowerCase()
-          .includes(searchInput.value.toLowerCase())
-      );
-    }
-  );
-}
-
 function selectStudentPiece(studentPiece) {
   if (!isStudentPieceSelected(studentPiece)) {
     selectedStudentPieces.value.push(studentPiece);
+    studentPiece.isFirst = false;
   } else {
     selectedStudentPieces.value.splice(
       selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id),
@@ -181,6 +170,20 @@ function isStudentPieceSelected(studentPiece) {
     selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id) !==
     -1
   );
+}
+
+function setFirstPiece(clickedStudentPiece) {
+  clickedStudentPiece.isFirst = true;
+
+  selectedStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.id != clickedStudentPiece.id) {
+      studentPiece.isFirst = false;
+    }
+  });
+}
+
+function unSetFirstPiece(clickedStudentPiece) {
+  clickedStudentPiece.isFirst = false;
 }
 
 function generateTimeslots() {
@@ -273,8 +276,17 @@ function getChipClass(timeslot) {
   }
 
   // if the timeslot is already reserved
-  if (timeslot.existingSignup != undefined) {
+  if (
+    timeslot.existingSignup != undefined &&
+    !timeslot.existingSignup.isGroupEvent
+  ) {
     return "bg-maroon text-white pl-1";
+  }
+  if (
+    timeslot.existingSignup != undefined &&
+    timeslot.existingSignup.isGroupEvent
+  ) {
+    return "bg-darkTeal text-white pl-1";
   }
 
   // if the timeslot would not provide enough time for the student
@@ -292,13 +304,51 @@ function openDialog() {
     errorMessage.value = "Please select an instrument.";
     return;
   }
+
   if (selectedStudentPieces.value.length == 0) {
     errorMessage.value = "Please select at least one piece.";
     return;
   }
+
+  var haveFirstPiece = false;
+  selectedStudentPieces.value.forEach((studentPiece) => {
+    if (studentPiece.isFirst) {
+      haveFirstPiece = true;
+    }
+  });
+
+  if (!haveFirstPiece && props.eventData.eventType.firstPiece) {
+    errorMessage.value = "Please select a first piece.";
+    return;
+  }
+
   if (selectedTimeslot.value == null) {
     errorMessage.value = "Please select a timeslot.";
     return;
+  }
+
+  // if group then check for selected pieces
+  var selectStatus = true;
+  if (
+    selectedTimeslot.value.existingSignup != null &&
+    selectedTimeslot.value.existingSignup.isGroupEvent
+  ) {
+    selectedTimeslot.value.existingSignup.eventSignupPieces.forEach((piece) => {
+      if (
+        selectedStudentPieces.value.findIndex(
+          (x) => x.pieceId === piece.pieceId
+        ) === -1
+      ) {
+        selectStatus = false;
+
+        errorMessage.value =
+          "Please select all pieces that are already in the group signup.";
+        return;
+      }
+    });
+    if (selectStatus == false) {
+      return;
+    }
   }
 
   // reset error message
@@ -392,7 +442,7 @@ function requestTimeslotFromStudent() {
     const data = {
       text: `${loginStore.user.firstName} ${
         loginStore.user.lastName
-      } has requested your timeslot for ${formatDate(
+      } has requested your timeslot for ${props.eventData.name} on ${formatDate(
         props.eventData.date
       )} (${new Date(props.eventData.date).toLocaleDateString("default", {
         weekday: "long",
@@ -414,37 +464,26 @@ function requestTimeslotFromStudent() {
   snackbar.value.message = "Request sent";
 }
 
-async function requestTimeslotsFromAdmin() {
-  var admins = [];
-  await UserRoleDataService.getRolesForRoleId(3)
-    .then((response) => {
-      admins = response.data;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-  admins.forEach((admin) => {
-    const data = {
-      text: `${loginStore.user.firstName} ${
-        loginStore.user.lastName
-      } has requested you create more timeslots for ${formatDate(
-        props.eventData.date
-      )} (${new Date(props.eventData.date).toLocaleDateString("default", {
-        weekday: "long",
-        timeZone: "UTC",
-      })})`,
-      data: `eventId=${props.eventData.id}`,
-      isCompleted: false,
-      userRoleId: admin.id,
-      notificationId: 1,
-    };
-    UserNotificationDataService.create(data).catch((e) => {
-      console.log(e);
-    });
+async function requestAdditionalTimeslots(userRole) {
+  const data = {
+    text: `${loginStore.user.firstName} ${
+      loginStore.user.lastName
+    } has requested you create more timeslots for ${props.eventData.name} on 
+    ${formatDate(props.eventData.date)} (${new Date(
+      props.eventData.date
+    ).toLocaleDateString("default", {
+      weekday: "long",
+      timeZone: "UTC",
+    })})`,
+    data: `eventId=${props.eventData.id}`,
+    isCompleted: false,
+    userRoleId: userRole.id,
+    notificationId: 1,
+  };
+  UserNotificationDataService.create(data).catch((e) => {
+    console.log(e);
   });
 
-  snackbar.value = true;
   snackbar.value.show = true;
   snackbar.value.color = "success";
   snackbar.value.message = "Request sent";
@@ -454,9 +493,11 @@ async function requestAvailabilityFromUserRole(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you enter availability for ${formatDate(
+    } has requested you enter availability for ${
+      props.eventData.name
+    } on ${formatDate(props.eventData.date)} (${new Date(
       props.eventData.date
-    )} (${new Date(props.eventData.date).toLocaleDateString("default", {
+    ).toLocaleDateString("default", {
       weekday: "long",
       timeZone: "UTC",
     })})`,
@@ -469,7 +510,6 @@ async function requestAvailabilityFromUserRole(userRole) {
     console.log(e);
   });
 
-  snackbar.value = true;
   snackbar.value.show = true;
   snackbar.value.color = "success";
   snackbar.value.message = "Request sent";
@@ -518,10 +558,11 @@ async function confirmSignup() {
         console.log(e);
       });
 
-    selectedStudentPieces.value.forEach((studentPiece) => {
+    selectedStudentPieces.value.forEach(async (studentPiece) => {
       const studentPieceData = {
         eventSignupId: eventSignupId,
         pieceId: studentPiece.pieceId,
+        isFirst: studentPiece.isFirst,
       };
       EventSignupPieceDataService.create(studentPieceData).catch((e) => {
         console.log(e);
@@ -546,6 +587,7 @@ async function confirmSignup() {
     .catch((e) => {
       console.log(e);
     });
+  emits("refreshEvents");
 }
 
 async function confirmTimeslotAvailable() {
@@ -605,20 +647,21 @@ watch(selectedStudentInstrument, async () => {
       console.log(e);
     });
 
-  selectedAccompanist.value = activeAccompanists.value.find(
-    (accompanist) =>
-      accompanist.id == selectedStudentInstrument.value.accompanistRole.id
-  );
+  if (selectedStudentInstrument.value.accompanistRole != null) {
+    selectedAccompanist.value = activeAccompanists.value.find(
+      (accompanist) =>
+        accompanist.id == selectedStudentInstrument.value.accompanistRole.id
+    );
+  } else {
+    selectedAccompanist.value = null;
+  }
 
   // update student pieces
-  selectedStudentPieces.value = [];
-  studentInstrumentStudentPieces.value = studentPieces.value.filter(
-    (studentPiece) =>
-      studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
-  );
-  searchStudentPieces();
+  getStudentPieces();
 
   getTimeslotLength();
+
+  disableTimeslots();
 });
 
 watch(selectedAccompanist, async () => {
@@ -692,7 +735,7 @@ onMounted(async () => {
         </v-row>
         <v-row class="mt-6">
           <v-col>
-            <v-select
+            <v-autocomplete
               label="Instrument"
               v-model="selectedStudentInstrument"
               :items="instruments"
@@ -700,7 +743,7 @@ onMounted(async () => {
               variant="plain"
               return-object
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
           <v-col>
             <v-text-field
@@ -713,7 +756,7 @@ onMounted(async () => {
             ></v-text-field
           ></v-col>
           <v-col>
-            <v-select
+            <v-autocomplete
               clearable
               label="Accompanist"
               v-model="selectedAccompanist"
@@ -722,7 +765,7 @@ onMounted(async () => {
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
               return-object
-            ></v-select>
+            ></v-autocomplete>
           </v-col>
         </v-row>
         <v-row class="ml-1">
@@ -731,21 +774,6 @@ onMounted(async () => {
               Musical Selection
             </v-row>
             <v-row>
-              <!-- take out search
-              <v-col cols="6" class="pl-0">
-                <input
-                  type="text"
-                  v-model="searchInput"
-                  @input="searchStudentPieces"
-                  class="pa-3 mainCardBorder text-blue bg-lightBlue font-weight-bold"
-                  style="outline: none"
-                  append-icon="mdi-magnify"
-                  placeholder="Search Repertoire"
-                  single-line
-                  hide-details
-                />
-              </v-col>
-              -->
               <v-col cols="6">
                 <v-btn
                   class="font-weight-bold text-none"
@@ -774,9 +802,11 @@ onMounted(async () => {
                         'bg-blue': isStudentPieceSelected(studentPiece),
                         'bg-white': !isStudentPieceSelected(studentPiece),
                       }"
-                      @click="selectStudentPiece(studentPiece)"
                     >
-                      <v-card-text>
+                      <v-card-text
+                        class="pb-2"
+                        @click="selectStudentPiece(studentPiece)"
+                      >
                         <v-row
                           no-gutters
                           class="text-blue font-weight-semi-bold"
@@ -785,10 +815,42 @@ onMounted(async () => {
                           }"
                         >
                           {{ studentPiece.piece.title }}
+                          {{ studentPiece.isFirst ? "(First Piece)" : "" }}
                         </v-row>
-                        <v-row no-gutters class="text-teal">
+                        <v-row
+                          no-gutters
+                          class="text-black"
+                          v-bind:class="{
+                            'text-white': isStudentPieceSelected(studentPiece),
+                          }"
+                        >
                           {{ studentPiece.piece.composer.fullName }}
                         </v-row>
+                      </v-card-text>
+                      <v-card-text
+                        class="mt-0 pt-0 pb-2"
+                        v-if="
+                          isStudentPieceSelected(studentPiece) &&
+                          eventData.eventType.firstPiece
+                        "
+                      >
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          size="small"
+                          v-if="studentPiece.isFirst"
+                          @click="unSetFirstPiece(studentPiece)"
+                        >
+                          UnSet First Piece
+                        </v-btn>
+                        <v-btn
+                          size="small"
+                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          v-if="!studentPiece.isFirst"
+                          @click="setFirstPiece(studentPiece)"
+                        >
+                          Set as First Piece
+                        </v-btn>
                       </v-card-text>
                     </v-card>
                   </v-list-item>
@@ -837,7 +899,7 @@ onMounted(async () => {
                     (selectedAccompanist == null ||
                       accompanistAvailability.length > 0)
                   "
-                  @click="requestTimeslotsFromAdmin"
+                  @click="(requestConfDialog = true), (timeSlotRequest = true)"
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
@@ -876,15 +938,14 @@ onMounted(async () => {
                           <v-icon
                             :icon="
                               timeslot.existingSignup.studentInstrumentSignups
-                                .length > 1
+                                .length > 0 &&
+                              timeslot.existingSignup.isGroupEvent
                                 ? 'mdi-account-multiple'
                                 : 'mdi-account'
                             "
                             size="small"
                             :color="
-                              selectedTimeslot == timeslot
-                                ? 'blue'
-                                : 'lightMaroon'
+                              selectedTimeslot == timeslot ? 'blue' : 'white'
                             "
                             v-if="timeslot.existingSignup != undefined"
                           ></v-icon>
@@ -908,7 +969,8 @@ onMounted(async () => {
                           class="font-weight-bold text-none px-5"
                           color="blue"
                           @click="
-                            requestAvailabilityFromUserRole(selectedInstructor)
+                            (requestConfDialog = true),
+                              (instructorAvailRequest = true)
                           "
                         >
                           Request availability
@@ -934,7 +996,8 @@ onMounted(async () => {
                           class="font-weight-bold text-none px-5"
                           color="blue"
                           @click="
-                            requestAvailabilityFromUserRole(selectedAccompanist)
+                            (requestConfDialog = true),
+                              (accompAvailRequest = true)
                           "
                         >
                           Request availability
@@ -947,11 +1010,38 @@ onMounted(async () => {
             </v-row>
             <v-row no-gutters>
               <v-checkbox
+                v-if="
+                  selectedTimeslot != null &&
+                  selectedTimeslot.existingSignup == null
+                "
                 v-model="groupSignup"
                 label="Allow other students to signup with you"
                 class="text-body-1 font-weight-bold text-darkBlue"
               ></v-checkbox>
             </v-row>
+            <v-card-text
+              v-if="
+                selectedTimeslot != null &&
+                selectedTimeslot.existingSignup != null &&
+                selectedTimeslot.existingSignup.isGroupEvent
+              "
+            >
+              <v-row
+                >These group pieces should be in your repertoire and
+                selected:</v-row
+              >
+              <v-row
+                v-for="studentPiece in selectedTimeslot.existingSignup
+                  .eventSignupPieces"
+              >
+                <div class="text-h8 font-weight-semi-bold text-blue">
+                  {{ studentPiece.piece.title }} ({{
+                    studentPiece.piece.composer.firstName
+                  }}
+                  {{ studentPiece.piece.composer.lastName }})
+                </div>
+              </v-row>
+            </v-card-text>
           </v-col>
         </v-row>
         <v-row no-gutters>
@@ -962,18 +1052,18 @@ onMounted(async () => {
           <v-btn
             flat
             size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-lightMaroon text-maroon"
-            @click="emits('closeDialogEvent')"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            flat
-            size="small"
             class="font-weight-semi-bold mr-2 mt-4 bg-blue text-none"
             @click="openDialog"
           >
             Signup
+          </v-btn>
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold mr-2 mt-4 bg-red text-none"
+            @click="emits('closeDialogEvent')"
+          >
+            Cancel
           </v-btn>
         </v-row>
       </v-card-text>
@@ -991,15 +1081,22 @@ onMounted(async () => {
       >
         {{ dialogMessage }}
       </v-card-text>
+      <v-card-text v-if="existingSignup != null">
+        <v-row>These are the group pieces: </v-row>
+        <v-row
+          v-for="studentPiece in selectedTimeslot.existingSignup
+            .eventSignupPieces"
+        >
+          <div class="mt-2 ml-3 text-h8 font-weight-semi-bold text-blue">
+            {{ studentPiece.piece.title }} ({{
+              studentPiece.piece.composer.firstName
+            }}
+            {{ studentPiece.piece.composer.lastName }})
+          </div>
+        </v-row>
+      </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn
-          @click="confimationDialog = false"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-lightMaroon text-maroon"
-          >Cancel</v-btn
-        >
         <v-btn
           @click="confirmSignup"
           flat
@@ -1009,6 +1106,13 @@ onMounted(async () => {
           <div v-if="existingSignup == null">Confirm</div>
           <div v-else>Confirm Group Signup</div>
         </v-btn>
+        <v-btn
+          @click="confimationDialog = false"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+          >Cancel</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -1026,19 +1130,20 @@ onMounted(async () => {
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          @click="otherSignupDialog = false"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-lightMaroon text-maroon"
-          >Cancel</v-btn
-        >
-        <v-btn
           @click="requestTimeslotFromStudent"
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           >Request This Timeslot</v-btn
         >
+        <v-btn
+          @click="otherSignupDialog = false"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+        >
+          Cancel
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -1052,13 +1157,53 @@ onMounted(async () => {
         studentInstrumentId: selectedStudentInstrument.id,
         status: 'Active',
       }"
-      :student-id="loginStore.currentRole.userId"
       :student-pieces="studentPieces"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="
         (addStudentPieceDialog = false), getStudentPieces()
       "
     ></StudentPieceDialogBody>
+  </v-dialog>
+  <v-dialog v-model="requestConfDialog" max-width="500">
+    <v-card class="pa-2 bg-lightBlue flatCardBorder">
+      <v-card-title class="pt-0 mt-0 text-blue font-weight-bold text-h5"
+        >Confirm Request
+      </v-card-title>
+      <v-card-text class="font-weight-semi-bold text-darkBlue">
+        Are you sure you want to send this request?
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          flat
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="
+            (requestConfDialog = false),
+              timeSlotRequest && selectedAccompanist != null
+                ? (requestAdditionalTimeslots(selectedInstructor),
+                  requestAdditionalTimeslots(selectedAccompanist),
+                  (timeSlotRequest = false))
+                : instructorAvailRequest
+                ? (requestAvailabilityFromUserRole(selectedInstructor),
+                  (instructorAvailRequest = false))
+                : accompAvailRequest
+                ? (requestAvailabilityFromUserRole(selectedAccompanist),
+                  (accompAvailRequest = false))
+                : (requestAdditionalTimeslots(selectedInstructor),
+                  (timeSlotRequest = false))
+          "
+        >
+          Send
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
+          @click="requestConfDialog = false"
+        >
+          Cancel
+        </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
   <v-snackbar
     v-model="snackbar.show"

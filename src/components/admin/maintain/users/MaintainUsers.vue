@@ -3,14 +3,24 @@ import { ref, onMounted, computed } from "vue";
 import UserDataService from "./../../../../services/UserDataService";
 import MaintainUserCard from "./MaintainUserCard.vue";
 import UserDialogBody from "./UserDialogBody.vue";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
+
+const loginStore = useLoginStore();
+const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
 
 const addUserDialog = ref(false);
+
+const dataLoaded = ref(false);
 
 // User Data
 const users = ref([]);
 const filteredUsers = ref([]);
+if (!isAdmin.value) {
+  filteredUsers.value = ["Students"];
+}
 
 async function getUsers() {
+  dataLoaded.value = false;
   await UserDataService.getAllWithRolesAndStudentInstruments("lastName")
     .then((response) => {
       users.value = response.data;
@@ -18,12 +28,15 @@ async function getUsers() {
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      dataLoaded.value = true;
     });
 }
 
 async function refreshUsers() {
   await getUsers();
-  await filterUsers();
+  searchFilteredList();
 }
 
 // Filtering
@@ -38,13 +51,17 @@ function searchFilteredList() {
   filteredUsers.value = users.value;
 
   // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value === "") return;
+  if (searchInput.value === "") {
+    filterUsers();
+    return;
+  }
 
   filteredUsers.value = filteredUsers.value.filter((user) =>
     (user.firstName.toLowerCase() + " " + user.lastName.toLowerCase()).includes(
       searchInput.value.toLowerCase()
     )
   );
+  filterUsers();
 }
 
 const statusFilterOptions = ["Active", "Disabled"];
@@ -57,6 +74,9 @@ const roleFilterOptions = [
   { role: "Accompanist", id: 4 },
 ];
 const roleFilterSelection = ref([]);
+if (!isAdmin.value) {
+  roleFilterSelection.value = [{ role: "Student", id: 1 }];
+}
 
 const studentTypeFilterOptions = [
   { title: "Instrumental", value: "Instrument" },
@@ -66,7 +86,7 @@ const studentTypeFilterSelection = ref([]);
 
 function filterUsers() {
   // Never clear the serach filter, so filter by that first, then the actual filters
-  searchFilteredList();
+  //searchFilteredList();
   // Filter by status
   if (statusFilterSelection.value) {
     filteredUsers.value = filteredUsers.value.filter(
@@ -104,8 +124,12 @@ function clearFilters() {
   filteredUsers.value = users.value;
   statusFilterSelection.value = null;
   roleFilterSelection.value = [];
+  if (!isAdmin.value) {
+    roleFilterSelection.value = [{ role: "Student", id: 1 }];
+  }
   studentTypeFilterSelection.value = [];
   searchInput.value = "";
+  filterUsers();
 }
 
 // Omits a specific key from an object
@@ -132,14 +156,16 @@ const currentPageData = computed(() => {
 });
 
 onMounted(async () => {
-  await getUsers();
+  await refreshUsers();
 });
 </script>
 
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight-bold text-h3">Users</h1>
+      <h1 class="text-maroon font-weight-bold text-h3">
+        {{ isAdmin ? "Users" : "Students" }}
+      </h1>
 
       <input
         type="text"
@@ -183,7 +209,10 @@ onMounted(async () => {
                   return-object
                 ></v-select>
               </v-list-item>
-              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+              <v-list-item
+                v-if="isAdmin"
+                class="pa-0 font-weight-semi-bold text-darkBlue"
+              >
                 Role
                 <v-select
                   multiple
@@ -249,6 +278,7 @@ onMounted(async () => {
         Clear filters
       </v-btn>
       <v-btn
+        v-if="isAdmin"
         size="medium"
         color="blue"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
@@ -260,7 +290,7 @@ onMounted(async () => {
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">
-          <v-row>
+          <v-row v-if="dataLoaded">
             <v-col
               v-for="user in currentPageData"
               :key="user.id"

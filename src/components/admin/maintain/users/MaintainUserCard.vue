@@ -52,16 +52,13 @@ async function fillRoleData() {
 // Fills instrument role labels, only is Student
 function fillInstrumentRoleLabels(instruments) {
   let isInstrumental = instruments.some(
-    (i) => i.instrument.type === "Instrument"
+    (i) => i.instrument.type === "Instrument" && i.status === "Active"
   );
-  let isVocal = instruments.some((i) => i.instrument.type === "Vocal");
+  let isVocal = instruments.some((i) => i.instrument.type === "Vocal" && i.status === "Active");
 
-  instrumentRoleLabels.value =
-    isInstrumental && isVocal
-      ? ["Instrumental", "Vocal"]
-      : isInstrumental && !isVocal
-      ? ["Instrumental"]
-      : ["Vocal"];
+
+  if(isInstrumental) instrumentRoleLabels.value.push("Instrumental")
+  if(isVocal) instrumentRoleLabels.value.push("Vocal")
 }
 
 async function disableUser(user) {
@@ -125,13 +122,12 @@ onMounted(async () => {
         </v-col>
       </v-row>
     </v-card-title>
-    <v-card-actions>
       <v-row class="pb-5 pl-2 pt-2">
         <v-col
           cols="auto"
           v-for="roleLabel in userRoleLabels"
           :key="roleLabel"
-          class="pb-0 pr-0"
+          class="pb-0 pr-1"
         >
           <v-chip
             label
@@ -157,18 +153,19 @@ onMounted(async () => {
             {{ instrumentLabel }}
           </v-chip>
         </v-col>
+      </v-row>
+        <v-card-actions>
         <v-spacer></v-spacer>
-        <v-col cols="auto" class="pb-0 pr-5">
+        <v-col cols="auto" class="pb-0">
           <v-btn
             flat
             size="small"
-            class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
+            class="font-weight-bold mt-0 mr-0 text-none text-white bg-blue flatChipBorder"
             @click="createOrEditDialog = true"
           >
             Edit
           </v-btn>
         </v-col>
-      </v-row>
     </v-card-actions>
   </v-card>
   <v-dialog
@@ -181,7 +178,7 @@ onMounted(async () => {
       :is-edit="true"
       :user-data="userData"
       :user-roles="props.userRoles"
-      @closeUserDialogEvent="closeUserDialog"
+      @closeUserDialogEvent="closeUserDialog(), emits('refreshUsersEvent')"
       @updateUserSuccessEvent="closeUserDialog(), emits('refreshUsersEvent')"
       @disableUserEvent="closeUserDialog(), disableUser(userData)"
       @enableUserEvent="closeUserDialog(), enableUser(userData)"
