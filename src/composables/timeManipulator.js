@@ -15,7 +15,7 @@ export function generateTimeSlots(startTime, endTime, minLength) {
   let newTimeText = "";
 
   let times = [];
-  for (let i = 0; i < generatedTimes.length - 1; i++) {
+  for (let i = 0; i < generatedTimes.length; i++) {
     if (generatedTimes[i].length < 8)
       generatedTimes[i] = generatedTimes[i] + ":00";
     newTimeText = get12HourTimeStringFromString(generatedTimes[i]);
@@ -38,7 +38,6 @@ export function getTimeSlots(timeInterval, totalMins, timeSlots) {
 
     // update totalMins
     totalMins -= timeInterval;
-
     // get next time slot
     return getTimeSlots(timeInterval, totalMins, timeSlots);
   } else {

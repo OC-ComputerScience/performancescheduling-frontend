@@ -1,21 +1,52 @@
 <script setup>
 import { ref } from "vue";
 import EventDialogBody from "./EventDialogBody.vue";
+import ViewSignupsDialog from "./ViewSignupsDialog.vue";
 import EventDataService from "../../../../services/EventDataService";
+import AvailabilityDataService from "../../../../services/AvailabilityDataService";
 import { formatDate } from "../../../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../../../composables/timeFormatter";
 
-const emits = defineEmits(["closeEventDialog", "refreshEventsEvent"]);
+const emits = defineEmits(["closeEventDialog", "refreshEventsEvent", "closeSignupsDialog"]);
 
-defineProps({
+const props = defineProps({
   eventData: { type: [Object], required: true },
 });
 
 const createOrEditDialog = ref(false);
+const viewSignupsDialog = ref(false);
+const availabilityData = ref([]);
+const studentSignupData = ref([]);
 
 function closeEventDialog() {
   createOrEditDialog.value = false;
 }
+
+function closeSignupsDialog() {
+  viewSignupsDialog.value = false;
+}
+
+async function getDialogData() {
+  await AvailabilityDataService.getAllByEventId(props.eventData.id)
+  .then((response) => {
+    availabilityData.value = response.data;
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });
+  
+  await EventDataService.getById(props.eventData.id)
+  .then((response) => {
+    studentSignupData.value = response.data;
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+  viewSignupsDialog.value = true;
+}
+  
+ 
+
 
 async function readyEvent(event) {
   event.isReady = true;
@@ -60,7 +91,7 @@ async function unreadyEvent(event) {
           <v-card-subtitle class="text-weight-semi-bold text-blue pt-1 pb-0">
             {{
               eventData.eventType.type +
-              " - instrument: " +
+              " - Instrument: " +
               eventData.eventType.instrumentType
             }}
           </v-card-subtitle>
@@ -83,8 +114,8 @@ async function unreadyEvent(event) {
       <v-btn
         flat
         size="small"
-        class="font-weight-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
-        @click="createOrEditDialog = true"
+        class="font-weight-bold mt-0 ml-4 text-none text-blue bg-white flatChipBorder"
+        @click="getDialogData"
       >
         View Signups
       </v-btn>
@@ -107,5 +138,12 @@ async function unreadyEvent(event) {
       @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
       @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
     ></EventDialogBody>
+  </v-dialog>
+  <v-dialog v-model="viewSignupsDialog" persistent max-width="600px">
+    <ViewSignupsDialog
+    :event-data="eventData"
+    :avail-data="availabilityData"
+    :student-signup-data="studentSignupData"
+    @closeSignupsDialog="closeSignupsDialog"></ViewSignupsDialog>
   </v-dialog>
 </template>

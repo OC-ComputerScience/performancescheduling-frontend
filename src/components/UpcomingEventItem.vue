@@ -5,8 +5,10 @@ import { formatDate } from "../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../composables/timeFormatter";
 import StudentEventSignupDialog from "./student/StudentEventSignupDialog.vue";
 import AvailabilityDialogBody from "./faculty/AvailabilityDialogBody.vue";
+import ViewSignupsDialog from "./admin/maintain/events/ViewSignupsDialog.vue";
 import EventDialogBody from "./admin/maintain/events/EventDialogBody.vue";
 import EventDataService from "../services/EventDataService";
+import AvailabilityDataService from "../services/AvailabilityDataService";
 
 const dialog = ref(false);
 const createOrEditDialog = ref(false);
@@ -26,12 +28,18 @@ const emits = defineEmits([
 
 const addOrEditAvailabilityDialog = ref(false);
 const signupCount = ref(0);
+const viewSignupsDialog = ref(false);
+const eventAvailabilityData = ref([]);
+const studentSignupData = ref([]);
 
 function closeAvailabilityDialog() {
   addOrEditAvailabilityDialog.value = false;
 }
 function closeEventDialog() {
   createOrEditDialog.value = false;
+}
+function closeSignupsDialog() {
+  viewSignupsDialog.value = false;
 }
 function handleClick() {
   if (props.roleId == 3) {
@@ -71,6 +79,24 @@ function countSignUps() {
     signupCount.value +=
       props.eventData.eventSignups[i].studentInstrumentSignups.length;
   }
+}
+async function getDialogData() {
+  await AvailabilityDataService.getAllByEventId(props.eventData.id)
+    .then((response) => {
+      eventAvailabilityData.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+
+  await EventDataService.getById(props.eventData.id)
+    .then((response) => {
+      studentSignupData.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  viewSignupsDialog.value = true;
 }
 
 onBeforeUpdate(async () => {
@@ -189,6 +215,15 @@ onBeforeUpdate(async () => {
         >
           {{ props.eventData.isReady ? "Unready" : "Ready" }}
         </v-btn>
+        <v-btn
+          v-if="roleId != 1"
+          flat
+          size="small"
+          class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
+          @click="getDialogData"
+        >
+          View Signups
+        </v-btn>
         <!-- Signup/Availability Button -->
         <v-btn
           flat
@@ -245,6 +280,14 @@ onBeforeUpdate(async () => {
         @readyEventEvent="closeEventDialog(), readyEvent(eventData)"
         @unreadyEventEvent="closeEventDialog(), unreadyEvent(eventData)"
       ></EventDialogBody>
+    </v-dialog>
+    <v-dialog v-model="viewSignupsDialog" persistent max-width="800px">
+      <ViewSignupsDialog
+        :event-data="eventData"
+        :avail-data="eventAvailabilityData"
+        :student-signup-data="studentSignupData"
+        @closeSignupsDialog="closeSignupsDialog"
+      ></ViewSignupsDialog>
     </v-dialog>
   </div>
 </template>
