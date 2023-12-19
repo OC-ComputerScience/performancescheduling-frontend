@@ -132,7 +132,6 @@ const roleColor = ref({});
 
 function getUserRoles() {
   userRoles.value = loginStore.user.roles;
-  console.log(userRoles.value);
 }
 function goToHome() {
   if (loginStore.currentRole.roleId == 1) {
@@ -201,13 +200,13 @@ watch(currentRole, () => {
 
 watch(
   () => router.currentRoute.value.path,
-  async newId =>
-{
-  updateActiveLink();
-},
-{
-  immediate: true
-});
+  async (newId) => {
+    updateActiveLink();
+  },
+  {
+    immediate: true,
+  }
+);
 
 onMounted(() => {
   getUserRoles();
