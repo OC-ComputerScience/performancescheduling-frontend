@@ -44,7 +44,7 @@ async function updateEventType() {
     if (valid.valid) {
       delete editedEventTypeData.value["createdAt"];
       delete editedEventTypeData.value["updatedAt"];
-
+      console.log(editedEventTypeData.value);
       await EventTypeDataService.update(editedEventTypeData.value)
         .then(() => {
           emits("updateEventTypeSuccessEvent");
@@ -175,6 +175,30 @@ async function updateEventType() {
                   ]"
                 >
                 </v-text-field>
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Grade Allowed
+                </v-card-subtitle>
+                <v-checkbox
+                  color="darkBlue"
+                  label="Grade Allowed"
+                  class="font-weight-bold text-blue mt-3"
+                  v-model="editedEventTypeData.allowGrade"
+                >
+                </v-checkbox>
+                <v-card-subtitle
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                >
+                  Ending Level Allowed
+                </v-card-subtitle>
+                <v-checkbox
+                  color="darkBlue"
+                  label="EndingLevel Allowed"
+                  class="font-weight-bold text-blue mt-3"
+                  v-model="editedEventTypeData.allowEndingLevel"
+                >
+                </v-checkbox>
               </v-col>
               <v-col cols="auto">
                 <v-card-subtitle
