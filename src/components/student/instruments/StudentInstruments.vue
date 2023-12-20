@@ -225,6 +225,7 @@ onMounted(async () => {
   <v-dialog v-model="addStudentInstrumentDialog" persistent max-width="600px">
     <UserInstrumentDialogBody
       :is-edit="false"
+      :is-student="true"
       :student-instrument-data="{
         id: null,
         status: 'Active',

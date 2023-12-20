@@ -1,8 +1,6 @@
 <script setup>
 import { ref, onBeforeMount } from "vue";
-import EventTypeDataService from "../../../../services/EventTypeDataService";
-import SemesterDataService from "../../../../services/SemesterDataService";
-import LocationDataService from "../../../../services/LocationDataService";
+
 import { formatDate } from "../../../../composables/dateFormatter";
 import {
   get12HourTimeStringFromString,
