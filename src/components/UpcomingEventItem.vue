@@ -28,6 +28,7 @@ const emits = defineEmits([
 
 const addOrEditAvailabilityDialog = ref(false);
 const signupCount = ref(0);
+const availabilityCount = ref(0);
 const viewSignupsDialog = ref(false);
 const eventAvailabilityData = ref([]);
 const studentSignupData = ref([]);
@@ -74,11 +75,7 @@ async function unreadyEvent(event) {
 }
 
 function countSignUps() {
-  signupCount.value = 0;
-  for (let i = 0; i < props.eventData.eventSignups.length; i++) {
-    signupCount.value +=
-      props.eventData.eventSignups[i].studentInstrumentSignups.length;
-  }
+  signupCount.value = props.eventData.eventSignups.length;
 }
 async function getDialogData() {
   await AvailabilityDataService.getAllByEventId(props.eventData.id)
@@ -99,8 +96,25 @@ async function getDialogData() {
   viewSignupsDialog.value = true;
 }
 
+function countAvailabilities() {
+  availabilityCount.value = 0;
+  if (props.eventData.availabilities != null) {
+    let sortAvailabilities = props.eventData.availabilities;
+    sortAvailabilities.sort((a, b) => {
+      return a.userRoleId > b.userRoleId ? 1 : -1;
+    });
+    let currentRoleId = 0;
+    sortAvailabilities.forEach((availability) => {
+      if (availability.userRoleId != currentRoleId) {
+        currentRoleId = availability.userRoleId;
+        availabilityCount.value++;
+      }
+    });
+  }
+}
 onBeforeUpdate(async () => {
   countSignUps();
+  countAvailabilities();
 });
 </script>
 
@@ -126,7 +140,9 @@ onBeforeUpdate(async () => {
                 <!-- Event Instrument Type -->
                 <!-- TODO(@ethanimooney): Make this actually work -->
                 <v-card-subtitle
-                  v-if="roleId == 3 || roleId == 1"
+                  v-if="
+                    roleId == 3 || roleId == 1 || roleId == 2 || roleId == 4
+                  "
                   class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
                 >
                   {{
@@ -148,13 +164,19 @@ onBeforeUpdate(async () => {
                   class="bg-darkBlue py-2 px-0 text-white mt-0"
                 >
                   <v-card-subtitle
-                    v-if="(roleId == 3 || roleId == 1) && eventData.isReady"
+                    v-if="
+                      (roleId == 3 ||
+                        roleId == 1 ||
+                        roleId == 2 ||
+                        roleId == 4) &&
+                      eventData.isReady
+                    "
                     class="font-weight-semi-bold"
                   >
                     {{ eventData.eventSignups == null ? "0" : signupCount }}
                     People Signed Up
                   </v-card-subtitle>
-                  <v-card-subtitle
+                  <!--<v-card-subtitle
                     size="small"
                     v-if="roleId == 2 || roleId == 4"
                     class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
@@ -168,16 +190,13 @@ onBeforeUpdate(async () => {
                     }}
                     Event
                   </v-card-subtitle>
+                  -->
                   <v-card-subtitle
-                    v-if="roleId == 3"
+                    v-if="roleId == 3 || roleId == 2"
                     class="font-weight-semi-bold"
                   >
-                    {{
-                      eventData.availabilities == null
-                        ? "0"
-                        : eventData.availabilities.length
-                    }}
-                    Availability Set
+                    {{ availabilityCount }}
+                    Staff Available
                   </v-card-subtitle>
                 </v-card>
               </v-col>
