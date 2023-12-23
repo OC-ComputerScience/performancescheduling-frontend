@@ -200,13 +200,13 @@ watch(currentRole, () => {
 
 watch(
   () => router.currentRoute.value.path,
-  async newId =>
-{
-  updateActiveLink();
-},
-{
-  immediate: true
-});
+  async (newId) => {
+    updateActiveLink();
+  },
+  {
+    immediate: true,
+  }
+);
 
 onMounted(() => {
   getUserRoles();

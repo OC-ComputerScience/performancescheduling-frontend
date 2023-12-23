@@ -6,6 +6,9 @@ import AvailabilityDialogBody from "./AvailabilityDialogBody.vue";
 import { useRouter } from "vue-router";
 import { useLoginStore } from "../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
+import ViewSignupsDialog from "../admin/maintain/events/ViewSignupsDialog.vue";
+import EventDataService from "../../services/EventDataService";
+import AvailabilityDataService from "../../services/AvailabilityDataService";
 
 const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
@@ -23,18 +26,41 @@ const emits = defineEmits(["refreshAvailabilitiesEvent"]);
 
 const addAvailabilityDialog = ref(false);
 const openAvailabilityDialog = ref(false);
+const viewSignupsDialog = ref(false);
+const eventAvailabilityData = ref([]);
+const studentSignupData = ref([]);
 
 function closeAvailabilityDialog() {
   addAvailabilityDialog.value = false;
   openAvailabilityDialog.value = false;
 }
-
+function closeSignupsDialog() {
+  viewSignupsDialog.value = false;
+}
 function openCritique(eventId) {
   router.push({ path: "facultyCreateCritique", query: { eventId: eventId } });
 }
 function okToCritique(eventDate) {
   if (new Date(eventDate) <= new Date()) return true;
   else return false;
+}
+async function getDialogData() {
+  await AvailabilityDataService.getAllByEventId(props.eventData.id)
+    .then((response) => {
+      eventAvailabilityData.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+
+  await EventDataService.getById(props.eventData.id)
+    .then((response) => {
+      studentSignupData.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  viewSignupsDialog.value = true;
 }
 
 onMounted(async () => {});
@@ -140,6 +166,14 @@ onMounted(async () => {});
       >
         Critique
       </v-btn>
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
+        @click="getDialogData"
+      >
+        View Signups
+      </v-btn>
       <!-- Add Availability Button -->
       <v-btn
         flat
@@ -186,5 +220,13 @@ onMounted(async () => {});
       "
       @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
     ></AvailabilityDialogBody>
+  </v-dialog>
+  <v-dialog v-model="viewSignupsDialog" persistent max-width="800px">
+    <ViewSignupsDialog
+      :event-data="eventData"
+      :avail-data="eventAvailabilityData"
+      :student-signup-data="studentSignupData"
+      @closeSignupsDialog="closeSignupsDialog"
+    ></ViewSignupsDialog>
   </v-dialog>
 </template>
