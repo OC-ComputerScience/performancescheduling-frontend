@@ -84,7 +84,7 @@ onMounted(async () => {});
       </v-row>
     </v-card-title>
     <v-row>
-      <v-col cols="5">
+      <v-col cols="7">
         <!-- Event Date -->
         <v-card-subtitle class="ml-1 mt-2 font-weight-semi-bold text-maroon">
           {{ formatDate(eventData.date) }}
@@ -103,7 +103,7 @@ onMounted(async () => {});
       </v-col>
 
       <!-- Event Availability Times -->
-      <v-col cols="7">
+      <v-col cols="5">
         <v-card-subtitle class="font-weight-bold text-black">
           Availability
         </v-card-subtitle>

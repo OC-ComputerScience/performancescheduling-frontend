@@ -208,7 +208,7 @@ onMounted(async () => {
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
+        <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
           <v-card
             class="fill-height mainCardBorder pa-2"
             style="overflow-y: auto; max-height: 840px; min-height: 840px"
@@ -235,7 +235,7 @@ onMounted(async () => {
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
+        <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
           <v-card
             class="fill-height mainCardBorder pa-2"
             style="overflow-y: auto; max-height: 840px; min-height: 840px"
