@@ -61,6 +61,7 @@ async function retrieveData() {
   await EventDataService.getGTEDateForFaculty(new Date(), "date,startTime")
     .then((response) => {
       upcomingEvents.value = response.data;
+      console.log(upcomingEvents.value);
     })
     .catch((e) => {
       console.log(e);
@@ -132,6 +133,20 @@ const filteredEvents = computed(() => {
   );
 });
 
+function getSignups(eventID) {
+  const count = upcomingEvents.value.find((event) => event.id === eventID)
+    .eventSignups.length;
+  return count;
+}
+
+function getEventType(eventID) {
+  const eventType = upcomingEvents.value.find(
+    (event) => event.id === eventID
+  ).eventType;
+
+  return eventType;
+}
+
 onMounted(async () => {
   await retrieveData();
 });
@@ -195,11 +210,8 @@ onMounted(async () => {
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
-          <v-card
-            class="fill-height mainCardBorder pa-2"
-            style="overflow-y: auto; max-height: 840px; min-height: 840px"
-          >
+        <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
             <v-card-title>
               <v-row class="pa-2">
                 <p class="font-weight-semi-bold text-darkBlue text-h5">
@@ -215,16 +227,15 @@ onMounted(async () => {
                 :availability-data="
                   availability.length <= 1 ? availability[0] : availability
                 "
+                :signUpCount="getSignups(availability[0].event.id)"
+                :eventType="getEventType(availability[0].event.id)"
                 @refreshAvailabilitiesEvent="refreshAvailability"
               ></EventAvailabilityItem>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
-          <v-card
-            class="fill-height mainCardBorder pa-2"
-            style="overflow-y: auto; max-height: 840px; min-height: 840px"
-          >
+        <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
             <v-card-title class="font-weight-semi-bold text-orange text-h5">
               Upcoming Events
             </v-card-title>
