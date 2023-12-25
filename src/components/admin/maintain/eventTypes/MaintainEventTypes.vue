@@ -265,6 +265,8 @@ onMounted(async () => {
         description: null,
         defaultSlotDuration: null,
         isPrivate: false,
+        allowGrade: false,
+        allowEndingLeve: false,
         status: 'Active',
       }"
       @closeAddEventTypeDialogEvent="addEventTypeDialog = false"

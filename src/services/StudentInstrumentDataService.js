@@ -32,7 +32,7 @@ class StudentInstrumentDataService {
         order
     );
   }
-  getStudentInstrumentSignupsByFacultuyRoleId(
+  getStudentInstrumentSignupsByFacultyRoleId(
     facultyRoleId,
     date,
     select,
