@@ -11,16 +11,24 @@ const studentNames = ref("");
 const endingLevel = ref(props.signup.endingLevelId);
 const editedSignup = ref(props.signup);
 const levelOptions = ref([]);
-console.log(props.signup);
 
 async function saveEndingLevel() {
   editedSignup.value.endingLevelId = endingLevel.value;
-  console.log(endingLevel.value);
 
   await EventSignupDataService.update(editedSignup.value).catch((error) => {
     console.log(error);
   });
-
+  props.signup.studentInstrumentSignups.forEach(async (stuSignup) => {
+    let studentInstrument = {
+      id: stuSignup.studentInstrument.id,
+      endingLevelId: endingLevel.value,
+    };
+    await StudentInstrumentDataService.update(studentInstrument).catch(
+      (error) => {
+        console.log(error);
+      }
+    );
+  });
   let studentInstrument = {
     id: props.signup.studentInstrumentSignups[0].studentInstrument.id,
     endingLevelId: endingLevel.value,
