@@ -11,6 +11,7 @@ import UpcomingEventItem from "../UpcomingEventItem.vue";
 import InstrumentItem from "./InstrumentItem.vue";
 import NotificationItem from "../NotificationItem.vue";
 import UserDataService from "../../services/UserDataService";
+import UserRoleDataService from "../../services/UserRoleDataService";
 
 const loginStore = useLoginStore();
 const studentRoleId = loginStore.currentRole.id;
@@ -92,7 +93,6 @@ async function retrieveData() {
 }
 
 async function activateUser() {
-  console.log(loginStore.user);
   await UserDataService.update({
     id: loginStore.user.userId,
     status: "Active",
@@ -100,7 +100,17 @@ async function activateUser() {
     .then(() => {
       activateStudent.value = false;
       addInstrumentDialog.value = true;
+      loginStore.user.status = "Active";
     })
+    .catch((e) => {
+      console.log(e);
+    });
+  console.log(loginStore.currentRole);
+  await UserRoleDataService.update({
+    id: loginStore.currentRole.id,
+    studentSemesters: loginStore.currentRole.studentSemesters + 1,
+  })
+    .then(loginStore.currentRole.studentSemesters++)
     .catch((e) => {
       console.log(e);
     });
