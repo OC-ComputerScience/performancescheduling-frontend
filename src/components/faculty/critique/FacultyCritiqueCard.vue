@@ -14,7 +14,7 @@ const feedbackDialog = ref(false);
 const gradeDialog = ref(false);
 const endingLevelDialog = ref(false);
 const eventSignupPieces = ref([]);
-console.log(props.eventData);
+
 function sortPieces() {
   eventSignupPieces.value = props.signup.eventSignupPieces;
   eventSignupPieces.value.sort((a, b) => {
@@ -238,9 +238,13 @@ onMounted(() => {
         >
           {{ signupHasFeedbackByFaculty() ? "Edit Feedback" : "Add Feedback" }}
         </v-btn>
-        <v-btn v-if="props.eventData.eventType.allowGrade" flat size="small">
-          flat size="small" class="font-weight-semi-bold ml-auto mr-2 bg-blue
-          text-none" @click="gradeDialog = true" >
+        <v-btn
+          v-if="props.eventData.eventType.allowGrade"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="gradeDialog = true"
+        >
           {{ props.signup.pass == null ? "Add Grade" : "Edit Grade" }}
         </v-btn>
         <v-btn

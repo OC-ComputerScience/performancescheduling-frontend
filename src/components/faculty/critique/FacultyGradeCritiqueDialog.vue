@@ -41,7 +41,7 @@ onMounted(async () => {
       <v-card-text>
         <v-row class="mt-1">
           <v-card-title class="font-weight-bold text-maroon text-h4">
-            {{ studentNames }}
+            Select Grade
           </v-card-title>
           <v-spacer></v-spacer>
           <v-card color="lightMaroon" elevation="0" class="mr-2">
@@ -57,7 +57,14 @@ onMounted(async () => {
           </v-card>
         </v-row>
         <v-row class="mt-4 ml-2">
-          Note: only one juror needs to submit a grade.
+          <v-card-subtitle class="text-black text-h7">
+            Note: only one hearer needs to submit a Grade.
+          </v-card-subtitle>
+        </v-row>
+        <v-row class="mt-6 ml-2">
+          <v-card-subtitle class="font-weight-bold text-black text-h6">
+            {{ studentNames }}
+          </v-card-subtitle>
         </v-row>
       </v-card-text>
       <v-card-actions>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { get12HourTimeStringFromString } from "../../../composables/timeFormatter";
 import EventSignupDataService from "../../../services/EventSignupDataService.js";
 import StudentInstrumentDataService from "../../../services/StudentInstrumentDataService";
@@ -33,7 +33,7 @@ async function saveEndingLevel() {
     id: props.signup.studentInstrumentSignups[0].studentInstrument.id,
     endingLevelId: endingLevel.value,
   };
-  console.log(studentInstrument);
+
   await StudentInstrumentDataService.update(studentInstrument).catch(
     (error) => {
       console.log(error);
@@ -79,8 +79,9 @@ onMounted(async () => {
       <v-card-text>
         <v-row class="mt-1">
           <v-card-title class="font-weight-bold text-maroon text-h4">
-            {{ studentNames }}
+            Enter Level
           </v-card-title>
+
           <v-spacer></v-spacer>
           <v-card color="lightMaroon" elevation="0" class="mr-2">
             <v-card-title>
@@ -95,8 +96,16 @@ onMounted(async () => {
           </v-card>
         </v-row>
         <v-row class="mt-4 ml-2">
-          Note: only one juror needs to submit an Ending Level.
+          <v-card-subtitle class="text-black text-h7">
+            Note: only one juror needs to submit an Ending Level.
+          </v-card-subtitle>
         </v-row>
+        <v-row class="mt-6 ml-2">
+          <v-card-subtitle class="font-weight-bold text-black text-h6">
+            {{ studentNames }}
+          </v-card-subtitle>
+        </v-row>
+
         <v-row class="mt-4 ml-2">
           <v-card-title class="font-weight-bold text-maroon text-h5">
             Ending Level
@@ -106,7 +115,7 @@ onMounted(async () => {
           <v-select
             color="darkBlue"
             variant="plain"
-            class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
             v-model="endingLevel"
             :items="levelOptions"
             :item-title="(item) => item.name"
