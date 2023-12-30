@@ -33,5 +33,9 @@ class UserDataService {
   update(data) {
     return http.put(this.baseUrl + data.id, data);
   }
+
+  disableAllUsers() {
+    return http.put(this.baseUrl);
+  }
 }
 export default new UserDataService();

@@ -93,64 +93,17 @@ function endDateCheck() {
 }
 
 async function disableAllStudents(){
-  await UserDataService.getAllWithRolesAndStudentInstruments("lastName", "ASC")
-    .then((response) => {
-      users.value = response.data;
-
-      users.value = users.value.filter((user) => {
-        return user.userRoles.some((role) => {
-          return role.role.role === "Student";
-        });
-      });
-
-      console.log('before', users.value)
-
-      users.value.forEach((user) => {
-        user.studentRole = user.userRoles.find(
-          (role) => role.role.role === "Student"
-        ).studentRole;
-        UserDataService.update({id: user.id, status: "Disabled"})
-          .catch((err) => {
-            console.log(err);
-          });
-
-        // StudentInstrumentDataService.update({studentRoleId: user.roleId, status: "Active"})
-        //   .catch((err) => {
-        //     console.log(err);
-        //   });
-
-        // user.userRoles.find(
-        //   (role) => role.role.role === "Student")
-        //   .studentRole.forEach((student) => 
-        //   StudentInstrumentDataService.update({id: student.id, status: "Disabled"})
-        //   .catch((err) => {
-        //     console.log(err);
-        //   })
-        // );
-      });
-
-      console.log('after', users.value)
-
-      users.value.forEach((user) => {
-        user.studentRole.forEach((student) => {
-          console.log('student', student)
-          console.log('id', student.id)
-          StudentInstrumentDataService.update({id: student.id, status: "Disabled"})
-          .catch((err) => {
-            console.log(err);
-          });
-        })
-        });
-      
-      // users.value = users.value.filter((user) => {
-      //   return user.userRoles.find(
-      //    (role) => role.role.role === "Student")
-      // });
-    })
+  UserDataService.disableAllUsers()
+    .catch((err) => {
+      console.log(err);
+    });
+  
+    StudentInstrumentDataService.disableAllStudentsInstruments()
     .catch((err) => {
       console.log(err);
     });
 }
+
 </script>
 
 <template>
