@@ -32,7 +32,8 @@ async function retrieveData() {
 
   if (currentRole.value.role.role == "Faculty") {
     await StudentInstrumentDataService.getStudentsForInstructorId(
-      currentRole.value.id
+      currentRole.value.id,
+      "Active"
     )
       .then((response) => {
         students.value = response.data;
@@ -44,7 +45,8 @@ async function retrieveData() {
 
   if (currentRole.value.role.role == "Accompanist") {
     await StudentInstrumentDataService.getStudentsForAccompanistId(
-      currentRole.value.id
+      currentRole.value.id,
+      "Active"
     )
       .then((response) => {
         students.value = response.data;
@@ -56,9 +58,10 @@ async function retrieveData() {
 
   refreshAvailability();
 
-  await EventDataService.getGTEDateForFaculty(new Date(), 'date,startTime')
+  await EventDataService.getGTEDateForFaculty(new Date(), "date,startTime")
     .then((response) => {
       upcomingEvents.value = response.data;
+      console.log(upcomingEvents.value);
     })
     .catch((e) => {
       console.log(e);
@@ -84,6 +87,9 @@ async function refreshAvailability() {
 
       // This cannot be sorted on the backend because it is reorganized in the code above
       groupedAvailabilities.value.sort(sortAvailabilities);
+      groupedAvailabilities.value.forEach((avail) => {
+        avail.sort(sortAvailabilityTimes);
+      });
 
       //Put the values of the loop list into an availabilities list with "normal" indexes
       availabilities.value = Object.values(groupedAvailabilities.value);
@@ -107,6 +113,12 @@ function sortAvailabilities(a, b) {
   return aStartTime.localeCompare(bStartTime);
 }
 
+function sortAvailabilityTimes(a, b) {
+  const aStartTime = a.startTime;
+  const bStartTime = b.startTime;
+  return aStartTime.localeCompare(bStartTime);
+}
+
 watch(currentRole, async () => {
   await retrieveData();
 });
@@ -114,9 +126,26 @@ watch(currentRole, async () => {
 //Filter upcoming events without availability
 const filteredEvents = computed(() => {
   return upcomingEvents.value.filter(
-    (event) => !groupedAvailabilities.value.some(availability => availability[0].event.id === event.id)
+    (event) =>
+      !groupedAvailabilities.value.some(
+        (availability) => availability[0].event.id === event.id
+      )
   );
 });
+
+function getSignups(eventID) {
+  const count = upcomingEvents.value.find((event) => event.id === eventID)
+    .eventSignups.length;
+  return count;
+}
+
+function getEventType(eventID) {
+  const eventType = upcomingEvents.value.find(
+    (event) => event.id === eventID
+  ).eventType;
+
+  return eventType;
+}
 
 onMounted(async () => {
   await retrieveData();
@@ -130,52 +159,59 @@ onMounted(async () => {
         <v-col cols="12" lg="3" class="ma-0 pa-4">
           <v-row class="fill-height ma-0">
             <v-col cols="12" class="pa-0 ma-0 pb-4">
-              <v-card class="fill-height mainCardBorder pa-2">
-                <v-card-title
-                class="font-weight-semi-bold text-blue text-h5 pb-0"
+              <v-card
+                class="fill-height mainCardBorder pa-2"
+                style="overflow-y: auto; max-height: 400px; min-height: 400px"
               >
+                <v-card-title
+                  class="font-weight-semi-bold text-blue text-h5 pb-0"
+                >
                   {{ notifications.length }} Notification{{
                     notifications.length > 0
-                    ? notifications.length > 1
-                      ? "s"
-                      : ""
-                    : "s"
+                      ? notifications.length > 1
+                        ? "s"
+                        : ""
+                      : "s"
                   }}
                 </v-card-title>
                 <v-card-text class="pt-0">
                   <NotificationItem
-                  v-for="notification of notifications"
-                  :key="notification.id"
+                    v-for="notification of notifications"
+                    :key="notification.id"
                     :notification-data="notification"
-                ></NotificationItem>
+                    @refreshNotices="retrieveData"
+                  ></NotificationItem>
                 </v-card-text>
               </v-card>
             </v-col>
             <v-col cols="12" class="pa-0 ma-0 pt-4">
-              <v-card class="fill-height mainCardBorder pa-2">
+              <v-card
+                class="fill-height mainCardBorder pa-2"
+                style="overflow-y: auto; max-height: 400px; min-height: 400px"
+              >
                 <v-row>
                   <v-col cols="auto">
                     <v-card-title
-                    class="font-weight-semi-bold text-darkBlue text-h5"
-                  >
+                      class="font-weight-semi-bold text-darkBlue text-h5"
+                    >
                       Current Students
                     </v-card-title>
                   </v-col>
                 </v-row>
                 <v-card-text>
                   <CurrentStudentsItem
-                  v-for="student of students"
-                  :key="student.id"
-                  :students-data="student"
+                    v-for="student of students"
+                    :key="student.id"
+                    :students-data="student"
                     @refreshUsersEvent="retrieveData()"
-                ></CurrentStudentsItem>
+                  ></CurrentStudentsItem>
                 </v-card-text>
               </v-card>
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2">
+        <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
             <v-card-title>
               <v-row class="pa-2">
                 <p class="font-weight-semi-bold text-darkBlue text-h5">
@@ -185,31 +221,33 @@ onMounted(async () => {
             </v-card-title>
             <v-card-text>
               <EventAvailabilityItem
-              v-for="availability in availabilities"
-              :key="availability[0].id"
+                v-for="availability in availabilities"
+                :key="availability[0].id"
                 :event-data="availability[0].event"
-              :availability-data="
-                availability.length <= 1 ? availability[0] : availability
-                  "
-              @refreshAvailabilitiesEvent="refreshAvailability"
-            ></EventAvailabilityItem>
+                :availability-data="
+                  availability.length <= 1 ? availability[0] : availability
+                "
+                :signUpCount="getSignups(availability[0].event.id)"
+                :eventType="getEventType(availability[0].event.id)"
+                @refreshAvailabilitiesEvent="refreshAvailability"
+              ></EventAvailabilityItem>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2">
+        <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
             <v-card-title class="font-weight-semi-bold text-orange text-h5">
               Upcoming Events
             </v-card-title>
             <v-card-text>
               <UpcomingEventItem
-              v-for="event of filteredEvents"
-              :key="event.id"
-              :event-data="event"
+                v-for="event of filteredEvents"
+                :key="event.id"
+                :event-data="event"
                 :role-id="currentRole.roleId"
-              :availability-data="groupedAvailabilities[event.id]"
+                :availability-data="groupedAvailabilities[event.id]"
                 @refreshAvailabilitiesEvent="refreshAvailability"
-            ></UpcomingEventItem>
+              ></UpcomingEventItem>
             </v-card-text>
           </v-card>
         </v-col>

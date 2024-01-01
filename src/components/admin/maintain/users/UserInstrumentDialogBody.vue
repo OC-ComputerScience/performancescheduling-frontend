@@ -4,6 +4,7 @@ import UserRoleDataService from "../../../../services/UserRoleDataService";
 import StudentInstrumentDataService from "../../../../services/StudentInstrumentDataService";
 import LevelDataService from "../../../../services/LevelDataService";
 import InstrumentDataService from "../../../../services/InstrumentDataService";
+import SemesterDataService from "../../../../services/SemesterDataService";
 
 const emits = defineEmits([
   "closeAddInstrumentDialog",
@@ -17,6 +18,7 @@ const emits = defineEmits([
 const props = defineProps({
   studentInstrumentData: { type: [Object], required: true },
   isEdit: { type: [Boolean], required: true },
+  isStudent: { type: [Boolean], required: true },
 });
 
 const form = ref(null);
@@ -24,6 +26,7 @@ const form = ref(null);
 const selectedInstrument = ref(props.studentInstrumentData.instrument);
 const selectedInstructor = ref(props.studentInstrumentData.instructorRole);
 const selectedAccompanist = ref(props.studentInstrumentData.accompanistRole);
+const selectedSemester = ref(props.studentInstrumentData.semester);
 
 const editedLevel = ref(props.studentInstrumentData.level);
 const privateHours = ref(props.studentInstrumentData.privateHours);
@@ -54,11 +57,12 @@ async function getInstruments() {
 
 const instructors = ref([]);
 const accompanists = ref([]);
+const semesters = ref([]);
 
 function getAllInstructors() {
-  UserRoleDataService.getRolesForRoleId(2, 'lastName,firstName')
+  UserRoleDataService.getRolesForRoleId(2, "lastName,firstName")
     .then((response) => {
-      instructors.value = response.data
+      instructors.value = response.data;
     })
     .catch((err) => {
       console.log(err);
@@ -66,18 +70,23 @@ function getAllInstructors() {
 }
 
 function getAllAccompanists() {
-  UserRoleDataService.getRolesForRoleId(4, 'lastName,firstName')
+  UserRoleDataService.getRolesForRoleId(4, "lastName,firstName")
     .then((response) => {
-      accompanists.value = [
-        { id: null, user: { firstName: "", lastName: "" } },
-        ...response.data,
-      ];
+      accompanists.value = response.data;
     })
     .catch((err) => {
       console.log(err);
     });
 }
-
+async function getSemesters() {
+  await SemesterDataService.getAll("startDate", false)
+    .then((response) => {
+      semesters.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 async function addInstrument() {
   form.value.validate().then(async (valid) => {
     if (valid.valid) {
@@ -92,6 +101,7 @@ async function addInstrument() {
             ? selectedAccompanist.value.id
             : null,
         levelId: editedLevel.value.id,
+        semesterId: selectedSemester.value.id,
       })
         .then(() => {
           emits("addInstrumentSuccessEvent");
@@ -110,6 +120,7 @@ async function updateInstrument() {
       await updateSelectedAccompanist();
       await updateLevel();
       await updatePrivateHours();
+      await updateSemester();
 
       emits("updateInstrumentSuccessEvent");
     }
@@ -133,8 +144,9 @@ async function updateSelectedInstructor() {
 async function updateSelectedAccompanist() {
   if (
     props.studentInstrumentData.accompanistRoleId === null ||
+    selectedAccompanist.value == null ||
     selectedAccompanist.value.id !=
-    props.studentInstrumentData.accompanistRoleId
+      props.studentInstrumentData.accompanistRoleId
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
@@ -160,6 +172,20 @@ async function updateLevel() {
   }
 }
 
+async function updateSemester() {
+  if (
+    props.studentInstrumentData.semesterId === null ||
+    selectedSemester.value.id != props.studentInstrumentData.semesterId
+  ) {
+    await StudentInstrumentDataService.update({
+      id: props.studentInstrumentData.id,
+      semesterId: selectedSemester.value.id,
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
 async function updatePrivateHours() {
   if (
     props.studentInstrumentData.privateHours === null ||
@@ -179,6 +205,7 @@ onMounted(async () => {
   await getInstruments();
   await getAllInstructors();
   await getAllAccompanists();
+  await getSemesters();
 });
 </script>
 
@@ -215,7 +242,7 @@ onMounted(async () => {
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Instrument
         </v-card-subtitle>
-        <v-select
+        <v-autocomplete
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -227,12 +254,26 @@ onMounted(async () => {
           :readonly="props.isEdit"
           :rules="[(v) => !!v || 'This field is required']"
         >
-        </v-select>
+        </v-autocomplete>
+        <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
+          Semester
+        </v-card-subtitle>
+        <v-select
+          v-model="selectedSemester"
+          :items="semesters"
+          item-title="name"
+          item-value="id"
+          variant="plain"
+          return-object
+          class="bg-white text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          :rules="[() => !!selectedSemester || 'This field is required']"
+        ></v-select>
 
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Instructor
         </v-card-subtitle>
-        <v-select
+        <v-autocomplete
+          clearable
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -243,12 +284,13 @@ onMounted(async () => {
           return-object
           :rules="[(v) => !!v || 'This field is required']"
         >
-        </v-select>
+        </v-autocomplete>
 
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Accompanist
         </v-card-subtitle>
-        <v-select
+        <v-autocomplete
+          clearable
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -258,7 +300,7 @@ onMounted(async () => {
           item-value="id"
           return-object
         >
-        </v-select>
+        </v-autocomplete>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Level
         </v-card-subtitle>
@@ -290,24 +332,24 @@ onMounted(async () => {
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          v-if="props.isEdit"
+          v-if="props.isEdit && !props.isStudent"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
           :class="
             props.studentInstrumentData.status === 'Disabled'
-            ? 'bg-darkBlue'
-            : 'bg-maroon'
-            "
+              ? 'bg-darkBlue'
+              : 'bg-maroon'
+          "
           @click="
-    props.studentInstrumentData.status === 'Disabled'
-      ? emits('enableStudentInstrumentEvent')
-      : emits('disableStudentInstrumentEvent')
-    "
+            props.studentInstrumentData.status === 'Disabled'
+              ? emits('enableStudentInstrumentEvent')
+              : emits('disableStudentInstrumentEvent')
+          "
         >
           {{
             props.studentInstrumentData.status === "Disabled"
-            ? "Enable"
-            : "Disable"
+              ? "Enable"
+              : "Disable"
           }}
         </v-btn>
         <v-btn

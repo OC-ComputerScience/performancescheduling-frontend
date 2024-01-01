@@ -23,7 +23,6 @@ const props = defineProps({
   studentpieceData: { type: [Object], required: true },
   studentPieces: { type: [Array], required: true },
 });
-console.log(props.studentpieceData);
 
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
@@ -362,25 +361,6 @@ onMounted(async () => {
           Add Composer
         </v-btn>
         <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
-          @click="props.isEdit ? updateStudentPiece() : addStudentPiece()"
-        >
-          {{ props.isEdit ? "Save" : "Add" }}
-        </v-btn>
-        <v-btn
-          flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
-          :class="props.isEdit ? '' : 'mr-auto'"
-          @click="
-            props.isEdit
-              ? emits('closeStudentPieceDialogEvent')
-              : emits('closeAddStudentPieceDialogEvent')
-          "
-        >
-          Cancel
-        </v-btn>
-        <v-btn
           v-if="props.isEdit"
           flat
           class="font-weight-semi-bold mt-0 ml-4 mr-auto text-none text-white flatChipBorder"
@@ -398,6 +378,25 @@ onMounted(async () => {
           {{
             props.studentpieceData.status === "Disabled" ? "Enable" : "Disable"
           }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
+          @click="props.isEdit ? updateStudentPiece() : addStudentPiece()"
+        >
+          {{ props.isEdit ? "Save" : "Add" }}
+        </v-btn>
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          :class="props.isEdit ? '' : 'mr-auto'"
+          @click="
+            props.isEdit
+              ? emits('closeStudentPieceDialogEvent')
+              : emits('closeAddStudentPieceDialogEvent')
+          "
+        >
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-form>

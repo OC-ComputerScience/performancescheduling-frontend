@@ -87,10 +87,6 @@ const adminMenus = [
     text: "Pieces",
   },
   {
-    link: "adminEvaluations",
-    text: "Evaluations",
-  },
-  {
     link: "adminMajors",
     text: "Majors",
   },
@@ -201,6 +197,16 @@ watch(currentRole, () => {
     resetMenu();
   }
 });
+
+watch(
+  () => router.currentRoute.value.path,
+  async (newId) => {
+    updateActiveLink();
+  },
+  {
+    immediate: true,
+  }
+);
 
 onMounted(() => {
   getUserRoles();
