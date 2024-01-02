@@ -77,5 +77,9 @@ class StudentInstrumentDataService {
   update(data) {
     return http.put(this.baseUrl + data.id, data);
   }
+
+  disableAllStudentsInstruments() {
+    return http.put(this.baseUrl);
+  }
 }
 export default new StudentInstrumentDataService();
