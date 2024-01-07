@@ -42,7 +42,6 @@ EventDataService.getById(props.eventData.id)
     studentSignupData.value.eventSignups.sort((a, b) => {
       return a.startTime > b.startTime ? 1 : -1;
     });
-    console.log(studentSignupData.value);
   })
   .catch((err) => {
     console.log(err);
@@ -128,7 +127,7 @@ function generatePDF() {
     { title: "Student", dataKey: "student" },
     { title: "Instrument", dataKey: "instrument" },
     { title: "Instructor", dataKey: "instructor" },
-    { title: "Accompianist", dataKey: "accompianist" },
+    { title: "Accompanist", dataKey: "accompanist" },
   ];
 
   const doc = new jsPDF({
@@ -175,7 +174,6 @@ function generatePDF() {
   doc.setFontSize(10).text(footer, 0.5, doc.internal.pageSize.height - 0.5);
 
   let pdfSignups = [];
-  console.log(studentSignupData.value.eventSignups);
   studentSignupData.value.eventSignups.forEach(function (eventSignup) {
     let signup = {};
     signup.startTime = get12HourTimeStringFromString(eventSignup.startTime);
@@ -192,9 +190,9 @@ function generatePDF() {
     });
 
     if (eventSignup.studentInstrumentSignups[0].accompanistRoleId == null) {
-      signup.accompianist = "None";
+      signup.accompanist = "None";
     } else {
-      signup.accompianist =
+      signup.accompanist =
         eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
           .firstName +
         " " +
