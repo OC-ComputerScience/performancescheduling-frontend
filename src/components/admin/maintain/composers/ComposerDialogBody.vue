@@ -199,7 +199,7 @@ function emptyNameCheck(composer) {
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
                 :rules="[
                   () =>
-                    !!editedComposerData.dateOfBirth ||
+                    !!editedComposerData.dateOfDeath ||
                     'This field is required',
                 ]"
               ></v-text-field>
