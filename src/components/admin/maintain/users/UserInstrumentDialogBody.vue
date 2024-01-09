@@ -213,12 +213,11 @@ async function updatePrivateHours() {
 }
 async function setDefaultValues() {
   await getStudentInstruments();
-  console.log(studentInstruments.value);
-  console.log(selectedInstrument.value);
+
   let defaultInstrument = studentInstruments.value.find(
     (x) => x.instrumentId === selectedInstrument.value.id
   );
-  console.log(defaultInstrument);
+
   if (defaultInstrument == null) {
     haveLevel.value = false;
     selectedInstructor.value = null;
@@ -231,12 +230,16 @@ async function setDefaultValues() {
     selectedInstructor.value = defaultInstrument.instructorRole;
     selectedAccompanist.value = defaultInstrument.accompanistRole;
     selectedSemester.value = semesters.value[0];
-    editedLevel.value = levelOptions.value[defaultInstrument.level.id];
+    if (defaultInstrument.endingLevel.id != null) {
+      editedLevel.value = levelOptions.value[defaultInstrument.endingLevel.id];
+    } else {
+      editedLevel.value = levelOptions.value[defaultInstrument.level.id];
+    }
+    editedLevel.value = levelOptions.value[defaultInstrument.endingLevel.id];
     privateHours.value = defaultInstrument.privateHours;
   }
 }
 watch(selectedInstrument, (newValue, oldValue) => {
-  console.log("selectedInstrument changed");
   if (newValue != null && !props.isEdit) {
     setDefaultValues();
   }
