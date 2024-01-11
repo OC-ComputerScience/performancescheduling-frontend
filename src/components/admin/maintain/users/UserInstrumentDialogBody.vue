@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import UserRoleDataService from "../../../../services/UserRoleDataService";
 import StudentInstrumentDataService from "../../../../services/StudentInstrumentDataService";
 import LevelDataService from "../../../../services/LevelDataService";
@@ -27,12 +27,18 @@ const selectedInstrument = ref(props.studentInstrumentData.instrument);
 const selectedInstructor = ref(props.studentInstrumentData.instructorRole);
 const selectedAccompanist = ref(props.studentInstrumentData.accompanistRole);
 const selectedSemester = ref(props.studentInstrumentData.semester);
+const studentInstruments = ref([]);
+const haveLevel = ref(false);
 
 const editedLevel = ref(props.studentInstrumentData.level);
 const editedEndingLevel = ref(props.studentInstrumentData.endingLevel);
 const privateHours = ref(props.studentInstrumentData.privateHours);
 console.log(props.studentInstrumentData);
 const levelOptions = ref([]);
+const instrumentOptions = ref([]);
+const instructors = ref([]);
+const accompanists = ref([]);
+const semesters = ref([]);
 
 async function getLevels() {
   await LevelDataService.getAll()
@@ -44,7 +50,17 @@ async function getLevels() {
     });
 }
 
-const instrumentOptions = ref([]);
+async function getStudentInstruments() {
+  await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
+    props.studentInstrumentData.studentRoleId
+  )
+    .then((response) => {
+      studentInstruments.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 
 async function getInstruments() {
   await InstrumentDataService.getAll("name")
@@ -56,12 +72,8 @@ async function getInstruments() {
     });
 }
 
-const instructors = ref([]);
-const accompanists = ref([]);
-const semesters = ref([]);
-
-function getAllInstructors() {
-  UserRoleDataService.getRolesForRoleId(2, "lastName,firstName")
+async function getAllInstructors() {
+  await UserRoleDataService.getRolesForRoleId(2, "lastName,firstName")
     .then((response) => {
       instructors.value = response.data;
     })
@@ -70,8 +82,8 @@ function getAllInstructors() {
     });
 }
 
-function getAllAccompanists() {
-  UserRoleDataService.getRolesForRoleId(4, "lastName,firstName")
+async function getAllAccompanists() {
+  await UserRoleDataService.getRolesForRoleId(4, "lastName,firstName")
     .then((response) => {
       accompanists.value = response.data;
     })
@@ -218,6 +230,39 @@ async function updatePrivateHours() {
     });
   }
 }
+async function setDefaultValues() {
+  await getStudentInstruments();
+
+  let defaultInstrument = studentInstruments.value.find(
+    (x) => x.instrumentId === selectedInstrument.value.id
+  );
+
+  if (defaultInstrument == null) {
+    haveLevel.value = false;
+    selectedInstructor.value = null;
+    selectedAccompanist.value = null;
+    editedLevel.value = levelOptions.value[0];
+    selectedSemester.value = semesters.value[0];
+    privateHours.value = 1;
+  } else {
+    haveLevel.value = true;
+    selectedInstructor.value = defaultInstrument.instructorRole;
+    selectedAccompanist.value = defaultInstrument.accompanistRole;
+    selectedSemester.value = semesters.value[0];
+    if (defaultInstrument.endingLevel.id != null) {
+      editedLevel.value = levelOptions.value[defaultInstrument.endingLevel.id];
+    } else {
+      editedLevel.value = levelOptions.value[defaultInstrument.level.id];
+    }
+    editedLevel.value = levelOptions.value[defaultInstrument.endingLevel.id];
+    privateHours.value = defaultInstrument.privateHours;
+  }
+}
+watch(selectedInstrument, (newValue, oldValue) => {
+  if (newValue != null && !props.isEdit) {
+    setDefaultValues();
+  }
+});
 
 onMounted(async () => {
   await getLevels();
@@ -324,6 +369,7 @@ onMounted(async () => {
           Level
         </v-card-subtitle>
         <v-select
+          :read-only="haveLevel"
           color="darkBlue"
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"

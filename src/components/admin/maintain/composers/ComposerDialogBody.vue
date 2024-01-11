@@ -107,7 +107,7 @@ function emptyNameCheck(composer) {
           >
             {{ props.isEdit ? "Edit" : "Add" }} Composer
           </v-col>
-          <v-spacer/>
+          <v-spacer />
           <v-col v-if="props.isEdit" cols="auto" align-self="center">
             <v-chip
               label
@@ -123,7 +123,7 @@ function emptyNameCheck(composer) {
           </v-col>
         </v-row>
       </v-card-title>
-      <v-row class='mt-2'>
+      <v-row class="mt-2">
         <v-col>
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
@@ -183,9 +183,6 @@ function emptyNameCheck(composer) {
                   () =>
                     !!editedComposerData.dateOfBirth ||
                     'This field is required',
-                  () =>
-                    /^[0-9]{4}$/.test(editedComposerData.dateOfBirth) ||
-                    'Must be a YYYY',
                 ]"
               ></v-text-field>
             </v-col>
@@ -202,8 +199,8 @@ function emptyNameCheck(composer) {
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
                 :rules="[
                   () =>
-                    /^[0-9]{4}$|Present/.test(editedComposerData.dateOfDeath) ||
-                    'Must be YYYY or Present',
+                    !!editedComposerData.dateOfDeath ||
+                    'This field is required',
                 ]"
               ></v-text-field>
             </v-col>
@@ -211,7 +208,7 @@ function emptyNameCheck(composer) {
         </v-col>
       </v-row>
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <v-btn
           v-if="props.isEdit"
           flat

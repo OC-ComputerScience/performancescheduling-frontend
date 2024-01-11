@@ -21,7 +21,7 @@ const studentInstrumentSignup = ref(
 );
 const loginStore = useLoginStore();
 
-const accompianist =
+const accompanist =
   studentInstrumentSignup.value.accompanistRoleSignup === null
     ? "None"
     : studentInstrumentSignup.value.accompanistRoleSignup.user.firstName +
@@ -288,7 +288,7 @@ onMounted(async () => {
           <v-col>
             <v-text-field
               label="Accompanist"
-              v-model="accompianist"
+              v-model="accompanist"
               text-label="Accompanist"
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"

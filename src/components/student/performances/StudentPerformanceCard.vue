@@ -108,7 +108,9 @@ function hasCritiques(piece) {
                         :icon="
                           'mdi-clock-time-' +
                           getHourWordFromNumber(
-                            eventSignupData.startTime.split(':')[0]
+                            get12HourTimeStringFromString(
+                              eventSignupData.startTime
+                            ).split(':')[0]
                           )
                         "
                       ></v-icon>

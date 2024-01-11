@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import StudentInstrumentDataService from "../../../services/StudentInstrumentDataService.js";
+import StudentInstrumentSignupDataService from "../../../services/StudentInstrumentSignupDataService.js";
 import StudentPerformanceCard from "./StudentPerformanceCard.vue";
 import { useLoginStore } from "../../../stores/LoginStore.js";
 
@@ -21,7 +21,7 @@ const currentPage = ref(1);
 const perPage = 9;
 
 async function getPerformances() {
-  await StudentInstrumentDataService.getStudentInstrumentSignupsByUserRoleId(
+  await StudentInstrumentSignupDataService.getByUserRoleId(
     loginStore.currentRole.id,
     new Date(),
     "LTE",
@@ -29,12 +29,8 @@ async function getPerformances() {
   ).then((response) => {
     performances.value = [];
 
-    response.data.forEach((studentInstrument) => {
-      studentInstrument.studentInstrumentSignups.forEach(
-        (studentInstrumentSignup) => {
-          performances.value.push(studentInstrumentSignup);
-        }
-      );
+    response.data.forEach((studentInstrumentSignup) => {
+      performances.value.push(studentInstrumentSignup);
     });
   });
 
