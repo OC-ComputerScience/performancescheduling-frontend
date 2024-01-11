@@ -110,14 +110,14 @@ async function updateInstrument() {
             <v-Select
               v-model="editedInstrumentData.type"
               :items="instrumentTypes"
-              class="text-blue font-weight-bold py-0 my-0 mb-4"
+              class="bg-lightGray text-blue font-weight-bold py-0 my-0 mb-4"
             ></v-Select>
           </v-col>
         </v-row>
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <v-btn
           v-if="props.isEdit"
           flat

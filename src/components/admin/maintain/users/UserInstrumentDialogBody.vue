@@ -31,8 +31,9 @@ const studentInstruments = ref([]);
 const haveLevel = ref(false);
 
 const editedLevel = ref(props.studentInstrumentData.level);
+const editedEndingLevel = ref(props.studentInstrumentData.endingLevel);
 const privateHours = ref(props.studentInstrumentData.privateHours);
-
+console.log(props.studentInstrumentData);
 const levelOptions = ref([]);
 const instrumentOptions = ref([]);
 const instructors = ref([]);
@@ -131,6 +132,7 @@ async function updateInstrument() {
       await updateSelectedInstructor();
       await updateSelectedAccompanist();
       await updateLevel();
+      await updateEndingLevel();
       await updatePrivateHours();
       await updateSemester();
 
@@ -178,6 +180,23 @@ async function updateLevel() {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
       levelId: editedLevel.value.id,
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
+async function updateEndingLevel() {
+  console.log(editedEndingLevel.value);
+  console.log(props.studentInstrumentData.endingLevelId);
+
+  if (
+    props.studentInstrumentData.endingLevelId === null ||
+    editedEndingLevel.value.id != props.studentInstrumentData.endingLevelId
+  ) {
+    await StudentInstrumentDataService.update({
+      id: props.studentInstrumentData.id,
+      endingLevelId: editedEndingLevel.value.id,
     }).catch((err) => {
       console.log(err);
     });
@@ -362,6 +381,25 @@ onMounted(async () => {
           :rules="[(v) => !!v || 'This field is required']"
         >
         </v-select>
+        <v-card-subtitle
+          v-if="isEdit"
+          class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+        >
+          Ending Level
+        </v-card-subtitle>
+        <v-select
+          v-if="isEdit"
+          color="darkBlue"
+          variant="plain"
+          :readonly="props.isStudent"
+          class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+          v-model="editedEndingLevel"
+          :items="levelOptions"
+          :item-title="(item) => item.name"
+          item-value="id"
+          return-object
+        >
+        </v-select>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
           Private Hours
         </v-card-subtitle>
@@ -371,7 +409,7 @@ onMounted(async () => {
           variant="plain"
           class="font-weight-bold text-blue pt-0 mt-0 bg-white flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
           v-model="privateHours"
-          :rules="[(v) => !!v || 'This field is required']"
+          :rules="[/^[1-2]/.test(privateHours) || 'Must be 1 or 2 hours']"
         >
         </v-text-field>
       </v-card-text>
