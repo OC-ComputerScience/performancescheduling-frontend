@@ -162,7 +162,7 @@ onMounted(async () => {
       stuSignup.studentInstrument.studentRole.user.lastName +
       ", " +
       stuSignup.studentInstrument.studentRole.user.firstName +
-      " (" + stuSignup.studentInstrument.instrument.name +","+ stuSignup.studentInstrument.level.name +","+ stuSignup.studentInstrument.privateHours + ")"
+      " (" + stuSignup.studentInstrument.instrument.name +", Level: "+ stuSignup.studentInstrument.level.name +", Hours: "+ stuSignup.studentInstrument.privateHours + ")"
   );
 
   if (students.length == 1) {
@@ -220,7 +220,7 @@ onMounted(async () => {
         <v-row class="mt-4">
           <v-col cols="6">
           <v-row class="font-weight-bold text-black text-h8 ml-1">
-              Instructor :{{
+              Instructor: {{
                 props.signup.studentInstrumentSignups[0].accompanistRoleSignup
                   .user.lastName +
                 ", " +
@@ -232,7 +232,7 @@ onMounted(async () => {
             <v-row v-if="props.signup.studentInstrumentSignups[0].accompanistRoleSignup !=null"
               class="font-weight-bold text-black pl-0 ml-0 py-0 mt-5 ml-1 text-h8"
             >
-              Accompinanist: {{
+              Accomp: {{
                 props.signup.studentInstrumentSignups[0].accompanistRoleSignup
                   .user.lastName +
                 ", " +
