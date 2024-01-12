@@ -189,10 +189,14 @@ function composerName(composer) {
 }
 
 onMounted(async () => {
-  getSemesters();
-  getPieces();
-  getComposers();
-  getStudentInstrument(loginStore.currentRole.id);
+  await getSemesters();
+  await getPieces();
+  await getComposers();
+  await getStudentInstrument(loginStore.currentRole.id);
+
+  if (!props.isEdit && editedStudentPieceData.value.semesterId == null) {
+    editedStudentPieceData.value.semesterId = semesters.value[0].id;
+  }
 });
 </script>
 
