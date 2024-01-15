@@ -37,6 +37,7 @@ const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 // student piece variables
 const studentPieces = ref([]);
+const allStudentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
@@ -60,6 +61,9 @@ const instructorAvailRequest = ref(false);
 const accompAvailRequest = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
+
+const onlySemesterPieces = ref(true);
+const disableOnlySemesterPiece = ref(false);
 
 async function getData() {
   // due to the watch statements, accompanists must be gotten before student instruments
@@ -120,49 +124,36 @@ async function getData() {
 async function getStudentPieces() {
   await StudentPieceDataService.getByUser(loginStore.user.userId)
     .then((response) => {
-      studentPieces.value = response.data.filter(
-        (studentPiece) => studentPiece.semesterId === props.eventData.semesterId
-      );
-
-      studentPieces.value.forEach(function (studentPiece) {
-        var fullName = "";
-        if (studentPiece.piece.composer.lastName) {
-          fullName = studentPiece.piece.composer.lastName;
-          if (studentPiece.piece.composer.firstName) {
-            fullName += ", " + studentPiece.piece.composer.firstName;
-          }
-        } else {
-          fullName = studentPiece.piece.composer.firstName;
-        }
-        studentPiece.piece.composer.fullName = fullName;
-      });
-      selectedStudentPieces.value = [];
-
-      studentInstrumentStudentPieces.value = studentPieces.value.filter(
-        (studentPiece) =>
-          studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
-      );
-
-      filteredStudentPieces.value = studentInstrumentStudentPieces.value;
-      filteredStudentPieces.value.forEach((studentPiece) => {
-        studentPiece.isFirst = false;
-      });
+      allStudentPieces.value = response.data;
     })
     .catch((e) => {
       console.log(e);
     });
+  filterStudentPieces();
 }
 
-function selectStudentPiece(studentPiece) {
-  if (!isStudentPieceSelected(studentPiece)) {
-    selectedStudentPieces.value.push(studentPiece);
-    studentPiece.isFirst = false;
-  } else {
-    selectedStudentPieces.value.splice(
-      selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id),
-      1
-    );
-  }
+function filterStudentPieces() {
+  studentPieces.value = allStudentPieces.value.filter(
+    (studentPiece) =>
+      (studentPiece.semesterId === props.eventData.semesterId ||
+        !onlySemesterPieces.value) &&
+      studentPiece.status === "Active"
+  );
+
+  studentPieces.value.forEach(function (studentPiece) {
+    var fullName = "";
+    if (studentPiece.piece.composer.lastName) {
+      fullName = studentPiece.piece.composer.lastName;
+      if (studentPiece.piece.composer.firstName) {
+        fullName += ", " + studentPiece.piece.composer.firstName;
+      }
+    } else {
+      fullName = studentPiece.piece.composer.firstName;
+    }
+    studentPiece.piece.composer.fullName = fullName;
+  });
+
+  filteredStudentPieces.value = studentPieces.value;
 }
 
 function isStudentPieceSelected(studentPiece) {
@@ -687,6 +678,10 @@ watch(selectedAccompanist, async () => {
   disableTimeslots();
 });
 
+watch(onlySemesterPieces, function () {
+  filterStudentPieces();
+});
+
 onMounted(async () => {
   await getData();
   eventTypeLabel.value =
@@ -784,8 +779,16 @@ onMounted(async () => {
                 </v-btn>
               </v-col>
             </v-row>
-            <v-row>
-              Only lists pieces from current semester and current instrument
+            <v-row mt-7>
+              <v-row>
+                <v-checkbox
+                  :disabled="disableOnlySemesterPiece"
+                  v-model="onlySemesterPieces"
+                  label="Only show pieces
+              from current semester"
+                  class="text-body-1 font-weight-bold text-darkBlue"
+                ></v-checkbox>
+              </v-row>
             </v-row>
             <v-row class="mt-5">
               <v-col cols="11" class="pl-0">
