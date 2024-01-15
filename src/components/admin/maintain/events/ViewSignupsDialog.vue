@@ -9,6 +9,7 @@ import {
 import {
   generateTimeSlots,
   subtractTimes,
+  addMinsToTime,
 } from "../../../../composables/timeManipulator.js";
 
 import AvailDataTable from "./AvailDataTable.vue";
@@ -19,16 +20,26 @@ const props = defineProps({
   availData: { type: [Object], required: true },
   studentSignupData: { type: [Object], required: true },
 });
-
+console.log(props.availData);
 function sortData() {
   tableData.value = [];
+  adjEndTime = props.eventData.endTime;
 
+  let minutes = (subtractTimes(props.eventData.startTime, props.eventData.endTime) /30);
+ 
+  if (minutes > parseInt(minutes)) {
+    var adjEndTime = addMinsToTime(30,props.eventData.endTime);
+  }
+ 
   var timeSlots = generateTimeSlots(
     props.eventData.startTime,
-    props.eventData.endTime,
+    adjEndTime,
     30
   );
+
+
   timeSlots.pop();
+
   timeSlots.forEach((element) => {
     tableData.value.push({
       time: element,
@@ -37,8 +48,9 @@ function sortData() {
       student: [],
     });
   });
-  var beginIndex = 0;
 
+  var beginIndex = 0;
+  
   // Finds the beginning index
   props.availData.forEach((element) => {
     for (var i = 0; i < timeSlots.length; i++) {
@@ -51,9 +63,11 @@ function sortData() {
     // Gets the number of 30 minute time slots that this element is available for
     var numberOfAvailabilities =
       subtractTimes(element.startTime, element.endTime) / 30;
+ 
     // If the element's role is a faculty member, add their first and last name to the faculty array
     if (element.userRole.role.role == "Faculty") {
       for (var i = 0; i < numberOfAvailabilities; i++) {
+        console.log(beginIndex + i  + " " + tableData.value.length);
         tableData.value[beginIndex + i].faculty.push({
           firstName: element.userRole.user.firstName,
           lastName: element.userRole.user.lastName,
