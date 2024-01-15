@@ -366,7 +366,7 @@ onMounted(async () => {
         >
         </v-autocomplete>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-          Level
+          Starting Level
         </v-card-subtitle>
         <v-select
           :read-only="haveLevel"
@@ -401,7 +401,7 @@ onMounted(async () => {
         >
         </v-select>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-          Private Hours
+          Private Lesson Hours
         </v-card-subtitle>
         <v-text-field
           type="number"
