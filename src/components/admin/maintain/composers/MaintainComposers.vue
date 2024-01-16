@@ -43,16 +43,19 @@ const searchInput = ref("");
 function searchAndFilterList() {
   filteredComposers.value = composers.value;
   // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value != "")
-    filteredComposers.value = filteredComposers.value.filter((composer) =>
-      (composer.firstName.toLowerCase() + " " + composer.lastName)
-        .toLowerCase()
-        .includes(searchInput.value.toLowerCase())
-    );
 
-  filterComposers();
+  if (searchInput.value != "") {
+    filteredComposers.value = filteredComposers.value.filter((composer) => {
+      let searchName = "";
+      if (composer.firstName != null)
+        searchName = composer.firstName.toLowerCase();
+      if (composer.lastName != null)
+        searchName += composer.lastName.toLowerCase();
+      return searchName.includes(searchInput.value.toLowerCase());
+    });
+    filterComposers();
+  }
 }
-
 const statusFilterOptions = ["Active", "Disabled", "Pending"];
 const statusFilterSelection = ref(null);
 

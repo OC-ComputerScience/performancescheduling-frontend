@@ -175,6 +175,7 @@ onMounted(async () => {
             <v-col v-for="signup in filteredSignups" :key="signup.id" cols="12">
               <FacultyCritiqueCard
                 :signup="signup"
+                :eventData="eventData"
                 @dialogClosedEvent="getData()"
               ></FacultyCritiqueCard>
             </v-col>

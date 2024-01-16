@@ -20,7 +20,7 @@ const currentPage = ref(1);
 const perPage = 9;
 
 async function getPerformances() {
-  await StudentInstrumentDataService.getStudentInstrumentSignupsByFacultuyRoleId(
+  await StudentInstrumentDataService.getStudentInstrumentSignupsByFacultyRoleId(
     facultyId,
     new Date(),
     "LTE",
