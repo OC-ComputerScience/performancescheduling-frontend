@@ -162,7 +162,13 @@ onMounted(async () => {
       stuSignup.studentInstrument.studentRole.user.lastName +
       ", " +
       stuSignup.studentInstrument.studentRole.user.firstName +
-      " (" + stuSignup.studentInstrument.instrument.name +", Level: "+ stuSignup.studentInstrument.level.name +", Hours: "+ stuSignup.studentInstrument.privateHours + ")"
+      " (" +
+      stuSignup.studentInstrument.instrument.name +
+      ", Level: " +
+      stuSignup.studentInstrument.level.name +
+      ", Hours: " +
+      stuSignup.studentInstrument.privateHours +
+      ")"
   );
 
   if (students.length == 1) {
@@ -193,6 +199,12 @@ onMounted(async () => {
       fullName = studentPiece.piece.composer.firstName;
     }
     studentPiece.piece.composer.fullName = fullName;
+    if (studentPiece.piece.poeticTranslation == null) {
+      studentPiece.piece.poeticTranslation = "Not Available";
+    }
+    if (studentPiece.piece.literalTranslation == null) {
+      studentPiece.piece.literalTranslation = "Not Available";
+    }
   });
 });
 </script>
@@ -219,8 +231,9 @@ onMounted(async () => {
         </v-row>
         <v-row class="mt-4">
           <v-col cols="6">
-          <v-row class="font-weight-bold text-black text-h8 ml-1">
-              Instructor: {{
+            <v-row class="font-weight-bold text-black text-h8 ml-1">
+              Instructor:
+              {{
                 props.signup.studentInstrumentSignups[0].accompanistRoleSignup
                   .user.lastName +
                 ", " +
@@ -228,11 +241,16 @@ onMounted(async () => {
                   .user.firstName
               }}
             </v-row>
-  
-            <v-row v-if="props.signup.studentInstrumentSignups[0].accompanistRoleSignup !=null"
+
+            <v-row
+              v-if="
+                props.signup.studentInstrumentSignups[0]
+                  .accompanistRoleSignup != null
+              "
               class="font-weight-bold text-black pl-0 ml-0 py-0 mt-5 ml-1 text-h8"
             >
-              Accomp: {{
+              Accomp:
+              {{
                 props.signup.studentInstrumentSignups[0].accompanistRoleSignup
                   .user.lastName +
                 ", " +
@@ -283,34 +301,24 @@ onMounted(async () => {
             </v-row>
             <div v-if="selectedStudentPiece.piece != undefined">
               <v-row class="font-weight-bold text-maroon ml-1">
-                Original Lyrics
-              </v-row>
-              <v-row class="text-maroon ml-1">
-                {{
-                  selectedStudentPiece.piece.originalLyrics != null
-                    ? selectedStudentPiece.piece.originalLyrics
-                    : "No lyrics available"
-                }}
-              </v-row>
-              <v-row class="font-weight-bold text-maroon ml-1">
                 Poetic Translation
               </v-row>
-              <v-row class="text-maroon ml-1">
-                {{
-                  selectedStudentPiece.piece.poeticTranslation != null
-                    ? selectedStudentPiece.piece.poeticTranslation
-                    : "No translation available"
-                }}
+              <v-row>
+                <v-textarea
+                  class="text-darkBlue bg-lightBlue ml-4 mr-12"
+                  v-model="selectedStudentPiece.piece.poeticTranslation"
+                >
+                </v-textarea>
               </v-row>
               <v-row class="font-weight-bold text-maroon ml-1">
                 Literal Translation
               </v-row>
-              <v-row class="text-maroon ml-1">
-                {{
-                  selectedStudentPiece.piece.literalTranslation != null
-                    ? selectedStudentPiece.piece.literalTranslation
-                    : "No translation available"
-                }}
+              <v-row>
+                <v-textarea
+                  class="text-darkBlue ml-4 mr-12 bg-lightBlue"
+                  v-model="selectedStudentPiece.piece.literalTranslation"
+                >
+                </v-textarea>
               </v-row>
             </div>
           </v-col>
