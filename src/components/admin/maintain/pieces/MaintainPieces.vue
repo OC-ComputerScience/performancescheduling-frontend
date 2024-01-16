@@ -54,17 +54,19 @@ const searchInput = ref("");
 function searchAndFilterList() {
   filteredPieces.value = pieces.value;
   // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value != "")
-    filteredPieces.value = filteredPieces.value.filter((piece) =>
-      (
-        piece.title.toLowerCase() +
-        " " +
-        piece.composer.firstName.toLowerCase() +
-        " " +
-        piece.composer.lastName.toLowerCase()
-      ).includes(searchInput.value.toLowerCase())
-    );
 
+  if (searchInput.value != "")
+    filteredPieces.value = filteredPieces.value.filter((piece) => {
+      let searchText = "";
+      if (piece.title != null)
+        searchText = searchText + piece.title.toLowerCase();
+      if (piece.composer.firstName != null)
+        searchText = searchText + piece.composer.firstName.toLowerCase();
+      if (piece.composer.lastName != null)
+        searchText = searchText + piece.composer.lastName.toLowerCase();
+
+      return searchText.includes(searchInput.value.toLowerCase());
+    });
   filterPieces();
 }
 
