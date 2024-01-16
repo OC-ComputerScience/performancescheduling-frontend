@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import StudentInstrumentDataService from "./../../../services/StudentInstrumentDataService";
 import UserInstrumentDialogBody from "./../../admin/maintain/users/UserInstrumentDialogBody.vue";
 import UserInstrumentCard from "./../../admin/maintain/users/UserInstrumentCard.vue";
+import SemesterDataService from "./../../../services/SemesterDataService";
 import { useLoginStore } from "./../../../stores/LoginStore.js";
 
 const addStudentInstrumentDialog = ref(false);
@@ -10,6 +11,7 @@ const loginStore = useLoginStore();
 // Student Instrument Data
 const studentinstruments = ref([]);
 const filteredStudentInstruments = ref([]);
+const semesters = ref([]);
 
 async function getStudentInstruments() {
   await StudentInstrumentDataService.getByUser(loginStore.currentRole.userId)
@@ -22,10 +24,20 @@ async function getStudentInstruments() {
     });
 }
 
+async function getSemesters() {
+  await SemesterDataService.getAll("startDate", false)
+    .then((response) => {
+      semesters.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 const filterMenuBool = ref(false);
 
 const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
+const semesterFilterSelection = ref(null);
 
 async function refreshStudentInstruments() {
   await getStudentInstruments();
@@ -35,13 +47,22 @@ async function refreshStudentInstruments() {
 // Filtering
 
 function filterStudentInstruments() {
+  filteredStudentInstruments.value = studentinstruments.value;
+
+  currentPage.value = 1;
   // Filter by status
   if (statusFilterSelection.value) {
-    currentPage.value = 1;
-    filteredStudentInstruments.value = studentinstruments.value;
     filteredStudentInstruments.value = filteredStudentInstruments.value.filter(
       (studentinstrument) =>
         studentinstrument.status === statusFilterSelection.value
+    );
+  }
+  // Filter by semester
+
+  if (semesterFilterSelection.value) {
+    filteredStudentInstruments.value = filteredStudentInstruments.value.filter(
+      (studentinstrument) =>
+        studentinstrument.semesterId === semesterFilterSelection.value.id
     );
   }
 }
@@ -51,6 +72,7 @@ function clearFilters() {
   currentPage.value = 1;
   filteredStudentInstruments.value = studentinstruments.value;
   statusFilterSelection.value = null;
+  semesterFilterSelection.value = null;
 }
 
 // Pagination
@@ -71,6 +93,7 @@ function closeAddInstrumentDialog() {
 
 onMounted(async () => {
   await getStudentInstruments();
+  await getSemesters();
 });
 </script>
 
@@ -106,6 +129,19 @@ onMounted(async () => {
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
+                ></v-select>
+              </v-list-item>
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Semesters
+                <v-select
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="semesterFilterSelection"
+                  :items="semesters"
+                  item-title="name"
+                  item-value="id"
+                  return-object
                 ></v-select>
               </v-list-item>
             </v-list>
@@ -160,6 +196,7 @@ onMounted(async () => {
             >
               <UserInstrumentCard
                 :student-instrument-data="studentinstrument"
+                :is-student="true"
                 @refreshStudentInstrumentsEvent="refreshStudentInstruments()"
               ></UserInstrumentCard>
             </v-col>
@@ -188,6 +225,7 @@ onMounted(async () => {
   <v-dialog v-model="addStudentInstrumentDialog" persistent max-width="600px">
     <UserInstrumentDialogBody
       :is-edit="false"
+      :is-student="true"
       :student-instrument-data="{
         id: null,
         status: 'Active',

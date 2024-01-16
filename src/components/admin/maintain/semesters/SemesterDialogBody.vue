@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
-
 import SemesterDataService from "../../../../services/SemesterDataService";
+import StudentInstrumentDataService from "../../../../services/StudentInstrumentDataService";
+import UserDataService from "../../../../services/UserDataService";
 import { formatDate } from "../../../../composables/dateFormatter";
 
 const emits = defineEmits([
@@ -19,6 +20,8 @@ const props = defineProps({
 });
 const form = ref(null);
 const editedSemesterData = ref(Object.assign({}, props.semesterData));
+const yesDisableStudents = ref(true);
+const users = ref([]);
 
 onMounted(() => {
   if (props.isEdit) {
@@ -45,6 +48,10 @@ async function addSemester() {
         .catch((err) => {
           console.log(err);
         });
+    if(yesDisableStudents.value){
+      disableAllStudents();
+    }
+
     }
   });
 }
@@ -84,6 +91,19 @@ function endDateCheck() {
     ? true
     : "Date must be in the format of MM/DD/YYYY.";
 }
+
+async function disableAllStudents(){
+  UserDataService.disableAllUsers()
+    .catch((err) => {
+      console.log(err);
+    });
+  
+    StudentInstrumentDataService.disableAllStudentsInstruments()
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 </script>
 
 <template>
@@ -157,6 +177,13 @@ function endDateCheck() {
               endDateCheck,
             ]"
           ></v-text-field>
+          <v-checkbox
+            v-if="!props.isEdit"
+            v-model="yesDisableStudents"
+            label="Disable all students"
+            class="font-weight-semi-bold text-darkBlue"
+          >
+          </v-checkbox>
         </v-card-text>
       </v-card-actions>
       <v-card-actions>

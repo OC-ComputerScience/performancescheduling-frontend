@@ -32,7 +32,7 @@ class StudentInstrumentDataService {
         order
     );
   }
-  getStudentInstrumentSignupsByFacultuyRoleId(
+  getStudentInstrumentSignupsByFacultyRoleId(
     facultyRoleId,
     date,
     select,
@@ -50,12 +50,16 @@ class StudentInstrumentDataService {
         order
     );
   }
-  getStudentsForInstructorId(instructorId) {
-    return http.get(this.baseUrl + "instructorId/" + instructorId);
+  getStudentsForInstructorId(instructorId, active) {
+    return http.get(
+      this.baseUrl + "instructorId/" + instructorId + "?active=" + active
+    );
   }
 
-  getStudentsForAccompanistId(accompanistId) {
-    return http.get(this.baseUrl + "accompanistId/" + accompanistId);
+  getStudentsForAccompanistId(accompanistId, active) {
+    return http.get(
+      this.baseUrl + "accompanistId/" + accompanistId + "?active=" + active
+    );
   }
 
   getStudentInstrumentsForStudentId(studentId) {
@@ -72,6 +76,10 @@ class StudentInstrumentDataService {
 
   update(data) {
     return http.put(this.baseUrl + data.id, data);
+  }
+
+  disableAllStudentsInstruments() {
+    return http.put(this.baseUrl);
   }
 }
 export default new StudentInstrumentDataService();

@@ -32,7 +32,8 @@ async function retrieveData() {
 
   if (currentRole.value.role.role == "Faculty") {
     await StudentInstrumentDataService.getStudentsForInstructorId(
-      currentRole.value.id
+      currentRole.value.id,
+      "Active"
     )
       .then((response) => {
         students.value = response.data;
@@ -44,7 +45,8 @@ async function retrieveData() {
 
   if (currentRole.value.role.role == "Accompanist") {
     await StudentInstrumentDataService.getStudentsForAccompanistId(
-      currentRole.value.id
+      currentRole.value.id,
+      "Active"
     )
       .then((response) => {
         students.value = response.data;
@@ -130,6 +132,20 @@ const filteredEvents = computed(() => {
   );
 });
 
+function getSignups(eventID) {
+  const count = upcomingEvents.value.find((event) => event.id === eventID)
+    .eventSignups.length;
+  return count;
+}
+
+function getEventType(eventID) {
+  const eventType = upcomingEvents.value.find(
+    (event) => event.id === eventID
+  ).eventType;
+
+  return eventType;
+}
+
 onMounted(async () => {
   await retrieveData();
 });
@@ -142,7 +158,10 @@ onMounted(async () => {
         <v-col cols="12" lg="3" class="ma-0 pa-4">
           <v-row class="fill-height ma-0">
             <v-col cols="12" class="pa-0 ma-0 pb-4">
-              <v-card class="fill-height mainCardBorder pa-2">
+              <v-card
+                class="fill-height mainCardBorder pa-2"
+                style="overflow-y: auto; max-height: 400px; min-height: 400px"
+              >
                 <v-card-title
                   class="font-weight-semi-bold text-blue text-h5 pb-0"
                 >
@@ -165,7 +184,10 @@ onMounted(async () => {
               </v-card>
             </v-col>
             <v-col cols="12" class="pa-0 ma-0 pt-4">
-              <v-card class="fill-height mainCardBorder pa-2">
+              <v-card
+                class="fill-height mainCardBorder pa-2"
+                style="overflow-y: auto; max-height: 400px; min-height: 400px"
+              >
                 <v-row>
                   <v-col cols="auto">
                     <v-card-title
@@ -187,8 +209,8 @@ onMounted(async () => {
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2">
+        <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
             <v-card-title>
               <v-row class="pa-2">
                 <p class="font-weight-semi-bold text-darkBlue text-h5">
@@ -204,13 +226,15 @@ onMounted(async () => {
                 :availability-data="
                   availability.length <= 1 ? availability[0] : availability
                 "
+                :signUpCount="getSignups(availability[0].event.id)"
+                :eventType="getEventType(availability[0].event.id)"
                 @refreshAvailabilitiesEvent="refreshAvailability"
               ></EventAvailabilityItem>
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2">
+        <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
+          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
             <v-card-title class="font-weight-semi-bold text-orange text-h5">
               Upcoming Events
             </v-card-title>

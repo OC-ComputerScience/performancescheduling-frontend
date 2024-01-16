@@ -21,5 +21,21 @@ class StudentInstrumentSignupDataService {
   update(data) {
     return http.put(this.baseUrl + data.id, data);
   }
+
+  getByUserRoleId(
+    userRoleId, 
+    date,
+    select,
+    order = "ASC") {
+    return http.get(this.baseUrl + 
+        "userRoleId/" + 
+        userRoleId +
+        "?date=" +
+        date +
+        "&select=" +
+        select +
+        "&order=" +
+        order);
+  }
 }
 export default new StudentInstrumentSignupDataService();

@@ -16,7 +16,7 @@ const emits = defineEmits([
   "closeUserDialogEvent",
   "updateUserSuccessEvent",
   "disableUserEvent",
-  "enableUserEvent"
+  "enableUserEvent",
 ]);
 
 const props = defineProps({
@@ -54,11 +54,15 @@ const editedUserRoles = ref(
 const isStudent = ref(false);
 const isFaculty = ref(false);
 
-function checkRoles(){
-  isStudent.value = editedUserRoles.value.some((ur) => ur.id === 1 && ur.status === "Active")
+function checkRoles() {
+  isStudent.value = editedUserRoles.value.some(
+    (ur) => ur.id === 1 && ur.status === "Active"
+  );
 
-  isFaculty.value = editedUserRoles.value.some((ur) => ur.id === 2 && ur.status === "Active")
-};
+  isFaculty.value = editedUserRoles.value.some(
+    (ur) => ur.id === 2 && ur.status === "Active"
+  );
+}
 
 checkRoles();
 
@@ -133,7 +137,9 @@ async function addUser() {
       await UserDataService.create(editedUserData.value)
         .then(async (response) => {
           for (let editedUserRole of editedUserRoles.value) {
-            const majorId = isStudent.value ? editedStudentMajor.value.id : null            
+            const majorId = isStudent.value
+              ? editedStudentMajor.value.id
+              : null;
             await UserRoleDataService.create({
               userId: response.data.id,
               roleId: editedUserRole.id,
@@ -165,7 +171,7 @@ async function updateUser() {
     if (valid.valid) {
       await updateUserRoles();
 
-      if (isStudent.value && studentRole != null){
+      if (isStudent.value && studentRole != null) {
         await updateStudentMajor();
         await updateStudentClassification();
         await updateStudentSemesters();
@@ -323,7 +329,9 @@ async function refreshStudentInstruments() {
     });
 }
 
-watch(editedUserRoles, () => {
+watch(
+  editedUserRoles,
+  () => {
     checkRoles();
   },
   { deep: true }
@@ -332,7 +340,7 @@ watch(editedUserRoles, () => {
 onMounted(async () => {
   await getAllRoles();
   await getAllMajors();
-  if (props.isEdit && isStudent.value){
+  if (props.isEdit && isStudent.value) {
     await refreshStudentInstruments();
   }
 });
@@ -460,18 +468,18 @@ onMounted(async () => {
               <v-spacer></v-spacer>
               <v-col cols="5" class="pa-0">
                 <v-card-subtitle
-                    class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+                  class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
                 >
-                    Honorific
-                  </v-card-subtitle>
-                  <v-text-field
-                    color="darkBlue"
-                    variant="plain"
-                    class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-                    v-model="editedUserData.honorific"
-                    :rules="[(v) => !!v || 'This field is required']"
-                  >
-                  </v-text-field>
+                  Honorific
+                </v-card-subtitle>
+                <v-text-field
+                  color="darkBlue"
+                  variant="plain"
+                  class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+                  v-model="editedUserData.honorific"
+                  :rules="[(v) => !!v || 'This field is required']"
+                >
+                </v-text-field>
               </v-col>
             </v-row>
 
@@ -639,6 +647,7 @@ onMounted(async () => {
                 v-for="studentInstrument of studentRole.studentRole"
                 :key="studentInstrument.id"
                 :student-instrument-data="studentInstrument"
+                :is-student="false"
                 @refreshStudentInstrumentsEvent="refreshStudentInstruments"
               ></UserInstrumentCard>
             </v-card>
