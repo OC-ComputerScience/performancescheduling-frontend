@@ -155,12 +155,40 @@ function filterStudentPieces() {
 
   filteredStudentPieces.value = studentPieces.value;
 }
-
+function selectStudentPiece(studentPiece) {
+  if (!isStudentPieceSelected(studentPiece)) {
+    selectedStudentPieces.value.push(studentPiece);
+    studentPiece.isFirst = false;
+  } else {
+    selectedStudentPieces.value.splice(
+      selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id),
+      1
+    );
+  }
+  if (isNonSemesterPieceSelected()) {
+    disableOnlySemesterPiece.value = true;
+  } else {
+    disableOnlySemesterPiece.value = false;
+  }
+}
 function isStudentPieceSelected(studentPiece) {
   return (
     selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id) !==
     -1
   );
+}
+
+function isNonSemesterPieceSelected() {
+  for (var i = 0; i < studentPieces.value.length; i++) {
+    if (
+      isStudentPieceSelected(studentPieces.value[i]) &&
+      studentPieces.value[i].semesterId != props.eventData.semesterId
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function setFirstPiece(clickedStudentPiece) {
@@ -459,7 +487,7 @@ async function requestAdditionalTimeslots(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you create more timeslots for ${props.eventData.name} on 
+    } has requested you create more timeslots for ${props.eventData.name} on
     ${formatDate(props.eventData.date)} (${new Date(
       props.eventData.date
     ).toLocaleDateString("default", {
