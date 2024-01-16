@@ -234,10 +234,10 @@ onMounted(async () => {
             <v-row class="font-weight-bold text-black text-h8 ml-1">
               Instructor:
               {{
-                props.signup.studentInstrumentSignups[0].accompanistRoleSignup
+                props.signup.studentInstrumentSignups[0].instructorRoleSignup
                   .user.lastName +
                 ", " +
-                props.signup.studentInstrumentSignups[0].accompanistRoleSignup
+                props.signup.studentInstrumentSignups[0].instructorRoleSignup
                   .user.firstName
               }}
             </v-row>
