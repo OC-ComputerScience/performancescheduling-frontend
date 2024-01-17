@@ -25,18 +25,14 @@ function sortData() {
   tableData.value = [];
   adjEndTime = props.eventData.endTime;
 
-  let minutes = (subtractTimes(props.eventData.startTime, props.eventData.endTime) /30);
- 
-  if (minutes > parseInt(minutes)) {
-    var adjEndTime = addMinsToTime(30,props.eventData.endTime);
-  }
- 
-  var timeSlots = generateTimeSlots(
-    props.eventData.startTime,
-    adjEndTime,
-    30
-  );
+  let minutes =
+    subtractTimes(props.eventData.startTime, props.eventData.endTime) / 30;
 
+  if (minutes > parseInt(minutes)) {
+    var adjEndTime = addMinsToTime(30, props.eventData.endTime);
+  }
+
+  var timeSlots = generateTimeSlots(props.eventData.startTime, adjEndTime, 30);
 
   timeSlots.pop();
 
@@ -50,7 +46,7 @@ function sortData() {
   });
 
   var beginIndex = 0;
-  
+
   // Finds the beginning index
   props.availData.forEach((element) => {
     for (var i = 0; i < timeSlots.length; i++) {
@@ -63,11 +59,10 @@ function sortData() {
     // Gets the number of 30 minute time slots that this element is available for
     var numberOfAvailabilities =
       subtractTimes(element.startTime, element.endTime) / 30;
- 
+
     // If the element's role is a faculty member, add their first and last name to the faculty array
     if (element.userRole.role.role == "Faculty") {
-      for (var i = 0; i < numberOfAvailabilities; i++) {
-        console.log(beginIndex + i  + " " + tableData.value.length);
+      for (let i = 0; i < numberOfAvailabilities; i++) {
         tableData.value[beginIndex + i].faculty.push({
           firstName: element.userRole.user.firstName,
           lastName: element.userRole.user.lastName,
@@ -76,7 +71,7 @@ function sortData() {
     }
     // If the element's role is an accompanist, add their first and last name to the accompanist array
     else if (element.userRole.role.role == "Accompanist") {
-      for (var i = 0; i < numberOfAvailabilities; i++) {
+      for (let i = 0; i < numberOfAvailabilities; i++) {
         tableData.value[beginIndex + i].accompanist.push({
           firstName: element.userRole.user.firstName,
           lastName: element.userRole.user.lastName,
@@ -87,7 +82,7 @@ function sortData() {
 
   props.studentSignupData.eventSignups.forEach((element) => {
     var placed = false;
-    for (var i = 0; i < timeSlots.length - 1 && !placed; i++) {
+    for (let i = 0; i < timeSlots.length && !placed; i++) {
       if (element.startTime < timeSlots[i].time) {
         element.studentInstrumentSignups.forEach((signup) => {
           tableData.value[i - 1].student.push({
@@ -97,6 +92,14 @@ function sortData() {
         });
         placed = true;
       }
+    }
+    if (!placed) {
+      element.studentInstrumentSignups.forEach((signup) => {
+        tableData.value[timeSlots.length - 1].student.push({
+          firstName: signup.studentInstrument.studentRole.user.firstName,
+          lastName: signup.studentInstrument.studentRole.user.lastName,
+        });
+      });
     }
   });
 }
