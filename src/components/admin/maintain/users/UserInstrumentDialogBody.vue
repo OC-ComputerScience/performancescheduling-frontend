@@ -33,7 +33,6 @@ const haveLevel = ref(false);
 const editedLevel = ref(props.studentInstrumentData.level);
 const editedEndingLevel = ref(props.studentInstrumentData.endingLevel);
 const privateHours = ref(props.studentInstrumentData.privateHours);
-console.log(props.studentInstrumentData);
 const levelOptions = ref([]);
 const instrumentOptions = ref([]);
 const instructors = ref([]);
@@ -187,9 +186,6 @@ async function updateLevel() {
 }
 
 async function updateEndingLevel() {
-  console.log(editedEndingLevel.value);
-  console.log(props.studentInstrumentData.endingLevelId);
-
   if (
     props.studentInstrumentData.endingLevelId === null ||
     editedEndingLevel.value.id != props.studentInstrumentData.endingLevelId
