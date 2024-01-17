@@ -20,7 +20,7 @@ const props = defineProps({
   availData: { type: [Object], required: true },
   studentSignupData: { type: [Object], required: true },
 });
-console.log(props.availData);
+
 function sortData() {
   tableData.value = [];
   adjEndTime = props.eventData.endTime;
