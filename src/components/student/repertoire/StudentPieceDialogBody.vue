@@ -239,20 +239,8 @@ onBeforeMount(async () => {
   await getComposers();
   await getStudentInstruments(loginStore.currentRole.id);
 
-  if (editedStudentPieceData.value.pieceId != null) {
-    let newPiece = pieces.value.find((piece) => {
-      return piece.id === editedStudentPieceData.value.pieceId;
-    });
-    editedPoeticTranslation.value = newPiece.poeticTranslation;
-    editedLiteralTranslation.value = newPiece.literalTranslation;
-    if (editedPoeticTranslation.value == null) {
-      editedPoeticTranslation.value =
-        "Please edit piece and update poetic translation";
-    }
-    if (editedLiteralTranslation.value == null) {
-      editedLiteralTranslation.value =
-        "Please edit piece and update poetic translation";
-    }
+  if (!props.isEdit && editedStudentPieceData.value.semesterId == null) {
+    editedStudentPieceData.value.semesterId = semesters.value[0].id;
   }
 });
 </script>
