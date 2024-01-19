@@ -33,7 +33,6 @@ const haveLevel = ref(false);
 const editedLevel = ref(props.studentInstrumentData.level);
 const editedEndingLevel = ref(props.studentInstrumentData.endingLevel);
 const privateHours = ref(props.studentInstrumentData.privateHours);
-console.log(props.studentInstrumentData);
 const levelOptions = ref([]);
 const instrumentOptions = ref([]);
 const instructors = ref([]);
@@ -187,9 +186,6 @@ async function updateLevel() {
 }
 
 async function updateEndingLevel() {
-  console.log(editedEndingLevel.value);
-  console.log(props.studentInstrumentData.endingLevelId);
-
   if (
     props.studentInstrumentData.endingLevelId === null ||
     editedEndingLevel.value.id != props.studentInstrumentData.endingLevelId
@@ -366,7 +362,7 @@ onMounted(async () => {
         >
         </v-autocomplete>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-          Level
+          Starting Level
         </v-card-subtitle>
         <v-select
           :read-only="haveLevel"
@@ -401,7 +397,7 @@ onMounted(async () => {
         >
         </v-select>
         <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">
-          Private Hours
+          Private Lesson Hours
         </v-card-subtitle>
         <v-text-field
           type="number"

@@ -236,7 +236,7 @@ onMounted(() => {
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="feedbackDialog = true"
         >
-          {{ signupHasFeedbackByFaculty() ? "Edit Feedback" : "Add Feedback" }}
+          {{ signupHasFeedbackByFaculty() ? "Edit Critique" : "Add Critique" }}
         </v-btn>
         <v-btn
           v-if="props.eventData.eventType.allowGrade"

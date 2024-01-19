@@ -93,18 +93,18 @@ async function updateUser() {
       await getUserData();
 
       loginStore.setRoles(userRoles.value);
+
+      if (currentRole.value.roleId == 1) {
+        router.push({ path: "studentHome" });
+      } else if (currentRole.value.roleId == 2) {
+        router.push({ path: "facultyHome" });
+      } else if (currentRole.value.roleId == 3) {
+        router.push({ path: "adminHome" });
+      } else {
+        router.push({ path: "accompanistHome" });
+      }
     }
   });
-
-  if (currentRole.value.roleId == 1) {
-    router.push({ path: "studentHome" });
-  } else if (currentRole.value.roleId == 2) {
-    router.push({ path: "facultyHome" });
-  } else if (currentRole.value.roleId == 3) {
-    router.push({ path: "adminHome" });
-  } else {
-    router.push({ path: "accompanistHome" });
-  }
 }
 
 // If the user's major has changed, update it
