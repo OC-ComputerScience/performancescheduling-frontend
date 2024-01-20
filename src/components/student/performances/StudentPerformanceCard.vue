@@ -2,7 +2,10 @@
 import { ref } from "vue";
 import { useLoginStore } from "../../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
-import { formatDate } from "./../../../composables/dateFormatter";
+import {
+  formatDate,
+  formatDateDash,
+} from "./../../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "./../../../composables/timeFormatter";
 import { getHourWordFromNumber } from "./../../../composables/timeFormatter";
 import PerformanceDialogBody from "./PerformanceDialogBody.vue";
@@ -27,6 +30,8 @@ const props = defineProps({
   studentInstrumentSignupData: { type: [Object], required: true },
 });
 
+console.log(props.eventData.date <= formatDateDash(new Date()));
+
 function openDialog(piece) {
   pieceData.value = piece;
   viewCritique.value = true;
@@ -44,7 +49,6 @@ function hasCritiques(piece) {
     isCritiqued.value = true;
     return true;
   } else {
-    isCritiqued.value = false;
     return false;
   }
 }
@@ -298,7 +302,11 @@ function hasCritiques(piece) {
           <v-row>
             <v-spacer></v-spacer>
             <v-btn
-              v-if="!isCritiqued && currentRole.roleId == 2"
+              v-if="
+                !isCritiqued &&
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
+              "
               flat
               size="small"
               :min-width="95"
@@ -309,9 +317,24 @@ function hasCritiques(piece) {
             </v-btn>
             <v-btn
               v-if="
+                isCritiqued &&
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
+              "
+              flat
+              size="small"
+              :min-width="95"
+              class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none text-white"
+              @click="critiqueDialog = true"
+            >
+              Edit Critique
+            </v-btn>
+            <v-btn
+              v-if="
                 eventData.eventType.allowGrade &&
                 eventSignupData.pass == null &&
-                currentRole.roleId == 2
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
               "
               flat
               size="small"
@@ -325,7 +348,8 @@ function hasCritiques(piece) {
               v-if="
                 eventData.eventType.allowGrade &&
                 eventSignupData.pass != null &&
-                currentRole.roleId == 2
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
               "
               flat
               size="small"
@@ -340,7 +364,8 @@ function hasCritiques(piece) {
               v-if="
                 eventData.eventType.allowEndingLevel &&
                 eventSignupData.endingLevelId == null &&
-                currentRole.roleId == 2
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
               "
               flat
               size="small"
@@ -354,7 +379,8 @@ function hasCritiques(piece) {
               v-if="
                 eventData.eventType.allowEndingLevel &&
                 eventSignupData.endingLevelId != null &&
-                currentRole.roleId == 2
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
               "
               flat
               size="small"
