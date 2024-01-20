@@ -28,10 +28,7 @@ const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
 
 let addForSemester = false;
-if (props.isEdit)
-  editedStudentPieceData.value.piece.composer.fullName = composerName(
-    editedStudentPieceData.value.piece.composer
-  );
+
 if (!props.isEdit) {
   if (editedStudentPieceData.value.semesterId != null) addForSemester = true;
 }
@@ -233,6 +230,7 @@ watch(
     }
   }
 );
+
 onBeforeMount(async () => {
   await getSemesters();
   await getPieces();
@@ -241,6 +239,19 @@ onBeforeMount(async () => {
 
   if (!props.isEdit && editedStudentPieceData.value.semesterId == null) {
     editedStudentPieceData.value.semesterId = semesters.value[0].id;
+  }
+  if (props.isEdit) {
+    let currentPiece = pieces.value.find((piece) => {
+      return piece.id === editedStudentPieceData.value.pieceId;
+    });
+
+    editedPoeticTranslation.value = currentPiece.poeticTranslation;
+    editedLiteralTranslation.value = currentPiece.literalTranslation;
+    editedStudentPieceData.value.piece.composer.fullName = composerName(
+      composers.value.find((composer) => {
+        return composer.id === currentPiece.composerId;
+      })
+    );
   }
 });
 </script>
