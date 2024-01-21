@@ -45,6 +45,7 @@ const createPieceDialog = ref(false);
 const addComposerDialog = ref(false);
 const editedPoeticTranslation = ref("");
 const editedLiteralTranslation = ref("");
+const currentPiece = ref(null);
 
 //add StudentPiece
 async function addStudentPiece() {
@@ -89,7 +90,16 @@ async function getPieces() {
   await PieceDataService.getAll("title", "ASC")
     .then((response) => {
       pieces.value = response.data;
-      filterPieces();
+      //filterPieces();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+async function getPiece(id) {
+  await PieceDataService.get(id)
+    .then((response) => {
+      currentPiece.value = response.data;
     })
     .catch((err) => {
       console.log(err);
@@ -233,23 +243,19 @@ watch(
 
 onBeforeMount(async () => {
   await getSemesters();
-  await getPieces();
+  if (!props.isEdit) await getPieces();
   await getComposers();
   await getStudentInstruments(loginStore.currentRole.id);
-
   if (!props.isEdit && editedStudentPieceData.value.semesterId == null) {
     editedStudentPieceData.value.semesterId = semesters.value[0].id;
   }
   if (props.isEdit) {
-    let currentPiece = pieces.value.find((piece) => {
-      return piece.id === editedStudentPieceData.value.pieceId;
-    });
-
-    editedPoeticTranslation.value = currentPiece.poeticTranslation;
-    editedLiteralTranslation.value = currentPiece.literalTranslation;
+    await getPiece(editedStudentPieceData.value.pieceId);
+    editedPoeticTranslation.value = currentPiece.value.poeticTranslation;
+    editedLiteralTranslation.value = currentPiece.value.literalTranslation;
     editedStudentPieceData.value.piece.composer.fullName = composerName(
       composers.value.find((composer) => {
-        return composer.id === currentPiece.composerId;
+        return composer.id === currentPiece.value.composerId;
       })
     );
   }
