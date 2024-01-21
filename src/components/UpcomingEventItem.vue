@@ -174,40 +174,46 @@ function generatePDF() {
   doc.setFontSize(10).text(footer, 0.5, doc.internal.pageSize.height - 0.5);
 
   let pdfSignups = [];
+  console.log(studentSignupData.value.eventSignups);
   studentSignupData.value.eventSignups.forEach(function (eventSignup) {
     let signup = {};
     signup.startTime = get12HourTimeStringFromString(eventSignup.startTime);
     signup.endTime = get12HourTimeStringFromString(eventSignup.endTime);
     signup.student = "";
     let comma = "";
-    eventSignup.studentInstrumentSignups.forEach(function (studentInstrument) {
-      signup.student +=
-        comma +
-        studentInstrument.studentInstrument.studentRole.user.firstName +
-        " " +
-        studentInstrument.studentInstrument.studentRole.user.lastName;
-      comma = ",";
-    });
 
-    if (eventSignup.studentInstrumentSignups[0].accompanistRoleId == null) {
-      signup.accompanist = "None";
-    } else {
-      signup.accompanist =
-        eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
+    if (eventSignup.studentInstrumentSignups.length > 0) {
+      eventSignup.studentInstrumentSignups.forEach(function (
+        studentInstrument
+      ) {
+        signup.student +=
+          comma +
+          studentInstrument.studentInstrument.studentRole.user.firstName +
+          " " +
+          studentInstrument.studentInstrument.studentRole.user.lastName;
+        comma = ",";
+      });
+
+      if (eventSignup.studentInstrumentSignups[0].accompanistRoleId == null) {
+        signup.accompanist = "None";
+      } else {
+        signup.accompanist =
+          eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
+            .firstName +
+          " " +
+          eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
+            .lastName;
+      }
+      signup.instructor =
+        eventSignup.studentInstrumentSignups[0].instructorRoleSignup.user
           .firstName +
         " " +
-        eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
+        eventSignup.studentInstrumentSignups[0].instructorRoleSignup.user
           .lastName;
+      signup.instrument =
+        eventSignup.studentInstrumentSignups[0].studentInstrument.instrument.name;
+      pdfSignups.push(signup);
     }
-    signup.instructor =
-      eventSignup.studentInstrumentSignups[0].instructorRoleSignup.user
-        .firstName +
-      " " +
-      eventSignup.studentInstrumentSignups[0].instructorRoleSignup.user
-        .lastName;
-    signup.instrument =
-      eventSignup.studentInstrumentSignups[0].studentInstrument.instrument.name;
-    pdfSignups.push(signup);
   });
 
   doc.autoTable({
