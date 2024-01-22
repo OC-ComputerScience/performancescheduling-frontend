@@ -30,8 +30,6 @@ const props = defineProps({
   studentInstrumentSignupData: { type: [Object], required: true },
 });
 
-console.log(props.eventData.date <= formatDateDash(new Date()));
-
 function openDialog(piece) {
   pieceData.value = piece;
   viewCritique.value = true;

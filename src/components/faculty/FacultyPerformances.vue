@@ -66,6 +66,7 @@ function filterPerformances() {
 function clearFilters() {
   currentPage.value = 1;
   filteredPerformances.value = performances.value;
+  searchInput.value = "";
   semesterFilterSelection.value = null;
 }
 
