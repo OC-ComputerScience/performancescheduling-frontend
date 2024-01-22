@@ -246,12 +246,14 @@ async function setDefaultValues() {
     selectedInstructor.value = defaultInstrument.instructorRole;
     selectedAccompanist.value = defaultInstrument.accompanistRole;
     selectedSemester.value = semesters.value[0];
-    console.log(defaultInstrument);
+
     if (defaultInstrument.endingLevelId != null) {
       editedLevel.value =
         levelOptions.value[defaultInstrument.endingLevelId - 1];
     } else {
-      editedLevel.value = levelOptions.value[defaultInstrument.levelId - 1];
+      if (defaultInstrument.levelId === null) editedLevel.value = 1;
+      else
+        editedLevel.value = levelOptions.value[defaultInstrument.levelId - 1];
     }
 
     privateHours.value = defaultInstrument.privateHours;
