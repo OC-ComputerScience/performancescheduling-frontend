@@ -187,8 +187,9 @@ async function updateLevel() {
 
 async function updateEndingLevel() {
   if (
-    props.studentInstrumentData.endingLevelId === null ||
-    editedEndingLevel.value.id != props.studentInstrumentData.endingLevelId
+    editedEndingLevel.value != null &&
+    (props.studentInstrumentData.endingLevelId === null ||
+      editedEndingLevel.value.id != props.studentInstrumentData.endingLevelId)
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
