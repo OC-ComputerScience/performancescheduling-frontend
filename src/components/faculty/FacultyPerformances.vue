@@ -3,18 +3,20 @@ import { ref, onBeforeMount, computed } from "vue";
 import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService.js";
 import StudentPerformanceCard from "../student/performances/StudentPerformanceCard.vue";
 import SemesterDataService from "./../../services/SemesterDataService";
+import UserRoleDataService from "./../../services/UserRoleDataService";
 import { useLoginStore } from "../../stores/LoginStore.js";
 
 const performances = ref([]);
 const filteredPerformances = ref([]);
 const filterMenuBool = ref(false);
 
-const loginStore = useLoginStore();
 const searchInput = ref("");
 
 // Filter options
 const semesterFilterOptions = ref([]);
 const semesterFilterSelection = ref(null);
+const instructorFilterOptions = ref([]);
+const instructorFilterSelection = ref(null);
 
 // Pagination
 const currentPage = ref(1);
@@ -26,10 +28,20 @@ async function getSemesters() {
   });
 }
 
+async function getInstructor() {
+  await UserRoleDataService.getRolesForRoleId(2, null, null, "All").then(
+    (response) => {
+      instructorFilterOptions.value = response.data;
+      instructorFilterOptions.value.forEach((instructor) => {
+        instructor.name =
+          instructor.user.firstName + " " + instructor.user.lastName;
+      });
+    }
+  );
+}
+
 async function getPerformances() {
-  await StudentInstrumentSignupDataService.getAllData(
-    semesterFilterSelection
-  ).then((response) => {
+  await StudentInstrumentSignupDataService.getAllData().then((response) => {
     performances.value = response.data;
   });
 
@@ -61,6 +73,12 @@ function filterPerformances() {
         semesterFilterSelection.value.id
     );
   }
+  if (instructorFilterSelection.value != null) {
+    filteredPerformances.value = filteredPerformances.value.filter(
+      (performance) =>
+        performance.instructorRoleId === instructorFilterSelection.value.id
+    );
+  }
 }
 
 function clearFilters() {
@@ -68,6 +86,7 @@ function clearFilters() {
   filteredPerformances.value = performances.value;
   searchInput.value = "";
   semesterFilterSelection.value = null;
+  instructorFilterSelection.value = null;
 }
 
 const currentPageData = computed(() => {
@@ -77,8 +96,30 @@ const currentPageData = computed(() => {
   );
 });
 
+const filerContents = computed(() => {
+  let fc = "";
+  if (searchInput.value != "") {
+    fc += "Student: " + searchInput.value + ", ";
+  } else {
+    fc += "Student: All, ";
+  }
+  if (semesterFilterSelection.value != null) {
+    fc += "Semester: " + semesterFilterSelection.value.name + ", ";
+  } else {
+    fc += "Semester: All, ";
+  }
+  if (instructorFilterSelection.value != null) {
+    fc += "Instructor: " + instructorFilterSelection.value.name;
+  } else {
+    fc += "Instructor: All";
+  }
+
+  return fc;
+});
+
 onBeforeMount(async () => {
   getSemesters();
+  getInstructor();
 
   refreshPerformances();
 });
@@ -131,6 +172,19 @@ onBeforeMount(async () => {
                   item-value="id"
                   return-object
                 ></v-select>
+                <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                </v-list-item>
+                Instructor
+                <v-select
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="instructorFilterSelection"
+                  :items="instructorFilterOptions"
+                  item-title="name"
+                  item-value="id"
+                  return-object
+                ></v-select>
               </v-list-item>
             </v-list>
           </v-card-text>
@@ -161,6 +215,7 @@ onBeforeMount(async () => {
         Clear filters
       </v-btn>
     </v-row>
+    <v-row class="ml-6"> Displaying : {{ filerContents }}</v-row>
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">
