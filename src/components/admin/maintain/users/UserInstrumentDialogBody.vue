@@ -251,6 +251,7 @@ async function setDefaultValues() {
       editedLevel.value =
         levelOptions.value[defaultInstrument.endingLevelId - 1];
     } else {
+      haveLevel.value = false;
       if (defaultInstrument.levelId === null) editedLevel.value = 1;
       else
         editedLevel.value = levelOptions.value[defaultInstrument.levelId - 1];
