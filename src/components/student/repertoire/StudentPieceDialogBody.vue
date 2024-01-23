@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import StudentPieceDataService from "./../../../services/StudentPieceDataService";
 import ComposerDataService from "./../../../services/ComposerDataService";
 import SemesterDataService from "./../../../services/SemesterDataService";
@@ -28,10 +28,7 @@ const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
 
 let addForSemester = false;
-if (props.isEdit)
-  editedStudentPieceData.value.piece.composer.fullName = composerName(
-    editedStudentPieceData.value.piece.composer
-  );
+
 if (!props.isEdit) {
   if (editedStudentPieceData.value.semesterId != null) addForSemester = true;
 }
@@ -46,6 +43,9 @@ const filteredPieces = ref([]);
 const editPieceDialog = ref(false);
 const createPieceDialog = ref(false);
 const addComposerDialog = ref(false);
+const editedPoeticTranslation = ref("");
+const editedLiteralTranslation = ref("");
+const currentPiece = ref(null);
 
 //add StudentPiece
 async function addStudentPiece() {
@@ -78,7 +78,7 @@ async function updateStudentPiece() {
   });
 }
 async function getSemesters() {
-  await SemesterDataService.getAll("name", false)
+  await SemesterDataService.getAll("startDate", "ASC")
     .then((response) => {
       semesters.value = response.data;
     })
@@ -90,7 +90,16 @@ async function getPieces() {
   await PieceDataService.getAll("title", "ASC")
     .then((response) => {
       pieces.value = response.data;
-      filterPieces();
+      //filterPieces();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+async function getPiece(id) {
+  await PieceDataService.get(id)
+    .then((response) => {
+      currentPiece.value = response.data;
     })
     .catch((err) => {
       console.log(err);
@@ -116,17 +125,39 @@ function filterPieces() {
   });
 }
 
-async function getStudentInstrument() {
+async function getStudentInstruments() {
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
     loginStore.currentRole.id
   )
     .then((response) => {
-      studentInstruments.value = response.data;
+      studentInstruments.value = response.data.filter((studentInstrument) => {
+        return studentInstrument.status === "Active";
+      });
     })
     .catch((err) => {
       console.log(err);
     });
 }
+
+function isVocal() {
+  if (
+    editedStudentPieceData.value.studentInstrumentId != null &&
+    studentInstruments.value.length > 0
+  ) {
+    let studentInstrument = studentInstruments.value.find(
+      (studentInstrument) => {
+        return (
+          studentInstrument.id ===
+          editedStudentPieceData.value.studentInstrumentId
+        );
+      }
+    );
+
+    if (studentInstrument.instrument.type == "Vocal") return true;
+  }
+  return false;
+}
+
 function closePieceDialog() {
   editPieceDialog.value = false;
   createPieceDialog.value = false;
@@ -142,6 +173,8 @@ async function updatePieceSuccess() {
         response.data.poeticTranslation;
 
       editedStudentPieceData.value.piece.title = response.data.title;
+      editedPoeticTranslation.value = response.data.poeticTranslation;
+      editedLiteralTranslation.value = response.data.literalTranslation;
     })
     .catch((err) => {
       console.log(err);
@@ -187,15 +220,44 @@ function composerName(composer) {
   }
   return composer.lastName + comma + composer.firstName;
 }
+watch(
+  () => editedStudentPieceData.value.pieceId,
+  () => {
+    if (editedStudentPieceData.value.pieceId != null) {
+      let newPiece = pieces.value.find((piece) => {
+        return piece.id === editedStudentPieceData.value.pieceId;
+      });
+      editedPoeticTranslation.value = newPiece.poeticTranslation;
+      editedLiteralTranslation.value = newPiece.literalTranslation;
+      if (editedPoeticTranslation.value == null) {
+        editedPoeticTranslation.value =
+          "Please edit piece and update poetic translation";
+      }
+      if (editedLiteralTranslation.value == null) {
+        editedLiteralTranslation.value =
+          "Please edit piece and update poetic translation";
+      }
+    }
+  }
+);
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await getSemesters();
-  await getPieces();
+  if (!props.isEdit) await getPieces();
   await getComposers();
-  await getStudentInstrument(loginStore.currentRole.id);
-
+  await getStudentInstruments(loginStore.currentRole.id);
   if (!props.isEdit && editedStudentPieceData.value.semesterId == null) {
     editedStudentPieceData.value.semesterId = semesters.value[0].id;
+  }
+  if (props.isEdit) {
+    await getPiece(editedStudentPieceData.value.pieceId);
+    editedPoeticTranslation.value = currentPiece.value.poeticTranslation;
+    editedLiteralTranslation.value = currentPiece.value.literalTranslation;
+    editedStudentPieceData.value.piece.composer.fullName = composerName(
+      composers.value.find((composer) => {
+        return composer.id === currentPiece.value.composerId;
+      })
+    );
   }
 });
 </script>
@@ -232,6 +294,41 @@ onMounted(async () => {
 
       <v-row :class="props.isEdit ? '' : 'mt-2'">
         <v-col>
+          <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >Instrument
+          </v-card-subtitle>
+          <v-select
+            v-model="editedStudentPieceData.studentInstrumentId"
+            :items="studentInstruments"
+            item-title="instrument.name"
+            item-value="id"
+            variant="plain"
+            :readonly="addForSemester ? true : false"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () =>
+                !!editedStudentPieceData.studentInstrumentId ||
+                'This field is required',
+            ]"
+          ></v-select>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Semester
+          </v-card-subtitle>
+          <v-select
+            v-model="editedStudentPieceData.semesterId"
+            :items="semesters"
+            item-title="name"
+            item-value="id"
+            variant="plain"
+            :readonly="addForSemester ? true : false"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+            :rules="[
+              () =>
+                !!editedStudentPieceData.semesterId || 'This field is required',
+            ]"
+          ></v-select>
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
@@ -299,42 +396,37 @@ onMounted(async () => {
             :rules="[checkDuplicateStudentPiece()]"
           >
           </v-select>
+
           <v-card-subtitle
+            v-if="isVocal()"
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
-            Semester
+            Poetic Translation
           </v-card-subtitle>
-          <v-select
-            v-model="editedStudentPieceData.semesterId"
-            :items="semesters"
-            item-title="name"
-            item-value="id"
+          <v-text-field
+            v-if="isVocal()"
+            v-model="editedPoeticTranslation"
+            color="darkBlue"
             variant="plain"
-            :readonly="addForSemester ? true : false"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            :rules="[
-              () =>
-                !!editedStudentPieceData.semesterId || 'This field is required',
-            ]"
-          ></v-select>
-
-          <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-            >Instrument
+            class="text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            readonly
+          >
+          </v-text-field>
+          <v-card-subtitle
+            v-if="isVocal()"
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Literal Translation
           </v-card-subtitle>
-          <v-select
-            v-model="editedStudentPieceData.studentInstrumentId"
-            :items="studentInstruments"
-            item-title="instrument.name"
-            item-value="id"
+          <v-text-field
+            v-if="isVocal()"
+            v-model="editedLiteralTranslation"
+            color="darkBlue"
             variant="plain"
-            :readonly="addForSemester ? true : false"
-            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            :rules="[
-              () =>
-                !!editedStudentPieceData.studentInstrumentId ||
-                'This field is required',
-            ]"
-          ></v-select>
+            class="text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+            readonly
+          >
+          </v-text-field>
         </v-col>
       </v-row>
       <v-card-actions>
