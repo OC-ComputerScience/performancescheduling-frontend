@@ -175,7 +175,7 @@ onBeforeMount(async () => {
                 <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 </v-list-item>
                 Instructor
-                <v-select
+                <v-autocomplete
                   color="darkBlue"
                   variant="underlined"
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
@@ -184,7 +184,7 @@ onBeforeMount(async () => {
                   item-title="name"
                   item-value="id"
                   return-object
-                ></v-select>
+                ></v-autocomplete>
               </v-list-item>
             </v-list>
           </v-card-text>
