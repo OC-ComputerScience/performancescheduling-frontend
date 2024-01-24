@@ -611,14 +611,12 @@ async function confirmSignup() {
   const studentInstrumentSignupData = {
     eventSignupId: eventSignupId,
     studentInstrumentId: selectedStudentInstrument.value.id,
-    instructorRoleId: selectedInstructor.value.id
-      ? selectedInstructor.value.id
-      : null,
+    instructorRoleId: selectedStudentInstrument.value.instructorRole.id,
+
     accompanistRoleId: selectedAccompanist.value
       ? selectedAccompanist.value.id
       : null,
   };
-
   await StudentInstrumentSignupDataService.create(studentInstrumentSignupData)
     .then(() => {
       confimationDialog.value = false;
@@ -849,6 +847,17 @@ onMounted(async () => {
               return-object
             ></v-autocomplete>
           </v-col>
+        </v-row>
+        <v-row class="mt-1 mb-1">
+          <v-spacer></v-spacer>
+          <div v-if="selectedInstructor != null">
+            Deselect Instructor and/or Accompanist to see times where some
+            Instrutor is available.
+          </div>
+          <div v-if="selectedInstructor == null">
+            Re-Select Instructor and/or Accompanist to see times where only they
+            are available.
+          </div>
         </v-row>
         <v-row class="ml-1">
           <v-col cols="6">
