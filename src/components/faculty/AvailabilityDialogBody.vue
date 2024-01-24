@@ -80,7 +80,7 @@ async function checkAvailability() {
           (start.value >= originalStartTime && start.value < originalEndTime) ||
           (end.value > originalStartTime && end.value <= originalEndTime) ||
           (start.value <= originalStartTime && end.value >= originalEndTime) ||
-          (start.value == originalStartTime)
+          start.value == originalStartTime
         ) {
           AvailabilityNoError.value = false;
           break;
@@ -461,7 +461,6 @@ onMounted(() => {
           >
             Cancel
           </v-btn>
-
         </v-card-actions>
       </v-card-text>
     </v-form>
