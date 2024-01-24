@@ -278,6 +278,7 @@ onBeforeMount(async () => {
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
                   return-object
+                  clearable
                 ></v-select>
               </v-list-item>
               <v-list-item
@@ -294,11 +295,12 @@ onBeforeMount(async () => {
                   :items="roleFilterOptions"
                   item-title="role"
                   return-object
+                  clearable
                 ></v-select>
               </v-list-item>
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Instructor
-                <v-select
+                <v-autocomplete
                   color="darkBlue"
                   variant="underlined"
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
@@ -307,7 +309,8 @@ onBeforeMount(async () => {
                   item-title="name"
                   item-value="id"
                   return-object
-                ></v-select>
+                  clearable
+                ></v-autocomplete>
               </v-list-item>
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Student Type
@@ -319,6 +322,7 @@ onBeforeMount(async () => {
                   :items="studentTypeFilterOptions"
                   item-title="title"
                   item-value="value"
+                  clearable
                 ></v-select>
               </v-list-item>
             </v-list>
