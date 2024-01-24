@@ -851,11 +851,11 @@ onMounted(async () => {
         <v-row class="mt-1 mb-1">
           <v-spacer></v-spacer>
           <div v-if="selectedInstructor != null">
-            Deselect Instructor and/or Accompanist to see times where some
-            Instrutor is available.
+            Deselect Instructor and/or Accompanist to view times where some
+            Instructor is available.
           </div>
           <div v-if="selectedInstructor == null">
-            Re-Select Instructor and/or Accompanist to see times where only they
+            Re-Select Instructor and/or Accompanist to only view times where they
             are available.
           </div>
         </v-row>
