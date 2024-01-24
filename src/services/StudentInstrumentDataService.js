@@ -62,8 +62,10 @@ class StudentInstrumentDataService {
     );
   }
 
-  getStudentInstrumentsForStudentId(studentId) {
-    return http.get(this.baseUrl + "studentId/" + studentId);
+  getStudentInstrumentsForStudentId(studentId, active) {
+    return http.get(
+      this.baseUrl + "studentId/" + studentId + "?active=" + active
+    );
   }
 
   create(data) {

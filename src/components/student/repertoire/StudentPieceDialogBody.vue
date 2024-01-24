@@ -118,7 +118,8 @@ function filterPieces() {
 
 async function getStudentInstrument() {
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
-    loginStore.currentRole.id
+    loginStore.currentRole.id,
+    "Active"
   )
     .then((response) => {
       studentInstruments.value = response.data;

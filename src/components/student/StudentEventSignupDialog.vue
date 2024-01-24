@@ -137,6 +137,7 @@ function filterStudentPieces() {
     (studentPiece) =>
       (studentPiece.semesterId === props.eventData.semesterId ||
         !onlySemesterPieces.value) &&
+      studentPiece.studentInstrumentId === selectedStudentInstrument.value.id &&
       studentPiece.status === "Active"
   );
 
