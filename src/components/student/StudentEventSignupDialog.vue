@@ -484,7 +484,7 @@ async function requestAdditionalTimeslots(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you create more timeslots for ${props.eventData.name} on 
+    } has requested you create more timeslots for ${props.eventData.name} on
     ${formatDate(props.eventData.date)} (${new Date(
       props.eventData.date
     ).toLocaleDateString("default", {
@@ -591,14 +591,12 @@ async function confirmSignup() {
   const studentInstrumentSignupData = {
     eventSignupId: eventSignupId,
     studentInstrumentId: selectedStudentInstrument.value.id,
-    instructorRoleId: selectedInstructor.value.id
-      ? selectedInstructor.value.id
-      : null,
+    instructorRoleId: selectedStudentInstrument.value.instructorRole.id,
+
     accompanistRoleId: selectedAccompanist.value
       ? selectedAccompanist.value.id
       : null,
   };
-
   await StudentInstrumentSignupDataService.create(studentInstrumentSignupData)
     .then(() => {
       confimationDialog.value = false;
