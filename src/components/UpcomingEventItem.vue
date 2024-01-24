@@ -174,7 +174,6 @@ function generatePDF() {
   doc.setFontSize(10).text(footer, 0.5, doc.internal.pageSize.height - 0.5);
 
   let pdfSignups = [];
-  console.log(studentSignupData.value.eventSignups);
   studentSignupData.value.eventSignups.forEach(function (eventSignup) {
     let signup = {};
     signup.startTime = get12HourTimeStringFromString(eventSignup.startTime);
