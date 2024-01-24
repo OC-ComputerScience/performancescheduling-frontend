@@ -29,6 +29,7 @@ const eventTypeLabel = ref("");
 const errorMessage = ref("");
 const groupSignup = ref(false);
 const activeAccompanists = ref([]);
+const activeInstructors = ref([]);
 // student instrument variables
 const instruments = ref([]);
 const selectedStudentInstrument = ref(null);
@@ -94,6 +95,20 @@ async function getData() {
       }
 
       selectedStudentInstrument.value = instruments.value[0];
+
+      activeInstructors.value = [
+        selectedStudentInstrument.value.instructorRole,
+      ];
+      activeInstructors.value.map(
+        (instructor) =>
+          (instructor.fullName =
+            instructor.user.firstName + " " + instructor.user.lastName)
+      );
+      instructorName.value = selectedInstructor.value
+        ? selectedInstructor.value.user.firstName +
+          " " +
+          selectedInstructor.value.user.lastName
+        : null;
     })
     .catch((e) => {
       console.log(e);
@@ -576,7 +591,9 @@ async function confirmSignup() {
   const studentInstrumentSignupData = {
     eventSignupId: eventSignupId,
     studentInstrumentId: selectedStudentInstrument.value.id,
-    instructorRoleId: selectedInstructor.value.id,
+    instructorRoleId: selectedInstructor.value.id
+      ? selectedInstructor.value.id
+      : null,
     accompanistRoleId: selectedAccompanist.value
       ? selectedAccompanist.value.id
       : null,
@@ -632,6 +649,12 @@ watch(selectedStudentInstrument, async () => {
 
   // update instructor and accompanist
   selectedInstructor.value = selectedStudentInstrument.value.instructorRole;
+  activeInstructors.value = [selectedStudentInstrument.value.instructorRole];
+  activeInstructors.value.map(
+    (instructor) =>
+      (instructor.fullName =
+        instructor.user.firstName + " " + instructor.user.lastName)
+  );
   instructorName.value = selectedInstructor.value
     ? selectedInstructor.value.user.firstName +
       " " +
@@ -664,6 +687,28 @@ watch(selectedStudentInstrument, async () => {
 
   getTimeslotLength();
 
+  disableTimeslots();
+});
+watch(selectedInstructor, async () => {
+  if (selectedInstructor.value != null) {
+    selectedInstructor.value.fullName =
+      selectedInstructor.value.user.firstName +
+      " " +
+      selectedInstructor.value.user.lastName;
+
+    await AvailabilityDataService.getByUserRoleAndEvent(
+      selectedInstructor.value.id,
+      props.eventData.id
+    )
+      .then((response) => {
+        instructorAvailability.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  } else {
+    instructorAvailability.value = [];
+  }
   disableTimeslots();
 });
 
@@ -749,14 +794,17 @@ onMounted(async () => {
             ></v-autocomplete>
           </v-col>
           <v-col>
-            <v-text-field
+            <v-autocomplete
+              clearable
               label="Instructor"
-              v-model="instructorName"
+              :items="activeInstructors"
+              item-title="fullName"
+              v-model="selectedInstructor"
               text-label="Instructor"
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-              readonly
-            ></v-text-field
+              return-object
+            ></v-autocomplete
           ></v-col>
           <v-col>
             <v-autocomplete
