@@ -263,7 +263,7 @@ watch(onlySemesterPieces, function (val) {
 });
 
 onMounted(async () => {
-  await getStudentPieces;
+  await getStudentPieces();
   getSelectedPices();
   filterStudentPieces();
   assignFirstPiece();
