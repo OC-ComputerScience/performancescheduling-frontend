@@ -452,6 +452,7 @@ function requestTimeslotFromStudent() {
       isCompleted: false,
       userRoleId: student.studentInstrument.studentRole.id,
       notificationId: 3,
+      from: loginStore.user.email,
     };
     UserNotificationDataService.create(data).catch((e) => {
       console.log(e);
@@ -479,6 +480,7 @@ async function requestAdditionalTimeslots(userRole) {
     isCompleted: false,
     userRoleId: userRole.id,
     notificationId: 1,
+    from: loginStore.user.email,
   };
   UserNotificationDataService.create(data).catch((e) => {
     console.log(e);
@@ -505,6 +507,7 @@ async function requestAvailabilityFromUserRole(userRole) {
     isCompleted: false,
     userRoleId: userRole.id,
     notificationId: 2,
+    from: loginStore.user.email,
   };
   UserNotificationDataService.create(data).catch((e) => {
     console.log(e);
