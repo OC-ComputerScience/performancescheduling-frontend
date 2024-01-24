@@ -1016,10 +1016,18 @@ onMounted(async () => {
                     <v-row v-if="instructorAvailability.length == 0">
                       <v-col cols="6">
                         <div
+                          v-if="selectedInstructor != null"
                           class="font-weight-semi-bold text-maroon text-body-1"
                         >
-                          {{ instructorName }} has not setup availability for
+                          {{ instructorName }} has not set up availability for
                           this event.
+                        </div>
+                        <div
+                          v-if="selectedInstructor == null"
+                          class="font-weight-semi-bold text-maroon text-body-1"
+                        >
+                          {{ instructorName }} has set up availability for this
+                          event.
                         </div>
                       </v-col>
                       <v-col cols="6">
