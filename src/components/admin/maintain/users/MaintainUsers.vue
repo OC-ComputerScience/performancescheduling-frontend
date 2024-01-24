@@ -37,6 +37,7 @@ async function getInstructor() {
 
 async function getUsers() {
   dataLoaded.value = false;
+  currentPage.value = 1;
   await UserDataService.getAllWithRolesAndStudentInstruments("lastName")
     .then((response) => {
       users.value = response.data;
@@ -52,7 +53,7 @@ async function getUsers() {
 
 async function refreshUsers() {
   await getUsers();
-  searchFilteredList();
+  filterUsers();
 }
 
 // Filtering
@@ -336,7 +337,8 @@ onBeforeMount(async () => {
               v-if="
                 statusFilterSelection ||
                 roleFilterSelection != 0 ||
-                studentTypeFilterSelection != 0
+                studentTypeFilterSelection ||
+                instructorFilterSelection
               "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
@@ -350,7 +352,8 @@ onBeforeMount(async () => {
         v-if="
           statusFilterSelection ||
           roleFilterSelection != 0 ||
-          studentTypeFilterSelection != 0
+          studentTypeFilterSelection ||
+          instructorFilterSelection
         "
         size="medium"
         color="maroon"
