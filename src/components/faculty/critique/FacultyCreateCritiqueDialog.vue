@@ -139,7 +139,13 @@ function modifyCritiqueArray(critique, action) {
     critiquesByFaculty.value.splice(index, 1);
   }
 }
-
+function getLevel(studentInstrument) {
+  if (studentInstrument.levelId != null) {
+    return studentInstrument.level.name;
+  } else {
+    return "None";
+  }
+}
 onMounted(async () => {
   critiquesByFaculty.value = props.signup.eventSignupPieces
     .filter((signupPiece) =>
@@ -165,7 +171,7 @@ onMounted(async () => {
       " (" +
       stuSignup.studentInstrument.instrument.name +
       ", Level: " +
-      stuSignup.studentInstrument.level.name +
+      getLevel(stuSignup.studentInstrument) +
       ", Hours: " +
       stuSignup.studentInstrument.privateHours +
       ")"

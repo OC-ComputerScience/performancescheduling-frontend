@@ -11,7 +11,7 @@ const studentNames = ref("");
 const endingLevel = ref(props.signup.endingLevelId);
 const editedSignup = ref(props.signup);
 const levelOptions = ref([]);
-
+console.log(props.signup);
 async function saveEndingLevel() {
   editedSignup.value.endingLevelId = endingLevel.value;
 

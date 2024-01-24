@@ -31,7 +31,11 @@ class AvailabilityDataService {
       this.baseUrl + "userRoleId/" + userRoleId + "/eventId/" + eventId
     );
   }
-  
+  getByRoleAndEvent(roleId, eventId) {
+    return http.get(
+      this.baseUrl + "role/" + roleId + "/eventId/" + eventId
+    );
+  }
   getAllByEventId(eventId){
     return http.get(this.baseUrl + `availability/${eventId}`)
   }

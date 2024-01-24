@@ -415,6 +415,7 @@ onBeforeMount(async () => {
   <v-dialog v-model="addUserDialog" persistent max-width="600px">
     <UserDialogBody
       :is-edit="false"
+      is-student="false"
       :user-data="{
         id: null,
         firstName: null,
