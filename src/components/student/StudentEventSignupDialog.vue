@@ -29,6 +29,7 @@ const eventTypeLabel = ref("");
 const errorMessage = ref("");
 const groupSignup = ref(false);
 const activeAccompanists = ref([]);
+const activeInstructors = ref([]);
 // student instrument variables
 const instruments = ref([]);
 const selectedStudentInstrument = ref(null);
@@ -98,6 +99,20 @@ async function getData() {
       }
 
       selectedStudentInstrument.value = instruments.value[0];
+
+      activeInstructors.value = [
+        selectedStudentInstrument.value.instructorRole,
+      ];
+      activeInstructors.value.map(
+        (instructor) =>
+          (instructor.fullName =
+            instructor.user.firstName + " " + instructor.user.lastName)
+      );
+      instructorName.value = selectedInstructor.value
+        ? selectedInstructor.value.user.firstName +
+          " " +
+          selectedInstructor.value.user.lastName
+        : null;
     })
     .catch((e) => {
       console.log(e);
@@ -596,12 +611,12 @@ async function confirmSignup() {
   const studentInstrumentSignupData = {
     eventSignupId: eventSignupId,
     studentInstrumentId: selectedStudentInstrument.value.id,
-    instructorRoleId: selectedInstructor.value.id,
+    instructorRoleId: selectedStudentInstrument.value.instructorRole.id,
+
     accompanistRoleId: selectedAccompanist.value
       ? selectedAccompanist.value.id
       : null,
   };
-
   await StudentInstrumentSignupDataService.create(studentInstrumentSignupData)
     .then(() => {
       confimationDialog.value = false;
@@ -652,6 +667,12 @@ watch(selectedStudentInstrument, async () => {
 
   // update instructor and accompanist
   selectedInstructor.value = selectedStudentInstrument.value.instructorRole;
+  activeInstructors.value = [selectedStudentInstrument.value.instructorRole];
+  activeInstructors.value.map(
+    (instructor) =>
+      (instructor.fullName =
+        instructor.user.firstName + " " + instructor.user.lastName)
+  );
   instructorName.value = selectedInstructor.value
     ? selectedInstructor.value.user.firstName +
       " " +
@@ -684,6 +705,35 @@ watch(selectedStudentInstrument, async () => {
 
   getTimeslotLength();
 
+  disableTimeslots();
+});
+watch(selectedInstructor, async () => {
+  if (selectedInstructor.value != null) {
+    selectedInstructor.value.fullName =
+      selectedInstructor.value.user.firstName +
+      " " +
+      selectedInstructor.value.user.lastName;
+    instructorName.value = selectedInstructor.value.fullName;
+    await AvailabilityDataService.getByUserRoleAndEvent(
+      selectedInstructor.value.id,
+      props.eventData.id
+    )
+      .then((response) => {
+        instructorAvailability.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  } else {
+    instructorName.value = "No Instructor";
+    await AvailabilityDataService.getByRoleAndEvent(2, props.eventData.id)
+      .then((response) => {
+        instructorAvailability.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
   disableTimeslots();
 });
 
@@ -773,14 +823,17 @@ onMounted(async () => {
             ></v-autocomplete>
           </v-col>
           <v-col>
-            <v-text-field
+            <v-autocomplete
+              clearable
               label="Instructor"
-              v-model="instructorName"
+              :items="activeInstructors"
+              item-title="fullName"
+              v-model="selectedInstructor"
               text-label="Instructor"
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-              readonly
-            ></v-text-field
+              return-object
+            ></v-autocomplete
           ></v-col>
           <v-col>
             <v-autocomplete
@@ -794,6 +847,17 @@ onMounted(async () => {
               return-object
             ></v-autocomplete>
           </v-col>
+        </v-row>
+        <v-row class="mt-1 mb-1">
+          <v-spacer></v-spacer>
+          <div v-if="selectedInstructor != null">
+            Deselect Instructor and/or Accompanist to view times where some
+            Instructor is available.
+          </div>
+          <div v-if="selectedInstructor == null">
+            Re-Select Instructor and/or Accompanist to only view times where they
+            are available.
+          </div>
         </v-row>
         <v-row class="ml-1">
           <v-col cols="6">
@@ -993,10 +1057,18 @@ onMounted(async () => {
                     <v-row v-if="instructorAvailability.length == 0">
                       <v-col cols="6">
                         <div
+                          v-if="selectedInstructor != null"
                           class="font-weight-semi-bold text-maroon text-body-1"
                         >
-                          {{ instructorName }} has not setup availability for
+                          {{ instructorName }} has not set up availability for
                           this event.
+                        </div>
+                        <div
+                          v-if="selectedInstructor == null"
+                          class="font-weight-semi-bold text-maroon text-body-1"
+                        >
+                          {{ instructorName }} has set up availability for this
+                          event.
                         </div>
                       </v-col>
                       <v-col cols="6">
