@@ -63,22 +63,6 @@ const searchInput = ref("");
 
 // Search filter
 // Filters the list of users by first and last name, based on searchInput
-function searchFilteredList() {
-  filteredUsers.value = users.value;
-
-  // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value === "") {
-    filterUsers();
-    return;
-  }
-
-  filteredUsers.value = filteredUsers.value.filter((user) =>
-    (user.firstName.toLowerCase() + " " + user.lastName.toLowerCase()).includes(
-      searchInput.value.toLowerCase()
-    )
-  );
-  filterUsers();
-}
 
 const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
@@ -101,6 +85,7 @@ const studentTypeFilterOptions = [
 const studentTypeFilterSelection = ref(null);
 
 function filterUsers() {
+  filteredUsers.value = users.value;
   // Never clear the serach filter, so filter by that first, then the actual filters
   //searchFilteredList();
   // Filter by status
@@ -114,7 +99,9 @@ function filterUsers() {
   if (roleFilterSelection.value.length > 0) {
     for (let role of roleFilterSelection.value) {
       filteredUsers.value = filteredUsers.value.filter((u) =>
-        u.userRoles.some((ur) => ur.roleId === role.id)
+        u.userRoles.some(
+          (ur) => ur.roleId === role.id && ur.status === "Active"
+        )
       );
     }
   }
@@ -129,7 +116,9 @@ function filterUsers() {
       let fsu = su.userRoles.find((sur) => sur.roleId === 1);
       if (fsu) {
         return fsu.studentRole.some(
-          (sr) => sr.instrument.type === studentTypeFilterSelection.value
+          (sr) =>
+            sr.instrument.type === studentTypeFilterSelection.value &&
+            sr.status === "Active"
         );
       } else return false;
     });
@@ -152,6 +141,15 @@ function filterUsers() {
       });
       return found;
     });
+  }
+  if (searchInput.value != "") {
+    filteredUsers.value = filteredUsers.value.filter((user) =>
+      (
+        user.firstName.toLowerCase() +
+        " " +
+        user.lastName.toLowerCase()
+      ).includes(searchInput.value.toLowerCase())
+    );
   }
 }
 
@@ -241,7 +239,7 @@ onBeforeMount(async () => {
       <input
         type="text"
         v-model="searchInput"
-        @input="searchFilteredList"
+        @input="filterUsers"
         class="ml-6 px-4 my-1 mainCardBorder text-blue bg-white font-weight-semi-bold"
         style="outline: none"
         append-icon="mdi-magnify"
