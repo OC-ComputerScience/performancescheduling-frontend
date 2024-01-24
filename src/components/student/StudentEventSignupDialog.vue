@@ -695,7 +695,7 @@ watch(selectedInstructor, async () => {
       selectedInstructor.value.user.firstName +
       " " +
       selectedInstructor.value.user.lastName;
-
+    instructorName.value = selectedInstructor.value.fullName;
     await AvailabilityDataService.getByUserRoleAndEvent(
       selectedInstructor.value.id,
       props.eventData.id
@@ -707,7 +707,14 @@ watch(selectedInstructor, async () => {
         console.log(e);
       });
   } else {
-    instructorAvailability.value = [];
+    instructorName.value = "No Instructor";
+    await AvailabilityDataService.getByRoleAndEvent(2, props.eventData.id)
+      .then((response) => {
+        instructorAvailability.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
   disableTimeslots();
 });
