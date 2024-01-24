@@ -11,7 +11,6 @@ const props = defineProps({
   studentInstrumentData: { type: [Object], required: true },
   isStudent: { type: [Boolean], required: true },
 });
-console.log(props.studentInstrumentData);
 function closeUserInstrumentDialog() {
   addOrEditInstrumentDialog.value = false;
 }
