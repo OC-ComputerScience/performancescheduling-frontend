@@ -2,22 +2,26 @@
 import { ref } from "vue";
 import { useLoginStore } from "../../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
-import { formatDate } from "./../../../composables/dateFormatter";
+import {
+  formatDate,
+  formatDateDash,
+} from "./../../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "./../../../composables/timeFormatter";
 import { getHourWordFromNumber } from "./../../../composables/timeFormatter";
 import PerformanceDialogBody from "./PerformanceDialogBody.vue";
 import FacultyCreateCritiqueDialog from "../../faculty/critique/FacultyCreateCritiqueDialog.vue";
 import FacultyGradeCritiqueDialog from "../../faculty/critique/FacultyGradeCritiqueDialog.vue";
+import FacultyEndingLevelCritiqueDialog from "../../faculty/critique/FacultyEndingLevelCritiqueDialog.vue";
 
 const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
 const emits = defineEmits(["dialogClosedEvent"]);
 
-PerformanceDialogBody;
 const viewCritique = ref(false);
 const pieceData = ref(null);
 const isCritiqued = ref(false);
 const gradeDialog = ref(false);
+const endingLevelDialog = ref(false);
 const critiqueDialog = ref(false);
 
 const props = defineProps({
@@ -35,6 +39,7 @@ function closeDialogs() {
   viewCritique.value = false;
   critiqueDialog.value = false;
   gradeDialog.value = false;
+  endingLevelDialog.value = false;
   emits("dialogClosedEvent");
 }
 function hasCritiques(piece) {
@@ -42,7 +47,6 @@ function hasCritiques(piece) {
     isCritiqued.value = true;
     return true;
   } else {
-    isCritiqued.value = false;
     return false;
   }
 }
@@ -120,7 +124,7 @@ function hasCritiques(piece) {
                   </v-col>
                 </v-row>
               </v-card>
-              <v-row>
+              <v-row v-if="eventData.eventType.allowGrade">
                 <v-card-title class="font-weight-semi-bold text-maroon mt-5">
                   Grade:
                   {{
@@ -129,6 +133,16 @@ function hasCritiques(piece) {
                       : eventSignupData.pass
                       ? "Passed"
                       : "Failed"
+                  }}
+                </v-card-title>
+              </v-row>
+              <v-row v-if="eventData.eventType.allowEndingLevel">
+                <v-card-title class="font-weight-semi-bold text-maroon mt-5">
+                  Ending Level:
+                  {{
+                    eventSignupData.endingLevelId == null
+                      ? "Level pending"
+                      : eventSignupData.endingLevelEventSignup.name
                   }}
                 </v-card-title>
               </v-row>
@@ -286,7 +300,11 @@ function hasCritiques(piece) {
           <v-row>
             <v-spacer></v-spacer>
             <v-btn
-              v-if="!isCritiqued && currentRole.roleId == 2"
+              v-if="
+                !isCritiqued &&
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
+              "
               flat
               size="small"
               :min-width="95"
@@ -296,7 +314,26 @@ function hasCritiques(piece) {
               Add Critique
             </v-btn>
             <v-btn
-              v-if="eventSignupData.pass == null && currentRole.roleId == 2"
+              v-if="
+                isCritiqued &&
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
+              "
+              flat
+              size="small"
+              :min-width="95"
+              class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none text-white"
+              @click="critiqueDialog = true"
+            >
+              Edit Critique
+            </v-btn>
+            <v-btn
+              v-if="
+                eventData.eventType.allowGrade &&
+                eventSignupData.pass == null &&
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
+              "
               flat
               size="small"
               :min-width="95"
@@ -306,7 +343,12 @@ function hasCritiques(piece) {
               Add Grade
             </v-btn>
             <v-btn
-              v-if="eventSignupData.pass != null && currentRole.roleId == 2"
+              v-if="
+                eventData.eventType.allowGrade &&
+                eventSignupData.pass != null &&
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
+              "
               flat
               size="small"
               :min-width="95"
@@ -314,6 +356,37 @@ function hasCritiques(piece) {
               @click="gradeDialog = true"
             >
               Edit Grade
+            </v-btn>
+
+            <v-btn
+              v-if="
+                eventData.eventType.allowEndingLevel &&
+                eventSignupData.endingLevelId == null &&
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
+              "
+              flat
+              size="small"
+              :min-width="95"
+              class="font-weight-semi-bold mr-2 bg-blue text-none text-white"
+              @click="endingLevelDialog = true"
+            >
+              Add End Level
+            </v-btn>
+            <v-btn
+              v-if="
+                eventData.eventType.allowEndingLevel &&
+                eventSignupData.endingLevelId != null &&
+                currentRole.roleId == 2 &&
+                eventData.date <= formatDateDash(new Date())
+              "
+              flat
+              size="small"
+              :min-width="95"
+              class="font-weight-semi-bold mr-2 bg-blue text-none text-white"
+              @click="endingLevelDialog = true"
+            >
+              Edit End Level
             </v-btn>
           </v-row>
         </v-col>
@@ -341,5 +414,13 @@ function hasCritiques(piece) {
       @closeDialogEvent="closeDialogs()"
     >
     </FacultyGradeCritiqueDialog>
+  </v-dialog>
+  <v-dialog v-model="endingLevelDialog" persistent max-width="800px">
+    <FacultyEndingLevelCritiqueDialog
+      :signup="props.studentInstrumentSignupData.eventSignup"
+      :time="props.eventSignupData"
+      @closeDialogEvent="closeDialogs()"
+    >
+    </FacultyEndingLevelCritiqueDialog>
   </v-dialog>
 </template>

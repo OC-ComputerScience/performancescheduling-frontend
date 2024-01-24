@@ -11,7 +11,6 @@ const props = defineProps({
   studentInstrumentData: { type: [Object], required: true },
   isStudent: { type: [Boolean], required: true },
 });
-
 function closeUserInstrumentDialog() {
   addOrEditInstrumentDialog.value = false;
 }
@@ -96,6 +95,15 @@ onMounted(async () => {});
             class="font-weight-semi-bold text-none text-white flatChipBorder bg-darkBlue mr-2"
           >
             Level: {{ studentInstrumentData.level.name }}
+          </v-chip>
+          <v-chip
+            v-if="studentInstrumentData.endingLevel"
+            label
+            flat
+            size="small"
+            class="font-weight-semi-bold text-none text-white flatChipBorder bg-darkBlue mr-2"
+          >
+            Ending Level: {{ studentInstrumentData.endingLevel.name }}
           </v-chip>
         </v-col>
       </v-row>

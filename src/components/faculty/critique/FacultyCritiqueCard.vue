@@ -4,13 +4,15 @@ import { useLoginStore } from "../../../stores/LoginStore";
 import { get12HourTimeStringFromString } from "../../../composables/timeFormatter";
 import FacultyCreateCritiqueDialog from "./FacultyCreateCritiqueDialog.vue";
 import FacultyGradeCritiqueDialog from "./FacultyGradeCritiqueDialog.vue";
+import FacultyEndingLevelCritiqueDialog from "./FacultyEndingLevelCritiqueDialog.vue";
 
 const emits = defineEmits(["dialogClosedEvent"]);
-const props = defineProps(["signup"]);
+const props = defineProps(["signup", "eventData"]);
 const LoginStore = useLoginStore();
 
 const feedbackDialog = ref(false);
 const gradeDialog = ref(false);
+const endingLevelDialog = ref(false);
 const eventSignupPieces = ref([]);
 
 function sortPieces() {
@@ -30,6 +32,7 @@ function signupHasFeedbackByFaculty() {
 function closeDialogs() {
   feedbackDialog.value = false;
   gradeDialog.value = false;
+  endingLevelDialog.value = false;
   emits("dialogClosedEvent");
 }
 
@@ -186,8 +189,8 @@ onMounted(() => {
               }}
             </v-chip>
           </v-row>
-          <v-row justify="end">
-            <v-btn
+          <v-row v-if="props.eventData.eventType.allowGrade" justify="end">
+            <v-chip
               label
               flat
               size="small"
@@ -201,7 +204,27 @@ onMounted(() => {
                   ? "Passed"
                   : "Failed"
               }}
-            </v-btn>
+            </v-chip>
+          </v-row>
+          <v-row
+            v-if="props.eventData.eventType.allowEndingLevel"
+            justify="end"
+          >
+            <v-chip
+              label
+              flat
+              size="small"
+              class="font-weight-bold mt-3 text-none text-white flatChipBorder"
+              :class="
+                props.signup.endingLevelId == null ? 'bg-maroon' : 'bg-teal'
+              "
+            >
+              {{
+                props.signup.endingLevelId == null
+                  ? "Ending Level pending"
+                  : "Ending Level " + props.signup.endingLevelEventSignup.name
+              }}
+            </v-chip>
           </v-row>
         </v-col>
       </v-row>
@@ -213,15 +236,29 @@ onMounted(() => {
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="feedbackDialog = true"
         >
-          {{ signupHasFeedbackByFaculty() ? "Edit Feedback" : "Add Feedback" }}
+          {{ signupHasFeedbackByFaculty() ? "Edit Critique" : "Add Critique" }}
         </v-btn>
         <v-btn
+          v-if="props.eventData.eventType.allowGrade"
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="gradeDialog = true"
         >
           {{ props.signup.pass == null ? "Add Grade" : "Edit Grade" }}
+        </v-btn>
+        <v-btn
+          v-if="props.eventData.eventType.allowEndingLevel"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="endingLevelDialog = true"
+        >
+          {{
+            props.signup.endingLevelId == null
+              ? "Add End Level"
+              : "Edit End Level"
+          }}
         </v-btn>
       </v-row>
     </v-card-text>
@@ -239,5 +276,12 @@ onMounted(() => {
       @closeDialogEvent="closeDialogs()"
     >
     </FacultyGradeCritiqueDialog>
+  </v-dialog>
+  <v-dialog v-model="endingLevelDialog" persistent max-width="800px">
+    <FacultyEndingLevelCritiqueDialog
+      :signup="props.signup"
+      @closeDialogEvent="closeDialogs()"
+    >
+    </FacultyEndingLevelCritiqueDialog>
   </v-dialog>
 </template>

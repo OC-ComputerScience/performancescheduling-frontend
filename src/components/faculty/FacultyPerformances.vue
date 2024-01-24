@@ -1,61 +1,51 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import StudentInstrumentDataService from "../../services/StudentInstrumentDataService.js";
+import { ref, onBeforeMount, computed } from "vue";
+import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService.js";
 import StudentPerformanceCard from "../student/performances/StudentPerformanceCard.vue";
+import SemesterDataService from "./../../services/SemesterDataService";
+import UserRoleDataService from "./../../services/UserRoleDataService";
 import { useLoginStore } from "../../stores/LoginStore.js";
 
 const performances = ref([]);
 const filteredPerformances = ref([]);
 const filterMenuBool = ref(false);
 
-const loginStore = useLoginStore();
-const facultyId = loginStore.currentRole.id;
+const searchInput = ref("");
 
 // Filter options
 const semesterFilterOptions = ref([]);
 const semesterFilterSelection = ref(null);
+const instructorFilterOptions = ref([]);
+const instructorFilterSelection = ref(null);
 
 // Pagination
 const currentPage = ref(1);
 const perPage = 9;
 
-async function getPerformances() {
-  await StudentInstrumentDataService.getStudentInstrumentSignupsByFacultuyRoleId(
-    facultyId,
-    new Date(),
-    "LTE",
-    "desc"
-  ).then((response) => {
-    performances.value = [];
+async function getSemesters() {
+  await SemesterDataService.getAll().then((response) => {
+    semesterFilterOptions.value = response.data;
+  });
+}
 
-    response.data.forEach((studentInstrument) => {
-      studentInstrument.studentInstrumentSignups.forEach(
-        (studentInstrumentSignup) => {
-          performances.value.push(studentInstrumentSignup);
-        }
-      );
-    });
+async function getInstructor() {
+  await UserRoleDataService.getRolesForRoleId(2, null, null, "All").then(
+    (response) => {
+      instructorFilterOptions.value = response.data;
+      instructorFilterOptions.value.forEach((instructor) => {
+        instructor.name =
+          instructor.user.firstName + " " + instructor.user.lastName;
+      });
+    }
+  );
+}
+
+async function getPerformances() {
+  await StudentInstrumentSignupDataService.getAllData().then((response) => {
+    performances.value = response.data;
   });
 
   filteredPerformances.value = performances.value;
-
-  buildSemesterList();
-}
-
-function buildSemesterList() {
-  semesterFilterOptions.value = [];
-  performances.value.forEach((performance) => {
-    if (
-      !semesterFilterOptions.value.some(function callback(item) {
-        return item.name == performance.eventSignup.event.semester.name;
-      })
-    ) {
-      semesterFilterOptions.value.push({
-        id: performance.eventSignup.event.semesterId,
-        name: performance.eventSignup.event.semester.name,
-      });
-    }
-  });
 }
 
 async function refreshPerformances() {
@@ -65,11 +55,28 @@ async function refreshPerformances() {
 
 function filterPerformances() {
   filteredPerformances.value = performances.value;
-  if (semesterFilterSelection.value != null) {
+  if (searchInput.value != "") {
     filteredPerformances.value = performances.value.filter(
+      (studentInstrumentSignup) =>
+        (
+          studentInstrumentSignup.studentInstrument.studentRole.user.firstName.toLowerCase() +
+          " " +
+          studentInstrumentSignup.studentInstrument.studentRole.user.lastName.toLowerCase()
+        ).includes(searchInput.value.toLowerCase())
+    );
+  }
+
+  if (semesterFilterSelection.value != null) {
+    filteredPerformances.value = filteredPerformances.value.filter(
       (performance) =>
         performance.eventSignup.event.semesterId ===
         semesterFilterSelection.value.id
+    );
+  }
+  if (instructorFilterSelection.value != null) {
+    filteredPerformances.value = filteredPerformances.value.filter(
+      (performance) =>
+        performance.instructorRoleId === instructorFilterSelection.value.id
     );
   }
 }
@@ -77,7 +84,9 @@ function filterPerformances() {
 function clearFilters() {
   currentPage.value = 1;
   filteredPerformances.value = performances.value;
+  searchInput.value = "";
   semesterFilterSelection.value = null;
+  instructorFilterSelection.value = null;
 }
 
 const currentPageData = computed(() => {
@@ -87,7 +96,31 @@ const currentPageData = computed(() => {
   );
 });
 
-onMounted(async () => {
+const filerContents = computed(() => {
+  let fc = "";
+  if (searchInput.value != "") {
+    fc += "Student: " + searchInput.value + ", ";
+  } else {
+    fc += "Student: All, ";
+  }
+  if (semesterFilterSelection.value != null) {
+    fc += "Semester: " + semesterFilterSelection.value.name + ", ";
+  } else {
+    fc += "Semester: All, ";
+  }
+  if (instructorFilterSelection.value != null) {
+    fc += "Instructor: " + instructorFilterSelection.value.name;
+  } else {
+    fc += "Instructor: All";
+  }
+
+  return fc;
+});
+
+onBeforeMount(async () => {
+  getSemesters();
+  getInstructor();
+
   refreshPerformances();
 });
 </script>
@@ -96,6 +129,17 @@ onMounted(async () => {
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
       <h1 class="text-maroon font-weight-bold text-h3">Performances</h1>
+      <input
+        type="text"
+        v-model="searchInput"
+        @input="filterPerformances"
+        class="ml-6 px-4 my-1 mainCardBorder text-blue bg-white font-weight-semi-bold"
+        style="outline: none"
+        append-icon="mdi-magnify"
+        placeholder="Search for Student"
+        single-line
+        hide-details
+      />
 
       <v-menu v-model="filterMenuBool" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
@@ -128,6 +172,19 @@ onMounted(async () => {
                   item-value="id"
                   return-object
                 ></v-select>
+                <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                </v-list-item>
+                Instructor
+                <v-autocomplete
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="instructorFilterSelection"
+                  :items="instructorFilterOptions"
+                  item-title="name"
+                  item-value="id"
+                  return-object
+                ></v-autocomplete>
               </v-list-item>
             </v-list>
           </v-card-text>
@@ -158,6 +215,7 @@ onMounted(async () => {
         Clear filters
       </v-btn>
     </v-row>
+    <v-row class="ml-6"> Displaying : {{ filerContents }}</v-row>
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">

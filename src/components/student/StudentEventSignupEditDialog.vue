@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useLoginStore } from "../../stores/LoginStore.js";
 import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
@@ -16,12 +16,16 @@ const props = defineProps({
   eventSignUpData: { type: [Object], required: true },
   studentInstrumentSignupData: { type: [Object], required: true },
 });
+
+const onlySemesterPieces = ref(true);
+const disableOnlySemesterPiece = ref(false);
+
 const studentInstrumentSignup = ref(
   Object.assign({}, props.studentInstrumentSignupData)
 );
 const loginStore = useLoginStore();
 
-const accompianist =
+const accompanist =
   studentInstrumentSignup.value.accompanistRoleSignup === null
     ? "None"
     : studentInstrumentSignup.value.accompanistRoleSignup.user.firstName +
@@ -39,6 +43,7 @@ const groupSignup = ref(studentInstrumentSignup.value.eventSignup.isGroupEvent);
 // student piece variables
 
 const studentPieces = ref([]);
+const allStudentPieces = ref([]);
 
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
@@ -51,57 +56,78 @@ const addStudentPieceDialog = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
 
-async function getData() {
-  await getStudentPieces();
-}
-
 async function getStudentPieces() {
   await StudentPieceDataService.getByUser(loginStore.user.userId)
     .then((response) => {
-      studentPieces.value = response.data.filter(
-        (studentPiece) =>
-          studentPiece.semesterId === props.eventData.semesterId &&
-          studentPiece.studentInstrumentId ===
-            studentInstrumentSignup.value.studentInstrumentId &&
-          studentPiece.status === "Active"
-      );
-      selectedStudentPieces.value = [];
-      studentPieces.value.forEach(function (studentPiece) {
-        var fullName = "";
-        if (studentPiece.piece.composer.lastName) {
-          fullName = studentPiece.piece.composer.lastName;
-          if (studentPiece.piece.composer.firstName) {
-            fullName += ", " + studentPiece.piece.composer.firstName;
-          }
-        } else {
-          fullName = studentPiece.piece.composer.firstName;
-        }
-        studentPiece.piece.composer.fullName = fullName;
-      });
-
-      studentInstrumentSignup.value.eventSignup.eventSignupPieces.forEach(
-        (studentPiece) => {
-          selectedStudentPieces.value.push(studentPiece);
-        }
-      );
-      studentPieces.value.forEach((studentPiece) => {
-        if (
-          selectedStudentPieces.value.findIndex(
-            (x) => x.pieceId === studentPiece.pieceId
-          ) !== -1
-        ) {
-          studentPiece.isFirst = selectedStudentPieces.value.find(
-            (x) => x.pieceId === studentPiece.pieceId
-          ).isFirst;
-        } else {
-          studentPiece.isFirst = false;
-        }
-      });
-      filteredStudentPieces.value = studentPieces.value;
+      allStudentPieces.value = response.data;
     })
     .catch((e) => {
       console.log(e);
     });
+}
+
+function filterStudentPieces() {
+  studentPieces.value = allStudentPieces.value.filter(
+    (studentPiece) =>
+      (studentPiece.semesterId === props.eventData.semesterId ||
+        !onlySemesterPieces.value) &&
+      studentPiece.studentInstrumentId ===
+        studentInstrumentSignup.value.studentInstrumentId &&
+      studentPiece.status === "Active"
+  );
+
+  studentPieces.value.forEach(function (studentPiece) {
+    var fullName = "";
+    if (studentPiece.piece.composer.lastName) {
+      fullName = studentPiece.piece.composer.lastName;
+      if (studentPiece.piece.composer.firstName) {
+        fullName += ", " + studentPiece.piece.composer.firstName;
+      }
+    } else {
+      fullName = studentPiece.piece.composer.firstName;
+    }
+    studentPiece.piece.composer.fullName = fullName;
+  });
+
+  filteredStudentPieces.value = studentPieces.value;
+}
+
+function assignFirstPiece() {
+  studentPieces.value.forEach((studentPiece) => {
+    if (
+      selectedStudentPieces.value.findIndex(
+        (x) => x.pieceId === studentPiece.pieceId
+      ) !== -1
+    ) {
+      studentPiece.isFirst = selectedStudentPieces.value.find(
+        (x) => x.pieceId === studentPiece.pieceId
+      ).isFirst;
+    } else {
+      studentPiece.isFirst = false;
+    }
+  });
+}
+
+function getSelectedPices() {
+  selectedStudentPieces.value = [];
+  studentInstrumentSignup.value.eventSignup.eventSignupPieces.forEach(
+    (studentPiece) => {
+      let semesterId =
+        allStudentPieces.value[
+          allStudentPieces.value.findIndex(
+            (x) => x.pieceId === studentPiece.pieceId
+          )
+        ].semesterId;
+      selectedStudentPieces.value.push(studentPiece);
+      if (
+        semesterId != props.eventData.semesterId &&
+        onlySemesterPieces.value
+      ) {
+        onlySemesterPieces.value = false;
+        disableOnlySemesterPiece.value = true;
+      }
+    }
+  );
 }
 
 function selectStudentPiece(studentPiece) {
@@ -147,20 +173,24 @@ function unSetFirstPiece(clickedStudentPiece) {
 
 async function deleteSignup() {
   //Delete only the student instrument sign up if it is a group and more people are still signed up there
-  if(props.eventSignUpData.studentInstrumentSignups.length > 1){
-    await StudentInstrumentSignupDataService.remove(studentInstrumentSignup.value.id)
-    .then(() => {
-      confimationDialog.value = false;
-      emits("closeDialogEvent");
-      emits("refreshEvents");
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  if (props.eventSignUpData.studentInstrumentSignups.length > 1) {
+    await StudentInstrumentSignupDataService.remove(
+      studentInstrumentSignup.value.id
+    )
+      .then(() => {
+        confimationDialog.value = false;
+        emits("closeDialogEvent");
+        emits("refreshEvents");
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
   //Delete the entire event sign up if there is only one person there
-  else{
-    await EventSignupDataService.remove(studentInstrumentSignup.value.eventSignupId)
+  else {
+    await EventSignupDataService.remove(
+      studentInstrumentSignup.value.eventSignupId
+    )
       .then(() => {
         confimationDialog.value = false;
         emits("closeDialogEvent");
@@ -227,8 +257,16 @@ async function saveSignup() {
   emits("refreshEvents");
 }
 
+watch(onlySemesterPieces, function (val) {
+  filterStudentPieces();
+  assignFirstPiece();
+});
+
 onMounted(async () => {
-  await getData();
+  await getStudentPieces();
+  getSelectedPices();
+  filterStudentPieces();
+  assignFirstPiece();
 });
 </script>
 <template>
@@ -288,7 +326,7 @@ onMounted(async () => {
           <v-col>
             <v-text-field
               label="Accompanist"
-              v-model="accompianist"
+              v-model="accompanist"
               text-label="Accompanist"
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -313,9 +351,15 @@ onMounted(async () => {
               </v-col>
             </v-row>
             <v-row>
-              Only lists pieces from current semester and current instrument
+              <v-checkbox
+                :disabled="disableOnlySemesterPiece"
+                v-model="onlySemesterPieces"
+                label="Only show pieces
+              from current semester"
+                class="text-body-1 font-weight-bold text-darkBlue"
+              ></v-checkbox>
             </v-row>
-            <v-row class="mt-5">
+            <v-row>
               <v-col cols="11" class="pl-0">
                 <v-list
                   style="height: 230px"
@@ -402,11 +446,10 @@ onMounted(async () => {
                 </v-card-text>
               </v-card>
             </v-row>
-            <v-row class="mt-6">
-              <v-col class="pl-0"> </v-col>
-            </v-row>
-            <v-row no-gutters>
+
+            <v-row mt-7>
               <v-checkbox
+                read-only="disableOnlySemesterPiece"
                 v-model="groupSignup"
                 label="Allow other students to signup with you"
                 class="text-body-1 font-weight-bold text-darkBlue"
