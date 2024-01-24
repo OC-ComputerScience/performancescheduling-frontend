@@ -311,18 +311,13 @@ async function updateFacultyTitle() {
 }
 
 async function refreshStudentInstruments() {
+  console.log("refreshing student instruments");
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
     studentRole.id
   )
     .then((response) => {
       studentRole.studentRole = response.data;
-      editedStudentHours.value = studentRole.studentRole.reduce((sum, obj) => {
-        if (obj.status === "Active") {
-          return sum + obj.privateHours;
-        } else {
-          return sum;
-        }
-      }, 0);
+      console.log(studentRole.studentRole);
     })
     .catch((err) => {
       console.log(err);
