@@ -105,7 +105,6 @@ async function activateUser() {
     .catch((e) => {
       console.log(e);
     });
-  console.log(loginStore.currentRole);
   await UserRoleDataService.update({
     id: loginStore.currentRole.id,
     studentSemesters: loginStore.currentRole.studentSemesters + 1,
