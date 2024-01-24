@@ -127,7 +127,8 @@ function filterPieces() {
 
 async function getStudentInstruments() {
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
-    loginStore.currentRole.id
+    loginStore.currentRole.id,
+    "Active"
   )
     .then((response) => {
       studentInstruments.value = response.data.filter((studentInstrument) => {
