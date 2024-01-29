@@ -39,7 +39,7 @@ const isAdmin = computed(() => currentRole.value.roleId == 3);
 const userRoles = ref([]);
 const workingRole = ref(currentRole.value);
 const userAvailability = ref([]);
-const selectedRole = ref([]);
+const selectedRole = ref(null);
 
 const arrayStartTime = ref([]);
 const arrayEndTime = ref([]);
@@ -480,7 +480,10 @@ onBeforeMount(() => {
         </v-autocomplete>
       </div>
 
-      <v-card-text class="pt-4">
+      <v-card-text
+        class="pt-4"
+        v-if="!isAdmin || (isAdmin && selectedRole != null)"
+      >
         <div
           v-if="Array.isArray(setAvailabilityData)"
           v-for="(time, index) in arrayStartTime"
