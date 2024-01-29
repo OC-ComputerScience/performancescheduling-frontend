@@ -28,8 +28,6 @@ const setCompleteAvailabilityData =
     ? ref(props.availabilityData)
     : ref(props.completeAvailabilityData);
 
-console.log(setCompleteAvailabilityData.value);
-
 const form = ref(null);
 
 const loginStore = useLoginStore();
@@ -80,8 +78,6 @@ async function checkAvailability() {
   const start = ref(get24HourTimeString(currentStartTime.value));
   const end = ref(get24HourTimeString(currentEndTime.value));
 
-  console.log(start.value);
-  console.log(end.value);
   //if there is more than one availability for this event, setAvailabilityData is an Array type
   if (
     Array.isArray(setCompleteAvailabilityData.value) &&
@@ -89,9 +85,6 @@ async function checkAvailability() {
   ) {
     //start and end time cannot overlap already set availabilities
     for (let i = 0; i < setCompleteAvailabilityData.value.length; i++) {
-      console.log("index=" + i);
-      console.log(setCompleteAvailabilityData.value[i]);
-
       const originalStartTime = setCompleteAvailabilityData.value[
         i
       ].startTime.slice(0, -3);
@@ -253,7 +246,6 @@ async function deleteAvailability(index) {
 }
 
 async function setAvailabilityTimes() {
-  console.log(setAvailabilityData.value);
   if (Array.isArray(setAvailabilityData.value)) {
     for (let i = 0; i < setAvailabilityData.value.length; i++) {
       arrayStartTime.value.push(
@@ -272,9 +264,6 @@ async function setAvailabilityTimes() {
       ? get12HourTimeStringFromString(setAvailabilityData.value.endTime)
       : "";
   }
-  console.log("build");
-  console.log(arrayStartTime.value);
-  console.log(arrayEndTime.value);
 }
 
 // Organizing time to be displayed when select the start and end time
