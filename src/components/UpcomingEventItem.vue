@@ -35,7 +35,7 @@ const viewSignupsDialog = ref(false);
 const eventAvailabilityData = ref([]);
 const studentSignupData = ref([]);
 const isEdit = ref(false);
-console.log(props.eventData);
+
 EventDataService.getById(props.eventData.id)
   .then((response) => {
     studentSignupData.value = response.data;

@@ -536,7 +536,7 @@ onBeforeMount(() => {
               Start Time
             </v-card-subtitle>
             <v-select
-              color="white"
+              color="darkBlue"
               variant="plain"
               class="font-weight-bold text-blue bg-white flatCardBorder pl-4 pr-2 my-0 mx-0 mb-4"
               v-model="arrayStartTime"
