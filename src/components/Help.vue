@@ -6,12 +6,12 @@ import VuePdfEmbed from 'vue-pdf-embed';
 import 'vue-pdf-embed/dist/style/index.css'
 
 
-const pdfSource = 'https://drive.google.com/file/d/1FrcHfkSbgyX60g5FlLGL8cZyEHiXZwl1/preview'
+const pdfSource = '../../public/StudentTutorial.pdf'
 
 </script>
 
 <template>
 
-<VuePdfEmbed :source="pdfSource" />
+<VuePdfEmbed :width="1000" :source="pdfSource" />
 
 </template>

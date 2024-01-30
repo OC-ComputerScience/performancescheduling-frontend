@@ -441,11 +441,13 @@ onMounted(() => {
                   Help
                 </v-btn>
               </div>
-
+              <!-- <div v-if="loginStore.currentRole.roleId != 1"> -->
+                <br />
+              <!-- </div> -->
               <v-btn
                 prepend-icon="mdi-logout"
                 color="mediumGray"
-                :class="'mt-2 menu-button font-weight-bold text-lightGray'"
+                :class="'mt-2 menu-button font-weight-bold text-black'"
                 density="comfortable"
                 elevation="0"
                 width="250px"
