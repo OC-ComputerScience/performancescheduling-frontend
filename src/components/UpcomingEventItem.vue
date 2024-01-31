@@ -242,39 +242,36 @@ onBeforeUpdate(async () => {
                 <v-card-title class="font-weight-bold text-orange text-h5">
                   {{ eventData.name }}
                 </v-card-title>
-                <v-row class="ml-3 mt-4 mb-4">
-                  <v-card-subtitle
-                    v-if="roleId == 3"
-                    class="mb-0 pb-0 font-weight-semi-bold text-h7"
-                    :class="eventData.isReady ? 'text-green' : 'text-red'"
-                  >
-                    {{ eventData.isReady ? "Ready" : "Not Ready" }}
-                  </v-card-subtitle>
-                  <v-btn
-                    v-if="roleId == 3"
-                    flat
-                    size="small"
-                    class="font-weight-semi-bold ml-auto mr-4 text-none text-white flatChipBorder"
-                    :class="
-                      props.eventData.isReady ? 'bg-maroon' : 'bg-darkBlue'
-                    "
-                    @click="
-                      props.eventData.isReady
-                        ? unreadyEvent(eventData)
-                        : readyEvent(eventData)
-                    "
-                  >
-                    {{
-                      props.eventData.isReady ? "Make Unready" : "Make Ready"
-                    }}
-                  </v-btn>
-                </v-row>
+                <div v-if="roleId == 3">
+                  <v-row class="ml-3 mt-4 mb-3">
+                    <v-card-subtitle
+                      class="mb-0 pb-0 font-weight-semi-bold text-h7"
+                      :class="eventData.isReady ? 'text-green' : 'text-red'"
+                    >
+                      {{ eventData.isReady ? "Ready" : "Not Ready" }}
+                    </v-card-subtitle>
+                    <v-btn
+                      flat
+                      size="small"
+                      class="font-weight-semi-bold ml-auto mr-4 text-none text-white flatChipBorder"
+                      :class="
+                        props.eventData.isReady ? 'bg-maroon' : 'bg-blue'
+                      "
+                      @click="
+                        props.eventData.isReady
+                          ? unreadyEvent(eventData)
+                          : readyEvent(eventData)
+                      "
+                    >
+                      {{
+                        props.eventData.isReady ? "Make Unready" : "Make Ready"
+                      }}
+                    </v-btn>
+                  </v-row>
+                </div>
                 <!-- Event Instrument Type -->
                 <!-- TODO(@ethanimooney): Make this actually work -->
                 <v-card-subtitle
-                  v-if="
-                    roleId == 3 || roleId == 1 || roleId == 2 || roleId == 4
-                  "
                   class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
                 >
                   {{
@@ -366,7 +363,7 @@ onBeforeUpdate(async () => {
           v-if="roleId != 1"
           flat
           size="small"
-          class="font-weight-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
+          class="font-weight-bold mt-0 mr-2 ml-auto text-none text-white bg-blue flatChipBorder"
           @click="getDialogData"
         >
           View Signups
