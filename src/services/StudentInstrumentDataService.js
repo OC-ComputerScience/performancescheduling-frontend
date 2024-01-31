@@ -66,7 +66,6 @@ class StudentInstrumentDataService {
   }
 
   getStudentInstrumentsForStudentId(studentId, active) {
-    console.log(active);
     if (active === undefined) {
       active = "";
     }
