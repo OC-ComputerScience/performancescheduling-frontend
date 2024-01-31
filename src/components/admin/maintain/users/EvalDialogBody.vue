@@ -170,7 +170,7 @@ onBeforeMount(async () => {
                 "
                 :items="levelOptions"
                 :item-title="(item) => item.name"
-                item-value="id"
+                item-value="name"
                 :rules="[(v) => !!v || 'This field is required']"
               >
               </v-select>
