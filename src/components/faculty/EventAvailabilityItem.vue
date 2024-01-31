@@ -134,7 +134,7 @@ onMounted(async () => {});
           Availability
         </v-card-subtitle>
         <!-- If there is more than one availability for the same event -->
-        <div v-if="availabilityData.length > 1">
+        <div>
           <v-card-subtitle
             v-for="availability in availabilityData"
             :key="availability.id"
@@ -142,12 +142,6 @@ onMounted(async () => {});
           >
             {{ get12HourTimeStringFromString(availability.startTime) }} -
             {{ get12HourTimeStringFromString(availability.endTime) }}
-          </v-card-subtitle>
-        </div>
-        <div v-else>
-          <v-card-subtitle class="font-weight-semi-bold text-maroonls">
-            {{ get12HourTimeStringFromString(availabilityData.startTime) }} -
-            {{ get12HourTimeStringFromString(availabilityData.endTime) }}
           </v-card-subtitle>
         </div>
       </v-col>
@@ -190,7 +184,7 @@ onMounted(async () => {});
         class="font-weight-semi-bold mr-2 bg-blue text-none"
         @click="openAvailabilityDialog = true"
       >
-        Edit
+        Edit availability
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -215,9 +209,7 @@ onMounted(async () => {});
       @addAvailabilityEvent="
         closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
       "
-      @deleteAvailabilityEvent="
-        closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
-      "
+      @deleteAvailabilityEvent="emits('refreshAvailabilitiesEvent')"
       @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
     ></AvailabilityDialogBody>
   </v-dialog>

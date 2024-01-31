@@ -210,7 +210,10 @@ onMounted(async () => {
           </v-row>
         </v-col>
         <v-col cols="12" lg="5" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
+          <v-card
+            class="fill-height mainCardBorder pa-2"
+            style="overflow-y: auto; max-height: 840px; min-height: 840px"
+          >
             <v-card-title>
               <v-row class="pa-2">
                 <p class="font-weight-semi-bold text-darkBlue text-h5">
@@ -223,9 +226,7 @@ onMounted(async () => {
                 v-for="availability in availabilities"
                 :key="availability[0].id"
                 :event-data="availability[0].event"
-                :availability-data="
-                  availability.length <= 1 ? availability[0] : availability
-                "
+                :availability-data="availability"
                 :signUpCount="getSignups(availability[0].event.id)"
                 :eventType="getEventType(availability[0].event.id)"
                 @refreshAvailabilitiesEvent="refreshAvailability"
@@ -234,7 +235,10 @@ onMounted(async () => {
           </v-card>
         </v-col>
         <v-col cols="12" lg="4" class="pa-0 ma-0 pa-4">
-          <v-card class="fill-height mainCardBorder pa-2" style="overflow-y: auto; max-height: 840px; min-height: 840px;">
+          <v-card
+            class="fill-height mainCardBorder pa-2"
+            style="overflow-y: auto; max-height: 840px; min-height: 840px"
+          >
             <v-card-title class="font-weight-semi-bold text-orange text-h5">
               Upcoming Events
             </v-card-title>
