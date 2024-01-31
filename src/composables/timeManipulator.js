@@ -35,7 +35,6 @@ export function getTimeSlots(timeInterval, totalMins, timeSlots) {
     var prevTimeSlot = timeSlots[timeSlots.length - 1];
     // add timeInterval to previousTimeSlot to get nextTimeSlot
     var nextTimeSlot = addMinsToTime(timeInterval, prevTimeSlot);
-    console.log(nextTimeSlot);
     timeSlots.push(nextTimeSlot);
 
     // update totalMins
