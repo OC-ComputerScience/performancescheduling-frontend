@@ -29,11 +29,13 @@ export function generateTimeSlots(startTime, endTime, minLength) {
 
 export function getTimeSlots(timeInterval, totalMins, timeSlots) {
   // base case - there are still more minutes
-  if (totalMins - timeInterval >= 0) {
+ 
+  if (totalMins - timeInterval > 0) {
     // get the previous time slot to add interval to
     var prevTimeSlot = timeSlots[timeSlots.length - 1];
     // add timeInterval to previousTimeSlot to get nextTimeSlot
     var nextTimeSlot = addMinsToTime(timeInterval, prevTimeSlot);
+    console.log(nextTimeSlot);
     timeSlots.push(nextTimeSlot);
 
     // update totalMins
