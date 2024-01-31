@@ -8,6 +8,7 @@ import { useLoginStore } from "../../../../stores/LoginStore.js";
 const props = defineProps({
   studentInstrumentData: { type: [Object], required: true },
 });
+
 const tab = ref(1);
 const loginStore = useLoginStore();
 const isInstructor = ref(
@@ -111,15 +112,12 @@ onBeforeMount(async () => {
   <v-card class="pa-2 flatCardBorder">
     <v-form ref="form" validate-on="input">
       <v-card-title>
-        <v-row class="pt-0 mt-0">
-          <v-col
-            cols="auto"
-            class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
-          >
-            Edit Evaluation
-          </v-col>
-          <v-spacer />
-          <v-col v-if="props.isEdit" cols="auto" align-self="center"> </v-col>
+        <v-row class="pt-0 mt-0 text-maroon font-weight-bold text-h4">
+          Edit Evaluation
+        </v-row>
+        <v-row class="pt-0 mt-2 text-maroon text-h6">
+          {{ props.studentInstrumentData.instrument.name }}
+          {{ props.studentInstrumentData.semester.name }}
         </v-row>
       </v-card-title>
       <v-tabs v-model="tab" color="maroon-accent-4" align-tabs="center">

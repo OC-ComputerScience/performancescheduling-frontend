@@ -311,13 +311,11 @@ async function updateFacultyTitle() {
 }
 
 async function refreshStudentInstruments() {
-  console.log("refreshing student instruments");
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
     studentRole.id
   )
     .then((response) => {
       studentRole.studentRole = response.data;
-      console.log(studentRole.studentRole);
     })
     .catch((err) => {
       console.log(err);
