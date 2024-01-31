@@ -9,6 +9,9 @@ class StudentInstrumentEvaluationDataService {
     }
     return http.get(url);
   }
+  getByStudentInstrumentId(studentInstrumentId) {
+    return http.get(this.baseUrl + "studentInstrument/" + studentInstrumentId);
+  }
 
   create(data) {
     return http.post(this.baseUrl, data);
