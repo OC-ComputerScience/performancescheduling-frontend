@@ -54,11 +54,12 @@ function fillInstrumentRoleLabels(instruments) {
   let isInstrumental = instruments.some(
     (i) => i.instrument.type === "Instrument" && i.status === "Active"
   );
-  let isVocal = instruments.some((i) => i.instrument.type === "Vocal" && i.status === "Active");
+  let isVocal = instruments.some(
+    (i) => i.instrument.type === "Vocal" && i.status === "Active"
+  );
 
-
-  if(isInstrumental) instrumentRoleLabels.value.push("Instrumental")
-  if(isVocal) instrumentRoleLabels.value.push("Vocal")
+  if (isInstrumental) instrumentRoleLabels.value.push("Instrumental");
+  if (isVocal) instrumentRoleLabels.value.push("Vocal");
 }
 
 async function disableUser(user) {
@@ -122,50 +123,50 @@ onMounted(async () => {
         </v-col>
       </v-row>
     </v-card-title>
-      <v-row class="pb-5 pl-2 pt-2">
-        <v-col
-          cols="auto"
-          v-for="roleLabel in userRoleLabels"
-          :key="roleLabel"
-          class="pb-0 pr-1"
+    <v-row class="pb-5 pl-2 pt-2">
+      <v-col
+        cols="auto"
+        v-for="roleLabel in userRoleLabels"
+        :key="roleLabel"
+        class="pb-0 pr-1"
+      >
+        <v-chip
+          label
+          flat
+          size="small"
+          class="font-weight-semi-bold bg-darkBlue text-none flatChipBorder"
         >
-          <v-chip
-            label
-            flat
-            size="small"
-            class="font-weight-semi-bold bg-darkBlue text-none flatChipBorder"
-          >
-            {{ roleLabel }}
-          </v-chip>
-        </v-col>
-        <v-col
-          cols="auto"
-          v-for="instrumentLabel in instrumentRoleLabels"
-          :key="instrumentLabel"
-          class="pb-0 pr-0"
+          {{ roleLabel }}
+        </v-chip>
+      </v-col>
+      <v-col
+        cols="auto"
+        v-for="instrumentLabel in instrumentRoleLabels"
+        :key="instrumentLabel"
+        class="pb-0 pr-0"
+      >
+        <v-chip
+          flat
+          label
+          size="small"
+          class="font-weight-semi-bold bg-blue text-none flatChipBorder"
         >
-          <v-chip
-            flat
-            label
-            size="small"
-            class="font-weight-semi-bold bg-blue text-none flatChipBorder"
-          >
-            {{ instrumentLabel }}
-          </v-chip>
-        </v-col>
-      </v-row>
-        <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-col cols="auto" class="pb-0">
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-bold mt-0 mr-0 text-none text-white bg-blue flatChipBorder"
-            @click="createOrEditDialog = true"
-          >
-            Edit
-          </v-btn>
-        </v-col>
+          {{ instrumentLabel }}
+        </v-chip>
+      </v-col>
+    </v-row>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-col cols="auto" class="pb-0">
+        <v-btn
+          flat
+          size="small"
+          class="font-weight-bold mt-0 mr-0 text-none text-white bg-blue flatChipBorder"
+          @click="createOrEditDialog = true"
+        >
+          Edit
+        </v-btn>
+      </v-col>
     </v-card-actions>
   </v-card>
   <v-dialog
