@@ -226,9 +226,7 @@ onMounted(async () => {
                 v-for="availability in availabilities"
                 :key="availability[0].id"
                 :event-data="availability[0].event"
-                :availability-data="
-                  availability.length <= 1 ? availability[0] : availability
-                "
+                :availability-data="availability"
                 :signUpCount="getSignups(availability[0].event.id)"
                 :eventType="getEventType(availability[0].event.id)"
                 @refreshAvailabilitiesEvent="refreshAvailability"

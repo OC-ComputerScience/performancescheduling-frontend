@@ -15,7 +15,7 @@ const props = defineProps({
       </v-row>
     </v-card-title>
 
-    <v-row class="pt-0 mt-0">
+    <v-row class="pt-0 mt-2">
       <v-card-title class="font-weight-bold text-darkBlue py-0 my-0">
         {{ pieceData.piece.title }}
       </v-card-title>
@@ -130,7 +130,7 @@ const props = defineProps({
     <v-card-actions>
       <v-btn
         flat
-        class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-blue flatChipBorder"
+        class="font-weight-semi-bold mt-2 ml-auto text-none text-white bg-blue flatChipBorder"
         @click="emits('closePerformanceDialog')"
       >
         Close

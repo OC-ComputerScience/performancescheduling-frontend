@@ -212,7 +212,7 @@ onBeforeMount(async () => {
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="clearFilters"
       >
-        Clear filters
+        Clear Filters
       </v-btn>
     </v-row>
     <v-row class="ml-6"> Displaying : {{ filerContents }}</v-row>

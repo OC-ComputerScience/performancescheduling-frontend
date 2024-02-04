@@ -29,7 +29,7 @@ class UserRoleDataService {
       url += "?sortVar=" + sortVar + "&order=" + (ascending ? "ASC" : "DESC");
     }
     if (userStatus != null) {
-      url += "?userStatus=" + userStatus;
+      url += "&userStatus=" + userStatus;
     }
     return http.get(url);
   }
