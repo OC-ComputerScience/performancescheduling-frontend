@@ -10,6 +10,10 @@ class EventSignupPieceDataService {
     return http.get(url);
   }
 
+  getAllByPieceId(pieceId) {
+    return http.get(this.baseUrl + "pieceId/" + pieceId);
+  }
+
   getByEventSignupId(eventSignupId) {
     return http.get(this.baseUrl + "eventSignupId/" + eventSignupId);
   }

@@ -55,15 +55,18 @@ async function updateComposer() {
 }
 function findSimilar(composer) {
   const similarComposers = props.composersData.filter((c) => {
+    var compFirstName;
+    var compLastName;
+    if (c.firstName == null) compFirstName = "";
+    else compFirstName = c.firstName.toLowerCase();
+
+    if (c.lastName == null) compLastName = "";
+    else compLastName = c.firstName.toLowerCase();
+
     return (
-      compareTwoStrings(
-        c.firstName.toLowerCase(),
-        composer.firstName.toLowerCase()
-      ) >= 0.7 &&
-      compareTwoStrings(
-        c.lastName.toLowerCase(),
-        composer.lastName.toLowerCase()
-      ) >= 0.8
+      compareTwoStrings(compFirstName, composer.firstName.toLowerCase()) >=
+        0.7 &&
+      compareTwoStrings(compLastName, composer.lastName.toLowerCase()) >= 0.8
     );
   });
   return similarComposers;
