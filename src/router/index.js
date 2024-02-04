@@ -23,6 +23,12 @@ const router = createRouter({
       name: "userSettings",
       alias: "/userSettings",
     },
+    {
+      path: "/base",
+      component: BaseView,
+      name: "help",
+      alias: "/help",
+    },
     // Student Routes
     {
       path: "/base",

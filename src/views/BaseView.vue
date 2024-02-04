@@ -1,6 +1,7 @@
 <script setup>
 import MainNav from "../components/MainNav.vue";
 import UserSettings from "../components/UserSettings.vue"
+import Help from "../components/Help.vue"
 
 import StudentHome from "../components/student/StudentHome.vue";
 import StudentPerformances from "../components/student/performances/StudentPerformances.vue";
@@ -47,6 +48,9 @@ const props = defineProps({
           <UserSettings
           v-if="fullPath === '/userSettings'"
         ></UserSettings>
+        <Help
+          v-if="fullPath === '/help'"
+        ></Help>
           <!-- Student pages -->
           <StudentHome v-if="fullPath === '/studentHome'"></StudentHome>
           <StudentPerformances
