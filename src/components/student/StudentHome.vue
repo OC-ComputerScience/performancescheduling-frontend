@@ -305,14 +305,14 @@ onMounted(async () => {
           <v-card-text>
             Once you Activate you will also need to:
             <ul class="ml-5">
-              <li>Add any additional Instruments for this semester</li>
+              <li>Add any additional Instruments for this semester.</li>
               <li>
                 Update your profile information, by clicking Student in Menu Bar
                 and selecting User Settings.
               </li>
               <li>
-                Adding your Pieces for this semester for each Instrument by
-                clicking Piece in Menu Bar
+                Add your Pieces for this semester for each Instrument by
+                clicking Piece in Menu Bar.
               </li>
             </ul>
           </v-card-text>
