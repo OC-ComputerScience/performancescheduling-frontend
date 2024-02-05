@@ -11,7 +11,6 @@ import EventDataService from "../services/EventDataService";
 import AvailabilityDataService from "../services/AvailabilityDataService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import StudentInstrumentSignupDataService from "../services/StudentInstrumentSignupDataService";
 
 const dialog = ref(false);
 const createOrEditDialog = ref(false);
@@ -35,6 +34,7 @@ const availabilityCount = ref(0);
 const viewSignupsDialog = ref(false);
 const eventAvailabilityData = ref([]);
 const studentSignupData = ref([]);
+const isEdit = ref(false);
 
 EventDataService.getById(props.eventData.id)
   .then((response) => {
@@ -56,18 +56,9 @@ function closeEventDialog() {
 function closeSignupsDialog() {
   viewSignupsDialog.value = false;
 }
-function handleClick() {
-  if (props.roleId == 3) {
-    createOrEditDialog.value = true;
-    //router.push({ path: "adminEvents" });
-  } else if (props.roleId == 1) {
-    dialog.value = true;
-  } else {
-    addOrEditAvailabilityDialog.value = true;
-  }
-}
-async function readyEvent(event) {
-  event.isReady = true;
+
+async function unreadyEvent(event) {
+  event.isReady = false;
   await EventDataService.update(event)
     .then(() => {
       emits("refreshEvents");
@@ -77,8 +68,8 @@ async function readyEvent(event) {
     });
 }
 
-async function unreadyEvent(event) {
-  event.isReady = false;
+async function readyEvent(event) {
+  event.isReady = true;
   await EventDataService.update(event)
     .then(() => {
       emits("refreshEvents");
@@ -180,34 +171,39 @@ function generatePDF() {
     signup.endTime = get12HourTimeStringFromString(eventSignup.endTime);
     signup.student = "";
     let comma = "";
-    eventSignup.studentInstrumentSignups.forEach(function (studentInstrument) {
-      signup.student +=
-        comma +
-        studentInstrument.studentInstrument.studentRole.user.firstName +
-        " " +
-        studentInstrument.studentInstrument.studentRole.user.lastName;
-      comma = ",";
-    });
 
-    if (eventSignup.studentInstrumentSignups[0].accompanistRoleId == null) {
-      signup.accompanist = "None";
-    } else {
-      signup.accompanist =
-        eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
+    if (eventSignup.studentInstrumentSignups.length > 0) {
+      eventSignup.studentInstrumentSignups.forEach(function (
+        studentInstrument
+      ) {
+        signup.student +=
+          comma +
+          studentInstrument.studentInstrument.studentRole.user.firstName +
+          " " +
+          studentInstrument.studentInstrument.studentRole.user.lastName;
+        comma = ",";
+      });
+
+      if (eventSignup.studentInstrumentSignups[0].accompanistRoleId == null) {
+        signup.accompanist = "None";
+      } else {
+        signup.accompanist =
+          eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
+            .firstName +
+          " " +
+          eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
+            .lastName;
+      }
+      signup.instructor =
+        eventSignup.studentInstrumentSignups[0].instructorRoleSignup.user
           .firstName +
         " " +
-        eventSignup.studentInstrumentSignups[0].accompanistRoleSignup.user
+        eventSignup.studentInstrumentSignups[0].instructorRoleSignup.user
           .lastName;
+      signup.instrument =
+        eventSignup.studentInstrumentSignups[0].studentInstrument.instrument.name;
+      pdfSignups.push(signup);
     }
-    signup.instructor =
-      eventSignup.studentInstrumentSignups[0].instructorRoleSignup.user
-        .firstName +
-      " " +
-      eventSignup.studentInstrumentSignups[0].instructorRoleSignup.user
-        .lastName;
-    signup.instrument =
-      eventSignup.studentInstrumentSignups[0].studentInstrument.instrument.name;
-    pdfSignups.push(signup);
   });
 
   doc.autoTable({
@@ -246,19 +242,36 @@ onBeforeUpdate(async () => {
                 <v-card-title class="font-weight-bold text-orange text-h5">
                   {{ eventData.name }}
                 </v-card-title>
-                <v-card-subtitle
-                  v-if="roleId == 3"
-                  class="mb-0 pb-0 font-weight-semi-bold"
-                  :class="eventData.isReady ? 'text-green' : 'text-red'"
-                >
-                  {{ eventData.isReady ? "Ready" : "Not Ready" }}
-                </v-card-subtitle>
+                <div v-if="roleId == 3">
+                  <v-row class="ml-3 mt-4 mb-3">
+                    <v-card-subtitle
+                      class="mb-0 pb-0 font-weight-semi-bold text-h7"
+                      :class="eventData.isReady ? 'text-green' : 'text-red'"
+                    >
+                      {{ eventData.isReady ? "Ready" : "Not Ready" }}
+                    </v-card-subtitle>
+                    <v-btn
+                      flat
+                      size="small"
+                      class="font-weight-semi-bold ml-auto mr-4 text-none text-white flatChipBorder"
+                      :class="
+                        props.eventData.isReady ? 'bg-maroon' : 'bg-blue'
+                      "
+                      @click="
+                        props.eventData.isReady
+                          ? unreadyEvent(eventData)
+                          : readyEvent(eventData)
+                      "
+                    >
+                      {{
+                        props.eventData.isReady ? "Make Unready" : "Make Ready"
+                      }}
+                    </v-btn>
+                  </v-row>
+                </div>
                 <!-- Event Instrument Type -->
                 <!-- TODO(@ethanimooney): Make this actually work -->
                 <v-card-subtitle
-                  v-if="
-                    roleId == 3 || roleId == 1 || roleId == 2 || roleId == 4
-                  "
                   class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
                 >
                   {{
@@ -336,25 +349,12 @@ onBeforeUpdate(async () => {
       <v-card-actions class="pt-0 mt-0">
         <v-spacer></v-spacer>
         <!--Unready/Ready-->
-        <v-btn
-          v-if="roleId == 3"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-4 text-none text-white flatChipBorder"
-          :class="props.eventData.isReady ? 'bg-maroon' : 'bg-darkBlue'"
-          @click="
-            props.eventData.isReady
-              ? unreadyEvent(eventData)
-              : readyEvent(eventData)
-          "
-        >
-          {{ props.eventData.isReady ? "Unready" : "Ready" }}
-        </v-btn>
+
         <v-btn
           v-if="roleId != 1"
           flat
           size="small"
-          class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
+          class="font-weight-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
           @click="generatePDF"
         >
           PDF Signups
@@ -363,25 +363,47 @@ onBeforeUpdate(async () => {
           v-if="roleId != 1"
           flat
           size="small"
-          class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
+          class="font-weight-bold mt-0 mr-2 ml-auto text-none text-white bg-blue flatChipBorder"
           @click="getDialogData"
         >
           View Signups
         </v-btn>
-        <!-- Signup/Availability Button -->
+
         <v-btn
+          v-if="roleId == 1"
+          flat
+          size="small"
+          class="font-weight-semi-bold mr-2 bg-blue text-none"
+          @click="dialog = true"
+        >
+          Signup
+        </v-btn>
+        <v-btn
+          v-if="roleId != 1"
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          @click="handleClick()"
+          @click="(isEdit = false), (addOrEditAvailabilityDialog = true)"
         >
-          {{
-            roleId == 1
-              ? "Signup"
-              : roleId == 3
-              ? "Edit Event"
-              : "Add Availability"
-          }}
+          Add Availability
+        </v-btn>
+        <v-btn
+          v-if="roleId == 3"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="(isEdit = true), (addOrEditAvailabilityDialog = true)"
+        >
+          Edit Availability
+        </v-btn>
+        <v-btn
+          v-if="roleId == 3"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="createOrEditDialog = true"
+        >
+          Edit Event
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -399,7 +421,7 @@ onBeforeUpdate(async () => {
       max-width="600px"
     >
       <AvailabilityDialogBody
-        :is-edit="false"
+        :is-edit="isEdit"
         :availability-data="
           availabilityData
             ? availabilityData
@@ -412,6 +434,7 @@ onBeforeUpdate(async () => {
         @addAvailabilityEvent="
           closeAvailabilityDialog(), emits('refreshAvailabilitiesEvent')
         "
+        @deleteAvailabilityEvent="emits('refreshAvailabilitiesEvent')"
         @closeAvailabilityDialogEvent="closeAvailabilityDialog()"
       ></AvailabilityDialogBody>
     </v-dialog>
@@ -428,7 +451,9 @@ onBeforeUpdate(async () => {
     <v-dialog v-model="viewSignupsDialog" persistent max-width="800px">
       <ViewSignupsDialog
         :event-data="eventData"
-        :avail-data="eventAvailabilityData"
+        :avail-data="
+          !isAdmin ? eventAvailabilityData : { startTime: null, endTime: null }
+        "
         :student-signup-data="studentSignupData"
         @closeSignupsDialog="closeSignupsDialog"
       ></ViewSignupsDialog>

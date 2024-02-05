@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onBeforeMount, computed } from "vue";
 import UserDataService from "./../../../../services/UserDataService";
+import UserRoleDataService from "./../../../../services/UserRoleDataService";
 import MaintainUserCard from "./MaintainUserCard.vue";
 import UserDialogBody from "./UserDialogBody.vue";
 import { useLoginStore } from "../../../../stores/LoginStore.js";
@@ -19,8 +20,24 @@ if (!isAdmin.value) {
   filteredUsers.value = ["Students"];
 }
 
+const instructorFilterOptions = ref([]);
+const instructorFilterSelection = ref(null);
+
+async function getInstructor() {
+  await UserRoleDataService.getRolesForRoleId(2, null, null, "All").then(
+    (response) => {
+      instructorFilterOptions.value = response.data;
+      instructorFilterOptions.value.forEach((instructor) => {
+        instructor.name =
+          instructor.user.firstName + " " + instructor.user.lastName;
+      });
+    }
+  );
+}
+
 async function getUsers() {
   dataLoaded.value = false;
+  currentPage.value = 1;
   await UserDataService.getAllWithRolesAndStudentInstruments("lastName")
     .then((response) => {
       users.value = response.data;
@@ -36,7 +53,7 @@ async function getUsers() {
 
 async function refreshUsers() {
   await getUsers();
-  searchFilteredList();
+  filterUsers();
 }
 
 // Filtering
@@ -47,22 +64,6 @@ const searchInput = ref("");
 
 // Search filter
 // Filters the list of users by first and last name, based on searchInput
-function searchFilteredList() {
-  filteredUsers.value = users.value;
-
-  // If the search input is empty, return the full list, otherwise filter
-  if (searchInput.value === "") {
-    filterUsers();
-    return;
-  }
-
-  filteredUsers.value = filteredUsers.value.filter((user) =>
-    (user.firstName.toLowerCase() + " " + user.lastName.toLowerCase()).includes(
-      searchInput.value.toLowerCase()
-    )
-  );
-  filterUsers();
-}
 
 const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
@@ -82,9 +83,10 @@ const studentTypeFilterOptions = [
   { title: "Instrumental", value: "Instrument" },
   { title: "Vocal", value: "Vocal" },
 ];
-const studentTypeFilterSelection = ref([]);
+const studentTypeFilterSelection = ref(null);
 
 function filterUsers() {
+  filteredUsers.value = users.value;
   // Never clear the serach filter, so filter by that first, then the actual filters
   //searchFilteredList();
   // Filter by status
@@ -98,23 +100,57 @@ function filterUsers() {
   if (roleFilterSelection.value.length > 0) {
     for (let role of roleFilterSelection.value) {
       filteredUsers.value = filteredUsers.value.filter((u) =>
-        u.userRoles.some((ur) => ur.roleId === role.id)
+        u.userRoles.some(
+          (ur) => ur.roleId === role.id && ur.status === "Active"
+        )
       );
     }
   }
 
   // Filter by student type, only available if student role filter is active
-  if (studentTypeFilterSelection.value.length > 0) {
+  if (studentTypeFilterSelection.value != null) {
     // For each studentType filter selected, filter filteredUsers by user.userRoles.
     // {role that is a student}.studentRole.{check if any of these studentRoles.instrument.
     // type are the type we are looking for.}
-    for (let type of studentTypeFilterSelection.value) {
-      filteredUsers.value = filteredUsers.value.filter((su) =>
-        su.userRoles
-          .find((sur) => sur.roleId === 1)
-          .studentRole.some((sr) => sr.instrument.type === type)
-      );
-    }
+
+    filteredUsers.value = filteredUsers.value.filter((su) => {
+      let fsu = su.userRoles.find((sur) => sur.roleId === 1);
+      if (fsu) {
+        return fsu.studentRole.some(
+          (sr) =>
+            sr.instrument.type === studentTypeFilterSelection.value &&
+            sr.status === "Active"
+        );
+      } else return false;
+    });
+  }
+
+  //filter by instructor
+
+  if (instructorFilterSelection.value != null) {
+    filteredUsers.value = filteredUsers.value.filter((user) => {
+      let found = false;
+      user.userRoles.forEach((ur) => {
+        if (ur.roleId === 1) {
+          if (
+            ur.studentRole.some(
+              (sr) => sr.instructorRoleId === instructorFilterSelection.value.id
+            )
+          )
+            found = true;
+        }
+      });
+      return found;
+    });
+  }
+  if (searchInput.value != "") {
+    filteredUsers.value = filteredUsers.value.filter((user) =>
+      (
+        user.firstName.toLowerCase() +
+        " " +
+        user.lastName.toLowerCase()
+      ).includes(searchInput.value.toLowerCase())
+    );
   }
 }
 
@@ -124,10 +160,11 @@ function clearFilters() {
   filteredUsers.value = users.value;
   statusFilterSelection.value = null;
   roleFilterSelection.value = [];
+  instructorFilterSelection.value = null;
   if (!isAdmin.value) {
     roleFilterSelection.value = [{ role: "Student", id: 1 }];
   }
-  studentTypeFilterSelection.value = [];
+  studentTypeFilterSelection.value = null;
   searchInput.value = "";
   filterUsers();
 }
@@ -155,11 +192,44 @@ const currentPageData = computed(() => {
   );
 });
 
-onMounted(async () => {
+const filerContents = computed(() => {
+  let fc = "";
+  if (searchInput.value != "") {
+    fc += "User: " + searchInput.value + ", ";
+  } else {
+    fc += "User: All, ";
+  }
+  if (statusFilterSelection.value != null) {
+    fc += "Status: " + statusFilterSelection.value + ", ";
+  } else {
+    fc += "Status: All, ";
+  }
+  if (roleFilterSelection.value.length > 0) {
+    fc += "Role: ";
+    roleFilterSelection.value.forEach((r) => {
+      fc += r.role + ",";
+    });
+  } else {
+    fc += "Role: All, ";
+  }
+  if (instructorFilterSelection.value != null) {
+    fc += "Instructor: " + instructorFilterSelection.value.name;
+  } else {
+    fc += "Instructor: All, ";
+  }
+  if (studentTypeFilterSelection.value != null) {
+    fc += "Type: " + studentTypeFilterSelection.value;
+  } else {
+    fc += "Type: All";
+  }
+  return fc;
+});
+
+onBeforeMount(async () => {
+  await getInstructor();
   await refreshUsers();
 });
 </script>
-
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
@@ -170,7 +240,7 @@ onMounted(async () => {
       <input
         type="text"
         v-model="searchInput"
-        @input="searchFilteredList"
+        @input="filterUsers"
         class="ml-6 px-4 my-1 mainCardBorder text-blue bg-white font-weight-semi-bold"
         style="outline: none"
         append-icon="mdi-magnify"
@@ -207,6 +277,7 @@ onMounted(async () => {
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
                   return-object
+                  clearable
                 ></v-select>
               </v-list-item>
               <v-list-item
@@ -223,15 +294,26 @@ onMounted(async () => {
                   :items="roleFilterOptions"
                   item-title="role"
                   return-object
+                  clearable
                 ></v-select>
               </v-list-item>
-              <v-list-item
-                v-if="roleFilterSelection.some((r) => r.id === 1)"
-                class="pa-0 font-weight-semi-bold text-darkBlue"
-              >
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Instructor
+                <v-autocomplete
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="instructorFilterSelection"
+                  :items="instructorFilterOptions"
+                  item-title="name"
+                  item-value="id"
+                  return-object
+                  clearable
+                ></v-autocomplete>
+              </v-list-item>
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Student Type
                 <v-select
-                  multiple
                   color="darkBlue"
                   variant="underlined"
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
@@ -239,6 +321,7 @@ onMounted(async () => {
                   :items="studentTypeFilterOptions"
                   item-title="title"
                   item-value="value"
+                  clearable
                 ></v-select>
               </v-list-item>
             </v-list>
@@ -254,7 +337,8 @@ onMounted(async () => {
               v-if="
                 statusFilterSelection ||
                 roleFilterSelection != 0 ||
-                studentTypeFilterSelection != 0
+                studentTypeFilterSelection ||
+                instructorFilterSelection
               "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
@@ -268,14 +352,15 @@ onMounted(async () => {
         v-if="
           statusFilterSelection ||
           roleFilterSelection != 0 ||
-          studentTypeFilterSelection != 0
+          studentTypeFilterSelection ||
+          instructorFilterSelection
         "
         size="medium"
         color="maroon"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="clearFilters"
       >
-        Clear filters
+        Clear Filters
       </v-btn>
       <v-btn
         v-if="isAdmin"
@@ -287,6 +372,7 @@ onMounted(async () => {
         Add new user
       </v-btn>
     </v-row>
+    <v-row class="ml-6"> Displaying : {{ filerContents }}</v-row>
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">
@@ -329,6 +415,7 @@ onMounted(async () => {
   <v-dialog v-model="addUserDialog" persistent max-width="600px">
     <UserDialogBody
       :is-edit="false"
+      is-student="false"
       :user-data="{
         id: null,
         firstName: null,

@@ -316,13 +316,6 @@ async function refreshStudentInstruments() {
   )
     .then((response) => {
       studentRole.studentRole = response.data;
-      editedStudentHours.value = studentRole.studentRole.reduce((sum, obj) => {
-        if (obj.status === "Active") {
-          return sum + obj.privateHours;
-        } else {
-          return sum;
-        }
-      }, 0);
     })
     .catch((err) => {
       console.log(err);

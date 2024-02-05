@@ -1,19 +1,28 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import UserInstrumentDialogBody from "./UserInstrumentDialogBody.vue";
+import EvalDialogBody from "./EvalDialogBody.vue";
 import StudentInstrumentDataService from "../../../../services/StudentInstrumentDataService.js";
+import { useLoginStore } from "../../../../stores/LoginStore.js";
 
 const emits = defineEmits(["refreshStudentInstrumentsEvent"]);
 
 const addOrEditInstrumentDialog = ref(false);
+const viewOrEditStudentInstrumentEval = ref(false);
+const isInstructor = ref(false);
+const loginStore = useLoginStore();
 
 const props = defineProps({
   studentInstrumentData: { type: [Object], required: true },
   isStudent: { type: [Boolean], required: true },
 });
-
 function closeUserInstrumentDialog() {
   addOrEditInstrumentDialog.value = false;
+}
+
+function setIsInstructor() {
+  isInstructor.value =
+    props.studentInstrumentData.instructorRole == loginStore.currentRole.roleId;
 }
 
 async function disableStudentInstrument(studentInstrument) {
@@ -38,7 +47,9 @@ async function enableStudentInstrument(studentInstrument) {
     });
 }
 
-onMounted(async () => {});
+onMounted(async () => {
+  setIsInstructor();
+});
 </script>
 
 <template>
@@ -97,6 +108,15 @@ onMounted(async () => {});
           >
             Level: {{ studentInstrumentData.level.name }}
           </v-chip>
+          <v-chip
+            v-if="studentInstrumentData.endingLevel"
+            label
+            flat
+            size="small"
+            class="font-weight-semi-bold text-none text-white flatChipBorder bg-darkBlue mr-2"
+          >
+            Ending Level: {{ studentInstrumentData.endingLevel.name }}
+          </v-chip>
         </v-col>
       </v-row>
     </v-card-title>
@@ -140,6 +160,14 @@ onMounted(async () => {});
           <v-btn
             flat
             size="small"
+            class="mr-2 font-weight-semi-bold text-none text-white bg-blue flatChipBorder"
+            @click="viewOrEditStudentInstrumentEval = true"
+          >
+            Eval
+          </v-btn>
+          <v-btn
+            flat
+            size="small"
             class="font-weight-semi-bold text-none text-white bg-blue flatChipBorder"
             @click="addOrEditInstrumentDialog = true"
           >
@@ -167,5 +195,16 @@ onMounted(async () => {});
           enableStudentInstrument(studentInstrumentData)
       "
     ></UserInstrumentDialogBody>
+  </v-dialog>
+  <v-dialog
+    v-model="viewOrEditStudentInstrumentEval"
+    persistent
+    max-width="600px"
+  >
+    <EvalDialogBody
+      :is-instructor="isInstructor"
+      :student-instrument-data="studentInstrumentData"
+      @closeEvalDialog="viewOrEditStudentInstrumentEval = false"
+    ></EvalDialogBody>
   </v-dialog>
 </template>

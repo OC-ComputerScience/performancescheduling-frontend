@@ -33,7 +33,6 @@ const haveLevel = ref(false);
 const editedLevel = ref(props.studentInstrumentData.level);
 const editedEndingLevel = ref(props.studentInstrumentData.endingLevel);
 const privateHours = ref(props.studentInstrumentData.privateHours);
-console.log(props.studentInstrumentData);
 const levelOptions = ref([]);
 const instrumentOptions = ref([]);
 const instructors = ref([]);
@@ -187,12 +186,10 @@ async function updateLevel() {
 }
 
 async function updateEndingLevel() {
-  console.log(editedEndingLevel.value);
-  console.log(props.studentInstrumentData.endingLevelId);
-
   if (
-    props.studentInstrumentData.endingLevelId === null ||
-    editedEndingLevel.value.id != props.studentInstrumentData.endingLevelId
+    editedEndingLevel.value != null &&
+    (props.studentInstrumentData.endingLevelId === null ||
+      editedEndingLevel.value.id != props.studentInstrumentData.endingLevelId)
   ) {
     await StudentInstrumentDataService.update({
       id: props.studentInstrumentData.id,
@@ -249,12 +246,17 @@ async function setDefaultValues() {
     selectedInstructor.value = defaultInstrument.instructorRole;
     selectedAccompanist.value = defaultInstrument.accompanistRole;
     selectedSemester.value = semesters.value[0];
-    if (defaultInstrument.endingLevel.id != null) {
-      editedLevel.value = levelOptions.value[defaultInstrument.endingLevel.id];
+
+    if (defaultInstrument.endingLevelId != null) {
+      editedLevel.value =
+        levelOptions.value[defaultInstrument.endingLevelId - 1];
     } else {
-      editedLevel.value = levelOptions.value[defaultInstrument.level.id];
+      haveLevel.value = false;
+      if (defaultInstrument.levelId === null) editedLevel.value = 1;
+      else
+        editedLevel.value = levelOptions.value[defaultInstrument.levelId - 1];
     }
-    editedLevel.value = levelOptions.value[defaultInstrument.endingLevel.id];
+
     privateHours.value = defaultInstrument.privateHours;
   }
 }

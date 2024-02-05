@@ -51,6 +51,9 @@ class StudentInstrumentDataService {
     );
   }
   getStudentsForInstructorId(instructorId, active) {
+    if (active === undefined) {
+      active = "";
+    }
     return http.get(
       this.baseUrl + "instructorId/" + instructorId + "?active=" + active
     );
@@ -62,8 +65,14 @@ class StudentInstrumentDataService {
     );
   }
 
-  getStudentInstrumentsForStudentId(studentId) {
-    return http.get(this.baseUrl + "studentId/" + studentId);
+  getStudentInstrumentsForStudentId(studentId, active) {
+    if (active === undefined) {
+      active = "";
+    }
+    else active = "?active=" + active;
+    return http.get(
+      this.baseUrl + "studentId/" + studentId + active
+    );
   }
 
   create(data) {

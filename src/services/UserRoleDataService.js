@@ -18,10 +18,18 @@ class UserRoleDataService {
     return http.get(this.baseUrl + "userId/" + userId);
   }
 
-  getRolesForRoleId(roleId, sortVar = null, ascending = true) {
+  getRolesForRoleId(
+    roleId,
+    sortVar = null,
+    ascending = true,
+    userStatus = null
+  ) {
     var url = this.baseUrl + "roleId/" + roleId;
     if (sortVar != null) {
       url += "?sortVar=" + sortVar + "&order=" + (ascending ? "ASC" : "DESC");
+    }
+    if (userStatus != null) {
+      url += "&userStatus=" + userStatus;
     }
     return http.get(url);
   }

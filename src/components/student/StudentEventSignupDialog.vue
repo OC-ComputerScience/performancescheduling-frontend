@@ -29,6 +29,7 @@ const eventTypeLabel = ref("");
 const errorMessage = ref("");
 const groupSignup = ref(false);
 const activeAccompanists = ref([]);
+const activeInstructors = ref([]);
 // student instrument variables
 const instruments = ref([]);
 const selectedStudentInstrument = ref(null);
@@ -37,6 +38,7 @@ const instructorName = ref(null);
 const selectedAccompanist = ref(null);
 // student piece variables
 const studentPieces = ref([]);
+const allStudentPieces = ref([]);
 const studentInstrumentStudentPieces = ref([]);
 const filteredStudentPieces = ref([]);
 const selectedStudentPieces = ref([]);
@@ -60,6 +62,9 @@ const instructorAvailRequest = ref(false);
 const accompAvailRequest = ref(false);
 // snackbar variables
 const snackbar = ref({ show: false, color: "", message: "" });
+
+const onlySemesterPieces = ref(true);
+const disableOnlySemesterPiece = ref(false);
 
 async function getData() {
   // due to the watch statements, accompanists must be gotten before student instruments
@@ -94,6 +99,20 @@ async function getData() {
       }
 
       selectedStudentInstrument.value = instruments.value[0];
+
+      activeInstructors.value = [
+        selectedStudentInstrument.value.instructorRole,
+      ];
+      activeInstructors.value.map(
+        (instructor) =>
+          (instructor.fullName =
+            instructor.user.firstName + " " + instructor.user.lastName)
+      );
+      instructorName.value = selectedInstructor.value
+        ? selectedInstructor.value.user.firstName +
+          " " +
+          selectedInstructor.value.user.lastName
+        : null;
     })
     .catch((e) => {
       console.log(e);
@@ -120,39 +139,38 @@ async function getData() {
 async function getStudentPieces() {
   await StudentPieceDataService.getByUser(loginStore.user.userId)
     .then((response) => {
-      studentPieces.value = response.data.filter(
-        (studentPiece) => studentPiece.semesterId === props.eventData.semesterId
-      );
-
-      studentPieces.value.forEach(function (studentPiece) {
-        var fullName = "";
-        if (studentPiece.piece.composer.lastName) {
-          fullName = studentPiece.piece.composer.lastName;
-          if (studentPiece.piece.composer.firstName) {
-            fullName += ", " + studentPiece.piece.composer.firstName;
-          }
-        } else {
-          fullName = studentPiece.piece.composer.firstName;
-        }
-        studentPiece.piece.composer.fullName = fullName;
-      });
-      selectedStudentPieces.value = [];
-
-      studentInstrumentStudentPieces.value = studentPieces.value.filter(
-        (studentPiece) =>
-          studentPiece.studentInstrumentId == selectedStudentInstrument.value.id
-      );
-
-      filteredStudentPieces.value = studentInstrumentStudentPieces.value;
-      filteredStudentPieces.value.forEach((studentPiece) => {
-        studentPiece.isFirst = false;
-      });
+      allStudentPieces.value = response.data;
     })
     .catch((e) => {
       console.log(e);
     });
+  filterStudentPieces();
 }
 
+function filterStudentPieces() {
+  studentPieces.value = allStudentPieces.value.filter(
+    (studentPiece) =>
+      (studentPiece.semesterId === props.eventData.semesterId ||
+        !onlySemesterPieces.value) &&
+      studentPiece.studentInstrumentId === selectedStudentInstrument.value.id &&
+      studentPiece.status === "Active"
+  );
+
+  studentPieces.value.forEach(function (studentPiece) {
+    var fullName = "";
+    if (studentPiece.piece.composer.lastName) {
+      fullName = studentPiece.piece.composer.lastName;
+      if (studentPiece.piece.composer.firstName) {
+        fullName += ", " + studentPiece.piece.composer.firstName;
+      }
+    } else {
+      fullName = studentPiece.piece.composer.firstName;
+    }
+    studentPiece.piece.composer.fullName = fullName;
+  });
+
+  filteredStudentPieces.value = studentPieces.value;
+}
 function selectStudentPiece(studentPiece) {
   if (!isStudentPieceSelected(studentPiece)) {
     selectedStudentPieces.value.push(studentPiece);
@@ -163,13 +181,30 @@ function selectStudentPiece(studentPiece) {
       1
     );
   }
+  if (isNonSemesterPieceSelected()) {
+    disableOnlySemesterPiece.value = true;
+  } else {
+    disableOnlySemesterPiece.value = false;
+  }
 }
-
 function isStudentPieceSelected(studentPiece) {
   return (
     selectedStudentPieces.value.findIndex((x) => x.id === studentPiece.id) !==
     -1
   );
+}
+
+function isNonSemesterPieceSelected() {
+  for (var i = 0; i < studentPieces.value.length; i++) {
+    if (
+      isStudentPieceSelected(studentPieces.value[i]) &&
+      studentPieces.value[i].semesterId != props.eventData.semesterId
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function setFirstPiece(clickedStudentPiece) {
@@ -454,6 +489,7 @@ function requestTimeslotFromStudent() {
       isCompleted: false,
       userRoleId: student.studentInstrument.studentRole.id,
       notificationId: 3,
+      from: loginStore.user.email,
     };
     UserNotificationDataService.create(data).catch((e) => {
       console.log(e);
@@ -470,7 +506,7 @@ async function requestAdditionalTimeslots(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you create more timeslots for ${props.eventData.name} on 
+    } has requested you create more timeslots for ${props.eventData.name} on
     ${formatDate(props.eventData.date)} (${new Date(
       props.eventData.date
     ).toLocaleDateString("default", {
@@ -481,6 +517,7 @@ async function requestAdditionalTimeslots(userRole) {
     isCompleted: false,
     userRoleId: userRole.id,
     notificationId: 1,
+    from: loginStore.user.email,
   };
   UserNotificationDataService.create(data).catch((e) => {
     console.log(e);
@@ -507,6 +544,7 @@ async function requestAvailabilityFromUserRole(userRole) {
     isCompleted: false,
     userRoleId: userRole.id,
     notificationId: 2,
+    from: loginStore.user.email,
   };
   UserNotificationDataService.create(data).catch((e) => {
     console.log(e);
@@ -575,12 +613,12 @@ async function confirmSignup() {
   const studentInstrumentSignupData = {
     eventSignupId: eventSignupId,
     studentInstrumentId: selectedStudentInstrument.value.id,
-    instructorRoleId: selectedInstructor.value.id,
+    instructorRoleId: selectedStudentInstrument.value.instructorRole.id,
+
     accompanistRoleId: selectedAccompanist.value
       ? selectedAccompanist.value.id
       : null,
   };
-
   await StudentInstrumentSignupDataService.create(studentInstrumentSignupData)
     .then(() => {
       confimationDialog.value = false;
@@ -632,6 +670,12 @@ watch(selectedStudentInstrument, async () => {
 
   // update instructor and accompanist
   selectedInstructor.value = selectedStudentInstrument.value.instructorRole;
+  activeInstructors.value = [selectedStudentInstrument.value.instructorRole];
+  activeInstructors.value.map(
+    (instructor) =>
+      (instructor.fullName =
+        instructor.user.firstName + " " + instructor.user.lastName)
+  );
   instructorName.value = selectedInstructor.value
     ? selectedInstructor.value.user.firstName +
       " " +
@@ -666,6 +710,35 @@ watch(selectedStudentInstrument, async () => {
 
   disableTimeslots();
 });
+watch(selectedInstructor, async () => {
+  if (selectedInstructor.value != null) {
+    selectedInstructor.value.fullName =
+      selectedInstructor.value.user.firstName +
+      " " +
+      selectedInstructor.value.user.lastName;
+    instructorName.value = selectedInstructor.value.fullName;
+    await AvailabilityDataService.getByUserRoleAndEvent(
+      selectedInstructor.value.id,
+      props.eventData.id
+    )
+      .then((response) => {
+        instructorAvailability.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  } else {
+    instructorName.value = "No Instructor";
+    await AvailabilityDataService.getByRoleAndEvent(2, props.eventData.id)
+      .then((response) => {
+        instructorAvailability.value = response.data;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+  disableTimeslots();
+});
 
 watch(selectedAccompanist, async () => {
   if (selectedAccompanist.value != null) {
@@ -688,6 +761,10 @@ watch(selectedAccompanist, async () => {
     accompanistAvailability.value = [];
   }
   disableTimeslots();
+});
+
+watch(onlySemesterPieces, function () {
+  filterStudentPieces();
 });
 
 onMounted(async () => {
@@ -749,14 +826,17 @@ onMounted(async () => {
             ></v-autocomplete>
           </v-col>
           <v-col>
-            <v-text-field
+            <v-autocomplete
+              clearable
               label="Instructor"
-              v-model="instructorName"
+              :items="activeInstructors"
+              item-title="fullName"
+              v-model="selectedInstructor"
               text-label="Instructor"
               variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-              readonly
-            ></v-text-field
+              return-object
+            ></v-autocomplete
           ></v-col>
           <v-col>
             <v-autocomplete
@@ -771,6 +851,17 @@ onMounted(async () => {
             ></v-autocomplete>
           </v-col>
         </v-row>
+        <v-row class="mt-1 mb-1">
+          <v-spacer></v-spacer>
+          <div v-if="selectedInstructor != null">
+            Deselect Instructor and/or Accompanist to view times where some
+            Instructor is available.
+          </div>
+          <div v-if="selectedInstructor == null">
+            Re-Select Instructor and/or Accompanist to only view times where they
+            are available.
+          </div>
+        </v-row>
         <v-row class="ml-1">
           <v-col cols="6">
             <v-row class="font-weight-bold text-maroon text-h6">
@@ -783,12 +874,20 @@ onMounted(async () => {
                   color="blue"
                   @click="addStudentPieceDialog = true"
                 >
-                  Add To Repertoire
+                  Add to Repertoire
                 </v-btn>
               </v-col>
             </v-row>
-            <v-row>
-              Only lists pieces from current semester and current instrument
+            <v-row mt-7>
+              <v-row>
+                <v-checkbox
+                  :disabled="disableOnlySemesterPiece"
+                  v-model="onlySemesterPieces"
+                  label="Only show pieces
+              from current semester"
+                  class="text-body-1 font-weight-bold text-darkBlue"
+                ></v-checkbox>
+              </v-row>
             </v-row>
             <v-row class="mt-5">
               <v-col cols="11" class="pl-0">
@@ -906,7 +1005,7 @@ onMounted(async () => {
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
-                  Request additional
+                  Request Additional
                 </v-btn>
               </v-col>
             </v-row>
@@ -961,10 +1060,18 @@ onMounted(async () => {
                     <v-row v-if="instructorAvailability.length == 0">
                       <v-col cols="6">
                         <div
+                          v-if="selectedInstructor != null"
                           class="font-weight-semi-bold text-maroon text-body-1"
                         >
-                          {{ instructorName }} has not setup availability for
+                          {{ instructorName }} has not set up availability for
                           this event.
+                        </div>
+                        <div
+                          v-if="selectedInstructor == null"
+                          class="font-weight-semi-bold text-maroon text-body-1"
+                        >
+                          {{ instructorName }} has set up availability for this
+                          event.
                         </div>
                       </v-col>
                       <v-col cols="6">
@@ -976,7 +1083,7 @@ onMounted(async () => {
                               (instructorAvailRequest = true)
                           "
                         >
-                          Request availability
+                          Request Availability
                         </v-btn>
                       </v-col>
                     </v-row>
@@ -1058,7 +1165,7 @@ onMounted(async () => {
             class="font-weight-semi-bold mr-2 mt-4 bg-blue text-none"
             @click="openDialog"
           >
-            Signup
+            Sign up
           </v-btn>
           <v-btn
             flat
