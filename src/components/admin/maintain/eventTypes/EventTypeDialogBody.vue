@@ -44,7 +44,6 @@ async function updateEventType() {
     if (valid.valid) {
       delete editedEventTypeData.value["createdAt"];
       delete editedEventTypeData.value["updatedAt"];
-      console.log(editedEventTypeData.value);
       await EventTypeDataService.update(editedEventTypeData.value)
         .then(() => {
           emits("updateEventTypeSuccessEvent");

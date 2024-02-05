@@ -871,7 +871,7 @@ onMounted(async () => {
                   color="blue"
                   @click="addStudentPieceDialog = true"
                 >
-                  Add To Repertoire
+                  Add to Repertoire
                 </v-btn>
               </v-col>
             </v-row>
@@ -1002,7 +1002,7 @@ onMounted(async () => {
                   class="font-weight-bold text-none px-5"
                   color="blue"
                 >
-                  Request additional
+                  Request Additional
                 </v-btn>
               </v-col>
             </v-row>
@@ -1080,7 +1080,7 @@ onMounted(async () => {
                               (instructorAvailRequest = true)
                           "
                         >
-                          Request availability
+                          Request Availability
                         </v-btn>
                       </v-col>
                     </v-row>
@@ -1162,7 +1162,7 @@ onMounted(async () => {
             class="font-weight-semi-bold mr-2 mt-4 bg-blue text-none"
             @click="openDialog"
           >
-            Signup
+            Sign up
           </v-btn>
           <v-btn
             flat

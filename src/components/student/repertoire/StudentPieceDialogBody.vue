@@ -383,7 +383,7 @@ onBeforeMount(async () => {
             readonly
             :rules="[checkDuplicateStudentPiece()]"
           ></v-text-field>
-          <v-select
+          <v-autocomplete
             v-if="!props.isEdit"
             placeholder="Select a Composer then select from the list of pieces"
             color="darkBlue"
@@ -396,7 +396,7 @@ onBeforeMount(async () => {
             @update:modelValue="setPiece(editedStudentPieceData.pieceId)"
             :rules="[checkDuplicateStudentPiece()]"
           >
-          </v-select>
+          </v-autocomplete>
 
           <v-card-subtitle
             v-if="isVocal()"

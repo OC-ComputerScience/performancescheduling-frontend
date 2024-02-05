@@ -29,5 +29,10 @@ class StudentPieceDataService {
   update(data) {
     return http.put(this.baseUrl + data.id, data);
   }
+
+  getAllByPieceId(pieceId) {
+    var url = this.baseUrl + "/pieceId/" + pieceId;
+    return http.get(url);
+  }
 }
 export default new StudentPieceDataService();

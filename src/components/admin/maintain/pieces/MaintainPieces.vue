@@ -4,6 +4,7 @@ import PieceDataService from "./../../../../services/PieceDataService";
 import ComposerDataService from "./../../../../services/ComposerDataService";
 import MaintainPieceCard from "./MaintainPieceCard.vue";
 import PieceDialogBody from "./PieceDialogBody.vue";
+import PieceDupDialogBody from "./PieceDupDialogBody.vue";
 import { useLoginStore } from "../../../../stores/LoginStore.js";
 
 const props = defineProps({
@@ -17,6 +18,7 @@ const loginStore = useLoginStore();
 const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
 
 const addPieceDialog = ref(false);
+const addDupDialog = ref(false);
 
 // Piece Data
 const pieces = ref([]);
@@ -27,7 +29,6 @@ async function getPieces() {
   await PieceDataService.getAll("title")
     .then((response) => {
       pieces.value = response.data;
-      filteredPieces.value = pieces.value;
     })
     .catch((err) => {
       console.log(err);
@@ -191,7 +192,15 @@ onMounted(async () => {
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="clearFilters"
       >
-        Clear filters
+        Clear Filters
+      </v-btn>
+      <v-btn
+        size="medium"
+        color="blue"
+        class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
+        @click="addDupDialog = true"
+      >
+        Remove dup pieces
       </v-btn>
       <v-btn
         size="medium"
@@ -258,5 +267,11 @@ onMounted(async () => {
       @closeAddPieceDialogEvent="addPieceDialog = false"
       @addPieceSuccessEvent="(addPieceDialog = false), refreshPieces()"
     ></PieceDialogBody>
+  </v-dialog>
+  <v-dialog v-model="addDupDialog" persistent max-width="600px">
+    <PieceDupDialogBody
+      :pieces-data="pieces"
+      @closeDupPieceDialogEvent="(addDupDialog = false), refreshPieces()"
+    ></PieceDupDialogBody>
   </v-dialog>
 </template>
