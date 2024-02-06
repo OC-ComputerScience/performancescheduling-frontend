@@ -16,7 +16,11 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+
     "jspdf": "^2.5.1",
+
+    "@tato30/vue-pdf": "^1.9.4",
+
     "jspdf-autotable": "^3.8.1",
     "pinia": "^2.0.36",
     "pinia-plugin-persistedstate": "^3.1.0",

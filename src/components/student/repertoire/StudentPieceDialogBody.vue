@@ -90,7 +90,8 @@ async function getPieces() {
   await PieceDataService.getAll("title", "ASC")
     .then((response) => {
       pieces.value = response.data;
-      //filterPieces();
+
+      if (composerId.value != null) filterPieces();
     })
     .catch((err) => {
       console.log(err);
@@ -210,16 +211,16 @@ function checkDuplicateStudentPiece() {
 }
 
 function composerName(composer) {
-  let comma = ", ";
-  if (
-    composer.firstName === null ||
-    composer.firstName === "" ||
-    composer.lastName === "" ||
-    composer.lastName == ""
-  ) {
+  let comma = " ";
+  if (composer.firstName === "" || composer.firstName == null) {
     comma = "";
+    composer.firstName = "";
   }
-  return composer.lastName + comma + composer.firstName;
+  if (composer.lastName === "" || composer.lastName == null) {
+    comma = "";
+    composer.lastName = "";
+  }
+  return composer.firstName + comma + composer.lastName;
 }
 watch(
   () => editedStudentPieceData.value.pieceId,
@@ -249,6 +250,8 @@ onBeforeMount(async () => {
   await getStudentInstruments(loginStore.currentRole.id);
   if (!props.isEdit && editedStudentPieceData.value.semesterId == null) {
     editedStudentPieceData.value.semesterId = semesters.value[0].id;
+    editedStudentPieceData.value.piece = {};
+    editedStudentPieceData.value.piece.composer = null;
   }
   if (props.isEdit) {
     await getPiece(editedStudentPieceData.value.pieceId);
@@ -356,20 +359,6 @@ onBeforeMount(async () => {
             item-value="id"
             @update:modelValue="filterPieces"
           >
-            <template v-slot:item="{ item, props: { onClick } }">
-              <v-list-item @click="onClick">
-                {{
-                  item.raw.firstName +
-                  (item.raw.firstName != null &&
-                  item.raw.firstName.length != 0 &&
-                  item.raw.lastName != null &&
-                  item.raw.lastName.length != 0
-                    ? ", "
-                    : "") +
-                  item.raw.lastName
-                }}
-              </v-list-item>
-            </template>
           </v-autocomplete>
           <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >Piece
