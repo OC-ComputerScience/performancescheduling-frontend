@@ -358,7 +358,7 @@ async function unreadyEvent(event) {
         class="font-weight-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
         @click="genProgramPDF"
       >
-        PDF Program Info
+        PDF Program
       </v-btn>
       <v-btn
         flat
