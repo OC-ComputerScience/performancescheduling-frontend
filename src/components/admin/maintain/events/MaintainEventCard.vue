@@ -177,7 +177,7 @@ async function genProgramPDF() {
     .text("The Department of Music", 4.25, 1.8, { align: "center" });
   doc
     .setFontSize(14)
-    .setFont("helvetica", "italics")
+    .setFont("helvetica", "italic")
     .text("Presents", 4.25, 2.6, { align: "center" });
 
   doc
@@ -187,23 +187,33 @@ async function genProgramPDF() {
 
   // create a line under heading
   //doc.setLineWidth(0.01).line(0.5, 1.5, 8.0, 1.5);
-
+  /*
   doc
     .setFontSize(10)
     .setFont("helvetica", "normal")
     .text("Page " + page, 7.0, doc.internal.pageSize.height - 0.5);
-
+*/
   let line = 4.5;
   let lineSize = 0.2;
   pdfSignups.forEach(function (signup) {
+    let pieceLength =
+      signup.pieces.length * 2 * lineSize +
+      signup.students.length * lineSize * 4;
+    if (line + pieceLength > 10) {
+      doc.addPage();
+
+      line = 1.0;
+      page++;
+    }
     signup.pieces.forEach(function (piece) {
       doc
         .setFontSize(10)
-        .setFont("helvetica", "italics")
+        .setFont("helvetica", "italic")
         .text(piece.title, 0.5, line);
 
       doc
         .setFontSize(10)
+        .setFont("helvetica", "normal")
         .text(
           piece.composer +
             " (" +
@@ -217,6 +227,25 @@ async function genProgramPDF() {
             align: "right",
           }
         );
+      let leftText = doc.getTextWidth(piece.title);
+      let rightText = doc.getTextWidth(
+        piece.composer +
+          " (" +
+          piece.compbirthDate +
+          "-" +
+          piece.compdeathDate +
+          ")"
+      );
+      let dotsLength = 7.5 - (leftText + rightText);
+      let dotPerInch = 25;
+      let dots =
+        "..........................................................................................................................................";
+      let printDots = dots.substring(0, dotsLength * dotPerInch);
+
+      doc
+        .setFontSize(10)
+        .setFont("helvetica", "italic")
+        .text(printDots, leftText + 0.6, line);
       line += lineSize;
       line += lineSize;
     });
@@ -251,7 +280,12 @@ async function genProgramPDF() {
         align: "center",
       });
       line += lineSize;
-      if (student.accompanist != "" && student.accompanist != null) {
+
+      if (
+        student.accompanist != "" &&
+        student.accompanist != null &&
+        student.accompanist != " "
+      ) {
         doc.setFontSize(10).text(student.accompanist + ", Piano", 4.25, line, {
           align: "center",
         });
@@ -259,18 +293,9 @@ async function genProgramPDF() {
       }
       line += lineSize;
     });
-    if (line > 8.5) {
-      doc.addPage();
-
-      line = 1.0;
-      page++;
-      doc
-        .setFontSize(10)
-        .text("Page " + page, 7.0, doc.internal.pageSize.height - 0.5);
-    }
   });
 
-  // Creating footer and saving file
+  //  saving file
 
   doc.save(`eventProgram.pdf`);
 }
