@@ -55,13 +55,13 @@ async function updateComposer() {
 }
 function findSimilar(composer) {
   const similarComposers = props.composersData.filter((c) => {
-    var compFirstName;
-    var compLastName;
+    let compFirstName;
+    let compLastName;
     if (c.firstName == null) compFirstName = "";
     else compFirstName = c.firstName.toLowerCase();
 
     if (c.lastName == null) compLastName = "";
-    else compLastName = c.firstName.toLowerCase();
+    else compLastName = c.lastName.toLowerCase();
 
     return (
       compareTwoStrings(compFirstName, composer.firstName.toLowerCase()) >=
