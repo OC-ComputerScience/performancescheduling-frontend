@@ -24,14 +24,11 @@ const props = defineProps({
   studentPieces: { type: [Array], required: true },
 });
 
+console.log("studentpieceData", props.studentpieceData);
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
 
 let addForSemester = false;
-
-if (!props.isEdit) {
-  if (editedStudentPieceData.value.semesterId != null) addForSemester = true;
-}
 
 const form = ref(null);
 const pieces = ref([]);
@@ -129,12 +126,14 @@ function filterPieces() {
 async function getStudentInstruments() {
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
     loginStore.currentRole.id,
-    "Active"
+    "All"
   )
     .then((response) => {
-      studentInstruments.value = response.data.filter((studentInstrument) => {
-        return studentInstrument.status === "Active";
-      });
+      studentInstruments.value = response.data;
+      if (addForSemester)
+        studentInstruments.value = response.data.filter((studentInstrument) => {
+          return studentInstrument.status === "Active";
+        });
     })
     .catch((err) => {
       console.log(err);
@@ -142,6 +141,8 @@ async function getStudentInstruments() {
 }
 
 function isVocal() {
+  console.log("studentInstruments", studentInstruments.value);
+  console.log(editedStudentPieceData.value.studentInstrumentId);
   if (
     editedStudentPieceData.value.studentInstrumentId != null &&
     studentInstruments.value.length > 0
@@ -247,7 +248,7 @@ onBeforeMount(async () => {
   await getSemesters();
   if (!props.isEdit) await getPieces();
   await getComposers();
-  await getStudentInstruments(loginStore.currentRole.id);
+
   if (!props.isEdit && editedStudentPieceData.value.semesterId == null) {
     editedStudentPieceData.value.semesterId = semesters.value[0].id;
     editedStudentPieceData.value.piece = {};
@@ -263,6 +264,10 @@ onBeforeMount(async () => {
       })
     );
   }
+  if (!props.isEdit) {
+    if (editedStudentPieceData.value.semesterId != null) addForSemester = true;
+  }
+  await getStudentInstruments(loginStore.currentRole.id);
 });
 </script>
 
@@ -307,7 +312,7 @@ onBeforeMount(async () => {
             item-title="instrument.name"
             item-value="id"
             variant="plain"
-            :readonly="addForSemester ? true : false"
+            :readonly="addForSemester ? false : true"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () =>
