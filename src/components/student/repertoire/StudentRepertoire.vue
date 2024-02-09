@@ -172,7 +172,7 @@ onMounted(async () => {
             <v-list class="pa-0 ma-0">
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Instrument
-                <v-select
+                <v-autocomplete
                   color="darkBlue"
                   variant="underlined"
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
@@ -180,7 +180,8 @@ onMounted(async () => {
                   :items="instrumentFilterOptions"
                   item-title="name"
                   item-value="id"
-                ></v-select>
+                  clearable
+                ></v-autocomplete>
               </v-list-item>
             </v-list>
 
@@ -193,6 +194,7 @@ onMounted(async () => {
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
+                  clearable
                 ></v-select>
               </v-list-item>
             </v-list>
@@ -208,6 +210,7 @@ onMounted(async () => {
                   :items="semesters"
                   item-title="name"
                   item-value="id"
+                  clearable
                 ></v-select>
               </v-list-item>
             </v-list>
@@ -221,7 +224,7 @@ onMounted(async () => {
             </v-btn>
             <v-btn
               v-if="
-                statusFilterSelection != null || semesterFilterSelection != null
+                statusFilterSelection != null || semesterFilterSelection != null || instrumentFilterSelection != null
               "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
