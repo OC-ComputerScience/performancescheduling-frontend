@@ -53,8 +53,8 @@ function searchAndFilterList() {
         searchName += composer.lastName.toLowerCase();
       return searchName.includes(searchInput.value.toLowerCase());
     });
-    filterComposers();
   }
+  filterComposers();
 }
 const statusFilterOptions = ["Active", "Disabled", "Pending"];
 const statusFilterSelection = ref(null);
