@@ -105,7 +105,7 @@ async function reassignStudentPieces(fromPieceId, toPieceId) {
 async function getComposers() {
   await ComposerDataService.getAll("lastName")
     .then((response) => {
-      composers.value = response.data;
+      composers.value = response.data.filter((composer) => composer.status === "Active");
       composers.value.forEach((composer) => {
         composer.fullName = composerName(composer);
       });
