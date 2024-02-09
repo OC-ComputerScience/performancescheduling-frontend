@@ -141,8 +141,6 @@ async function getStudentInstruments() {
 }
 
 function isVocal() {
-  console.log("studentInstruments", studentInstruments.value);
-  console.log(editedStudentPieceData.value.studentInstrumentId);
   if (
     editedStudentPieceData.value.studentInstrumentId != null &&
     studentInstruments.value.length > 0
