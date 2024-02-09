@@ -150,9 +150,12 @@ async function getStudentPieces() {
 function filterStudentPieces() {
   studentPieces.value = allStudentPieces.value.filter(
     (studentPiece) =>
-      (studentPiece.semesterId === props.eventData.semesterId ||
-        !onlySemesterPieces.value) &&
-      studentPiece.studentInstrumentId === selectedStudentInstrument.value.id &&
+      ((studentPiece.semesterId === props.eventData.semesterId &&
+        studentPiece.studentInstrumentId ===
+          selectedStudentInstrument.value.id) ||
+        !onlySemesterPieces.value &
+          (studentPiece.studentInstrument.instrumentId ===
+            selectedStudentInstrument.value.instrumentId)) &&
       studentPiece.status === "Active"
   );
 
@@ -855,8 +858,8 @@ onMounted(async () => {
             Instructor is available.
           </div>
           <div v-if="selectedInstructor == null">
-            Re-Select Instructor and/or Accompanist to only view times where they
-            are available.
+            Re-Select Instructor and/or Accompanist to only view times where
+            they are available.
           </div>
         </v-row>
         <v-row class="ml-1">
