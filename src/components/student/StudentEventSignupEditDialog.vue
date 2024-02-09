@@ -69,11 +69,13 @@ async function getStudentPieces() {
 function filterStudentPieces() {
   studentPieces.value = allStudentPieces.value.filter(
     (studentPiece) =>
-      (studentPiece.semesterId === props.eventData.semesterId ||
-        !onlySemesterPieces.value) &&
-      studentPiece.studentInstrumentId ===
-        studentInstrumentSignup.value.studentInstrumentId &&
-      studentPiece.status === "Active"
+      (studentPiece.semesterId === props.eventData.semesterId &&
+        studentPiece.studentInstrumentId ===
+          studentInstrumentSignup.value.studentInstrumentId) ||
+      (!onlySemesterPieces.value &
+        (studentPiece.studentInstrument.instrumentId ===
+          studentInstrumentSignup.value.studentInstrument.instrument.id) &&
+        studentPiece.status === "Active")
   );
 
   studentPieces.value.forEach(function (studentPiece) {
@@ -133,6 +135,9 @@ function getSelectedPices() {
 function selectStudentPiece(studentPiece) {
   if (!isStudentPieceSelected(studentPiece)) {
     selectedStudentPieces.value.push(studentPiece);
+    if (studentPiece.semesterId != props.eventData.semesterId) {
+      disableOnlySemesterPiece.value = true;
+    }
   } else {
     selectedStudentPieces.value.splice(
       selectedStudentPieces.value.findIndex(
@@ -257,7 +262,7 @@ async function saveSignup() {
   emits("refreshEvents");
 }
 
-watch(onlySemesterPieces, function (val) {
+watch(onlySemesterPieces, function () {
   filterStudentPieces();
   assignFirstPiece();
 });
