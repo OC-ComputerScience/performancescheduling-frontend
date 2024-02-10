@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import StudentPieceDataService from "./../../../services/StudentPieceDataService";
 import SemesterDataService from "./../../../services/SemesterDataService";
 import MaintainStudentPieceCard from "./MaintainStudentPieceCard.vue";
+import InstrumentDataService from "./../../../services/InstrumentDataService";
 import StudentPieceDialogBody from "./StudentPieceDialogBody.vue";
 import { useLoginStore } from "./../../../stores/LoginStore.js";
 
@@ -28,6 +29,16 @@ async function getSemesters() {
   await SemesterDataService.getAll("name", false)
     .then((response) => {
       semesters.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+async function getInstruments() {
+  await InstrumentDataService.getAll("name", true)
+    .then((response) => {
+      instrumentFilterOptions.value = response.data;
     })
     .catch((err) => {
       console.log(err);
@@ -69,6 +80,8 @@ function searchAndFilterList() {
 const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
 const semesterFilterSelection = ref(null);
+const instrumentFilterSelection = ref(null);
+const instrumentFilterOptions = ref([]);
 
 function filterStudentPieces() {
   // Filter by status
@@ -83,6 +96,13 @@ function filterStudentPieces() {
         studentpiece.semesterId === semesterFilterSelection.value
     );
   }
+  if (instrumentFilterSelection.value) {
+    filteredStudentPieces.value = filteredStudentPieces.value.filter(
+      (studentpiece) =>
+        studentpiece.studentInstrument.instrumentId ===
+        instrumentFilterSelection.value
+    );
+  }
 }
 
 // Clears all filters and returns to page 1
@@ -92,6 +112,7 @@ function clearFilters() {
   statusFilterSelection.value = null;
   semesterFilterSelection.value = null;
   searchInput.value = "";
+  instrumentFilterSelection.value = null;
 }
 
 // Pagination
@@ -109,6 +130,7 @@ const currentPageData = computed(() => {
 onMounted(async () => {
   await getStudentPieces();
   await getSemesters();
+  await getInstruments();
 });
 </script>
 
@@ -149,6 +171,22 @@ onMounted(async () => {
           <v-card-text>
             <v-list class="pa-0 ma-0">
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Instrument
+                <v-autocomplete
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="instrumentFilterSelection"
+                  :items="instrumentFilterOptions"
+                  item-title="name"
+                  item-value="id"
+                  clearable
+                ></v-autocomplete>
+              </v-list-item>
+            </v-list>
+
+            <v-list>
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Status
                 <v-select
                   color="darkBlue"
@@ -156,11 +194,11 @@ onMounted(async () => {
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
+                  clearable
                 ></v-select>
               </v-list-item>
             </v-list>
-          </v-card-text>
-          <v-card-text>
+
             <v-list class="pa-0 ma-0">
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Semester
@@ -172,6 +210,7 @@ onMounted(async () => {
                   :items="semesters"
                   item-title="name"
                   item-value="id"
+                  clearable
                 ></v-select>
               </v-list-item>
             </v-list>
@@ -185,7 +224,7 @@ onMounted(async () => {
             </v-btn>
             <v-btn
               v-if="
-                statusFilterSelection != null || semesterFilterSelection != null
+                statusFilterSelection != null || semesterFilterSelection != null || instrumentFilterSelection != null
               "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
@@ -196,7 +235,11 @@ onMounted(async () => {
         </v-card>
       </v-menu>
       <v-btn
-        v-if="statusFilterSelection != null"
+        v-if="
+          statusFilterSelection != null ||
+          semesterFilterSelection != null ||
+          instrumentFilterSelection != null
+        "
         size="medium"
         color="maroon"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
