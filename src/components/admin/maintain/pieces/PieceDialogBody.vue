@@ -49,7 +49,7 @@ async function addPiece() {
 async function getComposers() {
   await ComposerDataService.getAll("lastName")
     .then((response) => {
-      composers.value = response.data.filter((composer) => composer.status === "Active");
+      composers.value = response.data.filter((composer) => (composer.status === "Active" || composer.status == "Pending"));
       composers.value.forEach((composer) => {
         composer.fullName = composerName(composer);
       });
