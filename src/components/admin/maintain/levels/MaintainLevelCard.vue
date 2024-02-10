@@ -46,13 +46,6 @@ async function enableLevel(level) {
           {{ levelData.name }} - {{ levelData.creditHours }} Hour(s)
         </v-card-subtitle>
       </v-row>
-      <v-row class="pt-0 mt-0 pb-0">
-        <v-col cols="8" class="pl-0">
-          <v-card-text class="font-weight-semi-bold text-truncate pb-2">
-            {{ levelData.description }}
-          </v-card-text>
-        </v-col>
-      </v-row>
     </v-card-title>
     <v-card-actions class="mt-0">
       <v-spacer></v-spacer>
