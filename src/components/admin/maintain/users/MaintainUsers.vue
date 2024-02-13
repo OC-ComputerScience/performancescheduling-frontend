@@ -336,7 +336,7 @@ onBeforeMount(async () => {
             <v-btn
               v-if="
                 statusFilterSelection ||
-                roleFilterSelection != 0 ||
+                (roleFilterSelection != 0 && isAdmin)||
                 studentTypeFilterSelection ||
                 instructorFilterSelection
               "
@@ -351,7 +351,7 @@ onBeforeMount(async () => {
       <v-btn
         v-if="
           statusFilterSelection ||
-          roleFilterSelection != 0 ||
+          (roleFilterSelection != 0 && isAdmin) ||
           studentTypeFilterSelection ||
           instructorFilterSelection
         "
