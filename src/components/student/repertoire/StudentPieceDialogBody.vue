@@ -22,6 +22,7 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
   studentpieceData: { type: [Object], required: true },
   studentPieces: { type: [Array], required: true },
+  studentRoleId: { type: [Number], required: true },
 });
 
 const loginStore = useLoginStore();
@@ -85,7 +86,9 @@ async function getSemesters() {
 async function getPieces() {
   await PieceDataService.getAll("title", "ASC")
     .then((response) => {
-      pieces.value = response.data.filter((piece) => (piece.status === "Active" || piece.status == "Pending"));
+      pieces.value = response.data.filter(
+        (piece) => piece.status === "Active" || piece.status == "Pending"
+      );
 
       if (composerId.value != null) filterPieces();
     })
@@ -105,7 +108,10 @@ async function getPiece(id) {
 async function getComposers() {
   await ComposerDataService.getAll("lastName")
     .then((response) => {
-      composers.value = response.data.filter((composer) => (composer.status === "Active" || composer.status == "Pending"));
+      composers.value = response.data.filter(
+        (composer) =>
+          composer.status === "Active" || composer.status == "Pending"
+      );
       composers.value.forEach((composer) => {
         composer.fullName = composerName(composer);
       });
@@ -124,7 +130,7 @@ function filterPieces() {
 
 async function getStudentInstruments() {
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
-    loginStore.currentRole.id,
+    props.studentRoleId,
     "All"
   )
     .then((response) => {

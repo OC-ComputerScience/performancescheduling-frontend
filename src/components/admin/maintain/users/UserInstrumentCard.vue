@@ -53,9 +53,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-card class="bg-lightBlue pa-2 innerFlatCardBorder mb-4">
-    <v-card-title class="font-weight-bold text-darkBlue pa-0 ma-0">
-      <v-row class="pa-0 ma-0">
+  <v-card class="bg-lightBlue pa-0 innerFlatCardBorder">
+    <v-card-title class="font-weight-bold text-darkBlue pa-0 pl-3 pt-1 ma-0">
+      <v-row class="pt-1 pr-2">
         <v-col cols="auto">
           {{ props.studentInstrumentData.instrument.name }}
         </v-col>
@@ -81,7 +81,7 @@ onMounted(async () => {
           </v-chip>
         </v-col>
       </v-row>
-      <v-row class="pa-0 ma-0">
+      <v-row class="ma-0">
         <v-col cols="auto" align-self="center">
           <v-chip
             label
@@ -121,8 +121,8 @@ onMounted(async () => {
       </v-row>
     </v-card-title>
     <v-card-text class="pl-3">
-      <v-row class="pa-0 ma-0">
-        <v-col cols="5" class="pa-0 ma-0">
+      <v-row class="">
+        <v-col cols="5">
           <v-card-subtitle
             class="pa-0 ma-0 font-weight-semi-bold text-darkBlue"
           >
@@ -137,11 +137,7 @@ onMounted(async () => {
           </v-card-text>
         </v-col>
 
-        <v-col
-          cols="5"
-          class="pa-0 ma-0"
-          v-if="studentInstrumentData.accompanistRole"
-        >
+        <v-col cols="5" v-if="studentInstrumentData.accompanistRole">
           <v-card-subtitle
             class="pa-0 ma-0 font-weight-semi-bold text-darkBlue"
           >
@@ -155,6 +151,8 @@ onMounted(async () => {
             }}
           </v-card-text>
         </v-col>
+      </v-row>
+      <v-row class="">
         <v-spacer> </v-spacer>
         <v-col cols="auto">
           <v-btn
