@@ -14,8 +14,36 @@ const studentpieces = ref([]);
 const filteredStudentPieces = ref([]);
 const semesters = ref([]);
 
+const emits = defineEmits(["closeRepertoireDialogEvent"]);
+
+const props = defineProps({
+  userData: {
+    type: [Object],
+    reqired: false,
+  },
+  isDialog: {
+    type: Boolean,
+    required: false,
+  },
+  selectedStudentRoleId: {
+    type: Number,
+    required: false,
+  },
+});
+
+var userId;
+var studentRoleId;
+console.log(props.selectedStudentRoleId);
+if (props.isDialog) {
+  userId = props.userData.id;
+  studentRoleId = props.selectedStudentRoleId;
+} else {
+  userId = loginStore.currentRole.userId;
+  studentRoleId = loginStore.currentRole.id;
+}
+
 async function getStudentPieces() {
-  await StudentPieceDataService.getByUser(loginStore.currentRole.userId)
+  await StudentPieceDataService.getByUser(userId)
     .then((response) => {
       studentpieces.value = response.data;
       filteredStudentPieces.value = studentpieces.value;
@@ -44,7 +72,9 @@ async function getInstruments() {
       console.log(err);
     });
 }
-
+function closeDialog() {
+  emits("closeRepertoireDialogEvent");
+}
 async function refreshStudentPieces() {
   await getStudentPieces();
   await searchAndFilterList();
@@ -118,8 +148,10 @@ function clearFilters() {
 // Pagination
 
 const currentPage = ref(1);
-const perPage = 15;
-
+var perPage = 15;
+if (props.isDialog) {
+  perPage = 9;
+}
 const currentPageData = computed(() => {
   return filteredStudentPieces.value.slice(
     (currentPage.value - 1) * perPage,
@@ -135,7 +167,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-container fluid class="pa-8">
+  <!-- <v-container fluid class="pa-8"> -->
+  <v-card class="ma-6 pa-2 bg-lightGray elevation-0">
+    <v-row class="ml-1">
+      <h1 v-if="isDialog" class="mt-4 text-maroon font-weight">
+        {{ userData.firstName }} {{ userData.lastName }}
+      </h1>
+    </v-row>
     <v-row class="ml-1">
       <h1 class="text-maroon font-weight">Repertoire</h1>
 
@@ -224,7 +262,9 @@ onMounted(async () => {
             </v-btn>
             <v-btn
               v-if="
-                statusFilterSelection != null || semesterFilterSelection != null || instrumentFilterSelection != null
+                statusFilterSelection != null ||
+                semesterFilterSelection != null ||
+                instrumentFilterSelection != null
               "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
@@ -255,6 +295,15 @@ onMounted(async () => {
       >
         Add new Piece
       </v-btn>
+      <v-btn
+        v-if="isDialog"
+        size="medium"
+        color="blue"
+        class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
+        @click="closeDialog"
+      >
+        Close
+      </v-btn>
     </v-row>
     <v-row>
       <v-col>
@@ -270,6 +319,7 @@ onMounted(async () => {
               <MaintainStudentPieceCard
                 :studentpiece-data="studentpiece"
                 :student-pieces="studentpieces"
+                :student-role-id="studentRoleId"
                 @refreshStudentPiecesEvent="refreshStudentPieces()"
               ></MaintainStudentPieceCard>
             </v-col>
@@ -277,6 +327,7 @@ onMounted(async () => {
         </v-card>
       </v-col>
     </v-row>
+
     <v-row class="pt-3">
       <v-col>
         <v-card class="mainCardBorder">
@@ -294,7 +345,8 @@ onMounted(async () => {
         </v-card>
       </v-col>
     </v-row>
-  </v-container>
+  </v-card>
+  <!-- </v-container> -->
   <v-dialog v-model="addStudentPieceDialog" persistent max-width="600px">
     <StudentPieceDialogBody
       :is-edit="false"
@@ -305,6 +357,7 @@ onMounted(async () => {
         studentIntstrumentId: null,
         status: 'Active',
       }"
+      :student-role-id="studentRoleId"
       :student-pieces="studentpieces"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="
