@@ -168,7 +168,7 @@ onMounted(async () => {
 
 <template>
   <!-- <v-container fluid class="pa-8"> -->
-  <div class="ma-6 pa-2 bg-lightGray">
+  <v-card class="ma-6 pa-2 bg-lightGray elevation-0">
     <v-row class="ml-1">
       <h1 v-if="isDialog" class="mt-4 text-maroon font-weight">
         {{ userData.firstName }} {{ userData.lastName }}
@@ -345,7 +345,7 @@ onMounted(async () => {
         </v-card>
       </v-col>
     </v-row>
-  </div>
+  </v-card>
   <!-- </v-container> -->
   <v-dialog v-model="addStudentPieceDialog" persistent max-width="600px">
     <StudentPieceDialogBody
