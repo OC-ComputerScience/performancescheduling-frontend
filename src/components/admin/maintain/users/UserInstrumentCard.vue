@@ -155,6 +155,8 @@ onMounted(async () => {
             }}
           </v-card-text>
         </v-col>
+      </v-row>
+      <v-row>
         <v-spacer> </v-spacer>
         <v-col cols="auto">
           <v-btn

@@ -207,13 +207,13 @@ const filerContents = computed(() => {
   if (roleFilterSelection.value.length > 0) {
     fc += "Role: ";
     roleFilterSelection.value.forEach((r) => {
-      fc += r.role + ",";
+      fc += r.role + ", ";
     });
   } else {
     fc += "Role: All, ";
   }
   if (instructorFilterSelection.value != null) {
-    fc += "Instructor: " + instructorFilterSelection.value.name;
+    fc += "Instructor: " + instructorFilterSelection.value.name + " ";
   } else {
     fc += "Instructor: All, ";
   }
