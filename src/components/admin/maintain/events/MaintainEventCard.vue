@@ -120,8 +120,15 @@ async function genProgramPDF() {
               studentInstrument.studentInstrument.studentRole.user.lastName,
             classification:
               studentInstrument.studentInstrument.studentRole
-                .studentClassification,
-            major: studentInstrument.studentInstrument.studentRole.major.name,
+                .studentClassification != undefined
+                ? studentInstrument.studentInstrument.studentRole
+                    .studentClassification
+                : "",
+            major:
+              studentInstrument.studentInstrument.studentRole.major.name !=
+              undefined
+                ? studentInstrument.studentInstrument.studentRole.major.name
+                : "",
             instrument: studentInstrument.studentInstrument.instrument.name,
             instructor:
               (studentInstrument.studentInstrument.instructorRole.user.honorific
