@@ -29,6 +29,7 @@ const props = defineProps({
   eventSignupData: { type: [Object], required: true },
   studentInstrumentSignupData: { type: [Object], required: true },
 });
+console.log('event signup', props.eventSignupData);
 
 function openDialog(piece) {
   pieceData.value = piece;
@@ -140,11 +141,14 @@ function hasCritiques(piece) {
                 </v-card-title>
               </v-row>
               <v-row v-if="eventData.eventType.allowEndingLevel">
-                <v-card-title class="font-weight-semi-bold text-maroon mt-5">
+                <v-card-title class="font-weight-semi-bold mt-5">
                   Ending Level:
+                </v-card-title>
+                <v-card-title class="font-weight-semi-bold text-maroon mt-5"
+                  :class="eventSignupData.endingLevelId == null ? 'text-darkOrange' : 'text-teal'">
                   {{
                     eventSignupData.endingLevelId == null
-                      ? "Level pending"
+                      ? "Pending"
                       : eventSignupData.endingLevelEventSignup.name
                   }}
                 </v-card-title>
