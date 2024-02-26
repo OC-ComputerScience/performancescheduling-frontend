@@ -33,7 +33,6 @@ const props = defineProps({
 
 var userId;
 var studentRoleId;
-console.log(props.selectedStudentRoleId);
 if (props.isDialog) {
   userId = props.userData.id;
   studentRoleId = props.selectedStudentRoleId;
