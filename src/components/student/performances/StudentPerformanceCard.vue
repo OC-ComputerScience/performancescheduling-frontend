@@ -125,14 +125,17 @@ function hasCritiques(piece) {
                 </v-row>
               </v-card>
               <v-row v-if="eventData.eventType.allowGrade">
-                <v-card-title class="font-weight-semi-bold text-maroon mt-5">
+                <v-card-title class="font-weight-semi-bold mt-5">
                   Grade:
+                </v-card-title>
+                <v-card-title class="font-weight-semi-bold mt-5"
+                :class="eventSignupData.pass == null ? 'text-darkOrange' : eventSignupData.pass ? 'text-darkTeal' : 'text-maroon'">
                   {{
                     eventSignupData.pass == null
-                      ? "Grade pending"
+                      ? "Pending"
                       : eventSignupData.pass
                       ? "Passed"
-                      : "Failed"
+                      : "Not Passed"
                   }}
                 </v-card-title>
               </v-row>

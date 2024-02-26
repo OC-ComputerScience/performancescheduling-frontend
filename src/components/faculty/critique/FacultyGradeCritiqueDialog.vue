@@ -81,7 +81,7 @@ onMounted(async () => {
           class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-maroon flatChipBorder"
           @click="saveGrade(false)"
         >
-          Fail
+          Not Pass
         </v-btn>
         <v-btn
           flat
