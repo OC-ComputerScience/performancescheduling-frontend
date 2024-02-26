@@ -216,7 +216,7 @@ onMounted(() => {
               size="small"
               class="font-weight-bold mt-3 text-none text-white flatChipBorder"
               :class="
-                props.signup.endingLevelId == null ? 'bg-maroon' : 'bg-teal'
+                props.signup.endingLevelId == null ? 'bg-darkOrange' : 'bg-teal'
               "
             >
               {{
