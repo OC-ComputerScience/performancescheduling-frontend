@@ -207,13 +207,13 @@ const filerContents = computed(() => {
   if (roleFilterSelection.value.length > 0) {
     fc += "Role: ";
     roleFilterSelection.value.forEach((r) => {
-      fc += r.role + ",";
+      fc += r.role + ", ";
     });
   } else {
     fc += "Role: All, ";
   }
   if (instructorFilterSelection.value != null) {
-    fc += "Instructor: " + instructorFilterSelection.value.name;
+    fc += "Instructor: " + instructorFilterSelection.value.name + " ";
   } else {
     fc += "Instructor: All, ";
   }
@@ -336,7 +336,7 @@ onBeforeMount(async () => {
             <v-btn
               v-if="
                 statusFilterSelection ||
-                roleFilterSelection != 0 ||
+                (roleFilterSelection != 0 && isAdmin) ||
                 studentTypeFilterSelection ||
                 instructorFilterSelection
               "
@@ -351,7 +351,7 @@ onBeforeMount(async () => {
       <v-btn
         v-if="
           statusFilterSelection ||
-          roleFilterSelection != 0 ||
+          (roleFilterSelection != 0 && isAdmin) ||
           studentTypeFilterSelection ||
           instructorFilterSelection
         "
@@ -376,6 +376,17 @@ onBeforeMount(async () => {
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">
+          <v-card-text v-if="!dataLoaded" class="text-center">
+            <v-progress-circular
+              class="mb-4"
+              :rotate="360"
+              :size="100"
+              :width="12"
+              color="darkBlue"
+              indeterminate
+              >Loading..</v-progress-circular
+            >
+          </v-card-text>
           <v-row v-if="dataLoaded">
             <v-col
               v-for="user in currentPageData"
@@ -415,7 +426,6 @@ onBeforeMount(async () => {
   <v-dialog v-model="addUserDialog" persistent max-width="600px">
     <UserDialogBody
       :is-edit="false"
-      is-student="false"
       :user-data="{
         id: null,
         firstName: null,

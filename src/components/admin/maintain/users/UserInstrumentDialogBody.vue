@@ -18,7 +18,7 @@ const emits = defineEmits([
 const props = defineProps({
   studentInstrumentData: { type: [Object], required: true },
   isEdit: { type: [Boolean], required: true },
-  isStudent: { type: [Boolean], required: true },
+  isStudent: { type: [Boolean], required: false },
 });
 
 const form = ref(null);

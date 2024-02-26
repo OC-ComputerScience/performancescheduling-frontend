@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import StudentPieceDataService from "./../../../services/StudentPieceDataService";
 import SemesterDataService from "./../../../services/SemesterDataService";
 import MaintainStudentPieceCard from "./MaintainStudentPieceCard.vue";
+import InstrumentDataService from "./../../../services/InstrumentDataService";
 import StudentPieceDialogBody from "./StudentPieceDialogBody.vue";
 import { useLoginStore } from "./../../../stores/LoginStore.js";
 
@@ -13,8 +14,36 @@ const studentpieces = ref([]);
 const filteredStudentPieces = ref([]);
 const semesters = ref([]);
 
+const emits = defineEmits(["closeRepertoireDialogEvent"]);
+
+const props = defineProps({
+  userData: {
+    type: [Object],
+    reqired: false,
+  },
+  isDialog: {
+    type: Boolean,
+    required: false,
+  },
+  selectedStudentRoleId: {
+    type: Number,
+    required: false,
+  },
+});
+
+var userId;
+var studentRoleId;
+console.log(props.selectedStudentRoleId);
+if (props.isDialog) {
+  userId = props.userData.id;
+  studentRoleId = props.selectedStudentRoleId;
+} else {
+  userId = loginStore.currentRole.userId;
+  studentRoleId = loginStore.currentRole.id;
+}
+
 async function getStudentPieces() {
-  await StudentPieceDataService.getByUser(loginStore.currentRole.userId)
+  await StudentPieceDataService.getByUser(userId)
     .then((response) => {
       studentpieces.value = response.data;
       filteredStudentPieces.value = studentpieces.value;
@@ -34,6 +63,18 @@ async function getSemesters() {
     });
 }
 
+async function getInstruments() {
+  await InstrumentDataService.getAll("name", true)
+    .then((response) => {
+      instrumentFilterOptions.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+function closeDialog() {
+  emits("closeRepertoireDialogEvent");
+}
 async function refreshStudentPieces() {
   await getStudentPieces();
   await searchAndFilterList();
@@ -69,6 +110,8 @@ function searchAndFilterList() {
 const statusFilterOptions = ["Active", "Disabled"];
 const statusFilterSelection = ref(null);
 const semesterFilterSelection = ref(null);
+const instrumentFilterSelection = ref(null);
+const instrumentFilterOptions = ref([]);
 
 function filterStudentPieces() {
   // Filter by status
@@ -83,6 +126,13 @@ function filterStudentPieces() {
         studentpiece.semesterId === semesterFilterSelection.value
     );
   }
+  if (instrumentFilterSelection.value) {
+    filteredStudentPieces.value = filteredStudentPieces.value.filter(
+      (studentpiece) =>
+        studentpiece.studentInstrument.instrumentId ===
+        instrumentFilterSelection.value
+    );
+  }
 }
 
 // Clears all filters and returns to page 1
@@ -92,13 +142,16 @@ function clearFilters() {
   statusFilterSelection.value = null;
   semesterFilterSelection.value = null;
   searchInput.value = "";
+  instrumentFilterSelection.value = null;
 }
 
 // Pagination
 
 const currentPage = ref(1);
-const perPage = 15;
-
+var perPage = 15;
+if (props.isDialog) {
+  perPage = 9;
+}
 const currentPageData = computed(() => {
   return filteredStudentPieces.value.slice(
     (currentPage.value - 1) * perPage,
@@ -109,11 +162,18 @@ const currentPageData = computed(() => {
 onMounted(async () => {
   await getStudentPieces();
   await getSemesters();
+  await getInstruments();
 });
 </script>
 
 <template>
-  <v-container fluid class="pa-8">
+  <!-- <v-container fluid class="pa-8"> -->
+  <v-card class="ma-6 pa-2 bg-lightGray elevation-0">
+    <v-row class="ml-1">
+      <h1 v-if="isDialog" class="mt-4 text-maroon font-weight">
+        {{ userData.firstName }} {{ userData.lastName }}
+      </h1>
+    </v-row>
     <v-row class="ml-1">
       <h1 class="text-maroon font-weight">Repertoire</h1>
 
@@ -149,6 +209,22 @@ onMounted(async () => {
           <v-card-text>
             <v-list class="pa-0 ma-0">
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
+                Instrument
+                <v-autocomplete
+                  color="darkBlue"
+                  variant="underlined"
+                  class="font-weight-medium text-darkBlue pt-0 mt-0"
+                  v-model="instrumentFilterSelection"
+                  :items="instrumentFilterOptions"
+                  item-title="name"
+                  item-value="id"
+                  clearable
+                ></v-autocomplete>
+              </v-list-item>
+            </v-list>
+
+            <v-list>
+              <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Status
                 <v-select
                   color="darkBlue"
@@ -156,11 +232,11 @@ onMounted(async () => {
                   class="font-weight-medium text-darkBlue pt-0 mt-0"
                   v-model="statusFilterSelection"
                   :items="statusFilterOptions"
+                  clearable
                 ></v-select>
               </v-list-item>
             </v-list>
-          </v-card-text>
-          <v-card-text>
+
             <v-list class="pa-0 ma-0">
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
                 Semester
@@ -172,6 +248,7 @@ onMounted(async () => {
                   :items="semesters"
                   item-title="name"
                   item-value="id"
+                  clearable
                 ></v-select>
               </v-list-item>
             </v-list>
@@ -185,7 +262,9 @@ onMounted(async () => {
             </v-btn>
             <v-btn
               v-if="
-                statusFilterSelection != null || semesterFilterSelection != null
+                statusFilterSelection != null ||
+                semesterFilterSelection != null ||
+                instrumentFilterSelection != null
               "
               @click="clearFilters"
               class="bg-maroon ml-auto text-white font-weight-bold text-none innerCardBorder"
@@ -196,7 +275,11 @@ onMounted(async () => {
         </v-card>
       </v-menu>
       <v-btn
-        v-if="statusFilterSelection != null"
+        v-if="
+          statusFilterSelection != null ||
+          semesterFilterSelection != null ||
+          instrumentFilterSelection != null
+        "
         size="medium"
         color="maroon"
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
@@ -211,6 +294,15 @@ onMounted(async () => {
         @click="addStudentPieceDialog = true"
       >
         Add new Piece
+      </v-btn>
+      <v-btn
+        v-if="isDialog"
+        size="medium"
+        color="blue"
+        class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
+        @click="closeDialog"
+      >
+        Close
       </v-btn>
     </v-row>
     <v-row>
@@ -227,6 +319,7 @@ onMounted(async () => {
               <MaintainStudentPieceCard
                 :studentpiece-data="studentpiece"
                 :student-pieces="studentpieces"
+                :student-role-id="studentRoleId"
                 @refreshStudentPiecesEvent="refreshStudentPieces()"
               ></MaintainStudentPieceCard>
             </v-col>
@@ -234,6 +327,7 @@ onMounted(async () => {
         </v-card>
       </v-col>
     </v-row>
+
     <v-row class="pt-3">
       <v-col>
         <v-card class="mainCardBorder">
@@ -251,7 +345,8 @@ onMounted(async () => {
         </v-card>
       </v-col>
     </v-row>
-  </v-container>
+  </v-card>
+  <!-- </v-container> -->
   <v-dialog v-model="addStudentPieceDialog" persistent max-width="600px">
     <StudentPieceDialogBody
       :is-edit="false"
@@ -262,6 +357,7 @@ onMounted(async () => {
         studentIntstrumentId: null,
         status: 'Active',
       }"
+      :student-role-id="studentRoleId"
       :student-pieces="studentpieces"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="

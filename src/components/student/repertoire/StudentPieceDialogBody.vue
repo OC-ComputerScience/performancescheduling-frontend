@@ -22,16 +22,13 @@ const props = defineProps({
   isEdit: { type: [Boolean], required: true },
   studentpieceData: { type: [Object], required: true },
   studentPieces: { type: [Array], required: true },
+  studentRoleId: { type: [Number], required: true },
 });
 
 const loginStore = useLoginStore();
 const editedStudentPieceData = ref(Object.assign({}, props.studentpieceData));
 
 let addForSemester = false;
-
-if (!props.isEdit) {
-  if (editedStudentPieceData.value.semesterId != null) addForSemester = true;
-}
 
 const form = ref(null);
 const pieces = ref([]);
@@ -89,8 +86,11 @@ async function getSemesters() {
 async function getPieces() {
   await PieceDataService.getAll("title", "ASC")
     .then((response) => {
-      pieces.value = response.data;
-      //filterPieces();
+      pieces.value = response.data.filter(
+        (piece) => piece.status === "Active" || piece.status == "Pending"
+      );
+
+      if (composerId.value != null) filterPieces();
     })
     .catch((err) => {
       console.log(err);
@@ -108,7 +108,10 @@ async function getPiece(id) {
 async function getComposers() {
   await ComposerDataService.getAll("lastName")
     .then((response) => {
-      composers.value = response.data;
+      composers.value = response.data.filter(
+        (composer) =>
+          composer.status === "Active" || composer.status == "Pending"
+      );
       composers.value.forEach((composer) => {
         composer.fullName = composerName(composer);
       });
@@ -127,13 +130,15 @@ function filterPieces() {
 
 async function getStudentInstruments() {
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
-    loginStore.currentRole.id,
-    "Active"
+    props.studentRoleId,
+    "All"
   )
     .then((response) => {
-      studentInstruments.value = response.data.filter((studentInstrument) => {
-        return studentInstrument.status === "Active";
-      });
+      studentInstruments.value = response.data;
+      if (addForSemester)
+        studentInstruments.value = response.data.filter((studentInstrument) => {
+          return studentInstrument.status === "Active";
+        });
     })
     .catch((err) => {
       console.log(err);
@@ -210,16 +215,16 @@ function checkDuplicateStudentPiece() {
 }
 
 function composerName(composer) {
-  let comma = ", ";
-  if (
-    composer.firstName === null ||
-    composer.firstName === "" ||
-    composer.lastName === "" ||
-    composer.lastName == ""
-  ) {
+  let comma = " ";
+  if (composer.firstName === "" || composer.firstName == null) {
     comma = "";
+    composer.firstName = "";
   }
-  return composer.lastName + comma + composer.firstName;
+  if (composer.lastName === "" || composer.lastName == null) {
+    comma = "";
+    composer.lastName = "";
+  }
+  return composer.firstName + comma + composer.lastName;
 }
 watch(
   () => editedStudentPieceData.value.pieceId,
@@ -246,9 +251,11 @@ onBeforeMount(async () => {
   await getSemesters();
   if (!props.isEdit) await getPieces();
   await getComposers();
-  await getStudentInstruments(loginStore.currentRole.id);
+
   if (!props.isEdit && editedStudentPieceData.value.semesterId == null) {
     editedStudentPieceData.value.semesterId = semesters.value[0].id;
+    editedStudentPieceData.value.piece = {};
+    editedStudentPieceData.value.piece.composer = null;
   }
   if (props.isEdit) {
     await getPiece(editedStudentPieceData.value.pieceId);
@@ -260,6 +267,10 @@ onBeforeMount(async () => {
       })
     );
   }
+  if (!props.isEdit) {
+    if (editedStudentPieceData.value.semesterId != null) addForSemester = true;
+  }
+  await getStudentInstruments(loginStore.currentRole.id);
 });
 </script>
 
@@ -304,7 +315,7 @@ onBeforeMount(async () => {
             item-title="instrument.name"
             item-value="id"
             variant="plain"
-            :readonly="addForSemester ? true : false"
+            :readonly="addForSemester ? false : true"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[
               () =>
@@ -356,20 +367,6 @@ onBeforeMount(async () => {
             item-value="id"
             @update:modelValue="filterPieces"
           >
-            <template v-slot:item="{ item, props: { onClick } }">
-              <v-list-item @click="onClick">
-                {{
-                  item.raw.firstName +
-                  (item.raw.firstName != null &&
-                  item.raw.firstName.length != 0 &&
-                  item.raw.lastName != null &&
-                  item.raw.lastName.length != 0
-                    ? ", "
-                    : "") +
-                  item.raw.lastName
-                }}
-              </v-list-item>
-            </template>
           </v-autocomplete>
           <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >Piece

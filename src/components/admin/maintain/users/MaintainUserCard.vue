@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from "vue";
 import UserDialogBody from "./UserDialogBody.vue";
 import UserDataService from "../../../../services/UserDataService.js";
+import StudentRepertoire from "../../../student/repertoire/StudentRepertoire.vue";
 
 const emits = defineEmits(["closeUserDialog", "refreshUsersEvent"]);
 
@@ -10,6 +11,7 @@ const props = defineProps({
   userRoles: { type: [Array], required: true },
 });
 
+var studentRoleId = 0;
 watch(
   () => props.userRoles,
   async () => {
@@ -18,13 +20,17 @@ watch(
 );
 
 const createOrEditDialog = ref(false);
+const repertoireDialog = ref(false);
 
 function closeUserDialog() {
   createOrEditDialog.value = false;
 }
+function closeRepetoireDialog() {
+  repertoireDialog.value = false;
+}
 
 const userRoleLabels = ref([]);
-
+const isStudent = ref(false);
 const studentInstrumentData = ref({});
 const instrumentRoleLabels = ref({});
 
@@ -36,6 +42,8 @@ async function fillRoleData() {
     if (role.status === "Disabled") continue;
     const roleId = role.roleId;
     if (roleId === 1) {
+      isStudent.value = true;
+      studentRoleId = role.id;
       studentInstrumentData.value = role.studentRole;
       fillInstrumentRoleLabels(studentInstrumentData.value);
       userRoleLabels.value.push("Student");
@@ -156,17 +164,26 @@ onMounted(async () => {
       </v-col>
     </v-row>
     <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-col cols="auto" class="pb-0">
+      <v-row>
+        <v-spacer></v-spacer>
         <v-btn
+          v-if="isStudent"
           flat
           size="small"
           class="font-weight-bold mt-0 mr-0 text-none text-white bg-blue flatChipBorder"
+          @click="repertoireDialog = true"
+        >
+          Repertoire
+        </v-btn>
+        <v-btn
+          flat
+          size="small"
+          class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
           @click="createOrEditDialog = true"
         >
           Edit
         </v-btn>
-      </v-col>
+      </v-row>
     </v-card-actions>
   </v-card>
   <v-dialog
@@ -184,5 +201,14 @@ onMounted(async () => {
       @disableUserEvent="closeUserDialog(), disableUser(userData)"
       @enableUserEvent="closeUserDialog(), enableUser(userData)"
     ></UserDialogBody>
+  </v-dialog>
+  <v-dialog v-model="repertoireDialog" persistent max-width="1200px" scrollable>
+    <StudentRepertoire
+      :user-data="props.userData"
+      :is-dialog="true"
+      :selected-student-role-id="studentRoleId"
+      @closeRepertoireDialogEvent="closeRepetoireDialog()"
+    >
+    </StudentRepertoire>
   </v-dialog>
 </template>
