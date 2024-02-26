@@ -336,7 +336,7 @@ onBeforeMount(async () => {
             <v-btn
               v-if="
                 statusFilterSelection ||
-                (roleFilterSelection != 0 && isAdmin)||
+                (roleFilterSelection != 0 && isAdmin) ||
                 studentTypeFilterSelection ||
                 instructorFilterSelection
               "
@@ -376,6 +376,17 @@ onBeforeMount(async () => {
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">
+          <v-card-text v-if="!dataLoaded" class="text-center">
+            <v-progress-circular
+              class="mb-4"
+              :rotate="360"
+              :size="100"
+              :width="12"
+              color="darkBlue"
+              indeterminate
+              >Loading..</v-progress-circular
+            >
+          </v-card-text>
           <v-row v-if="dataLoaded">
             <v-col
               v-for="user in currentPageData"

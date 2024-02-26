@@ -17,6 +17,7 @@ const semesterFilterOptions = ref([]);
 const semesterFilterSelection = ref(null);
 const instructorFilterOptions = ref([]);
 const instructorFilterSelection = ref(null);
+const notLoaded = ref(false);
 
 // Pagination
 const currentPage = ref(1);
@@ -41,8 +42,10 @@ async function getInstructor() {
 }
 
 async function getPerformances() {
+  notLoaded.value = true;
   await StudentInstrumentSignupDataService.getAllData().then((response) => {
     performances.value = response.data;
+    notLoaded.value = false;
   });
 
   filteredPerformances.value = performances.value;
@@ -219,6 +222,17 @@ onBeforeMount(async () => {
     <v-row>
       <v-col>
         <v-card class="pa-5 mainCardBorder">
+          <v-card-text v-if="notLoaded" class="text-center">
+            <v-progress-circular
+              class="mb-4"
+              :rotate="360"
+              :size="100"
+              :width="12"
+              color="darkBlue"
+              indeterminate
+              >Loading..</v-progress-circular
+            >
+          </v-card-text>
           <v-row>
             <v-col
               cols="6"
