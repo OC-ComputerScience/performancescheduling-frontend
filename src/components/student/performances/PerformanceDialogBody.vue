@@ -36,90 +36,157 @@ const props = defineProps({
           {{ critique.userRole.user.lastName }}</v-expansion-panel-title
         >
         <v-expansion-panel-text>
-          <v-row class="pt-0 pl-6 mt-0">
+          <v-row class="pt-0 pl-3 mt-0">
             <v-card-subtitle
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-              >Overall
+              >Overall Performance and Suggestion
             </v-card-subtitle>
           </v-row>
-
-          <v-row class="pt-0 pb-2 pl-6 mt-0">
+          <v-row class="pt-0 pb-1 pl-3 mt-0">
             <v-card-text>
               {{ critique.overallComment }}
             </v-card-text>
           </v-row>
 
+          
+
           <v-row>
             <v-col cols="6">
-              <v-row class="pt-0 pl-6 mt-0">
-                <v-card-subtitle
-                  class="pl-0 pb-0 font-weight-semi-bold text-darkBlue"
-                  >Accuracy - Grade: {{ critique.accuracyGrade }}
-                </v-card-subtitle>
+              <v-row class="pt-0 pl-3 mt-0">
+                <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
+                  <v-text class="text-darkBlue">
+                  Tone - Grade: 
+                  </v-text>
+                  <v-text :class="{
+                    'text-green': critique.toneGrade === 'Excellent',
+                    'text-blue': critique.toneGrade === 'Good',
+                    'text-yellow': critique.toneGrade === 'Fair',
+                    'text-red': critique.toneGrade === 'Poor'
+                  }">
+                  {{ critique.toneGrade }}
+                  </v-text>
+                  </v-card-subtitle
+                >
+              </v-row>
+              <v-row class="pt-0 pb-0 pl-3 mt-0">
+                <v-card-text>
+                  {{ critique.toneComment }}
+                </v-card-text>
               </v-row>
 
-              <v-row class="pt-0 pb-3 pl-6 mt-0">
+              <v-divider class="mb-2"></v-divider>
+
+              <v-row class="pt-0 pl-3 mt-0">
+                <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
+                  <v-text class="text-darkBlue">
+                    Accuracy/Intonation - Grade: 
+                  </v-text>
+                  <v-text :class="{
+                    'text-green': critique.accuracyGrade === 'Excellent',
+                    'text-blue': critique.accuracyGrade === 'Good',
+                    'text-yellow': critique.accuracyGrade === 'Fair',
+                    'text-red': critique.accuracyGrade === 'Poor'
+                  }">
+                  {{ critique.accuracyGrade }}
+                  </v-text>
+                </v-card-subtitle>
+              </v-row>
+              <v-row class="pt-0 pb-1 pl-3 mt-0">
                 <v-card-text>
                   {{ critique.accuracyComment }}
                 </v-card-text>
               </v-row>
-              <v-row class="pt-0 pl-6 mt-0">
-                <v-card-subtitle
-                  class="pl-0 pb-0 font-weight-semi-bold text-darkBlue"
-                  >Balance - Grade: {{ critique.balanceGrade }}</v-card-subtitle
-                >
-              </v-row>
 
-              <v-row class="pt-0 pb-3 pl-6 mt-0">
+              <v-divider class="mb-2"></v-divider>
+
+              <v-row class="pt-0 pl-3 mt-0">
+                <v-card-subtitle
+                  class="pl-0 pb-0 font-weight-semi-bold"
+                  ><v-text class="text-darkBlue">
+                    Balance Blend - Grade: 
+                  </v-text>
+                  <v-text :class="{
+                    'text-green': critique.balanceGrade === 'Excellent',
+                    'text-blue': critique.balanceGrade === 'Good',
+                    'text-yellow': critique.balanceGrade === 'Fair',
+                    'text-red': critique.balanceGrade === 'Poor'
+                  }">
+                  {{ critique.balanceGrade }}
+                  </v-text>
+                </v-card-subtitle>
+              </v-row>
+              <v-row class="pt-0 pb-1 pl-3 mt-0">
                 <v-card-text>
                   {{ critique.balanceComment }}
                 </v-card-text>
               </v-row>
-              <v-row class="pt-0 pl-6 mt-0">
-                <v-card-subtitle
-                  class="pl-0 pb-0 font-weight-semi-bold text-darkBlue"
-                  >Deportment - Grade: {{ critique.deportmentGrade }}
-                </v-card-subtitle>
-              </v-row>
-              <v-row class="pt-0 pb-0 pl-6 mt-0">
-                <v-card-text class="pb-0"> </v-card-text>
-              </v-row>
-            </v-col>
-            <v-col cols="6">
-              <v-row class="pt-0 pl-6 mt-0">
-                <v-card-subtitle
-                  class="pl-0 pb-0 font-weight-semi-bold text-darkBlue"
-                  >Diction - Grade: {{ critique.dictionGrade }}
-                </v-card-subtitle>
-              </v-row>
 
-              <v-row class="pt-0 pb-3 pl-6 mt-0">
+              <v-divider class="mb-2"></v-divider>
+
+              <v-row class="pt-0 pl-3 mt-0">
+                <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
+                  <v-text class="text-darkBlue">
+                    Deportment - Grade: 
+                  </v-text>
+                  <v-text :class="{
+                    'text-green': critique.deportmentGrade === 'Excellent',
+                    'text-blue': critique.deportmentGrade === 'Good',
+                    'text-yellow': critique.deportmentGrade === 'Fair',
+                    'text-red': critique.deportmentGrade === 'Poor'
+                  }">
+                  {{ critique.deportmentGrade }}
+                  </v-text>
+                </v-card-subtitle>
+              </v-row>
+              <v-row class="pt-0 pb-1 pl-3 mt-0">
+                <v-card-text> 
+                  {{ critique.deportmentComment }}
+                </v-card-text>
+              </v-row>
+              
+              <v-divider class="mb-2"></v-divider>
+
+              <v-row class="pt-0 pl-3 mt-0">
+                <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
+                  <v-text class=" text-darkBlue">
+                    Diction/Articulation - Grade: 
+                  </v-text>
+                  <v-text :class="{
+                    'text-green': critique.dictionGrade === 'Excellent',
+                    'text-blue': critique.dictionGrade === 'Good',
+                    'text-yellow': critique.dictionGrade === 'Fair',
+                    'text-red': critique.dictionGrade === 'Poor'
+                  }">
+                  {{ critique.dictionGrade }}
+                  </v-text>
+                </v-card-subtitle>
+              </v-row>
+              <v-row class="pt-0 pb-1 pl-3 mt-0">
                 <v-card-text>
                   {{ critique.dictionComment }}
                 </v-card-text>
               </v-row>
-              <v-row class="pt-0 pl-6 mt-0">
-                <v-card-subtitle
-                  class="pl-0 pb-0 font-weight-semi-bold text-darkBlue"
-                  >Interpretation - Grade: {{ critique.interpretationGrade }}
+
+              <v-divider class="mb-2"></v-divider>
+
+              <v-row class="pt-0 pl-3 mt-0">
+                <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
+                  <v-text class="text-darkBlue">
+                    Interpretation, Musicianship - Grade: 
+                  </v-text>
+                  <v-text :class="{
+                    'text-green': critique.interpretationGrade === 'Excellent',
+                    'text-blue': critique.interpretationGrade === 'Good',
+                    'text-yellow': critique.interpretationGrade === 'Fair',
+                    'text-red': critique.interpretationGrade === 'Poor'
+                  }">
+                  {{ critique.interpretationGrade }}
+                  </v-text>
                 </v-card-subtitle>
               </v-row>
-
-              <v-row class="pt-0 pb-3 pl-6 mt-0">
+              <v-row class="pt-0 pb-1 pl-3 mt-0">
                 <v-card-text>
                   {{ critique.interpretationComment }}
-                </v-card-text>
-              </v-row>
-              <v-row class="pt-0 pl-6 mt-0">
-                <v-card-subtitle
-                  class="pl-0 pb-0 font-weight-semi-bold text-darkBlue"
-                  >Tone - Grade: {{ critique.toneGrade }}</v-card-subtitle
-                >
-              </v-row>
-
-              <v-row class="pt-0 pb-3 pl-6 mt-0">
-                <v-card-text>
-                  {{ critique.toneComment }}
                 </v-card-text>
               </v-row>
             </v-col>
