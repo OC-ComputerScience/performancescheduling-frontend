@@ -128,14 +128,14 @@ onMounted(async () => {
         <v-spacer></v-spacer>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-maroon flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
           @click="saveEndingLevel()"
         >
           Save
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-blue flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
           @click="emits('closeDialogEvent')"
         >
           Cancel
