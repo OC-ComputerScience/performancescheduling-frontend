@@ -43,12 +43,13 @@ function closeDialogs() {
   emits("dialogClosedEvent");
 }
 function hasCritiques(piece) {
-  if (piece.critiques.length > 0) {
-    isCritiqued.value = true;
-    return true;
-  } else {
-    return false;
-  }
+  piece.critiques.forEach((critique) => {
+    if (critique.userRoleId == currentRole.value.id) {
+      isCritiqued.value = true;
+    }
+  });
+
+  return false;
 }
 </script>
 
@@ -128,8 +129,16 @@ function hasCritiques(piece) {
                 <v-card-title class="font-weight-semi-bold mt-5">
                   Grade:
                 </v-card-title>
-                <v-card-title class="font-weight-semi-bold mt-5"
-                :class="eventSignupData.pass == null ? 'text-darkOrange' : eventSignupData.pass ? 'text-darkTeal' : 'text-maroon'">
+                <v-card-title
+                  class="font-weight-semi-bold mt-5"
+                  :class="
+                    eventSignupData.pass == null
+                      ? 'text-darkOrange'
+                      : eventSignupData.pass
+                      ? 'text-darkTeal'
+                      : 'text-maroon'
+                  "
+                >
                   {{
                     eventSignupData.pass == null
                       ? "Pending"
@@ -143,8 +152,14 @@ function hasCritiques(piece) {
                 <v-card-title class="font-weight-semi-bold mt-5">
                   Ending Level:
                 </v-card-title>
-                <v-card-title class="font-weight-semi-bold text-maroon mt-5"
-                  :class="eventSignupData.endingLevelId == null ? 'text-darkOrange' : 'text-darkBlue'">
+                <v-card-title
+                  class="font-weight-semi-bold text-maroon mt-5"
+                  :class="
+                    eventSignupData.endingLevelId == null
+                      ? 'text-darkOrange'
+                      : 'text-darkBlue'
+                  "
+                >
                   {{
                     eventSignupData.endingLevelId == null
                       ? "Pending"
