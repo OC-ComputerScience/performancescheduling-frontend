@@ -1,9 +1,19 @@
 <script setup>
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useLoginStore } from "../stores/LoginStore.js";
+
+const loginStore = useLoginStore();
 
 const page = ref(0);
-const { pdf, pages } = usePDF('../../public/StudentTutorial.pdf');
+const studentTutorialPath = '../../public/StudentTutorial.pdf';
+const instructorTutorialPath = '../../public/InstructorTutorial.pdf';
+
+const selectedPdfPath = computed(() => {
+  return loginStore.currentRole.roleId === 1 ? studentTutorialPath : instructorTutorialPath;
+});
+
+const { pdf, pages } = usePDF(selectedPdfPath.value);
 
 function goToEnteredPage() {
   if (page.value >= 0 && page.value <= pages.value) {
