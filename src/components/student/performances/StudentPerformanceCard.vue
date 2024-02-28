@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { useLoginStore } from "../../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
 import {
@@ -42,15 +42,29 @@ function closeDialogs() {
   endingLevelDialog.value = false;
   emits("dialogClosedEvent");
 }
-function hasCritiques(piece) {
-  piece.critiques.forEach((critique) => {
-    if (critique.userRoleId == currentRole.value.id) {
-      isCritiqued.value = true;
+function hasAnyCritiques(piece) {
+  if (piece.critiques.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+function hasCurrentUserCritiqued() {
+  props.studentInstrumentSignupData.eventSignup.eventSignupPieces.forEach(
+    (piece) => {
+      piece.critiques.forEach((critique) => {
+        if (critique.userRoleId == currentRole.value.id) {
+          isCritiqued.value = true;
+        }
+      });
     }
-  });
+  );
 
   return false;
 }
+onBeforeMount(() => {
+  hasCurrentUserCritiqued();
+});
 </script>
 
 <template>
@@ -302,7 +316,7 @@ function hasCritiques(piece) {
                   </v-card-text>
                 </v-col>
                 <v-col
-                  v-if="hasCritiques(eventSignupPiece)"
+                  v-if="hasAnyCritiques(eventSignupPiece)"
                   cols="3"
                   min-width="95"
                 >
