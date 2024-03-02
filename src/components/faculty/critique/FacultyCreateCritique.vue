@@ -48,7 +48,7 @@ function filterSignups() {
   filteredSignups.value = eventData.value.eventSignups.filter((signup) => {
     var matchesFilter = true;
 
-    //filter by pass/fail first because it is less resource intensive
+    //filter by pass/not passed first because it is less resource intensive
     if (gradeFilterSelection.value !== "All") {
       matchesFilter =
         gradeFilterSelection.value === "Given"
@@ -122,7 +122,7 @@ onMounted(async () => {
                 ></v-select>
               </v-list-item>
               <v-list-item class="pa-0 font-weight-semi-bold text-darkBlue">
-                Pass/Fail Grade
+                Pass/Not Pass Grade
                 <v-select
                   color="darkBlue"
                   variant="underlined"

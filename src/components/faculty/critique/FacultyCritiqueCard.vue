@@ -180,7 +180,7 @@ onMounted(() => {
               flat
               size="small"
               class="font-weight-bold mt-0 text-none text-white flatChipBorder"
-              :class="signupHasFeedbackByFaculty() ? 'bg-teal' : 'bg-maroon'"
+              :class="signupHasFeedbackByFaculty() ? 'bg-teal' : 'bg-darkOrange'"
             >
               {{
                 signupHasFeedbackByFaculty()
@@ -195,14 +195,14 @@ onMounted(() => {
               flat
               size="small"
               class="font-weight-bold mt-3 text-none text-white flatChipBorder"
-              :class="props.signup.pass == null ? 'bg-maroon' : 'bg-teal'"
+              :class="props.signup.pass == null ? 'bg-darkOrange' : props.signup.pass ? 'bg-teal' : 'bg-maroon'"
             >
               {{
                 props.signup.pass == null
                   ? "Grade pending"
                   : props.signup.pass
                   ? "Passed"
-                  : "Failed"
+                  : "Not Passed"
               }}
             </v-chip>
           </v-row>
@@ -216,7 +216,7 @@ onMounted(() => {
               size="small"
               class="font-weight-bold mt-3 text-none text-white flatChipBorder"
               :class="
-                props.signup.endingLevelId == null ? 'bg-maroon' : 'bg-teal'
+                props.signup.endingLevelId == null ? 'bg-darkOrange' : 'bg-teal'
               "
             >
               {{

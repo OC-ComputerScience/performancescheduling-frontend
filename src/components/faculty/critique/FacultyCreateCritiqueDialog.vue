@@ -69,10 +69,6 @@ async function saveCritique() {
   critique.value.eventSignupPieceId = selectedStudentPiece.value.id;
 
   if (existingCritique) {
-    if (!hasCritiqueChanged(existingCritique)) {
-      return true;
-    }
-
     await CritiqueDataService.update(critique.value)
       .then((response) => {
         modifyCritiqueArray(response.data, "update");
@@ -343,17 +339,45 @@ onMounted(async () => {
               </v-btn>
             </v-row>
 
+            <!-- Tone -->
+            <v-row class="ml-1">
+              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Tone</p>
+              <p class="text-maroon mt-2 mr-1">
+                (beauty, control/clarity, vibrato, warmth)
+              </p>
+              <v-radio-group v-model="critique.toneGrade" inline>
+                <v-radio label="Excellent" value="Excellent" color="green">
+                </v-radio>
+                <v-radio label="Good" value="Good" color="blue"> </v-radio>
+                <v-radio label="Fair" value="Fair" color="yellow"> </v-radio>
+                <v-radio label="Poor" value="Poor" color="red"></v-radio>
+              </v-radio-group>
+            </v-row>
+            <v-text-field
+              v-model="critique.toneComment"
+              label="Comment"
+              dense
+              rows="2"
+            >
+            </v-text-field>
+
             <!-- Accuracy -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
-                Accuracy
+                Accuracy/Intonation
+              </p>
+            </v-row>
+            <v-row class="ml-1">
+              <p class="text-maroon mt-2 mr-1">
+                (correct notes with correct rhythm, tuning with keyboard and/or
+                ensemble)
               </p>
               <v-radio-group v-model="critique.accuracyGrade" inline>
                 <v-radio label="Excellent" value="Excellent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
-                <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
-                <v-radio label="Bad" value="Bad" color="red"></v-radio>
+                <v-radio label="Fair" value="Fair" color="yellow"> </v-radio>
+                <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
             <v-text-field
@@ -365,13 +389,18 @@ onMounted(async () => {
             </v-text-field>
             <!-- Balance -->
             <v-row class="ml-1">
-              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Balance</p>
+              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
+                Balance Blend
+              </p>
+              <p class="text-maroon mt-2 mr-1">
+                (with accompanist or within ensemble)
+              </p>
               <v-radio-group v-model="critique.balanceGrade" inline>
                 <v-radio label="Excellent" value="Excellent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
-                <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
-                <v-radio label="Bad" value="Bad" color="red"></v-radio>
+                <v-radio label="Fair" value="Fair" color="yellow"> </v-radio>
+                <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
             <v-text-field
@@ -386,12 +415,13 @@ onMounted(async () => {
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
                 Deportment
               </p>
+              <p class="text-maroon mt-2 mr-1">(poise, entrance/exit bow)</p>
               <v-radio-group v-model="critique.deportmentGrade" inline>
                 <v-radio label="Excellent" value="Excellent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
-                <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
-                <v-radio label="Bad" value="Bad" color="red"></v-radio>
+                <v-radio label="Fair" value="Fair" color="yellow"> </v-radio>
+                <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
             <v-text-field
@@ -404,12 +434,20 @@ onMounted(async () => {
             <!-- Diction -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Diction</p>
+              <p class="text-maroon mt-2 mr-1">(vocal)</p>
+              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
+                / Articulation
+              </p>
+              <p class="text-maroon mt-2 mr-1">(instrumental)</p>
+              <p class="text-maroon mt-2 mr-1">
+                (vowels; consonants - legato, double/triple tongue)
+              </p>
               <v-radio-group v-model="critique.dictionGrade" inline>
                 <v-radio label="Excellent" value="Excellent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
-                <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
-                <v-radio label="Bad" value="Bad" color="red"></v-radio>
+                <v-radio label="Fair" value="Fair" color="yellow"> </v-radio>
+                <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
             <v-text-field
@@ -422,14 +460,17 @@ onMounted(async () => {
             <!-- Interpretation -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
-                Interpretation
+                Interpretation, Musicianship
+              </p>
+              <p class="text-maroon mt-2 mr-1">
+                (phrasing, tempo, dynamics communication, rapport)
               </p>
               <v-radio-group v-model="critique.interpretationGrade" inline>
                 <v-radio label="Excellent" value="Excellent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
-                <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
-                <v-radio label="Bad" value="Bad" color="red"></v-radio>
+                <v-radio label="Fair" value="Fair" color="yellow"> </v-radio>
+                <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
             <v-text-field
@@ -439,27 +480,14 @@ onMounted(async () => {
               rows="2"
             >
             </v-text-field>
-            <!-- Tone -->
-            <v-row class="ml-1">
-              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Tone</p>
-              <v-radio-group v-model="critique.toneGrade" inline>
-                <v-radio label="Excellent" value="Excellent" color="green">
-                </v-radio>
-                <v-radio label="Good" value="Good" color="blue"> </v-radio>
-                <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
-                <v-radio label="Bad" value="Bad" color="red"></v-radio>
-              </v-radio-group>
-            </v-row>
-            <v-text-field
-              v-model="critique.toneComment"
-              label="Comment"
-              dense
-              rows="2"
-            >
-            </v-text-field>
             <!-- Overall -->
             <v-row class="ml-1 mb-3">
-              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Overall</p>
+              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
+                Performance and Suggestions
+              </p>
+              <p class="text-maroon mt-2 mr-1">
+                (overall readiness to perform)
+              </p>
             </v-row>
             <v-text-field
               v-model="critique.overallComment"
