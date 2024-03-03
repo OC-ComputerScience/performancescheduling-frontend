@@ -171,7 +171,7 @@ onBeforeMount(async () => {
                 "
                 :items="levelOptions"
                 :item-title="(item) => item.name"
-                item-value="id"
+                item-value="name"
                 :rules="[(v) => !!v || 'This field is required']"
               >
               </v-select>
@@ -201,7 +201,7 @@ onBeforeMount(async () => {
                 Mid-Term Preparation
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructo && !isAdmin"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="
                   editedStudentInstrumentEvaluationData.midtermPreparation
                 "
