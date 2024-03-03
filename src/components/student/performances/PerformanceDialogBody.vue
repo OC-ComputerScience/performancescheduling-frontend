@@ -27,19 +27,13 @@ const props = defineProps({
     </v-row>
 
     <v-expansion-panels v-if="pieceData.critiques" class="pt-6">
-      <v-expansion-panel
-        v-for="critique in pieceData.critiques"
-        :key="critique.id"
-      >
+      <v-expansion-panel v-for="critique in pieceData.critiques" :key="critique.id">
         <v-expansion-panel-title class="text-darkBlue font-weight-bold">
           {{ critique.userRole.user.firstName }}
-          {{ critique.userRole.user.lastName }}</v-expansion-panel-title
-        >
+          {{ critique.userRole.user.lastName }}</v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-row class="pt-0 pl-3 mt-0">
-            <v-card-subtitle
-              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-              >Overall Performance and Suggestion
+            <v-card-subtitle class="pl-0 pb-2 font-weight-semi-bold text-darkBlue">Overall Performance and Suggestion
             </v-card-subtitle>
           </v-row>
           <v-row class="pt-0 pb-1 pl-3 mt-0">
@@ -48,14 +42,14 @@ const props = defineProps({
             </v-card-text>
           </v-row>
 
-          
+
 
           <v-row>
             <v-col cols="6">
               <v-row class="pt-0 pl-3 mt-0">
                 <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
                   <v-text class="text-darkBlue">
-                  Tone - Grade: 
+                    Tone - Grade:
                   </v-text>
                   <v-text :class="{
                     'text-green': critique.toneGrade === 'Excellent',
@@ -63,10 +57,9 @@ const props = defineProps({
                     'text-yellow': critique.toneGrade === 'Fair',
                     'text-red': critique.toneGrade === 'Poor'
                   }">
-                  {{ critique.toneGrade }}
+                    {{ critique.toneGrade }}
                   </v-text>
-                  </v-card-subtitle
-                >
+                </v-card-subtitle>
               </v-row>
               <v-row class="pt-0 pb-0 pl-3 mt-0">
                 <v-card-text>
@@ -79,7 +72,7 @@ const props = defineProps({
               <v-row class="pt-0 pl-3 mt-0">
                 <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
                   <v-text class="text-darkBlue">
-                    Accuracy/Intonation - Grade: 
+                    Accuracy/Intonation - Grade:
                   </v-text>
                   <v-text :class="{
                     'text-green': critique.accuracyGrade === 'Excellent',
@@ -87,7 +80,7 @@ const props = defineProps({
                     'text-yellow': critique.accuracyGrade === 'Fair',
                     'text-red': critique.accuracyGrade === 'Poor'
                   }">
-                  {{ critique.accuracyGrade }}
+                    {{ critique.accuracyGrade }}
                   </v-text>
                 </v-card-subtitle>
               </v-row>
@@ -100,10 +93,8 @@ const props = defineProps({
               <v-divider class="mb-2"></v-divider>
 
               <v-row class="pt-0 pl-3 mt-0">
-                <v-card-subtitle
-                  class="pl-0 pb-0 font-weight-semi-bold"
-                  ><v-text class="text-darkBlue">
-                    Balance Blend - Grade: 
+                <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold"><v-text class="text-darkBlue">
+                    Balance Blend - Grade:
                   </v-text>
                   <v-text :class="{
                     'text-green': critique.balanceGrade === 'Excellent',
@@ -111,7 +102,7 @@ const props = defineProps({
                     'text-yellow': critique.balanceGrade === 'Fair',
                     'text-red': critique.balanceGrade === 'Poor'
                   }">
-                  {{ critique.balanceGrade }}
+                    {{ critique.balanceGrade }}
                   </v-text>
                 </v-card-subtitle>
               </v-row>
@@ -126,7 +117,7 @@ const props = defineProps({
               <v-row class="pt-0 pl-3 mt-0">
                 <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
                   <v-text class="text-darkBlue">
-                    Deportment - Grade: 
+                    Deportment - Grade:
                   </v-text>
                   <v-text :class="{
                     'text-green': critique.deportmentGrade === 'Excellent',
@@ -134,22 +125,22 @@ const props = defineProps({
                     'text-yellow': critique.deportmentGrade === 'Fair',
                     'text-red': critique.deportmentGrade === 'Poor'
                   }">
-                  {{ critique.deportmentGrade }}
+                    {{ critique.deportmentGrade }}
                   </v-text>
                 </v-card-subtitle>
               </v-row>
               <v-row class="pt-0 pb-1 pl-3 mt-0">
-                <v-card-text> 
+                <v-card-text>
                   {{ critique.deportmentComment }}
                 </v-card-text>
               </v-row>
-              
+
               <v-divider class="mb-2"></v-divider>
 
               <v-row class="pt-0 pl-3 mt-0">
                 <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
                   <v-text class=" text-darkBlue">
-                    Diction/Articulation - Grade: 
+                    Diction/Articulation - Grade:
                   </v-text>
                   <v-text :class="{
                     'text-green': critique.dictionGrade === 'Excellent',
@@ -157,7 +148,7 @@ const props = defineProps({
                     'text-yellow': critique.dictionGrade === 'Fair',
                     'text-red': critique.dictionGrade === 'Poor'
                   }">
-                  {{ critique.dictionGrade }}
+                    {{ critique.dictionGrade }}
                   </v-text>
                 </v-card-subtitle>
               </v-row>
@@ -172,7 +163,7 @@ const props = defineProps({
               <v-row class="pt-0 pl-3 mt-0">
                 <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
                   <v-text class="text-darkBlue">
-                    Interpretation, Musicianship - Grade: 
+                    Interpretation, Musicianship - Grade:
                   </v-text>
                   <v-text :class="{
                     'text-green': critique.interpretationGrade === 'Excellent',
@@ -180,7 +171,7 @@ const props = defineProps({
                     'text-yellow': critique.interpretationGrade === 'Fair',
                     'text-red': critique.interpretationGrade === 'Poor'
                   }">
-                  {{ critique.interpretationGrade }}
+                    {{ critique.interpretationGrade }}
                   </v-text>
                 </v-card-subtitle>
               </v-row>
@@ -189,17 +180,37 @@ const props = defineProps({
                   {{ critique.interpretationComment }}
                 </v-card-text>
               </v-row>
+
+              <v-divider class="mb-2"></v-divider>
+
+              <v-row class="pt-0 pl-3 mt-0">
+                <v-card-subtitle class="pl-0 pb-0 font-weight-semi-bold">
+                  <v-text class="text-darkBlue">
+                    Technique - Grade:
+                  </v-text>
+                  <v-text :class="{
+                    'text-green': critique.techniqueGrade === 'Excellent',
+                    'text-blue': critique.techniqueGrade === 'Good',
+                    'text-yellow': critique.techniqueGrade === 'Fair',
+                    'text-red': critique.techniqueGrade === 'Poor'
+                  }">
+                    {{ critique.techniqueGrade }}
+                  </v-text>
+                </v-card-subtitle>
+              </v-row>
+              <v-row class="pt-0 pb-1 pl-3 mt-0">
+                <v-card-text>
+                  {{ critique.techniqueComment }}
+                </v-card-text>
+              </v-row>
             </v-col>
           </v-row>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
     <v-card-actions>
-      <v-btn
-        flat
-        class="font-weight-semi-bold mt-2 ml-auto text-none text-white bg-blue flatChipBorder"
-        @click="emits('closePerformanceDialog')"
-      >
+      <v-btn flat class="font-weight-semi-bold mt-2 ml-auto text-none text-white bg-blue flatChipBorder"
+        @click="emits('closePerformanceDialog')">
         Close
       </v-btn>
     </v-card-actions>
