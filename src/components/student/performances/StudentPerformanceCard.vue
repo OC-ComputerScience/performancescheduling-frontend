@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { useLoginStore } from "../../../stores/LoginStore.js";
 import { storeToRefs } from "pinia";
 import {
@@ -19,7 +19,6 @@ const emits = defineEmits(["dialogClosedEvent"]);
 
 const viewCritique = ref(false);
 const pieceData = ref(null);
-const isCritiqued = ref(false);
 const gradeDialog = ref(false);
 const endingLevelDialog = ref(false);
 const critiqueDialog = ref(false);
@@ -42,14 +41,23 @@ function closeDialogs() {
   endingLevelDialog.value = false;
   emits("dialogClosedEvent");
 }
-function hasCritiques(piece) {
+function hasAnyCritiques(piece) {
   if (piece.critiques.length > 0) {
-    isCritiqued.value = true;
     return true;
   } else {
     return false;
   }
 }
+function hasCurrentUserCritiqued() {
+  return props.studentInstrumentSignupData.eventSignup.eventSignupPieces.some((signupPiece) =>
+    signupPiece.critiques.some(
+      (critique) => critique.userRoleId == currentRole.value.id
+    )
+  );
+}
+onBeforeMount(() => {
+  hasCurrentUserCritiqued();
+});
 </script>
 
 <template>
@@ -128,8 +136,16 @@ function hasCritiques(piece) {
                 <v-card-title class="font-weight-semi-bold mt-5">
                   Grade:
                 </v-card-title>
-                <v-card-title class="font-weight-semi-bold mt-5"
-                :class="eventSignupData.pass == null ? 'text-darkOrange' : eventSignupData.pass ? 'text-darkTeal' : 'text-maroon'">
+                <v-card-title
+                  class="font-weight-semi-bold mt-5"
+                  :class="
+                    eventSignupData.pass == null
+                      ? 'text-darkOrange'
+                      : eventSignupData.pass
+                      ? 'text-darkTeal'
+                      : 'text-maroon'
+                  "
+                >
                   {{
                     eventSignupData.pass == null
                       ? "Pending"
@@ -143,8 +159,14 @@ function hasCritiques(piece) {
                 <v-card-title class="font-weight-semi-bold mt-5">
                   Ending Level:
                 </v-card-title>
-                <v-card-title class="font-weight-semi-bold text-maroon mt-5"
-                  :class="eventSignupData.endingLevelId == null ? 'text-darkOrange' : 'text-darkBlue'">
+                <v-card-title
+                  class="font-weight-semi-bold text-maroon mt-5"
+                  :class="
+                    eventSignupData.endingLevelId == null
+                      ? 'text-darkOrange'
+                      : 'text-darkBlue'
+                  "
+                >
                   {{
                     eventSignupData.endingLevelId == null
                       ? "Pending"
@@ -287,7 +309,7 @@ function hasCritiques(piece) {
                   </v-card-text>
                 </v-col>
                 <v-col
-                  v-if="hasCritiques(eventSignupPiece)"
+                  v-if="hasAnyCritiques(eventSignupPiece)"
                   cols="3"
                   min-width="95"
                 >
@@ -307,7 +329,6 @@ function hasCritiques(piece) {
             <v-spacer></v-spacer>
             <v-btn
               v-if="
-                !isCritiqued &&
                 currentRole.roleId == 2 &&
                 eventData.date <= formatDateDash(new Date())
               "
@@ -317,21 +338,7 @@ function hasCritiques(piece) {
               class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none text-white"
               @click="critiqueDialog = true"
             >
-              Add Critique
-            </v-btn>
-            <v-btn
-              v-if="
-                isCritiqued &&
-                currentRole.roleId == 2 &&
-                eventData.date <= formatDateDash(new Date())
-              "
-              flat
-              size="small"
-              :min-width="95"
-              class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none text-white"
-              @click="critiqueDialog = true"
-            >
-              Edit Critique
+            {{ hasCurrentUserCritiqued() ? "Edit Critique" : "Add Critique" }}
             </v-btn>
             <v-btn
               v-if="
