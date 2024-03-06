@@ -19,7 +19,6 @@ const emits = defineEmits(["dialogClosedEvent"]);
 
 const viewCritique = ref(false);
 const pieceData = ref(null);
-const isCritiqued = ref(false);
 const gradeDialog = ref(false);
 const endingLevelDialog = ref(false);
 const critiqueDialog = ref(false);
@@ -50,17 +49,11 @@ function hasAnyCritiques(piece) {
   }
 }
 function hasCurrentUserCritiqued() {
-  props.studentInstrumentSignupData.eventSignup.eventSignupPieces.forEach(
-    (piece) => {
-      piece.critiques.forEach((critique) => {
-        if (critique.userRoleId == currentRole.value.id) {
-          isCritiqued.value = true;
-        }
-      });
-    }
+  return props.studentInstrumentSignupData.eventSignup.eventSignupPieces.some((signupPiece) =>
+    signupPiece.critiques.some(
+      (critique) => critique.userRoleId == currentRole.value.id
+    )
   );
-
-  return false;
 }
 onBeforeMount(() => {
   hasCurrentUserCritiqued();
@@ -336,7 +329,6 @@ onBeforeMount(() => {
             <v-spacer></v-spacer>
             <v-btn
               v-if="
-                !isCritiqued &&
                 currentRole.roleId == 2 &&
                 eventData.date <= formatDateDash(new Date())
               "
@@ -346,21 +338,7 @@ onBeforeMount(() => {
               class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none text-white"
               @click="critiqueDialog = true"
             >
-              Add Critique
-            </v-btn>
-            <v-btn
-              v-if="
-                isCritiqued &&
-                currentRole.roleId == 2 &&
-                eventData.date <= formatDateDash(new Date())
-              "
-              flat
-              size="small"
-              :min-width="95"
-              class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none text-white"
-              @click="critiqueDialog = true"
-            >
-              Edit Critique
+            {{ hasCurrentUserCritiqued() ? "Edit Critique" : "Add Critique" }}
             </v-btn>
             <v-btn
               v-if="
