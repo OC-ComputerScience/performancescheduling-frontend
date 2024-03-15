@@ -58,5 +58,21 @@ class EventDataService {
   getBySemester(semesterId) {
     return http.get(this.baseUrl + `semesterId/${semesterId}`);
   }
+
+  emailActiveStudentsForEvent(eventId, data) {
+    return http.post(this.baseUrl + `${eventId}/emailActiveStudents`, data);
+  }
+
+  emailActiveInstAccForEvent(eventId, data) {
+    return http.post(this.baseUrl + `${eventId}/emailActiveInstAccForEvent`, data);
+  }
+  emailSignedUpStudentsForEvent(eventId, data) {
+    return http.post(this.baseUrl + `${eventId}/emailSignedUpStudentsForEvent`, data);
+  }
+
+  emailAvailInstAccForEvent(eventId, data) {
+    return http.post(this.baseUrl + `${eventId}/emailAvailInstAccForEvent`, data);
+  }
+
 }
 export default new EventDataService();

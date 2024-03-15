@@ -18,6 +18,7 @@ const createOrEditDialog = ref(false);
 const props = defineProps({
   eventData: { type: [Object], required: true },
   roleId: { type: [Number], required: true },
+  fromEmail: { type: [String], required: true },
   availabilityData: { type: [Object], required: false },
 });
 
@@ -77,6 +78,26 @@ async function readyEvent(event) {
     .catch((err) => {
       console.log(err);
     });
+}
+
+function sendNotification() {
+  EventDataService.emailActiveStudentsForEvent(props.eventData.id, {
+    fromEmail: props.fromEmail,
+  });
+
+  EventDataService.emailActiveInstAccForEvent(props.eventData.id, {
+    fromEmail: props.fromEmail,
+  });
+}
+
+function sendReminder() {
+  EventDataService.emailSignedUpStudentsForEvent(props.eventData.id, {
+    fromEmail: props.fromEmail,
+  });
+
+  EventDataService.emailAvailInstAccForEvent(props.eventData.id, {
+    fromEmail: props.fromEmail,
+  });
 }
 
 function countSignUps() {
@@ -254,9 +275,7 @@ onBeforeUpdate(async () => {
                       flat
                       size="small"
                       class="font-weight-semi-bold ml-auto mr-4 text-none text-white flatChipBorder"
-                      :class="
-                        props.eventData.isReady ? 'bg-maroon' : 'bg-blue'
-                      "
+                      :class="props.eventData.isReady ? 'bg-maroon' : 'bg-blue'"
                       @click="
                         props.eventData.isReady
                           ? unreadyEvent(eventData)
@@ -385,7 +404,7 @@ onBeforeUpdate(async () => {
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="(isEdit = false), (addOrEditAvailabilityDialog = true)"
         >
-          Add Availability
+          Add Avail
         </v-btn>
         <v-btn
           v-if="roleId == 3"
@@ -394,7 +413,25 @@ onBeforeUpdate(async () => {
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="(isEdit = true), (addOrEditAvailabilityDialog = true)"
         >
-          Edit Availability
+          Edit Avail
+        </v-btn>
+        <v-btn
+          v-if="roleId == 3"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="sendNotification"
+        >
+          Notify
+        </v-btn>
+        <v-btn
+          v-if="roleId == 3 && eventData.isReady"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="sendReminder"
+        >
+          Remind
         </v-btn>
         <v-btn
           v-if="roleId == 3"
