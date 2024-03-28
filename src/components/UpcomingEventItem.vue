@@ -36,6 +36,8 @@ const viewSignupsDialog = ref(false);
 const eventAvailabilityData = ref([]);
 const studentSignupData = ref([]);
 const isEdit = ref(false);
+const emailNoticeSent = ref(false);
+const emailReminderSent = ref(false);
 
 EventDataService.getById(props.eventData.id)
   .then((response) => {
@@ -88,6 +90,7 @@ function sendNotification() {
   EventDataService.emailActiveInstAccForEvent(props.eventData.id, {
     fromEmail: props.fromEmail,
   });
+  emailNoticeSent.value = true;
 }
 
 function sendReminder() {
@@ -98,6 +101,8 @@ function sendReminder() {
   EventDataService.emailAvailInstAccForEvent(props.eventData.id, {
     fromEmail: props.fromEmail,
   });
+
+  emailReminderSent.value = true;
 }
 
 function countSignUps() {
@@ -494,6 +499,52 @@ onBeforeUpdate(async () => {
         :student-signup-data="studentSignupData"
         @closeSignupsDialog="closeSignupsDialog"
       ></ViewSignupsDialog>
+    </v-dialog>
+    <v-dialog v-model="emailNoticeSent" persistent max-width="500px">
+      <v-card flat class="flatCardBorder bg-lightBlue mt-4">
+        <v-card-title class="font-weight-bold text-orange text-h5">
+          {{ eventData.name }}
+        </v-card-title>
+        <v-card-subtitle
+          class="ml-1 mt-2 font-weight-semi-bold text-h7 text-maroon text-wrap text-center"
+        >
+          Email Notification Sent
+          {{
+            eventData.isReady
+              ? "to Faculty, Accompanists  and Students"
+              : "to Faculty and  Accompanists"
+          }}
+          that are active
+        </v-card-subtitle>
+        <v-btn
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-4 mb-4 text-none text-black flatChipBorder"
+          @click="emailNoticeSent = false"
+          >Ok</v-btn
+        >
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="emailReminderSent" persistent max-width="500px">
+      <v-card flat class="flatCardBorder bg-lightBlue mt-4">
+        <v-card-title class="font-weight-bold text-orange text-h5">
+          {{ eventData.name }}
+        </v-card-title>
+        <v-card-subtitle
+          class="ml-1 mt-2 font-weight-semi-bold text-h7 text-maroon text-wrap text-center"
+        >
+          Email Reminder Sent to Faculty, Accompanists and Students signed up
+          for the event
+        </v-card-subtitle>
+
+        <v-btn
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-4 mb-4 text-none text-black flatChipBorder"
+          @click="emailReminderSent = false"
+          >Ok</v-btn
+        >
+      </v-card>
     </v-dialog>
   </div>
 </template>
