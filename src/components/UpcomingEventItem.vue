@@ -18,6 +18,7 @@ const createOrEditDialog = ref(false);
 const props = defineProps({
   eventData: { type: [Object], required: true },
   roleId: { type: [Number], required: true },
+  fromEmail: { type: [String], required: true },
   availabilityData: { type: [Object], required: false },
 });
 
@@ -35,6 +36,8 @@ const viewSignupsDialog = ref(false);
 const eventAvailabilityData = ref([]);
 const studentSignupData = ref([]);
 const isEdit = ref(false);
+const emailNoticeSent = ref(false);
+const emailReminderSent = ref(false);
 
 EventDataService.getById(props.eventData.id)
   .then((response) => {
@@ -77,6 +80,29 @@ async function readyEvent(event) {
     .catch((err) => {
       console.log(err);
     });
+}
+
+function sendNotification() {
+  EventDataService.emailActiveStudentsForEvent(props.eventData.id, {
+    fromEmail: props.fromEmail,
+  });
+
+  EventDataService.emailActiveInstAccForEvent(props.eventData.id, {
+    fromEmail: props.fromEmail,
+  });
+  emailNoticeSent.value = true;
+}
+
+function sendReminder() {
+  EventDataService.emailSignedUpStudentsForEvent(props.eventData.id, {
+    fromEmail: props.fromEmail,
+  });
+
+  EventDataService.emailAvailInstAccForEvent(props.eventData.id, {
+    fromEmail: props.fromEmail,
+  });
+
+  emailReminderSent.value = true;
 }
 
 function countSignUps() {
@@ -254,9 +280,7 @@ onBeforeUpdate(async () => {
                       flat
                       size="small"
                       class="font-weight-semi-bold ml-auto mr-4 text-none text-white flatChipBorder"
-                      :class="
-                        props.eventData.isReady ? 'bg-maroon' : 'bg-blue'
-                      "
+                      :class="props.eventData.isReady ? 'bg-maroon' : 'bg-blue'"
                       @click="
                         props.eventData.isReady
                           ? unreadyEvent(eventData)
@@ -385,7 +409,7 @@ onBeforeUpdate(async () => {
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="(isEdit = false), (addOrEditAvailabilityDialog = true)"
         >
-          Add Availability
+          Add Avail
         </v-btn>
         <v-btn
           v-if="roleId == 3"
@@ -394,7 +418,25 @@ onBeforeUpdate(async () => {
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
           @click="(isEdit = true), (addOrEditAvailabilityDialog = true)"
         >
-          Edit Availability
+          Edit Avail
+        </v-btn>
+        <v-btn
+          v-if="roleId == 3"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="sendNotification"
+        >
+          Notify
+        </v-btn>
+        <v-btn
+          v-if="roleId == 3 && eventData.isReady"
+          flat
+          size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          @click="sendReminder"
+        >
+          Remind
         </v-btn>
         <v-btn
           v-if="roleId == 3"
@@ -457,6 +499,57 @@ onBeforeUpdate(async () => {
         :student-signup-data="studentSignupData"
         @closeSignupsDialog="closeSignupsDialog"
       ></ViewSignupsDialog>
+    </v-dialog>
+    <v-dialog v-model="emailNoticeSent" persistent max-width="500px">
+      <v-card flat class="flatCardBorder bg-lightBlue mt-4">
+        <v-card-title class="font-weight-bold text-orange text-h5">
+          {{ eventData.name }}
+        </v-card-title>
+        <v-card-subtitle
+          class="ml-1 mt-2 font-weight-semi-bold text-h7 text-maroon text-wrap text-center"
+        >
+          Email Notification Sent
+          {{
+            eventData.isReady
+              ? "to Faculty, Accompanists  and Students"
+              : "to Faculty and  Accompanists"
+          }}
+          that are active
+        </v-card-subtitle>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold ma-4 text-none text-white bg-blue"
+            @click="emailNoticeSent = false"
+            >Close</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="emailReminderSent" persistent max-width="500px">
+      <v-card class="flatCardBorder bg-lightBlue mt-4">
+        <v-card-title class="font-weight-bold text-orange text-h5">
+          {{ eventData.name }}
+        </v-card-title>
+        <v-card-subtitle
+          class="ml-1 mt-2 font-weight-semi-bold text-h7 text-maroon text-wrap text-center"
+        >
+          Email Reminder Sent to Faculty, Accompanists and Students signed up
+          for the event
+        </v-card-subtitle>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold ma-4 text-none text-white bg-blue"
+            @click="emailReminderSent = false"
+            >Close</v-btn
+          >
+        </v-card-actions>
+      </v-card>
     </v-dialog>
   </div>
 </template>
