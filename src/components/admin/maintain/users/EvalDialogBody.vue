@@ -16,6 +16,7 @@ const isInstructor = ref(
     ? true
     : false
 );
+const isAdmin = ref(loginStore.currentRole.roleId === 3 ? true : false);
 
 const emits = defineEmits(["closeEvalDialog"]);
 
@@ -135,7 +136,7 @@ onBeforeMount(async () => {
                 Beginning Greatest Strengths
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="
                   editedStudentInstrumentEvaluationData.beginningGreatestStrengths
                 "
@@ -148,7 +149,7 @@ onBeforeMount(async () => {
                 Beginning Targeted Improvement
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="
                   editedStudentInstrumentEvaluationData.beginningTargetedImprovement
                 "
@@ -161,7 +162,7 @@ onBeforeMount(async () => {
                 Beginning Performance Level Goal
               </v-card-subtitle>
               <v-select
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 color="darkBlue"
                 variant="plain"
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-2"
@@ -187,7 +188,7 @@ onBeforeMount(async () => {
                 Mid-Term Attendance
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="
                   editedStudentInstrumentEvaluationData.midtermAttendance
                 "
@@ -200,7 +201,7 @@ onBeforeMount(async () => {
                 Mid-Term Preparation
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="
                   editedStudentInstrumentEvaluationData.midtermPreparation
                 "
@@ -213,7 +214,7 @@ onBeforeMount(async () => {
                 Mid-Term Goal Progress
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="
                   editedStudentInstrumentEvaluationData.midtermGoalProgress
                 "
@@ -226,7 +227,7 @@ onBeforeMount(async () => {
                 Mid-Term Attitude
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="editedStudentInstrumentEvaluationData.midtermAttitude"
                 variant="plain"
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-2"
@@ -237,7 +238,7 @@ onBeforeMount(async () => {
                 Mid-term Grade
               </v-card-subtitle>
               <v-select
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 color="darkBlue"
                 variant="plain"
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-2"
@@ -258,7 +259,7 @@ onBeforeMount(async () => {
                 Final Attendance
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="editedStudentInstrumentEvaluationData.finalAttendance"
                 variant="plain"
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-2"
@@ -269,7 +270,7 @@ onBeforeMount(async () => {
                 Final Preparation
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="editedStudentInstrumentEvaluationData.finalPreparation"
                 variant="plain"
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-2"
@@ -280,7 +281,7 @@ onBeforeMount(async () => {
                 Final Goal Progress
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="
                   editedStudentInstrumentEvaluationData.finalGoalProgress
                 "
@@ -293,7 +294,7 @@ onBeforeMount(async () => {
                 Final Attitude
               </v-card-subtitle>
               <v-text-field
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 v-model="editedStudentInstrumentEvaluationData.finalAttitude"
                 variant="plain"
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-2"
@@ -304,7 +305,7 @@ onBeforeMount(async () => {
                 Final Grade
               </v-card-subtitle>
               <v-select
-                :readonly="!isInstructor"
+                :readonly="!isInstructor && !isAdmin"
                 color="darkBlue"
                 variant="plain"
                 class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-2"
@@ -319,7 +320,7 @@ onBeforeMount(async () => {
       <v-card-actions>
         <v-spacer />
         <v-btn
-          v-if="isInstructor"
+          v-if="isInstructor || isAdmin"
           flat
           class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
           @click="isEdit ? updateEval() : addEval()"
