@@ -516,17 +516,20 @@ onBeforeUpdate(async () => {
           }}
           that are active
         </v-card-subtitle>
-        <v-btn
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-4 mb-4 text-none text-black flatChipBorder"
-          @click="emailNoticeSent = false"
-          >Ok</v-btn
-        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold ma-4 text-none text-white bg-blue"
+            @click="emailNoticeSent = false"
+            >Close</v-btn
+          >
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <v-dialog v-model="emailReminderSent" persistent max-width="500px">
-      <v-card flat class="flatCardBorder bg-lightBlue mt-4">
+      <v-card class="flatCardBorder bg-lightBlue mt-4">
         <v-card-title class="font-weight-bold text-orange text-h5">
           {{ eventData.name }}
         </v-card-title>
@@ -536,14 +539,16 @@ onBeforeUpdate(async () => {
           Email Reminder Sent to Faculty, Accompanists and Students signed up
           for the event
         </v-card-subtitle>
-
-        <v-btn
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-4 mb-4 text-none text-black flatChipBorder"
-          @click="emailReminderSent = false"
-          >Ok</v-btn
-        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            flat
+            size="small"
+            class="font-weight-semi-bold ma-4 text-none text-white bg-blue"
+            @click="emailReminderSent = false"
+            >Close</v-btn
+          >
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
