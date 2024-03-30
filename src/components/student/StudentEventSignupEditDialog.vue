@@ -374,11 +374,11 @@ onMounted(async () => {
               eventData.eventType.firstPiece
               ">
                         <v-spacer></v-spacer>
-                        <v-btn class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2" size="small"
+                        <v-btn :disabled="disableEditing" class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2" size="small"
                           v-if="studentPiece.isFirst" @click="unSetFirstPiece(studentPiece)">
                           UnSet First Piece
                         </v-btn>
-                        <v-btn size="small" class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                        <v-btn :disabled="disableEditing" size="small" class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
                           v-if="!studentPiece.isFirst" @click="setFirstPiece(studentPiece)">
                           Set as First Piece
                         </v-btn>
