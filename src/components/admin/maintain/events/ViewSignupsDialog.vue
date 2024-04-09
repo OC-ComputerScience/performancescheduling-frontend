@@ -34,7 +34,7 @@ function sortData() {
 
   var timeSlots = generateTimeSlots(props.eventData.startTime, adjEndTime, 30);
 
-  timeSlots.pop();
+  //timeSlots.pop();
 
   timeSlots.forEach((element) => {
     tableData.value.push({
