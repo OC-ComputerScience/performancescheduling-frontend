@@ -277,19 +277,15 @@ function withinAvailability(timeslotStart, timeslotEnd) {
 function getTimeslotLength() {
   if (props.eventData.eventType.slotType === "Fixed") {
     timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
-  } else {
-    if (selectedStudentInstrument.value.instrument.type === "Vocal") {
+  } 
+  else {
       if (isMusicMajor.value) {
-        timeslotLength.value =
-          selectedStudentInstrument.value.privateHours == 1 ? 10 : 15;
+        timeslotLength.value = 10;
       } else {
         timeslotLength.value =
           selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
       }
-    } else {
-      timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
     }
-  }
 }
 
 function hasExistingSignup(timeslotStart, timeslotEnd) {
