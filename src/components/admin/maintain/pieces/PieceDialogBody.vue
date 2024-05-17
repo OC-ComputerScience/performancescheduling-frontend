@@ -49,7 +49,10 @@ async function addPiece() {
 async function getComposers() {
   await ComposerDataService.getAll("lastName")
     .then((response) => {
-      composers.value = response.data.filter((composer) => (composer.status === "Active" || composer.status == "Pending"));
+      composers.value = response.data.filter(
+        (composer) =>
+          composer.status === "Active" || composer.status == "Pending"
+      );
       composers.value.forEach((composer) => {
         composer.fullName = composerName(composer);
       });
@@ -102,9 +105,15 @@ function similarPieceCheck(piece) {
   if (props.isEdit == true || piece.title == null) return true;
 
   var similarPieces = findSimilar(piece);
+
   var similarPieceNames = "";
   similarPieces.forEach((p) => {
-    if (p.composerId == piece.composerId) similarPieceNames += p.title + ", ";
+    if (
+      p.composerId == piece.composerId &&
+      p.movement == p.movement &&
+      piece.work == p.work
+    )
+      similarPieceNames += p.title + ", ";
   });
   if (similarPieceNames.length > 0)
     similarPieceNames = similarPieceNames.slice(0, -2);
@@ -167,6 +176,26 @@ function similarPieceCheck(piece) {
               () => !!editedPieceData.title || 'This field is required',
               similarPieceCheck(editedPieceData),
             ]"
+          ></v-text-field>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Movement (or section)
+          </v-card-subtitle>
+          <v-text-field
+            v-model="editedPieceData.movement"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          ></v-text-field>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Work (Musical, Opera, etc.)
+          </v-card-subtitle>
+          <v-text-field
+            v-model="editedPieceData.work"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
           ></v-text-field>
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
