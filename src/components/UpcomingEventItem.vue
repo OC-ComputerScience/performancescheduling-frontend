@@ -145,6 +145,7 @@ function generatePDF() {
     { title: "Instrument", dataKey: "instrument" },
     { title: "Instructor", dataKey: "instructor" },
     { title: "Accompanist", dataKey: "accompanist" },
+    { title: "Piece(s)", dataKey: "pieces" },
   ];
 
   const doc = new jsPDF({
@@ -196,6 +197,7 @@ function generatePDF() {
     signup.startTime = get12HourTimeStringFromString(eventSignup.startTime);
     signup.endTime = get12HourTimeStringFromString(eventSignup.endTime);
     signup.student = "";
+    signup.pieces = "";
     let comma = "";
 
     if (eventSignup.studentInstrumentSignups.length > 0) {
@@ -228,6 +230,12 @@ function generatePDF() {
           .lastName;
       signup.instrument =
         eventSignup.studentInstrumentSignups[0].studentInstrument.instrument.name;
+      comma = "";
+      eventSignup.eventSignupPieces.forEach(function (piece) {
+        signup.pieces += comma + piece.piece.title;
+        comma = ",";
+      });
+
       pdfSignups.push(signup);
     }
   });
