@@ -125,8 +125,7 @@ async function genProgramPDF() {
                     .studentClassification
                 : "",
             major:
-              studentInstrument.studentInstrument.studentRole.major !=
-              undefined
+              studentInstrument.studentInstrument.studentRole.major != undefined
                 ? studentInstrument.studentInstrument.studentRole.major.name
                 : "Not specified",
             instrument: studentInstrument.studentInstrument.instrument.name,
