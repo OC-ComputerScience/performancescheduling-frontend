@@ -104,6 +104,9 @@ async function genProgramPDF() {
           eventSignupPieces.piece.composer.lastName;
         progPiece.compbirthDate = eventSignupPieces.piece.composer.dateOfBirth;
         progPiece.compdeathDate = eventSignupPieces.piece.composer.dateOfDeath;
+        progPiece.movement = eventSignupPieces.piece.movement;
+        progPiece.work = eventSignupPieces.piece.work;
+        progPiece.translation = eventSignupPieces.piece.literalTranslation;
 
         signup.pieces.push(progPiece);
       });
@@ -125,8 +128,7 @@ async function genProgramPDF() {
                     .studentClassification
                 : "",
             major:
-              studentInstrument.studentInstrument.studentRole.major !=
-              undefined
+              studentInstrument.studentInstrument.studentRole.major != undefined
                 ? studentInstrument.studentInstrument.studentRole.major.name
                 : "Not specified",
             instrument: studentInstrument.studentInstrument.instrument.name,
@@ -167,6 +169,9 @@ async function genProgramPDF() {
   doc.setFont("helvetica");
 
   let page = 1;
+  let numTranslationLines = 0;
+  let translationLine = 0;
+
   //let asof = "signups as of " + new Date(Date.now()).toLocaleDateString();
 
   //let footer = props.eventData.name + " " + asof;
@@ -205,8 +210,10 @@ async function genProgramPDF() {
   pdfSignups.forEach(function (signup) {
     let pieceLength =
       signup.pieces.length * 2 * lineSize +
-      signup.students.length * lineSize * 4;
-    if (line + pieceLength > 10) {
+      signup.students.length * lineSize * 4 +
+      countLines(signup.pieces[0].translation) * lineSize;
+    console.log("pieceLength: " + (line + pieceLength));
+    if (Math.round(line + pieceLength) > 10) {
       doc.addPage();
 
       line = 1.0;
@@ -217,7 +224,24 @@ async function genProgramPDF() {
         .setFontSize(10)
         .setFont("helvetica", "italic")
         .text(piece.title, 0.5, line);
-
+      let addLine = 0;
+      if (piece.movement != null && piece.movement != "") {
+        addLine = lineSize;
+        doc
+          .setFontSize(10)
+          .setFont("helvetica", "italic")
+          .text(piece.movement, 1.0, line + lineSize);
+      }
+      if (piece.work != null && piece.work != "") {
+        doc
+          .setFontSize(10)
+          .setFont("helvetica", "italic")
+          .text("from ", 1.0, line + addLine + lineSize);
+        doc
+          .setFontSize(10)
+          .setFont("helvetica", "normal")
+          .text(piece.work, 1.35, line + addLine + lineSize);
+      }
       doc
         .setFontSize(10)
         .setFont("helvetica", "normal")
@@ -255,6 +279,23 @@ async function genProgramPDF() {
         .text(printDots, leftText + 0.6, line);
       line += lineSize;
       line += lineSize;
+      numTranslationLines = 0;
+      translationLine = line + lineSize * 4 * signup.students.length;
+      if (piece.translation != null && piece.translation != "") {
+        doc
+          .setFontSize(10)
+          .setFont("helvetica", "normal")
+          .text("Translation: ", 0.5, translationLine);
+
+        doc
+          .setFontSize(10)
+          .setFont("helvetica", "normal")
+          .text(piece.translation, 1.0, translationLine + lineSize, {
+            maxWidth: 6.5,
+          });
+
+        numTranslationLines = 1 + countLines(piece.translation);
+      }
     });
 
     signup.students.forEach(function (student) {
@@ -300,6 +341,7 @@ async function genProgramPDF() {
       }
       line += lineSize;
     });
+    line = translationLine + numTranslationLines * lineSize;
   });
 
   //  saving file
@@ -316,6 +358,19 @@ async function unreadyEvent(event) {
     .catch((err) => {
       console.log(err);
     });
+}
+
+function countLines(text) {
+  if (text == null) return 0;
+
+  let cr = text.split(/\r\n|\r|\n/).length + 1;
+  console.log("cr: " + cr);
+  let lines = text.length / 90 + 1;
+  console.log("lines: " + lines);
+  if (cr > lines) {
+    lines = cr;
+  }
+  return lines;
 }
 </script>
 

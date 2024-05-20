@@ -182,21 +182,23 @@ function similarPieceCheck(piece) {
           >
             Movement (or section)
           </v-card-subtitle>
-          <v-text-field
+          <v-textarea
             v-model="editedPieceData.movement"
+            rows="2"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-text-field>
+          ></v-textarea>
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
             Work (Musical, Opera, etc.)
           </v-card-subtitle>
-          <v-text-field
+          <v-textarea
             v-model="editedPieceData.work"
+            rows="2"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-          ></v-text-field>
+          ></v-textarea>
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
@@ -205,7 +207,6 @@ function similarPieceCheck(piece) {
           <v-textarea
             placeholder="lyric translated poetically"
             rows="3"
-            no-resize
             v-model="editedPieceData.poeticTranslation"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -217,7 +218,6 @@ function similarPieceCheck(piece) {
           </v-card-subtitle>
           <v-textarea
             placeholder="lyrics translated literally"
-            no-resize
             rows="3"
             v-model="editedPieceData.literalTranslation"
             variant="plain"
