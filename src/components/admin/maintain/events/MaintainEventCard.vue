@@ -89,7 +89,7 @@ async function genProgramPDF() {
   let pdfSignups = [];
 
   studentSignupData.value.eventSignups.forEach(function (eventSignup) {
-    if (eventSignup.pass) {
+    if (!props.eventData.eventType.allowGrade || eventSignup.pass) {
       let signup = {};
       signup.startTime = get12HourTimeStringFromString(eventSignup.startTime);
       signup.endTime = get12HourTimeStringFromString(eventSignup.endTime);
