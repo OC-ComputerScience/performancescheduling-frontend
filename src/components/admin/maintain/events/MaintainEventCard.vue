@@ -89,7 +89,8 @@ async function genProgramPDF() {
   let pdfSignups = [];
 
   studentSignupData.value.eventSignups.forEach(function (eventSignup) {
-    if (eventSignup.pass) {
+    // if (eventSignup.pass ) {
+    if (true) {
       let signup = {};
       signup.startTime = get12HourTimeStringFromString(eventSignup.startTime);
       signup.endTime = get12HourTimeStringFromString(eventSignup.endTime);
@@ -210,16 +211,20 @@ async function genProgramPDF() {
   pdfSignups.forEach(function (signup) {
     let pieceLength =
       signup.pieces.length * 2 * lineSize +
-      signup.students.length * lineSize * 4 +
-      countLines(signup.pieces[0].translation) * lineSize;
-    console.log("pieceLength: " + (line + pieceLength));
+      signup.students.length * lineSize * 4;
+    signup.pieces.forEach((piece) => {
+      pieceLength += countLines(piece.translation) * lineSize;
+    });
+
     if (Math.round(line + pieceLength) > 10) {
       doc.addPage();
 
       line = 1.0;
       page++;
     }
+    let pieceNumber = 0;
     signup.pieces.forEach(function (piece) {
+      pieceNumber++;
       doc
         .setFontSize(10)
         .setFont("helvetica", "italic")
@@ -280,7 +285,9 @@ async function genProgramPDF() {
       line += lineSize;
       line += lineSize;
       numTranslationLines = 0;
-      translationLine = line + lineSize * 4 * signup.students.length;
+      if (pieceNumber == signup.pieces.length)
+        translationLine = line + lineSize * 4 * signup.students.length;
+      else translationLine = line;
       if (piece.translation != null && piece.translation != "") {
         doc
           .setFontSize(10)
@@ -295,6 +302,8 @@ async function genProgramPDF() {
           });
 
         numTranslationLines = 1 + countLines(piece.translation);
+        if (pieceNumber < signup.pieces.length)
+          line += numTranslationLines * lineSize;
       }
     });
 
@@ -362,11 +371,8 @@ async function unreadyEvent(event) {
 
 function countLines(text) {
   if (text == null) return 0;
-
   let cr = text.split(/\r\n|\r|\n/).length + 1;
-  console.log("cr: " + cr);
   let lines = text.length / 90 + 1;
-  console.log("lines: " + lines);
   if (cr > lines) {
     lines = cr;
   }
