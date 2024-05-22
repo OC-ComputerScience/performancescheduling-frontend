@@ -966,17 +966,17 @@ onMounted(async () => {
               <div class="font-weight-bold text-h6 text-maroon">
                 Timeslots Available
               </div>
-              <v-card color="lightMaroon" elevation="0" class="ml-2 mb-0 py-0">
+              <v-card color="lightMaroon" elevation="0" class="ml-2 mb-0">
                 <v-row>
                   <v-card-text
-                    class="mt-5 py-0 mr-1 pr-0 font-weight-semi-bold text-maroon"
+                    class="mt-6 mr-1 ml-1 py-0 pr-0 font-weight-semi-bold text-maroon"
                   >
                     {{ timeslotLength }} Min Timeslot Length
                   </v-card-text>
                   <v-checkbox
                     v-model="doubleTime"
                     label="Double"
-                    class="ml-0 my-0 py-0 mr-5 text-maroon font-weight-semi-bold text-body-2"
+                    class="ml-1 mt-1 my-0 mr-5 font-weight-semi-bold text-darkBlue text-body-2"
                   ></v-checkbox>
                 </v-row>
               </v-card>
