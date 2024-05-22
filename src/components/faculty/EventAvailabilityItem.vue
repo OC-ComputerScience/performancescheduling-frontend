@@ -9,6 +9,7 @@ import { storeToRefs } from "pinia";
 import ViewSignupsDialog from "../admin/maintain/events/ViewSignupsDialog.vue";
 import EventDataService from "../../services/EventDataService";
 import AvailabilityDataService from "../../services/AvailabilityDataService";
+import EventReport from "../../reports/eventReport.js";
 
 const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
@@ -62,7 +63,16 @@ async function getDialogData() {
     });
   viewSignupsDialog.value = true;
 }
-
+async function generateEventReport() {
+  await EventDataService.getById(props.eventData.id)
+    .then((response) => {
+      studentSignupData.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  EventReport.generateEventReport(props.eventData, studentSignupData.value);
+}
 onMounted(async () => {});
 </script>
 
@@ -159,6 +169,14 @@ onMounted(async () => {});
         @click="openCritique(eventData.id)"
       >
         Critique
+      </v-btn>
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
+        @click="generateEventReport()"
+      >
+        Event report
       </v-btn>
       <v-btn
         flat
