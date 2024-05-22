@@ -52,6 +52,19 @@ async function enablePiece(piece) {
           <v-card-subtitle class="font-weight-bold text-h7 text-darkBlue">
             {{ pieceData.title }}
           </v-card-subtitle>
+          <v-card-text
+            v-if="pieceData.movement"
+            class="text-weight-semi-bold font-italic pt-1 pb-0"
+          >
+            {{ pieceData.movement }}
+          </v-card-text>
+          <v-card-text
+            v-if="pieceData.work"
+            class="text-weight-semi-bold font-italic pt-1 pb-0"
+          >
+            from {{ pieceData.work }}
+          </v-card-text>
+
           <v-card-text class="text-weight-semi-bold pt-1 pb-0">
             {{ pieceData.composer.lastName }},
             {{ pieceData.composer.firstName }}
