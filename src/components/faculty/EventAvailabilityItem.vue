@@ -165,7 +165,7 @@ onMounted(async () => {});
         "
         flat
         size="small"
-        class="font-weight-semi-bold mr-2 ml-auto bg-blue text-none"
+        class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
         @click="openCritique(eventData.id)"
       >
         Critique
@@ -173,15 +173,15 @@ onMounted(async () => {});
       <v-btn
         flat
         size="small"
-        class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
+        class="font-weight-bold mt-0 mr-1 ml-0 text-none text-white bg-blue flatChipBorder"
         @click="generateEventReport()"
       >
-        Event report
+        Event Report
       </v-btn>
       <v-btn
         flat
         size="small"
-        class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
+        class="font-weight-bold mt-0 mr-1 ml-0 text-none text-white bg-blue flatChipBorder"
         @click="getDialogData"
       >
         View Signups
@@ -190,19 +190,19 @@ onMounted(async () => {});
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-auto bg-blue text-none"
+        class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
         @click="(addAvailabilityDialog = true), (openAvailabilityDialog = true)"
       >
-        Add availability
+        Add Avail
       </v-btn>
       <!-- Edit Availability Button -->
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold mr-2 bg-blue text-none"
+        class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
         @click="openAvailabilityDialog = true"
       >
-        Edit availability
+        Edit Avail
       </v-btn>
     </v-card-actions>
   </v-card>

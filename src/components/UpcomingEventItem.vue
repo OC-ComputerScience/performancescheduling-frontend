@@ -267,7 +267,7 @@ onBeforeUpdate(async () => {
           v-if="roleId != 1"
           flat
           size="small"
-          class="font-weight-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
+          class="font-weight-bold mt-0 mr-1 ml-0 text-none text-white bg-blue flatChipBorder"
           @click="generateEventReport()"
         >
           Event Report
@@ -276,7 +276,7 @@ onBeforeUpdate(async () => {
           v-if="roleId != 1"
           flat
           size="small"
-          class="font-weight-bold mt-0 mr-2 ml-auto text-none text-white bg-blue flatChipBorder"
+          class="font-weight-bold mt-0 mr-1 ml-0 text-none text-white bg-blue flatChipBorder"
           @click="getDialogData"
         >
           View Signups
@@ -286,7 +286,7 @@ onBeforeUpdate(async () => {
           v-if="roleId == 1"
           flat
           size="small"
-          class="font-weight-semi-bold mr-2 bg-blue text-none"
+          class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
           @click="dialog = true"
         >
           Signup
@@ -295,7 +295,7 @@ onBeforeUpdate(async () => {
           v-if="roleId != 1"
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
           @click="(isEdit = false), (addOrEditAvailabilityDialog = true)"
         >
           Add Avail
@@ -304,7 +304,7 @@ onBeforeUpdate(async () => {
           v-if="roleId == 3"
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
           @click="(isEdit = true), (addOrEditAvailabilityDialog = true)"
         >
           Edit Avail
@@ -313,7 +313,7 @@ onBeforeUpdate(async () => {
           v-if="roleId == 3"
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
           @click="sendNotification"
         >
           Notify
@@ -322,7 +322,7 @@ onBeforeUpdate(async () => {
           v-if="roleId == 3 && eventData.isReady"
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
           @click="sendReminder"
         >
           Remind
@@ -331,7 +331,7 @@ onBeforeUpdate(async () => {
           v-if="roleId == 3"
           flat
           size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
+          class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
           @click="createOrEditDialog = true"
         >
           Edit Event
