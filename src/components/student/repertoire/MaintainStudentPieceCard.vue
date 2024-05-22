@@ -62,6 +62,14 @@ async function enableStudentPiece(studentpiece) {
             {{ studentpieceData.piece.title }}
           </v-card-subtitle>
           <v-card-text class="text-weight-semi-bold pt-1 pb-0">
+            {{ studentpieceData.piece.movement }}
+            {{
+              studentpieceData.piece.work !== null
+                ? "from " + studentpieceData.piece.work
+                : ""
+            }}
+          </v-card-text>
+          <v-card-text class="text-weight-semi-bold pt-1 pb-0">
             {{ studentpieceData.piece.composer.lastName }}{{ comma
             }}{{ studentpieceData.piece.composer.firstName }}
           </v-card-text>
