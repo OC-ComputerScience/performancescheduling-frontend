@@ -89,7 +89,11 @@ async function getPieces() {
       pieces.value = response.data.filter(
         (piece) => piece.status === "Active" || piece.status == "Pending"
       );
-
+      pieces.value.forEach((piece) => {
+        let movementAddl = piece.movement != null ? " " + piece.movement : "";
+        let workAddl = piece.work != null ? " " + piece.work : "";
+        piece.titleAddl = piece.title + movementAddl + workAddl;
+      });
       if (composerId.value != null) filterPieces();
     })
     .catch((err) => {
@@ -100,6 +104,16 @@ async function getPiece(id) {
   await PieceDataService.get(id)
     .then((response) => {
       currentPiece.value = response.data;
+      let movementAddl =
+        currentPiece.value.movement != null
+          ? " (" + currentPiece.value.movement + ")"
+          : "";
+      let workAddl =
+        currentPiece.value.work != null
+          ? " ( from " + currentPiece.value.work + ")"
+          : "";
+      currentPiece.value.titleAddl =
+        currentPiece.value.title + movementAddl + workAddl;
     })
     .catch((err) => {
       console.log(err);
@@ -181,6 +195,14 @@ async function updatePieceSuccess() {
       editedStudentPieceData.value.piece.title = response.data.title;
       editedPoeticTranslation.value = response.data.poeticTranslation;
       editedLiteralTranslation.value = response.data.literalTranslation;
+      let movementAddl =
+        response.data.movement != null
+          ? " (" + response.data.movement + ")"
+          : "";
+      let workAddl =
+        response.data.work != null ? " ( from " + response.data.work + ")" : "";
+      editedStudentPieceData.value.piece.titleAddl =
+        response.data.title + movementAddl + workAddl;
     })
     .catch((err) => {
       console.log(err);
@@ -261,11 +283,22 @@ onBeforeMount(async () => {
     await getPiece(editedStudentPieceData.value.pieceId);
     editedPoeticTranslation.value = currentPiece.value.poeticTranslation;
     editedLiteralTranslation.value = currentPiece.value.literalTranslation;
+
     editedStudentPieceData.value.piece.composer.fullName = composerName(
       composers.value.find((composer) => {
         return composer.id === currentPiece.value.composerId;
       })
     );
+    let movementAddl =
+      editedStudentPieceData.value.piece.movement != null
+        ? " (" + editedStudentPieceData.value.piece.movement + ")"
+        : "";
+    let workAddl =
+      editedStudentPieceData.value.piece.work != null
+        ? " ( from " + editedStudentPieceData.value.piece.work + ")"
+        : "";
+    editedStudentPieceData.value.piece.titleAddl =
+      editedStudentPieceData.value.piece.title + movementAddl + workAddl;
   }
   if (!props.isEdit) {
     if (editedStudentPieceData.value.semesterId != null) addForSemester = true;
@@ -373,7 +406,7 @@ onBeforeMount(async () => {
           </v-card-subtitle>
           <v-text-field
             v-if="props.isEdit"
-            v-model="editedStudentPieceData.piece.title"
+            v-model="editedStudentPieceData.piece.titleAddl"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -388,7 +421,7 @@ onBeforeMount(async () => {
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
             v-model="editedStudentPieceData.pieceId"
             :items="filteredPieces"
-            item-title="title"
+            item-title="titleAddl"
             item-value="id"
             @update:modelValue="setPiece(editedStudentPieceData.pieceId)"
             :rules="[checkDuplicateStudentPiece()]"
