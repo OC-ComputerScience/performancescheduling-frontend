@@ -148,6 +148,9 @@ async function addUser() {
               studentClassification: editedStudentClassification.value,
               studentSemesters: editedStudentSemesters.value,
               title: editedFacultyTitle.value,
+              textStatus: editedUserData.value.textStatus,
+              emailStatus: editedUserData.value.emailStatus,
+              adminEmail: editedUserData.value.adminEmail,
             }).catch((err) => {
               console.log(err);
             });
@@ -598,7 +601,7 @@ onMounted(async () => {
             </v-row>
 
             <v-row class="mt-0">
-              <v-col cols="8" class="d-flex pa-0 mt-0">
+              <v-col cols="12" class="d-flex pa-0 mt-0">
                 <v-checkbox
                   v-model="editedUserData.textStatus"
                   label="Text Opt In"
@@ -608,6 +611,12 @@ onMounted(async () => {
                 <v-checkbox
                   v-model="editedUserData.emailStatus"
                   label="Email Opt In"
+                  class="font-weight-semi-bold text-darkBlue mr-5"
+                >
+                </v-checkbox>
+                <v-checkbox
+                  v-model="editedUserData.adminEmail"
+                  label="Admin Email Opt In"
                   class="font-weight-semi-bold text-darkBlue mr-5"
                 >
                 </v-checkbox>

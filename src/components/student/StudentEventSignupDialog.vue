@@ -277,15 +277,14 @@ function withinAvailability(timeslotStart, timeslotEnd) {
 function getTimeslotLength() {
   if (props.eventData.eventType.slotType === "Fixed") {
     timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
-  } 
-  else {
-      if (isMusicMajor.value) {
-        timeslotLength.value = 10;
-      } else {
-        timeslotLength.value =
-          selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
-      }
+  } else {
+    if (isMusicMajor.value) {
+      timeslotLength.value = 10;
+    } else {
+      timeslotLength.value =
+        selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
     }
+  }
 }
 
 function hasExistingSignup(timeslotStart, timeslotEnd) {
@@ -512,7 +511,7 @@ async function requestAdditionalTimeslots(userRole) {
     })})`,
     data: `eventId=${props.eventData.id}`,
     isCompleted: false,
-    userRoleId: userRole.id,
+    userRoleId: userRole != null ? userRole.id : null,
     notificationId: 1,
     from: loginStore.user.email,
   };
@@ -1288,6 +1287,7 @@ onMounted(async () => {
               timeSlotRequest && selectedAccompanist != null
                 ? (requestAdditionalTimeslots(selectedInstructor),
                   requestAdditionalTimeslots(selectedAccompanist),
+                  requestAdditionalTimeslots(null),
                   (timeSlotRequest = false))
                 : instructorAvailRequest
                 ? (requestAvailabilityFromUserRole(selectedInstructor),
@@ -1295,8 +1295,7 @@ onMounted(async () => {
                 : accompAvailRequest
                 ? (requestAvailabilityFromUserRole(selectedAccompanist),
                   (accompAvailRequest = false))
-                : (requestAdditionalTimeslots(selectedInstructor),
-                  (timeSlotRequest = false))
+                : (requestAdditionalTimeslots(null), (timeSlotRequest = false))
           "
         >
           Send
