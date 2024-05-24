@@ -493,9 +493,7 @@ onBeforeUpdate(async () => {
     <v-dialog v-model="viewSignupsDialog" persistent max-width="800px">
       <ViewSignupsDialog
         :event-data="eventData"
-        :avail-data="
-          !isAdmin ? eventAvailabilityData : { startTime: null, endTime: null }
-        "
+        :avail-data="eventAvailabilityData"
         :student-signup-data="studentSignupData"
         @closeSignupsDialog="closeSignupsDialog"
       ></ViewSignupsDialog>
