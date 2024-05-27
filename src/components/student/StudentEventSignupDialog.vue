@@ -65,7 +65,7 @@ const snackbar = ref({ show: false, color: "", message: "" });
 
 const onlySemesterPieces = ref(true);
 const disableOnlySemesterPiece = ref(false);
-
+const doubleTime = ref(false);
 async function getData() {
   // due to the watch statements, accompanists must be gotten before student instruments
   await UserRoleDataService.getRolesForRoleId(4, "lastName,firstName")
@@ -228,16 +228,13 @@ function generateTimeslots() {
   timeslots.value = generateTimeSlots(
     props.eventData.startTime,
     props.eventData.endTime,
-    props.eventData.eventType.defaultSlotDuration
+    timeslotLength.value
   );
 
   timeslots.value.forEach((timeslot) => {
     timeslot.existingSignup = hasExistingSignup(
       timeslot.time,
-      addMinsToTime(
-        props.eventData.eventType.defaultSlotDuration,
-        timeslot.time
-      )
+      addMinsToTime(timeslotLength.value, timeslot.time)
     );
   });
   disableTimeslots();
@@ -278,17 +275,15 @@ function getTimeslotLength() {
   if (props.eventData.eventType.slotType === "Fixed") {
     timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
   } else {
-    if (selectedStudentInstrument.value.instrument.type === "Vocal") {
-      if (isMusicMajor.value) {
-        timeslotLength.value =
-          selectedStudentInstrument.value.privateHours == 1 ? 10 : 15;
-      } else {
-        timeslotLength.value =
-          selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
-      }
+    if (isMusicMajor.value) {
+      timeslotLength.value = 10;
     } else {
-      timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
+      timeslotLength.value =
+        selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
     }
+  }
+  if (doubleTime.value) {
+    timeslotLength.value *= 2;
   }
 }
 
@@ -767,6 +762,12 @@ watch(onlySemesterPieces, function () {
   filterStudentPieces();
 });
 
+watch(doubleTime, function () {
+  getTimeslotLength();
+  generateTimeslots();
+  disableTimeslots();
+});
+
 onMounted(async () => {
   await getData();
   eventTypeLabel.value =
@@ -868,28 +869,28 @@ onMounted(async () => {
               Musical Selection
             </v-row>
             <v-row>
-              <v-col cols="6">
-                <v-btn
-                  class="font-weight-bold text-none"
-                  color="blue"
-                  @click="addStudentPieceDialog = true"
-                >
-                  Add to Repertoire
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-row mt-7>
               <v-row>
-                <v-checkbox
-                  :disabled="disableOnlySemesterPiece"
-                  v-model="onlySemesterPieces"
-                  label="Only show pieces
-              from current semester"
-                  class="text-body-1 font-weight-bold text-darkBlue"
-                ></v-checkbox>
+                <v-col cols="6">
+                  <v-btn
+                    class="font-weight-bold text-none"
+                    color="blue"
+                    @click="addStudentPieceDialog = true"
+                  >
+                    Add to Repertoire
+                  </v-btn>
+                </v-col>
               </v-row>
             </v-row>
-            <v-row class="mt-5">
+            <v-row class="my-0mt-5">
+              <v-checkbox
+                :disabled="disableOnlySemesterPiece"
+                v-model="onlySemesterPieces"
+                label="Only show pieces
+              from current semester"
+                class="my-0 text-body-1 font-weight-bold text-darkBlue"
+              ></v-checkbox>
+            </v-row>
+            <v-row class="mt-0">
               <v-col cols="11" class="pl-0">
                 <v-list
                   style="height: 230px"
@@ -965,12 +966,19 @@ onMounted(async () => {
               <div class="font-weight-bold text-h6 text-maroon">
                 Timeslots Available
               </div>
-              <v-card color="lightMaroon" elevation="0" class="ml-2">
-                <v-card-text
-                  class="mt-1 py-0 font-weight-semi-bold text-maroon"
-                >
-                  {{ timeslotLength }} Min Timeslot Length
-                </v-card-text>
+              <v-card color="lightMaroon" elevation="0" class="ml-2 mb-0">
+                <v-row>
+                  <v-card-text
+                    class="mt-6 mr-1 ml-1 py-0 pr-0 font-weight-semi-bold text-maroon"
+                  >
+                    {{ timeslotLength }} Min Timeslot Length
+                  </v-card-text>
+                  <v-checkbox
+                    v-model="doubleTime"
+                    label="Double"
+                    class="ml-1 mt-1 my-0 mr-5 font-weight-semi-bold text-darkBlue text-body-2"
+                  ></v-checkbox>
+                </v-row>
               </v-card>
             </v-row>
             <v-row>

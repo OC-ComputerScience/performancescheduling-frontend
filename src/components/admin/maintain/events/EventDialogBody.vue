@@ -187,8 +187,17 @@ function timeCheck(time) {
 
 function checkEndTimeAfterStart(startTime, endTime){
   if(startTime?.length > 4 && endTime?.length > 4){
-    const start = new Date("2000-01-01T" + get24HourTimeString(startTime));
-    const end = new Date("2000-01-01T" + get24HourTimeString(endTime));
+    let startTime24Hour = get24HourTimeString(startTime);
+    let endTime24Hour = get24HourTimeString(endTime);
+
+    if(startTime24Hour.split(':')[0].length < 2){
+      startTime24Hour = '0'+startTime24Hour;
+    }
+    if(endTime24Hour.split(':')[0].length < 2){
+      endTime24Hour = '0'+endTime24Hour;
+    }
+    const start = new Date("2000-01-01T" + startTime24Hour);
+    const end = new Date("2000-01-01T" + endTime24Hour);
 
     if(start.getTime() < end.getTime()){
       return true;
