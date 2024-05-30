@@ -20,6 +20,8 @@ const props = defineProps({
 const onlySemesterPieces = ref(true);
 const disableOnlySemesterPiece = ref(false);
 
+const disableEditing = ref(false);
+
 const studentInstrumentSignup = ref(
   Object.assign({}, props.studentInstrumentSignupData)
 );
@@ -29,8 +31,8 @@ const accompanist =
   studentInstrumentSignup.value.accompanistRoleSignup === null
     ? "None"
     : studentInstrumentSignup.value.accompanistRoleSignup.user.firstName +
-      " " +
-      studentInstrumentSignup.value.accompanistRoleSignup.user.lastName;
+    " " +
+    studentInstrumentSignup.value.accompanistRoleSignup.user.lastName;
 const instructor =
   studentInstrumentSignup.value.instructorRoleSignup.user.firstName +
   " " +
@@ -71,7 +73,7 @@ function filterStudentPieces() {
     (studentPiece) =>
       (studentPiece.semesterId === props.eventData.semesterId &&
         studentPiece.studentInstrumentId ===
-          studentInstrumentSignup.value.studentInstrumentId) ||
+        studentInstrumentSignup.value.studentInstrumentId) ||
       (!onlySemesterPieces.value &
         (studentPiece.studentInstrument.instrumentId ===
           studentInstrumentSignup.value.studentInstrument.instrument.id) &&
@@ -207,6 +209,14 @@ async function deleteSignup() {
   }
 }
 
+function checkHasCritique() {
+  props.eventSignUpData.eventSignupPieces.forEach((piece) => {
+    if (piece.critiques.length > 0) {
+      return disableEditing.value = true;
+    }
+  })
+}
+
 async function saveSignup() {
   if (selectedStudentPieces.value.length == 0) {
     errorMessage.value =
@@ -268,6 +278,7 @@ watch(onlySemesterPieces, function () {
 });
 
 onMounted(async () => {
+  checkHasCritique()
   await getStudentPieces();
   getSelectedPices();
   filterStudentPieces();
@@ -297,10 +308,10 @@ onMounted(async () => {
                 <div class="text-maroon mx-2 text-h7">
                   <v-icon icon="mdi-clock"></v-icon>
                   {{
-                    get12HourTimeStringFromString(eventData.startTime) +
-                    " - " +
-                    get12HourTimeStringFromString(eventData.endTime)
-                  }}
+              get12HourTimeStringFromString(eventData.startTime) +
+              " - " +
+              get12HourTimeStringFromString(eventData.endTime)
+            }}
                 </div>
               </v-row>
             </v-card-text>
@@ -308,35 +319,18 @@ onMounted(async () => {
         </v-row>
         <v-row class="mt-6">
           <v-col>
-            <v-text-field
-              label="Instrument"
-              v-model="
-                studentInstrumentSignup.studentInstrument.instrument.name
-              "
-              variant="plain"
-              read-only
-              class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-            ></v-text-field>
+            <v-text-field label="Instrument" v-model="studentInstrumentSignup.studentInstrument.instrument.name
+              " variant="plain" read-only
+              class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field
-              label="Instructor"
-              v-model="instructor"
-              text-label="Instructor"
-              variant="plain"
+            <v-text-field label="Instructor" v-model="instructor" text-label="Instructor" variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-              readonly
-            ></v-text-field
-          ></v-col>
+              readonly></v-text-field></v-col>
           <v-col>
-            <v-text-field
-              label="Accompanist"
-              v-model="accompanist"
-              text-label="Accompanist"
-              variant="plain"
+            <v-text-field label="Accompanist" v-model="accompanist" text-label="Accompanist" variant="plain"
               class="bg-lightBlue text-darkBlue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
-              readonly
-            ></v-text-field>
+              readonly></v-text-field>
           </v-col>
         </v-row>
         <v-row class="ml-1">
@@ -346,83 +340,46 @@ onMounted(async () => {
             </v-row>
             <v-row>
               <v-col cols="6">
-                <v-btn
-                  class="font-weight-bold text-none"
-                  color="blue"
-                  @click="addStudentPieceDialog = true"
-                >
+                <v-btn class="font-weight-bold text-none" color="blue" @click="addStudentPieceDialog = true">
                   Add To Repertoire
                 </v-btn>
               </v-col>
             </v-row>
             <v-row>
-              <v-checkbox
-                :disabled="disableOnlySemesterPiece"
-                v-model="onlySemesterPieces"
-                label="Only show pieces
-              from current semester"
-                class="text-body-1 font-weight-bold text-darkBlue"
-              ></v-checkbox>
+              <v-checkbox :disabled="disableOnlySemesterPiece || disableEditing" v-model="onlySemesterPieces" label="Only show pieces
+              from current semester" class="text-body-1 font-weight-bold text-darkBlue"></v-checkbox>
             </v-row>
             <v-row>
               <v-col cols="11" class="pl-0">
-                <v-list
-                  style="height: 230px"
-                  class="overflow-y-auto bg-lightBlue"
-                >
-                  <v-list-item
-                    v-for="(studentPiece, index) in filteredStudentPieces"
-                    :key="index"
-                  >
-                    <v-card
-                      v-bind:class="{
-                        'bg-blue': isStudentPieceSelected(studentPiece),
-                        'bg-white': !isStudentPieceSelected(studentPiece),
-                      }"
-                    >
+                <v-list style="height: 230px" class="overflow-y-auto bg-lightBlue">
+                  <v-list-item v-for="(studentPiece, index) in filteredStudentPieces" :key="index">
+                    <v-card v-bind:class="{
+              'bg-blue': isStudentPieceSelected(studentPiece),
+              'bg-white': !isStudentPieceSelected(studentPiece),
+            }">
                       <v-card-text @click="selectStudentPiece(studentPiece)">
-                        <v-row
-                          no-gutters
-                          class="text-blue font-weight-semi-bold"
-                          v-bind:class="{
-                            'text-white': isStudentPieceSelected(studentPiece),
-                          }"
-                        >
+                        <v-row no-gutters class="text-blue font-weight-semi-bold" v-bind:class="{
+              'text-white': isStudentPieceSelected(studentPiece),
+            }">
                           {{ studentPiece.piece.title }}
                           {{ studentPiece.isFirst ? "(First Piece)" : "" }}
                         </v-row>
-                        <v-row
-                          no-gutters
-                          class="text-black"
-                          v-bind:class="{
-                            'text-white': isStudentPieceSelected(studentPiece),
-                          }"
-                        >
+                        <v-row no-gutters class="text-black" v-bind:class="{
+              'text-white': isStudentPieceSelected(studentPiece),
+            }">
                           {{ studentPiece.piece.composer.fullName }}
                         </v-row>
                       </v-card-text>
-                      <v-card-text
-                        class="mt-0 pt-0 pb-2"
-                        v-if="
-                          isStudentPieceSelected(studentPiece) &&
-                          eventData.eventType.firstPiece
-                        "
-                      >
+                      <v-card-text class="mt-0 pt-0 pb-2" v-if="isStudentPieceSelected(studentPiece) &&
+              eventData.eventType.firstPiece
+              ">
                         <v-spacer></v-spacer>
-                        <v-btn
-                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
-                          size="small"
-                          v-if="studentPiece.isFirst"
-                          @click="unSetFirstPiece(studentPiece)"
-                        >
+                        <v-btn :disabled="disableEditing" class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2" size="small"
+                          v-if="studentPiece.isFirst" @click="unSetFirstPiece(studentPiece)">
                           UnSet First Piece
                         </v-btn>
-                        <v-btn
-                          size="small"
-                          class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
-                          v-if="!studentPiece.isFirst"
-                          @click="setFirstPiece(studentPiece)"
-                        >
+                        <v-btn :disabled="disableEditing" size="small" class="ml-auto text-blue bg-white font-weight-semi-bold text-none mr-2"
+                          v-if="!studentPiece.isFirst" @click="setFirstPiece(studentPiece)">
                           Set as First Piece
                         </v-btn>
                       </v-card-text>
@@ -443,22 +400,19 @@ onMounted(async () => {
                 <v-card-text class="text-blue py-2 font-weight-bold text-h6">
                   <div>
                     {{
-                      get12HourTimeStringFromString(eventSignUpData.startTime) +
-                      " - " +
-                      get12HourTimeStringFromString(eventSignUpData.endTime)
-                    }}
+              get12HourTimeStringFromString(eventSignUpData.startTime) +
+              " - " +
+              get12HourTimeStringFromString(eventSignUpData.endTime)
+            }}
                   </div>
                 </v-card-text>
               </v-card>
             </v-row>
 
             <v-row mt-7>
-              <v-checkbox
-                read-only="disableOnlySemesterPiece"
-                v-model="groupSignup"
+              <v-checkbox read-only="disableOnlySemesterPiece" :disabled="disableEditing" v-model="groupSignup"
                 label="Allow other students to signup with you"
-                class="text-body-1 font-weight-bold text-darkBlue"
-              ></v-checkbox>
+                class="text-body-1 font-weight-bold text-darkBlue"></v-checkbox>
             </v-row>
           </v-col>
         </v-row>
@@ -467,29 +421,17 @@ onMounted(async () => {
           <div class="font-weight-bold mr-2 mt-4 text-red text-h6">
             {{ errorMessage }}
           </div>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-maroon text-none"
-            @click="confimationDialog = true"
-          >
+          <v-btn flat size="small" v-if="!disableEditing" class="font-weight-semi-bold mr-2 mt-4 bg-maroon text-none"
+            @click="confimationDialog = true">
             Delete
           </v-btn>
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-teal text-none text-white"
-            @click="saveSignup"
-          >
+          <v-btn flat size="small" v-if="!disableEditing" class="font-weight-semi-bold mr-2 mt-4 bg-teal text-none text-white"
+            @click="saveSignup">
             Save
           </v-btn>
 
-          <v-btn
-            flat
-            size="small"
-            class="font-weight-semi-bold mr-2 mt-4 bg-red text-none"
-            @click="emits('closeDialogEvent')"
-          >
+          <v-btn flat size="small" class="font-weight-semi-bold mr-2 mt-4 bg-red text-none"
+            @click="emits('closeDialogEvent')">
             Cancel
           </v-btn>
         </v-row>
@@ -501,61 +443,35 @@ onMounted(async () => {
       <v-card-title class="text-h6 font-weight-bold text-maroon">
         Confirm Signup Deletion
       </v-card-title>
-      <v-card-text
-        class="text-h8 font-weight-semi-bold text-blue"
-        style="white-space: normal; word-wrap: break-word"
-      >
+      <v-card-text class="text-h8 font-weight-semi-bold text-blue" style="white-space: normal; word-wrap: break-word">
         Are you sure you want to delete this signup? This action cannot be
         undone.
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn
-          @click="deleteSignup()"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-        >
+        <v-btn @click="deleteSignup()" flat size="small" class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none">
           Confirm
         </v-btn>
-        <v-btn
-          @click="confimationDialog = false"
-          flat
-          size="small"
-          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none"
-          >Cancel</v-btn
-        >
+        <v-btn @click="confimationDialog = false" flat size="small"
+          class="font-weight-semi-bold ml-auto mr-2 bg-red text-none">Cancel</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
   <v-dialog v-model="addStudentPieceDialog" persistent max-width="600px">
-    <StudentPieceDialogBody
-      :is-edit="false"
-      :studentpiece-data="{
-        id: null,
-        pieceId: null,
-        semesterId: eventData.semesterId,
-        studentInstrumentId: studentInstrumentSignup.studentInstrument.id,
-        status: 'Active',
-      }"
-      :student-pieces="studentPieces"
-      @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
+    <StudentPieceDialogBody :is-edit="false" :studentpiece-data="{
+              id: null,
+              pieceId: null,
+              semesterId: eventData.semesterId,
+              studentInstrumentId: studentInstrumentSignup.studentInstrument.id,
+              status: 'Active',
+            }" :student-pieces="studentPieces" @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="
-        (addStudentPieceDialog = false), getStudentPieces()
-      "
-    ></StudentPieceDialogBody>
+              (addStudentPieceDialog = false), getStudentPieces()
+              "></StudentPieceDialogBody>
   </v-dialog>
-  <v-snackbar
-    v-model="snackbar.show"
-    :color="snackbar.color"
-    :timeout="3000"
-    right
-  >
-    <v-icon
-      left
-      :icon="snackbar.color === 'success' ? 'mdi-check' : 'mdi-alert'"
-    >
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000" right>
+    <v-icon left :icon="snackbar.color === 'success' ? 'mdi-check' : 'mdi-alert'">
     </v-icon>
     {{ snackbar.message }}
   </v-snackbar>
