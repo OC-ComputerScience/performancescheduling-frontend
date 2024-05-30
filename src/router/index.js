@@ -117,6 +117,7 @@ const router = createRouter({
       name: "adminInstruments",
       alias: "/adminInstruments",
     },
+
     {
       path: "/base",
       component: BaseView,

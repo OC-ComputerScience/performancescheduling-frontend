@@ -56,6 +56,12 @@ const menus = [
     roles: [3],
   },
   {
+    link: "facultyPerformances",
+    text: "Performances",
+    roles: [3],
+  },
+
+  {
     link: "accompanistHome",
     text: "Home",
     roles: [4],
@@ -425,7 +431,12 @@ onMounted(() => {
                 </template>
                 User Settings
               </v-btn>
-              <div v-if="loginStore.currentRole.roleId == 1 || loginStore.currentRole.roleId == 2">
+              <div
+                v-if="
+                  loginStore.currentRole.roleId == 1 ||
+                  loginStore.currentRole.roleId == 2
+                "
+              >
                 <v-btn
                   prepend-icon="mdi-account-question"
                   color="lightYellow"
@@ -442,7 +453,7 @@ onMounted(() => {
                 </v-btn>
               </div>
               <!-- <div v-if="loginStore.currentRole.roleId != 2"> -->
-                <br />
+              <br />
               <!-- </div> -->
               <v-btn
                 prepend-icon="mdi-logout"
