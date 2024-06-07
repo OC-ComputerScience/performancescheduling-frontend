@@ -31,6 +31,7 @@ const { currentRole } = storeToRefs(loginStore);
 const form = ref(null);
 
 const addInstrumentDialog = ref(false);
+const allowFullEdit = ref(false);
 
 function addInstrument() {
   addInstrumentDialog.value = true;
@@ -312,6 +313,18 @@ async function updateFacultyTitle() {
     });
   }
 }
+// If full edit is allowed, update the user's data
+// async function updateFullData() {
+
+//     await UserRoleDataService.update({
+//       id: editedUserRole.id,
+//       firstName: editedUserData.firstName,
+//       lastName: editedUserData.lastName,
+//       title: editedUserData.email,
+//     }).catch((err) => {
+//       console.log(err);
+//     });
+//   }
 
 async function refreshStudentInstruments() {
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
@@ -347,11 +360,16 @@ onMounted(async () => {
     <v-form ref="form" validate-on="input">
       <v-card-title>
         <v-row class="pt-0 mt-0">
-          <v-col
-            cols="auto"
-            class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
-          >
+          <v-col cols="auto" class="auto text-maroon font-weight-bold text-h4">
             {{ props.isEdit ? "Edit" : "Add" }} User
+          </v-col>
+          <v-col>
+            <v-checkbox
+              v-if="props.isEdit"
+              v-model="allowFullEdit"
+              label="Allow Full Edit "
+              class="ml-6 font-weight-semi-bold text-darkBlue"
+            ></v-checkbox>
           </v-col>
         </v-row>
       </v-card-title>
@@ -388,13 +406,13 @@ onMounted(async () => {
         <v-row :class="props.isEdit ? '' : 'mt-2'">
           <v-col>
             <v-card-subtitle
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >
               First Name
             </v-card-subtitle>
             <v-text-field
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               placeholder="John"
               v-model="editedUserData.firstName"
               variant="plain"
@@ -403,13 +421,13 @@ onMounted(async () => {
             ></v-text-field>
 
             <v-card-subtitle
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >
               Last Name
             </v-card-subtitle>
             <v-text-field
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               placeholder="Doe"
               v-model="editedUserData.lastName"
               variant="plain"
@@ -418,13 +436,13 @@ onMounted(async () => {
             ></v-text-field>
 
             <v-card-subtitle
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >
               Email
             </v-card-subtitle>
             <v-text-field
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               placeholder="john.doe@oc.edu"
               v-model="editedUserData.email"
               variant="plain"

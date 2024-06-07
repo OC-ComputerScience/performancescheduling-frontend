@@ -2,10 +2,7 @@
 import { ref, onBeforeMount } from "vue";
 
 import { formatDate } from "../../../../composables/dateFormatter";
-import {
-  get12HourTimeStringFromString,
-  get24HourTimeString,
-} from "../../../../composables/timeFormatter";
+import { get12HourTimeStringFromString } from "../../../../composables/timeFormatter";
 import {
   generateTimeSlots,
   subtractTimes,
@@ -44,25 +41,42 @@ function sortData() {
       student: [],
     });
   });
-
+  console.log("Time Slots: ", timeSlots);
   var beginIndex = 0;
 
   // Finds the beginning index
   props.availData.forEach((element) => {
     for (var i = 0; i < timeSlots.length; i++) {
-      if (element.startTime == timeSlots[i].time) {
+      if (
+        element.startTime == timeSlots[i].time ||
+        (i < timeSlots.length &&
+          element.startTime > timeSlots[i].time &&
+          element.startTime < timeSlots[i + 1].time) ||
+        i == timeSlots.length - 1
+      ) {
         beginIndex = i;
         break;
       }
     }
-
+    console.log("Begin Index: ", beginIndex);
     // Gets the number of 30 minute time slots that this element is available for
     var numberOfAvailabilities =
       subtractTimes(element.startTime, element.endTime) / 30;
 
+    numberOfAvailabilities = Math.round(numberOfAvailabilities + 0.5);
+
     // If the element's role is a faculty member, add their first and last name to the faculty array
     if (element.userRole.role.role == "Faculty") {
+      console.log(
+        "Faculty: ",
+        element.userRole.user.firstName,
+        element.userRole.user.lastName
+      );
       for (let i = 0; i < numberOfAvailabilities; i++) {
+        console.log(
+          "Adding faculty: ",
+          beginIndex + i + " " + timeSlots.length - 1
+        );
         tableData.value[beginIndex + i].faculty.push({
           firstName: element.userRole.user.firstName,
           lastName: element.userRole.user.lastName,
@@ -107,6 +121,7 @@ function sortData() {
 onBeforeMount(() => {
   sortData();
 });
+
 const emits = defineEmits(["closeSignupsDialog"]);
 </script>
 

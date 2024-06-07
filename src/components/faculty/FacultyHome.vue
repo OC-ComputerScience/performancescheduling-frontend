@@ -133,15 +133,20 @@ const filteredEvents = computed(() => {
 });
 
 function getSignups(eventID) {
-  const count = upcomingEvents.value.find((event) => event.id === eventID)
-    .eventSignups.length;
+  let count = 0;
+  if (upcomingEvents.value.find((event) => event.id === eventID) != null) {
+    count = upcomingEvents.value.find((event) => event.id === eventID)
+      .eventSignups.length;
+  }
   return count;
 }
 
 function getEventType(eventID) {
-  const eventType = upcomingEvents.value.find(
-    (event) => event.id === eventID
-  ).eventType;
+  let eventType = {};
+  if (upcomingEvents.value.find((event) => event.id === eventID) != null)
+    eventType = upcomingEvents.value.find(
+      (event) => event.id === eventID
+    ).eventType;
 
   return eventType;
 }
@@ -248,6 +253,7 @@ onMounted(async () => {
                 :key="event.id"
                 :event-data="event"
                 :role-id="currentRole.roleId"
+                :fromEmail="''"
                 :availability-data="groupedAvailabilities[event.id]"
                 @refreshAvailabilitiesEvent="refreshAvailability"
               ></UpcomingEventItem>
