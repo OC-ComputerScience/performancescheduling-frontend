@@ -252,11 +252,23 @@ function checkEndTimeAfterStart(startTime, endTime) {
           </v-card-subtitle>
 
           <v-text-field
-            placeholder="Wednesday Recital Hearing"
+            placeholder="Spring Recital Hearing"
             v-model="editedEventData.name"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[() => !!editedEventData.name || 'This field is required']"
+          ></v-text-field>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Program Name
+          </v-card-subtitle>
+
+          <v-text-field
+            placeholder="Spring Recital"
+            v-model="editedEventData.programName"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
           ></v-text-field>
           <v-row>
             <v-col>
