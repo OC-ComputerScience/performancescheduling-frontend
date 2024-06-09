@@ -13,6 +13,9 @@ class UserRoleDataService {
   create(data) {
     return http.post(this.baseUrl, data);
   }
+  get(roleId) {
+    return http.get(this.baseUrl + roleId);
+  }
 
   getRolesForUser(userId) {
     return http.get(this.baseUrl + "userId/" + userId);
