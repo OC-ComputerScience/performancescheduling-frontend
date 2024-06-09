@@ -468,7 +468,18 @@ onBeforeMount(() => {
         >
         </v-autocomplete>
       </div>
-
+      <v-card-text class="pt-4" v-if="isAdmin && selectedRole == null">
+        <v-card-actions class="d-flex justify-center">
+          <v-spacer></v-spacer>
+          <v-btn
+            flat
+            class="font-weight-semi-bold mt-0 ml-3 text-none text-white bg-red flatChipBorder"
+            @click="emits('closeAvailabilityDialogEvent')"
+          >
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card-text>
       <v-card-text
         class="pt-4"
         v-if="!isAdmin || (isAdmin && selectedRole != null)"
