@@ -415,7 +415,7 @@ onBeforeMount(async () => {
           ></v-text-field>
           <v-autocomplete
             v-if="!props.isEdit"
-            placeholder="Select a Composer then select from the list of pieces"
+            placeholder="Select piece for the Composer above"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
