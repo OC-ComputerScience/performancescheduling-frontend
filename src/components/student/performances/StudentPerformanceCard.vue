@@ -49,10 +49,11 @@ function hasAnyCritiques(piece) {
   }
 }
 function hasCurrentUserCritiqued() {
-  return props.studentInstrumentSignupData.eventSignup.eventSignupPieces.some((signupPiece) =>
-    signupPiece.critiques.some(
-      (critique) => critique.userRoleId == currentRole.value.id
-    )
+  return props.studentInstrumentSignupData.eventSignup.eventSignupPieces.some(
+    (signupPiece) =>
+      signupPiece.critiques.some(
+        (critique) => critique.userRoleId == currentRole.value.id
+      )
   );
 }
 onBeforeMount(() => {
@@ -78,7 +79,7 @@ onBeforeMount(() => {
               <v-card-subtitle class="font-weight-semi-bold text-maroon">
                 {{ eventData.semester.name }}
               </v-card-subtitle>
-              <div v-if="currentRole.roleId == 2">
+              <div v-if="currentRole.roleId == 2 || currentRole.roleId == 3">
                 <v-card-subtitle
                   class="font-weight-semi-bold text-darkblue mt-4 text-h6"
                 >
@@ -338,7 +339,7 @@ onBeforeMount(() => {
               class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none text-white"
               @click="critiqueDialog = true"
             >
-            {{ hasCurrentUserCritiqued() ? "Edit Critique" : "Add Critique" }}
+              {{ hasCurrentUserCritiqued() ? "Edit Critique" : "Add Critique" }}
             </v-btn>
             <v-btn
               v-if="
