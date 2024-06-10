@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useLoginStore } from "../../../stores/LoginStore.js";
 import { get12HourTimeStringFromString } from "../../../composables/timeFormatter";
 import CritiqueDataService from "../../../services/CritiqueDataService.js";
+import UserRoleDataService from "../../../services/UserRoleDataService.js";
 
 const emits = defineEmits(["closeDialogEvent"]);
 
@@ -14,6 +15,7 @@ const studentNames = ref("");
 const selectedStudentPiece = ref({});
 const critique = ref({});
 const errorSnackbar = ref(false);
+const majorName = ref("Several Majors");
 
 function clearCritique() {
   critique.value = {};
@@ -89,6 +91,16 @@ async function saveCritique() {
   }
 
   return true;
+}
+
+async function getMajor(roleId) {
+  await UserRoleDataService.get(roleId)
+    .then((response) => {
+      majorName.value = response.data.major.name;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 function hasCritiqueChanged(existingCritique) {
@@ -172,6 +184,11 @@ onMounted(async () => {
       stuSignup.studentInstrument.privateHours +
       ")"
   );
+  if (students.length == 1) {
+    let studentRoleId =
+      props.signup.studentInstrumentSignups[0].studentInstrument.studentRole.id;
+    await getMajor(studentRoleId);
+  }
 
   if (students.length == 1) {
     studentNames.value = students[0];
@@ -234,6 +251,10 @@ onMounted(async () => {
         <v-row class="mt-4">
           <v-col cols="6">
             <v-row class="font-weight-bold text-black text-h8 ml-1">
+              Major:
+              {{ majorName }}
+            </v-row>
+            <v-row class="font-weight-bold text-black text-h8 ml-1">
               Instructor:
               {{
                 props.signup.studentInstrumentSignups[0].instructorRoleSignup
@@ -244,9 +265,13 @@ onMounted(async () => {
               }}
             </v-row>
 
-            <v-row v-if="props.signup.studentInstrumentSignups[0]
+            <v-row
+              v-if="
+                props.signup.studentInstrumentSignups[0]
                   .accompanistRoleSignup != null
-                " class="font-weight-bold text-black pl-0 ml-0 py-0 mt-5 ml-1 text-h8">
+              "
+              class="font-weight-bold text-black pl-0 ml-0 py-0 mt-5 ml-1 text-h8"
+            >
               Accomp:
               {{
                 props.signup.studentInstrumentSignups[0].accompanistRoleSignup
@@ -261,17 +286,30 @@ onMounted(async () => {
             </v-row>
             <v-row class="mt-3">
               <v-col cols="11" class="ml-1">
-                <v-list style="height: 280px" class="overflow-y-auto bg-lightBlue">
-                  <v-list-item v-for="(studentPiece, index) in eventSignupPieces" :key="index">
-                    <v-card v-bind:class="{
-                      'bg-blue': selectedStudentPiece.id == studentPiece.id,
-                      'bg-white': selectedStudentPiece.id != studentPiece.id,
-                    }" @click="changeSelectedPiece(studentPiece)">
+                <v-list
+                  style="height: 280px"
+                  class="overflow-y-auto bg-lightBlue"
+                >
+                  <v-list-item
+                    v-for="(studentPiece, index) in eventSignupPieces"
+                    :key="index"
+                  >
+                    <v-card
+                      v-bind:class="{
+                        'bg-blue': selectedStudentPiece.id == studentPiece.id,
+                        'bg-white': selectedStudentPiece.id != studentPiece.id,
+                      }"
+                      @click="changeSelectedPiece(studentPiece)"
+                    >
                       <v-card-text>
-                        <v-row no-gutters class="text-blue font-weight-semi-bold" v-bind:class="{
-                          'text-white':
-                            selectedStudentPiece.id == studentPiece.id,
-                        }">
+                        <v-row
+                          no-gutters
+                          class="text-blue font-weight-semi-bold"
+                          v-bind:class="{
+                            'text-white':
+                              selectedStudentPiece.id == studentPiece.id,
+                          }"
+                        >
                           {{ studentPiece.piece.title }}
                           {{ studentPiece.isFirst ? "(First Piece)" : "" }}
                         </v-row>
@@ -289,16 +327,20 @@ onMounted(async () => {
                 Poetic Translation
               </v-row>
               <v-row>
-                <v-textarea class="text-darkBlue bg-lightBlue ml-4 mr-12"
-                  v-model="selectedStudentPiece.piece.poeticTranslation">
+                <v-textarea
+                  class="text-darkBlue bg-lightBlue ml-4 mr-12"
+                  v-model="selectedStudentPiece.piece.poeticTranslation"
+                >
                 </v-textarea>
               </v-row>
               <v-row class="font-weight-bold text-maroon ml-1">
                 Literal Translation
               </v-row>
               <v-row>
-                <v-textarea class="text-darkBlue ml-4 mr-12 bg-lightBlue"
-                  v-model="selectedStudentPiece.piece.literalTranslation">
+                <v-textarea
+                  class="text-darkBlue ml-4 mr-12 bg-lightBlue"
+                  v-model="selectedStudentPiece.piece.literalTranslation"
+                >
                 </v-textarea>
               </v-row>
             </div>
@@ -309,8 +351,11 @@ onMounted(async () => {
                 Critique
               </div>
               <v-spacer></v-spacer>
-              <v-btn flat class="font-weight-semi-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
-                @click="clearCritique()">
+              <v-btn
+                flat
+                class="font-weight-semi-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
+                @click="clearCritique()"
+              >
                 Clear Current Critique
               </v-btn>
             </v-row>
@@ -329,8 +374,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.toneComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.toneComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
 
             <!-- Accuracy -->
             <v-row class="ml-1">
@@ -351,8 +403,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.accuracyComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.accuracyComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Balance -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
@@ -369,8 +428,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.balanceComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.balanceComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Deportment -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
@@ -385,8 +451,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.deportmentComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.deportmentComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Diction -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Diction</p>
@@ -406,8 +479,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.dictionComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.dictionComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Interpretation -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
@@ -424,23 +504,40 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.interpretationComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.interpretationComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Technique -->
             <v-row class="ml-1">
-              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Technique</p>
+              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
+                Technique
+              </p>
               <p class="text-maroon mt-2 mr-1">
-                (attacks, releases, flexibility, range, resonance, placement, support, agility)
+                (attacks, releases, flexibility, range, resonance, placement,
+                support, agility)
               </p>
               <v-radio-group v-model="critique.techniqueGrade" inline>
                 <v-radio label="Excellent" value="Excellent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
-                <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
-                <v-radio label="Bad" value="Bad" color="red"></v-radio>
+                <v-radio label="Fair" value="Fair" color="yellow"> </v-radio>
+                <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.techniqueComment" label="Comment" dense rows="2"></v-text-field>
+            <v-textarea
+              v-model="critique.techniqueComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            ></v-textarea>
             <!-- Overall -->
             <v-row class="ml-1 mb-3">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
@@ -450,25 +547,43 @@ onMounted(async () => {
                 (overall readiness to perform)
               </p>
             </v-row>
-            <v-text-field v-model="critique.overallComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.overallComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
           </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn flat class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
-          @click="saveDialog()">
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
+          @click="saveDialog()"
+        >
           Save
         </v-btn>
-        <v-btn flat class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
-          @click="closeDialog()">
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          @click="closeDialog()"
+        >
           Cancel
         </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
-  <v-snackbar :timeout="2500" color="maroon" rounded="pill" v-model="errorSnackbar">
+  <v-snackbar
+    :timeout="2500"
+    color="maroon"
+    rounded="pill"
+    v-model="errorSnackbar"
+  >
     You must fill the overall comment or clear all fields.
     <template v-slot:actions>
       <v-btn @click="errorSnackbar = false">
