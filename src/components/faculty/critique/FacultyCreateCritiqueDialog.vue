@@ -4,6 +4,7 @@ import { useLoginStore } from "../../../stores/LoginStore.js";
 import { get12HourTimeStringFromString } from "../../../composables/timeFormatter";
 import CritiqueDataService from "../../../services/CritiqueDataService.js";
 import UserRoleDataService from "../../../services/UserRoleDataService.js";
+import StudentInstrumentSignupDataService from "../../../services/StudentInstrumentSignupDataService.js";
 
 const emits = defineEmits(["closeDialogEvent"]);
 
@@ -16,6 +17,40 @@ const selectedStudentPiece = ref({});
 const critique = ref({});
 const errorSnackbar = ref(false);
 const majorName = ref("Several Majors");
+const studentSignups = ref([]);
+const instructorName = ref("");
+const accompanistName = ref("");
+
+async function getSISData() {
+  for (let i = 0; i < props.signup.studentInstrumentSignups.length; i++) {
+    studentSignups.value.push(props.signup.studentInstrumentSignups[i]);
+
+    await StudentInstrumentSignupDataService.getAllDataById(
+      props.signup.studentInstrumentSignups[i].id
+    )
+      .then((response) => {
+        let sisData = response.data;
+        studentSignups.value[i].accompanistRoleSignup =
+          sisData.accompanistRoleSignup;
+        studentSignups.value[i].instructorRoleSignup =
+          sisData.instructorRoleSignup;
+        studentSignups.value[i].studentInstrument = sisData.studentInstrument;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  instructorName.value =
+    studentSignups.value[0].instructorRoleSignup.user.lastName +
+    ", " +
+    studentSignups.value[0].instructorRoleSignup.user.firstName;
+  accompanistName.value =
+    studentSignups.value[0].accompanistRoleSignup == null
+      ? null
+      : studentSignups.value[0].accompanistRoleSignup.user.lastName +
+        ", " +
+        studentSignups.value[0].accompanistRoleSignup.user.firstName;
+}
 
 function clearCritique() {
   critique.value = {};
@@ -155,6 +190,8 @@ function getLevel(studentInstrument) {
   }
 }
 onMounted(async () => {
+  console.log("onMounted FacultyCreateCritiqueDialog.vue");
+  await getSISData();
   critiquesByFaculty.value = props.signup.eventSignupPieces
     .filter((signupPiece) =>
       signupPiece.critiques.some(
@@ -171,7 +208,7 @@ onMounted(async () => {
 
   fillCritique();
 
-  let students = props.signup.studentInstrumentSignups.map(
+  let students = studentSignups.value.map(
     (stuSignup) =>
       stuSignup.studentInstrument.studentRole.user.lastName +
       ", " +
@@ -186,7 +223,7 @@ onMounted(async () => {
   );
   if (students.length == 1) {
     let studentRoleId =
-      props.signup.studentInstrumentSignups[0].studentInstrument.studentRole.id;
+      studentSignups.value[0].studentInstrument.studentRole.id;
     await getMajor(studentRoleId);
   }
 
@@ -256,30 +293,15 @@ onMounted(async () => {
             </v-row>
             <v-row class="font-weight-bold text-black text-h8 ml-1">
               Instructor:
-              {{
-                props.signup.studentInstrumentSignups[0].instructorRoleSignup
-                  .user.lastName +
-                ", " +
-                props.signup.studentInstrumentSignups[0].instructorRoleSignup
-                  .user.firstName
-              }}
+              {{ instructorName }}
             </v-row>
 
             <v-row
-              v-if="
-                props.signup.studentInstrumentSignups[0]
-                  .accompanistRoleSignup != null
-              "
+              v-if="accompanistName != null"
               class="font-weight-bold text-black pl-0 ml-0 py-0 mt-5 ml-1 text-h8"
             >
               Accomp:
-              {{
-                props.signup.studentInstrumentSignups[0].accompanistRoleSignup
-                  .user.lastName +
-                ", " +
-                props.signup.studentInstrumentSignups[0].accompanistRoleSignup
-                  .user.firstName
-              }}
+              {{ accompanistName }}
             </v-row>
             <v-row class="font-weight-bold text-maroon text-h6 mt-5 ml-1">
               Musical Selection
