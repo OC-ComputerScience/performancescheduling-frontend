@@ -20,26 +20,20 @@ const majorName = ref("Several Majors");
 const studentSignups = ref([]);
 const instructorName = ref("");
 const accompanistName = ref("");
+const students = ref([]);
 
 async function getSISData() {
-  for (let i = 0; i < props.signup.studentInstrumentSignups.length; i++) {
-    studentSignups.value.push(props.signup.studentInstrumentSignups[i]);
+  await StudentInstrumentSignupDataService.getAllDataByEventSingupId(
+    props.signup.id
+  )
+    .then((response) => {
+      for (let i = 0; i < response.data.length; i++)
+        studentSignups.value.push(response.data[i]);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 
-    await StudentInstrumentSignupDataService.getAllDataById(
-      props.signup.studentInstrumentSignups[i].id
-    )
-      .then((response) => {
-        let sisData = response.data;
-        studentSignups.value[i].accompanistRoleSignup =
-          sisData.accompanistRoleSignup;
-        studentSignups.value[i].instructorRoleSignup =
-          sisData.instructorRoleSignup;
-        studentSignups.value[i].studentInstrument = sisData.studentInstrument;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
   instructorName.value =
     studentSignups.value[0].instructorRoleSignup.user.lastName +
     ", " +
@@ -208,7 +202,7 @@ onMounted(async () => {
 
   fillCritique();
 
-  let students = studentSignups.value.map(
+  students.value = studentSignups.value.map(
     (stuSignup) =>
       stuSignup.studentInstrument.studentRole.user.lastName +
       ", " +
@@ -221,22 +215,12 @@ onMounted(async () => {
       stuSignup.studentInstrument.privateHours +
       ")"
   );
-  if (students.length == 1) {
+  if (students.value.length == 1) {
     let studentRoleId =
       studentSignups.value[0].studentInstrument.studentRole.id;
     await getMajor(studentRoleId);
   }
 
-  if (students.length == 1) {
-    studentNames.value = students[0];
-  } else if (students.length == 2) {
-    //joins all with "and" but no commas
-    studentNames.value = students.join(" and ");
-  } else {
-    //joins all with commas, but last one gets ", and"
-    studentNames.value =
-      students.slice(0, -1).join(", ") + ", and " + students.slice(-1);
-  }
   eventSignupPieces.value = props.signup.eventSignupPieces;
   eventSignupPieces.value.sort((a, b) => {
     return a.isFirst === b.isFirst ? 0 : a.isFirst > b.isFirst ? -1 : 1;
@@ -268,10 +252,14 @@ onMounted(async () => {
   <v-card class="pa-2 flatCardBorder">
     <v-form ref="form" validate-on="input">
       <v-card-text>
-        <v-row class="mt-1 mb-4">
-          <v-card-title class="font-weight-bold text-maroon text-h4">
-            {{ studentNames }}
-          </v-card-title>
+        <v-row class="mt-0 mb-0">
+          <v-container
+            v-for="student in students"
+            class="font-weight-bold text-maroon my-0 py-1 text-h5"
+          >
+            {{ student }}
+          </v-container>
+
           <v-spacer></v-spacer>
           <v-card color="lightMaroon" elevation="0" class="mr-2">
             <v-card-title>
