@@ -14,6 +14,11 @@ class StudentInstrumentSignupDataService {
     url += "allData/";
     return http.get(url);
   }
+  getAllDataById(id) {
+    var url = this.baseUrl;
+    url += "allData/" + id;
+    return http.get(url);
+  }
 
   create(data) {
     return http.post(this.baseUrl, data);
