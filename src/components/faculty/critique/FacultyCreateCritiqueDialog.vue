@@ -184,7 +184,6 @@ function getLevel(studentInstrument) {
   }
 }
 onMounted(async () => {
-  console.log("onMounted FacultyCreateCritiqueDialog.vue");
   await getSISData();
   critiquesByFaculty.value = props.signup.eventSignupPieces
     .filter((signupPiece) =>
