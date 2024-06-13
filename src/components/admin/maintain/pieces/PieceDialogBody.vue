@@ -63,16 +63,7 @@ async function getComposers() {
 }
 
 function composerName(composer) {
-  let comma = ", ";
-  if (
-    composer.firstName === null ||
-    composer.firstName === "" ||
-    composer.lastName === "" ||
-    composer.lastName == ""
-  ) {
-    comma = "";
-  }
-  return composer.lastName + comma + composer.firstName;
+  return composer.firstName + " " + composer.lastName;
 }
 // Update the piece's roles
 
@@ -232,7 +223,7 @@ function similarPieceCheck(piece) {
           </v-card-subtitle>
 
           <v-autocomplete
-            placeholder="Start typing the composer's last name"
+            placeholder="Start typing the composer's name then select a composer"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
