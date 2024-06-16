@@ -41,7 +41,6 @@ function sortData() {
       student: [],
     });
   });
-  console.log("Time Slots: ", timeSlots);
   var beginIndex = 0;
 
   // Finds the beginning index
