@@ -263,7 +263,7 @@ watch(
       }
       if (editedLiteralTranslation.value == null) {
         editedLiteralTranslation.value =
-          "Please edit piece and update poetic translation";
+          "Please edit piece and update literal translation";
       }
     }
   }
