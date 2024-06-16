@@ -9,11 +9,14 @@ import InstrumentDataService from "../../services/InstrumentDataService";
 import MajorDataService from "../../services/MajorDataService";
 import PieceDataService from "../../services/PieceDataService";
 import UpcomingEventItem from "../UpcomingEventItem.vue";
+import NotificationItem from "../NotificationItem.vue";
+import UserNotificationDataService from "../../services/UserNotificationDataService.js";
 
 const loginStore = useLoginStore();
 const pendingItemCount = ref(0);
 const pendingItems = ref([]);
 const upcomingEvents = ref([]);
+const notifications = ref([]);
 
 async function retrieveData() {
   pendingItemCount.value = 0;
@@ -25,7 +28,13 @@ async function retrieveData() {
     .catch((e) => {
       console.log(e);
     });
-
+  await UserNotificationDataService.getByUserRole(loginStore.currentRole.id)
+    .then((response) => {
+      notifications.value = response.data;
+    })
+    .catch((e) => {
+      console.log(e);
+    });
   await ComposerDataService.getAllByStatus("Pending")
     .then((response) => {
       if (response.data.length > 0) {
@@ -103,7 +112,7 @@ onMounted(async () => {
         <v-col cols="6" lg="5" class="pa-0 ml-8 ma-2">
           <v-card
             class="fill-height mainCardBorder pa-2"
-            style="overflow-y: auto; max-height: 740px; min-height: 740px"
+            style="overflow-y: auto; max-height: 200px; min-height: 200px"
           >
             <v-card-title>
               <v-row class="pa-2">
@@ -124,6 +133,29 @@ onMounted(async () => {
                 :link="pendingItem.link"
                 :key="pendingItem.id"
               ></AdminPendingItemCard>
+            </v-card-text>
+          </v-card>
+
+          <v-card
+            class="fill-height mainCardBorder pa-2 mt-5"
+            style="overflow-y: auto; max-height: 400px; min-height: 400px"
+          >
+            <v-card-title class="font-weight-semi-bold text-blue text-h5 pb-0">
+              {{ notifications.length }} Notification{{
+                notifications.length > 0
+                  ? notifications.length > 1
+                    ? "s"
+                    : ""
+                  : "s"
+              }}
+            </v-card-title>
+            <v-card-text class="pt-0">
+              <NotificationItem
+                v-for="notification of notifications"
+                :key="notification.id"
+                :notification-data="notification"
+                @refreshNotices="retrieveData"
+              ></NotificationItem>
             </v-card-text>
           </v-card>
         </v-col>
