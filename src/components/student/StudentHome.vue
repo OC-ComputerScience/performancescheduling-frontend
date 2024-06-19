@@ -258,6 +258,7 @@ onMounted(async () => {
                 v-for="event of relevantUpcomingEvents"
                 :key="event.id"
                 :event-data="event"
+                :fromEmail="loginStore.user.email"
                 :role-id="loginStore.currentRole.roleId"
                 @refreshEvents="retrieveData()"
               ></UpcomingEventItem>

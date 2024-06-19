@@ -3,7 +3,8 @@ import { formatDate } from "../../composables/dateFormatter";
 import { get12HourTimeStringFromString } from "../../composables/timeFormatter";
 import { getHourWordFromNumber } from "../../composables/timeFormatter";
 import StudentEventSignupEditDialog from "./StudentEventSignupEditDialog.vue";
-import { defineProps, defineEmits, ref } from "vue";
+import { defineProps, defineEmits, ref, onMounted } from "vue";
+import StudentInstrumentSignupDataService from "../../services/StudentInstrumentSignupDataService";
 
 const editSignUp = ref(false);
 const emits = defineEmits(["refreshEvents"]);
@@ -12,6 +13,33 @@ const props = defineProps({
   eventSignupData: { type: [Object], required: true },
   studentInstrumentSignupData: { type: [Object], required: true },
   isSignup: { type: [Boolean], required: true },
+});
+const names = ref("");
+
+onMounted(() => {
+  if (props.eventSignupData.studentInstrumentSignups.length > 1) {
+    let comma = "";
+    for (
+      let i = 0;
+      i < props.eventSignupData.studentInstrumentSignups.length;
+      i++
+    ) {
+      StudentInstrumentSignupDataService.getAllDataById(
+        props.eventSignupData.studentInstrumentSignups[i].id
+      )
+        .then((response) => {
+          names.value +=
+            comma +
+            response.data.studentInstrument.studentRole.user.firstName +
+            " " +
+            response.data.studentInstrument.studentRole.user.lastName;
+          comma = ", ";
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
+  }
 });
 </script>
 
@@ -82,6 +110,7 @@ const props = defineProps({
         </v-col>
       </v-row>
     </v-card-title>
+    <v-card-subtitle v-if="names.length > 0">with {{ names }}</v-card-subtitle>
     <v-card-text class="pt-4 pb-0">
       <v-row class="pb-0 mb-0">
         <v-col cols="12" lg="6" v-if="props.isSignup" class="mb-0 pb-0">
