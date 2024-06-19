@@ -41,7 +41,6 @@ function sortData() {
       student: [],
     });
   });
-  console.log("Time Slots: ", timeSlots);
   var beginIndex = 0;
 
   // Finds the beginning index
@@ -58,25 +57,16 @@ function sortData() {
         break;
       }
     }
-    console.log("Begin Index: ", beginIndex);
+
     // Gets the number of 30 minute time slots that this element is available for
     var numberOfAvailabilities =
       subtractTimes(element.startTime, element.endTime) / 30;
-
-    numberOfAvailabilities = Math.round(numberOfAvailabilities + 0.5);
+    // Rounds the number of availabilities to the nearest whole number (add .499 make it round down if it's .5)
+    numberOfAvailabilities = Math.round(numberOfAvailabilities + 0.499);
 
     // If the element's role is a faculty member, add their first and last name to the faculty array
     if (element.userRole.role.role == "Faculty") {
-      console.log(
-        "Faculty: ",
-        element.userRole.user.firstName,
-        element.userRole.user.lastName
-      );
       for (let i = 0; i < numberOfAvailabilities; i++) {
-        console.log(
-          "Adding faculty: ",
-          beginIndex + i + " " + timeSlots.length - 1
-        );
         tableData.value[beginIndex + i].faculty.push({
           firstName: element.userRole.user.firstName,
           lastName: element.userRole.user.lastName,

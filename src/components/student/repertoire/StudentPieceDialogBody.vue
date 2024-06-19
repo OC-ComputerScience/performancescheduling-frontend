@@ -263,7 +263,7 @@ watch(
       }
       if (editedLiteralTranslation.value == null) {
         editedLiteralTranslation.value =
-          "Please edit piece and update poetic translation";
+          "Please edit piece and update literal translation";
       }
     }
   }
@@ -344,6 +344,7 @@ onBeforeMount(async () => {
           </v-card-subtitle>
           <v-select
             v-model="editedStudentPieceData.studentInstrumentId"
+            placeholder="Select an instrument"
             :items="studentInstruments"
             item-title="instrument.name"
             item-value="id"
@@ -390,7 +391,7 @@ onBeforeMount(async () => {
 
           <v-autocomplete
             v-if="!props.isEdit"
-            placeholder="First start typing the composer's last name"
+            placeholder="Start typing the composer's name then select a composer"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -415,7 +416,7 @@ onBeforeMount(async () => {
           ></v-text-field>
           <v-autocomplete
             v-if="!props.isEdit"
-            placeholder="Select a Composer then select from the list of pieces"
+            placeholder="Select piece for the Composer above"
             color="darkBlue"
             variant="plain"
             class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -437,6 +438,7 @@ onBeforeMount(async () => {
           <v-text-field
             v-if="isVocal()"
             v-model="editedPoeticTranslation"
+            placeholder="Please edit piece and update poetic translation"
             color="darkBlue"
             variant="plain"
             class="text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
@@ -452,6 +454,7 @@ onBeforeMount(async () => {
           <v-text-field
             v-if="isVocal()"
             v-model="editedLiteralTranslation"
+            placeholder="Please edit piece and update literal translation"
             color="darkBlue"
             variant="plain"
             class="text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"

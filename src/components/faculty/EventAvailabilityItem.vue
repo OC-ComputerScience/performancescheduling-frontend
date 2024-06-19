@@ -42,7 +42,12 @@ function openCritique(eventId) {
   router.push({ path: "facultyCreateCritique", query: { eventId: eventId } });
 }
 function okToCritique(eventDate) {
-  if (new Date(eventDate) <= new Date()) return true;
+  let date = new Date().toLocaleDateString().split("/");
+  date[1] = ("0" + date[1]).slice(-2);
+  date[0] = ("0" + date[0]).slice(-2);
+  let today = `${date[2]}-${date[0]}-${date[1]}`;
+
+  if (eventDate <= today) return true;
   else return false;
 }
 async function getDialogData() {
