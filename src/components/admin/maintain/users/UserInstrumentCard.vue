@@ -53,7 +53,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-card class="bg-lightBlue pa-0 innerFlatCardBorder">
+  <v-card class="bg-lightBlue pa-0 ma-2 innerFlatCardBorder">
     <v-card-title class="font-weight-bold text-darkBlue pa-0 pl-3 pt-1 ma-0">
       <v-row class="pt-1 pr-2">
         <v-col cols="auto">
@@ -82,7 +82,7 @@ onMounted(async () => {
         </v-col>
       </v-row>
       <v-row class="ma-0">
-        <v-col cols="auto" align-self="center">
+        <v-col cols="auto">
           <v-chip
             label
             flat
