@@ -171,7 +171,7 @@ function similarPieceCheck(piece) {
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
-            Movement (or section)
+            Movement (or Section)
           </v-card-subtitle>
           <v-textarea
             v-model="editedPieceData.movement"
@@ -196,7 +196,7 @@ function similarPieceCheck(piece) {
             Poetic Translation
           </v-card-subtitle>
           <v-textarea
-            placeholder="lyric translated poetically"
+            placeholder="Lyrics translated poetically"
             rows="3"
             v-model="editedPieceData.poeticTranslation"
             variant="plain"
@@ -208,7 +208,7 @@ function similarPieceCheck(piece) {
             Literal Translation
           </v-card-subtitle>
           <v-textarea
-            placeholder="lyrics translated literally"
+            placeholder="Lyrics translated literally"
             rows="3"
             v-model="editedPieceData.literalTranslation"
             variant="plain"

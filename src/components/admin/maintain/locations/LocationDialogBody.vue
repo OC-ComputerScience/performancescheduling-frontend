@@ -92,7 +92,7 @@ async function updateLocation() {
               Room Name
             </v-card-subtitle>
             <v-text-field
-              placeholder="name of room"
+              placeholder="Judd Theatre"
               v-model="editedLocationData.roomName"
               variant="plain"
               class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -106,7 +106,7 @@ async function updateLocation() {
               Room Number
             </v-card-subtitle>
             <v-text-field
-              placeholder="GC-000"
+              placeholder="GC-153"
               v-model="editedLocationData.roomNumber"
               variant="plain"
               class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -121,7 +121,7 @@ async function updateLocation() {
               Building
             </v-card-subtitle>
             <v-text-field
-              placeholder="building name"
+              placeholder="Garvey Center"
               v-model="editedLocationData.building"
               variant="plain"
               class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
