@@ -9,12 +9,15 @@ const page = ref(0);
 const studentTutorialPath = "/StudentTutorial.pdf";
 const instructorTutorialPath = "/InstructorTutorial.pdf";
 const adminTutorialPath = "/AdminTutorial.pdf";
+const accompTutorialPath = "/AccompanistTutorial.pdf";
 
 const selectedPdfPath = computed(() => {
   return loginStore.currentRole.roleId === 1
     ? studentTutorialPath
     : loginStore.currentRole.roleId === 3
     ? adminTutorialPath
+    : loginStore.currentRole.roleId === 4
+    ? accompTutorialPath
     : instructorTutorialPath;
 });
 
