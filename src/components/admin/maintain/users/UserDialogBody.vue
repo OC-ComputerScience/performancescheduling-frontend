@@ -365,7 +365,7 @@ onMounted(async () => {
           </v-col>
           <v-col>
             <v-checkbox
-              v-if="props.isEdit"
+              v-if="props.isEdit && currentRole.role.role == 'Admin'"
               v-model="allowFullEdit"
               label="Allow Full Edit "
               class="ml-6 font-weight-semi-bold text-darkBlue"
@@ -662,7 +662,7 @@ onMounted(async () => {
               </v-col>
             </v-row>
 
-            <v-card class="bg-lightGray pa-4 pb-0 flatCardBorder">
+            <v-card class="bg-lightGray pa-3 pb-0 flatCardBorder">
               <UserInstrumentCard
                 v-for="studentInstrument of studentRole.studentRole"
                 :key="studentInstrument.id"
