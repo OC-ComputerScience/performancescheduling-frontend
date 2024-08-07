@@ -92,7 +92,7 @@ async function updateEventType() {
               Type
             </v-card-subtitle>
             <v-text-field
-              placeholder="Jury"
+              placeholder="Vocal Jury"
               v-model="editedEventTypeData.type"
               variant="plain"
               class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -107,7 +107,7 @@ async function updateEventType() {
               Description
             </v-card-subtitle>
             <v-text-field
-              placeholder="A short performance"
+              placeholder="End of Semester Vocal Evals"
               v-model="editedEventTypeData.description"
               variant="plain"
               class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -193,7 +193,7 @@ async function updateEventType() {
                 </v-card-subtitle>
                 <v-checkbox
                   color="darkBlue"
-                  label="EndingLevel Allowed"
+                  label="Ending Level Allowed"
                   class="font-weight-bold text-blue mt-3"
                   v-model="editedEventTypeData.allowEndingLevel"
                 >
