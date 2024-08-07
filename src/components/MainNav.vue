@@ -431,23 +431,22 @@ onMounted(() => {
                 </template>
                 User Settings
               </v-btn>
-              <v-btn
-                prepend-icon="mdi-account-question"
-                color="lightYellow"
-                :class="'mt-2 menu-button font-weight-bold text-maroon'"
-                density="comfortable"
-                elevation="0"
-                width="250px"
-                @click="changeComp('help')"
-              >
-                <template v-slot:prepend>
-                  <v-icon></v-icon>
-                </template>
-                Help
-              </v-btn>
-              <!-- <div v-if="loginStore.currentRole.roleId != 2"> -->
-              <br />
-              <!-- </div> -->
+              <div>
+                <v-btn
+                  prepend-icon="mdi-account-question"
+                  color="lightYellow"
+                  :class="'mt-2 menu-button font-weight-bold text-maroon'"
+                  density="comfortable"
+                  elevation="0"
+                  width="250px"
+                  @click="changeComp('help')"
+                >
+                  <template v-slot:prepend>
+                    <v-icon></v-icon>
+                  </template>
+                  Help
+                </v-btn>
+              </div>
               <v-btn
                 prepend-icon="mdi-logout"
                 color="mediumGray"
