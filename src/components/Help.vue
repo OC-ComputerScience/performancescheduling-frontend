@@ -13,8 +13,8 @@ const adminTutorialPath = "/AdminTutorial.pdf";
 const selectedPdfPath = computed(() => {
   return loginStore.currentRole.roleId === 1
     ? studentTutorialPath
-    ? loginStore.currentRole.roleId === 2
-    : adminTutorialPath
+    : loginStore.currentRole.roleId === 3
+    ? adminTutorialPath
     : instructorTutorialPath;
 });
 
@@ -32,7 +32,7 @@ function goToEnteredPage() {
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight">Help</h1>
+      <h1 class="text-maroon font-weight-bold text-h3">Help</h1>
     </v-row>
     <br />
     <div class="d-flex justify-center align-center mb-3">
