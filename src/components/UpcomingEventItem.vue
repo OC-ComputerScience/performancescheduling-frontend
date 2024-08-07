@@ -157,6 +157,7 @@ onBeforeUpdate(async () => {
                 <v-card-title class="font-weight-bold text-orange text-h5">
                   {{ eventData.name }}
                 </v-card-title>
+                <!--Unready/Ready-->
                 <div v-if="roleId == 3">
                   <v-row class="ml-3 mt-4 mb-3">
                     <v-card-subtitle
@@ -183,7 +184,6 @@ onBeforeUpdate(async () => {
                   </v-row>
                 </div>
                 <!-- Event Instrument Type -->
-                <!-- TODO(@ethanimooney): Make this actually work -->
                 <v-card-subtitle
                   class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
                 >
@@ -218,21 +218,7 @@ onBeforeUpdate(async () => {
                     {{ eventData.eventSignups == null ? "0" : signupCount }}
                     People Signed Up
                   </v-card-subtitle>
-                  <!--<v-card-subtitle
-                    size="small"
-                    v-if="roleId == 2 || roleId == 4"
-                    class="font-weight-semi-bold ml-auto mr-2 bg-darkBlue text-none"
-                  >
-                    {{
-                      eventData.eventType.instrumentType === "Both"
-                        ? "Vocal & Instrumental"
-                        : eventData.eventType.instrumentType === "Vocal"
-                        ? "Vocal"
-                        : "Instrumental"
-                    }}
-                    Event
-                  </v-card-subtitle>
-                  -->
+ 
                   <v-card-subtitle
                     v-if="roleId == 3 || roleId == 2"
                     class="font-weight-semi-bold"
@@ -261,7 +247,6 @@ onBeforeUpdate(async () => {
       </v-card-subtitle>
       <v-card-actions class="pt-0 mt-0">
         <v-spacer></v-spacer>
-        <!--Unready/Ready-->
 
         <v-btn
           v-if="roleId != 1"

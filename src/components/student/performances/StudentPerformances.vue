@@ -130,7 +130,7 @@ onMounted(async () => {
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter performances
+            Filter Performances
           </v-btn>
         </template>
 
