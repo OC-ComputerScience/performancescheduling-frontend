@@ -8,10 +8,13 @@ const loginStore = useLoginStore();
 const page = ref(0);
 const studentTutorialPath = "/StudentTutorial.pdf";
 const instructorTutorialPath = "/InstructorTutorial.pdf";
+const adminTutorialPath = "/AdminTutorial.pdf";
 
 const selectedPdfPath = computed(() => {
   return loginStore.currentRole.roleId === 1
     ? studentTutorialPath
+    ? loginStore.currentRole.roleId === 2
+    : adminTutorialPath
     : instructorTutorialPath;
 });
 
