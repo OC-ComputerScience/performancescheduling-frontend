@@ -277,10 +277,12 @@ function getTimeslotLength() {
   } 
   else {
       if (isMusicMajor.value) {
-        timeslotLength.value = 10;
+        timeslotLength.value = props.eventData.eventType.defaultSlotDuration * 2;
       } else {
         timeslotLength.value =
-          selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
+          selectedStudentInstrument.value.privateHours == 1 
+          ? props.eventData.eventType.defaultSlotDuration 
+          : props.eventData.eventType.defaultSlotDuration * 2;
       }
     }
     if (doubleTime.value) {
