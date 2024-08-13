@@ -240,7 +240,7 @@ function similarPieceCheck(piece) {
         <v-btn
           v-if="props.isEdit && props.isAdmin"
           flat
-          class="font-weight-semi-bold mt-0 mr-3 text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white flatChipBorder"
           :class="
             props.pieceData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
           "
@@ -259,7 +259,7 @@ function similarPieceCheck(piece) {
             props.pieceData.status === 'Pending'
           "
           flat
-          class="font-weight-semi-bold mt-0 mr-4 text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white flatChipBorder"
           :class="
             props.pieceData.status === 'Pending' ? 'bg-darkBlue' : 'bg-maroon'
           "
@@ -269,7 +269,7 @@ function similarPieceCheck(piece) {
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
           @click="props.isEdit ? updatePiece() : addPiece()"
         >
           {{ props.isEdit ? "Save" : "Add" }}
