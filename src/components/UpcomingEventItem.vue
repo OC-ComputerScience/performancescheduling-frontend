@@ -206,13 +206,7 @@ onBeforeUpdate(async () => {
                   class="bg-darkBlue py-2 px-0 text-white mt-0"
                 >
                   <v-card-subtitle
-                    v-if="
-                      (roleId == 3 ||
-                        roleId == 1 ||
-                        roleId == 2 ||
-                        roleId == 4) &&
-                      eventData.isReady
-                    "
+                    v-if="eventData.isReady"
                     class="font-weight-semi-bold"
                   >
                     {{ eventData.eventSignups == null ? "0" : signupCount }}
