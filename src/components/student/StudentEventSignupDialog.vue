@@ -359,7 +359,7 @@ function openDialog() {
   }
 
   if (selectedTimeslot.value == null) {
-    errorMessage.value = "Please select a timeslot.";
+    errorMessage.value = "Please select a time slot.";
     return;
   }
 
@@ -463,7 +463,7 @@ function openDialog() {
         weekday: "long",
         timeZone: "UTC",
       })})
-    \nTimeslot: ${get12HourTimeStringFromString(
+    \nTime slot: ${get12HourTimeStringFromString(
       selectedTimeslot.value.time
     )} - ${get12HourTimeStringFromString(timeslotEndTime)}
     \nIs already reserved by ${studentsInSignup}`;
@@ -505,7 +505,7 @@ async function requestAdditionalTimeslots(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you create more timeslots for ${props.eventData.name} on
+    } has requested you create more time slots for ${props.eventData.name} on
     ${formatDate(props.eventData.date)} (${new Date(
       props.eventData.date
     ).toLocaleDateString("default", {
@@ -868,7 +868,7 @@ onMounted(async () => {
         </v-row>
         <v-row class="ml-1">
           <v-col cols="6">
-            <v-row class="font-weight-bold text-maroon text-h6">
+            <v-row class="font-weight-bold text-maroon text-h6 mb-1">
               Musical Selection
             </v-row>
             <v-row>
@@ -967,14 +967,14 @@ onMounted(async () => {
           <v-col cols="6">
             <v-row>
               <div class="font-weight-bold text-h6 text-maroon">
-                Timeslots Available
+                Time slots Available
               </div>
               <v-card color="lightMaroon" elevation="0" class="ml-2 mb-0">
                 <v-row>
                   <v-card-text
                     class="mt-6 mr-1 ml-1 py-0 pr-0 font-weight-semi-bold text-maroon"
                   >
-                    {{ timeslotLength }} Min Timeslot Length
+                    {{ timeslotLength }} Min Time Slot Length
                   </v-card-text>
                   <v-checkbox
                     v-model="doubleTime"
@@ -1255,7 +1255,7 @@ onMounted(async () => {
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          >Request This Timeslot</v-btn
+          >Request This Time Slot</v-btn
         >
         <v-btn
           @click="otherSignupDialog = false"

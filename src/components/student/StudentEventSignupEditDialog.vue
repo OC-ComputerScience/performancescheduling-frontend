@@ -335,7 +335,7 @@ onMounted(async () => {
         </v-row>
         <v-row class="ml-1">
           <v-col cols="6">
-            <v-row class="font-weight-bold text-maroon text-h6">
+            <v-row class="font-weight-bold text-maroon text-h6 mb-1">
               Musical Selection
             </v-row>
             <v-row>
@@ -392,7 +392,7 @@ onMounted(async () => {
           <v-col cols="6">
             <v-row>
               <div class="font-weight-bold text-h6 text-maroon mb-4">
-                Timeslot Selected
+                Time Slot Selected
               </div>
             </v-row>
             <v-row>
