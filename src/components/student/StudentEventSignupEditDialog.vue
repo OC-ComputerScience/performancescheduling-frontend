@@ -411,7 +411,7 @@ onMounted(async () => {
 
             <v-row mt-7>
               <v-checkbox read-only="disableOnlySemesterPiece" :disabled="disableEditing" v-model="groupSignup"
-                label="Allow other students to signup with you"
+                label="Allow other students to sign up with you"
                 class="text-body-1 font-weight-bold text-darkBlue"></v-checkbox>
             </v-row>
           </v-col>
