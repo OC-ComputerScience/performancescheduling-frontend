@@ -268,7 +268,7 @@ onBeforeUpdate(async () => {
           class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
           @click="dialog = true"
         >
-          Signup
+          Sign up
         </v-btn>
         <v-btn
           v-if="roleId != 1"
