@@ -94,7 +94,7 @@ onMounted(async () => {});
               </v-card-title>
 
               <v-card-subtitle
-                class="pt-0 mt-0 font-weight-semi-bold text-maroon"
+                class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
               >
                 {{
                   eventType.instrumentType === "Both"

@@ -252,48 +252,49 @@ onMounted(async () => {
     <v-form ref="form" validate-on="input">
       <v-card-text>
         <v-row class="mt-0 mb-0">
-          <v-container
-            v-for="student in students"
-            class="font-weight-bold text-maroon my-0 py-1 text-h5"
-          >
-            {{ student }}
-          </v-container>
-
-          <v-spacer></v-spacer>
-          <v-card color="lightMaroon" elevation="0" class="mr-2">
-            <v-card-title>
-              <div class="text-maroon font-weight-bold">
-                {{
-                  get12HourTimeStringFromString(props.signup.startTime) +
-                  "-" +
-                  get12HourTimeStringFromString(props.signup.endTime)
-                }}
-              </div>
-            </v-card-title>
-          </v-card>
+          <v-col class="d-flex align-center" cols="8">
+            <div
+              v-for="student in students"
+              class="font-weight-bold text-maroon my-0 py-1 text-h4"
+            >
+              {{ student }}
+            </div>
+          </v-col>
+          <v-col class="d-flex justify-end align-center" cols="4">
+            <v-card color="lightMaroon" elevation="0">
+              <v-card-title>
+                <div class="text-maroon font-weight-bold">
+                  {{
+                    get12HourTimeStringFromString(props.signup.startTime) +
+                    "-" +
+                    get12HourTimeStringFromString(props.signup.endTime)
+                  }}
+                </div>
+              </v-card-title>
+            </v-card>
+          </v-col>
         </v-row>
         <v-row class="mt-4">
           <v-col cols="6">
-            <v-row class="font-weight-bold text-black text-h8 ml-1">
-              Major:
-              {{ majorName }}
+            <v-row>
+              <p class="font-weight-bold text-black text-h8 ml-4">Major:</p>
+              <p class="ml-1">{{ majorName }}</p>
             </v-row>
-            <v-row class="font-weight-bold text-black text-h8 ml-1">
-              Instructor:
-              {{ instructorName }}
+            <v-row class="mt-4">
+              <p class="font-weight-bold text-black text-h8 ml-4">Instructor:</p>
+              <p class="ml-1">{{ instructorName }}</p>
             </v-row>
-
             <v-row
               v-if="accompanistName != null"
-              class="font-weight-bold text-black pl-0 ml-0 py-0 mt-5 ml-1 text-h8"
+              class="mt-4"
             >
-              Accomp:
-              {{ accompanistName }}
+              <p class="font-weight-bold text-black text-h8 ml-4">Accomp:</p>
+              <p class="ml-1">{{ accompanistName }}</p>
             </v-row>
             <v-row class="font-weight-bold text-maroon text-h6 mt-5 ml-1">
               Musical Selection
             </v-row>
-            <v-row class="mt-3">
+            <v-row class="mt-2">
               <v-col cols="11" class="ml-1">
                 <v-list
                   style="height: 280px"
@@ -332,7 +333,7 @@ onMounted(async () => {
               </v-col>
             </v-row>
             <div v-if="selectedStudentPiece.piece != undefined">
-              <v-row class="font-weight-bold text-maroon ml-1">
+              <v-row class="font-weight-bold text-maroon ml-1 mt-2">
                 Poetic Translation
               </v-row>
               <v-row>
@@ -342,7 +343,7 @@ onMounted(async () => {
                 >
                 </v-textarea>
               </v-row>
-              <v-row class="font-weight-bold text-maroon ml-1">
+              <v-row class="font-weight-bold text-maroon ml-1 mt-6">
                 Literal Translation
               </v-row>
               <v-row>

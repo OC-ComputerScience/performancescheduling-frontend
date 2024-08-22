@@ -114,7 +114,7 @@ onBeforeMount(async () => {
     <v-form ref="form" validate-on="input">
       <v-card-title>
         <v-row class="pt-0 mt-0 text-maroon font-weight-bold text-h4">
-          Edit Evaluation
+          Evaluation
         </v-row>
         <v-row class="pt-0 mt-2 text-maroon text-h6">
           {{ props.studentInstrumentData.instrument.name }}

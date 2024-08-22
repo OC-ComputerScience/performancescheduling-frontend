@@ -439,7 +439,6 @@ onBeforeMount(async () => {
             v-if="isVocal()"
             v-model="editedPoeticTranslation"
             placeholder="Please edit piece and update poetic translation"
-            color="darkBlue"
             variant="plain"
             class="text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
             readonly
@@ -455,7 +454,6 @@ onBeforeMount(async () => {
             v-if="isVocal()"
             v-model="editedLiteralTranslation"
             placeholder="Please edit piece and update literal translation"
-            color="darkBlue"
             variant="plain"
             class="text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
             readonly

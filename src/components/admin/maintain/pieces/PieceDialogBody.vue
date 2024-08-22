@@ -215,24 +215,25 @@ function similarPieceCheck(piece) {
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
           ></v-textarea>
 
-          <v-card-subtitle
-            v-if="props.isAdmin"
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Composer
-          </v-card-subtitle>
+          <div v-if="props.isAdmin">
+            <v-card-subtitle
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Composer
+            </v-card-subtitle>
 
-          <v-autocomplete
-            placeholder="Start typing the composer's name then select a composer"
-            color="darkBlue"
-            variant="plain"
-            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-            v-model="editedPieceData.composerId"
-            :items="composers"
-            item-title="fullName"
-            item-value="id"
-          >
-          </v-autocomplete>
+            <v-autocomplete
+              placeholder="Start typing the composer's name then select a composer"
+              color="darkBlue"
+              variant="plain"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+              v-model="editedPieceData.composerId"
+              :items="composers"
+              item-title="fullName"
+              item-value="id"
+            >
+            </v-autocomplete>
+          </div>
         </v-col>
       </v-row>
       <v-card-actions>
@@ -240,7 +241,7 @@ function similarPieceCheck(piece) {
         <v-btn
           v-if="props.isEdit && props.isAdmin"
           flat
-          class="font-weight-semi-bold mt-0 mr-3 text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white flatChipBorder"
           :class="
             props.pieceData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
           "
@@ -259,7 +260,7 @@ function similarPieceCheck(piece) {
             props.pieceData.status === 'Pending'
           "
           flat
-          class="font-weight-semi-bold mt-0 mr-4 text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white flatChipBorder"
           :class="
             props.pieceData.status === 'Pending' ? 'bg-darkBlue' : 'bg-maroon'
           "
@@ -269,7 +270,7 @@ function similarPieceCheck(piece) {
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
           @click="props.isEdit ? updatePiece() : addPiece()"
         >
           {{ props.isEdit ? "Save" : "Add" }}

@@ -359,7 +359,7 @@ function openDialog() {
   }
 
   if (selectedTimeslot.value == null) {
-    errorMessage.value = "Please select a timeslot.";
+    errorMessage.value = "Please select a time slot.";
     return;
   }
 
@@ -410,7 +410,7 @@ function openDialog() {
       weekday: "long",
       timeZone: "UTC",
     })})
-    \nTimeslot: ${get12HourTimeStringFromString(
+    \nTime Slot: ${get12HourTimeStringFromString(
       selectedTimeslot.value.time
     )} - ${get12HourTimeStringFromString(timeslotEndTime)}
     \nInstrument: ${selectedStudentInstrument.value.instrument.name}`;
@@ -448,7 +448,7 @@ function openDialog() {
         weekday: "long",
         timeZone: "UTC",
       })})
-    \nTimeslot: ${get12HourTimeStringFromString(
+    \nTime Slot: ${get12HourTimeStringFromString(
       selectedTimeslot.value.time
     )} - ${get12HourTimeStringFromString(timeslotEndTime)}
     \nInstrument: ${selectedStudentInstrument.value.instrument.name}
@@ -463,7 +463,7 @@ function openDialog() {
         weekday: "long",
         timeZone: "UTC",
       })})
-    \nTimeslot: ${get12HourTimeStringFromString(
+    \nTime slot: ${get12HourTimeStringFromString(
       selectedTimeslot.value.time
     )} - ${get12HourTimeStringFromString(timeslotEndTime)}
     \nIs already reserved by ${studentsInSignup}`;
@@ -505,7 +505,7 @@ async function requestAdditionalTimeslots(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you create more timeslots for ${props.eventData.name} on
+    } has requested you create more time slots for ${props.eventData.name} on
     ${formatDate(props.eventData.date)} (${new Date(
       props.eventData.date
     ).toLocaleDateString("default", {
@@ -573,7 +573,7 @@ async function confirmSignup() {
     snackbar.value.color = "error";
     snackbar.value.message =
       existingSignup.value == null
-        ? "This timeslot has already been reserved"
+        ? "This time slot has already been reserved"
         : "This group signup is no longer available";
     confimationDialog.value = false;
     return;
@@ -868,7 +868,7 @@ onMounted(async () => {
         </v-row>
         <v-row class="ml-1">
           <v-col cols="6">
-            <v-row class="font-weight-bold text-maroon text-h6">
+            <v-row class="font-weight-bold text-maroon text-h6 mb-1">
               Musical Selection
             </v-row>
             <v-row>
@@ -966,20 +966,22 @@ onMounted(async () => {
           </v-col>
           <v-col cols="6">
             <v-row>
-              <div class="font-weight-bold text-h6 text-maroon">
-                Timeslots Available
+              <div class="font-weight-bold text-h6 text-maroon mb-1">
+                Time Slots Available
               </div>
-              <v-card color="lightMaroon" elevation="0" class="ml-2 mb-0">
+              </v-row>
                 <v-row>
+                  <v-card color="lightMaroon" elevation="0" class="mb-0">
+                    <v-row class="align-center">
                   <v-card-text
-                    class="mt-6 mr-1 ml-1 py-0 pr-0 font-weight-semi-bold text-maroon"
+                    class="ml-3 mt-1 mb-1 font-weight-semi-bold text-maroon"
                   >
-                    {{ timeslotLength }} Min Timeslot Length
+                    {{ timeslotLength }}-Minute Time Slot Length
                   </v-card-text>
                   <v-checkbox
                     v-model="doubleTime"
                     label="Double"
-                    class="ml-1 mt-1 my-0 mr-5 font-weight-semi-bold text-darkBlue text-body-2"
+                    class="mr-6 mt-1 mb-1 font-weight-semi-bold text-darkBlue text-body-2 d-flex align-center"
                   ></v-checkbox>
                 </v-row>
               </v-card>
@@ -1136,7 +1138,7 @@ onMounted(async () => {
                   selectedTimeslot.existingSignup == null
                 "
                 v-model="groupSignup"
-                label="Allow other students to signup with you"
+                label="Allow other students to sign up with you"
                 class="text-body-1 font-weight-bold text-darkBlue"
               ></v-checkbox>
             </v-row>
@@ -1240,7 +1242,7 @@ onMounted(async () => {
   <v-dialog v-model="otherSignupDialog" persistent max-width="600px">
     <v-card>
       <v-card-title class="text-h6 font-weight-bold text-maroon">
-        This timeslot is already taken
+        This time slot is already taken
       </v-card-title>
       <v-card-text
         class="text-h8 font-weight-semi-bold text-blue"
@@ -1255,7 +1257,7 @@ onMounted(async () => {
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          >Request This Timeslot</v-btn
+          >Request This Time Slot</v-btn
         >
         <v-btn
           @click="otherSignupDialog = false"
