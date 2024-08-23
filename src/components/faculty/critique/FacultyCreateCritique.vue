@@ -104,7 +104,7 @@ onMounted(async () => {
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter signups
+            Filter Signups
           </v-btn>
         </template>
 

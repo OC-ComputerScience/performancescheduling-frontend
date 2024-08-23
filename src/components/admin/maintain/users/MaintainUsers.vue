@@ -261,7 +261,7 @@ onBeforeMount(async () => {
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter users
+            Filter Users
           </v-btn>
         </template>
 
@@ -369,7 +369,7 @@ onBeforeMount(async () => {
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="addUserDialog = true"
       >
-        Add new user
+        Add new User
       </v-btn>
     </v-row>
     <v-row class="ml-6"> Displaying : {{ filerContents }}</v-row>

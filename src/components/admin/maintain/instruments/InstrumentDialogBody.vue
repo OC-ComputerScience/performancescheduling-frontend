@@ -110,7 +110,8 @@ async function updateInstrument() {
             <v-Select
               v-model="editedInstrumentData.type"
               :items="instrumentTypes"
-              class="bg-lightGray text-blue font-weight-bold py-0 my-0 mb-4"
+              variant="plain"
+              class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             ></v-Select>
           </v-col>
         </v-row>

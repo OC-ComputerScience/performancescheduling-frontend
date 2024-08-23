@@ -91,7 +91,7 @@ onMounted(async () => {
 <template>
   <v-container fluid class="pa-8">
     <v-row class="ml-1">
-      <h1 class="text-maroon font-weight">Instruments</h1>
+      <h1 class="text-maroon font-weight-bold text-h3">Instruments</h1>
 
       <input
         type="text"
@@ -117,7 +117,7 @@ onMounted(async () => {
                 :icon="filterMenuBool ? 'mdi-chevron-up' : 'mdi-chevron-down'"
               ></v-icon>
             </template>
-            Filter instruments
+            Filter Instruments
           </v-btn>
         </template>
 
@@ -186,7 +186,7 @@ onMounted(async () => {
         class="font-weight-semi-bold ml-6 px-2 my-1 mainCardBorder text-none"
         @click="addInstrumentDialog = true"
       >
-        Add new instrument
+        Add new Instrument
       </v-btn>
     </v-row>
     <v-row>

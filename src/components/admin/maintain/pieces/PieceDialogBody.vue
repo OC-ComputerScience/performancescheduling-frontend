@@ -49,7 +49,10 @@ async function addPiece() {
 async function getComposers() {
   await ComposerDataService.getAll("lastName")
     .then((response) => {
-      composers.value = response.data.filter((composer) => (composer.status === "Active" || composer.status == "Pending"));
+      composers.value = response.data.filter(
+        (composer) =>
+          composer.status === "Active" || composer.status == "Pending"
+      );
       composers.value.forEach((composer) => {
         composer.fullName = composerName(composer);
       });
@@ -60,16 +63,7 @@ async function getComposers() {
 }
 
 function composerName(composer) {
-  let comma = ", ";
-  if (
-    composer.firstName === null ||
-    composer.firstName === "" ||
-    composer.lastName === "" ||
-    composer.lastName == ""
-  ) {
-    comma = "";
-  }
-  return composer.lastName + comma + composer.firstName;
+  return composer.firstName + " " + composer.lastName;
 }
 // Update the piece's roles
 
@@ -102,9 +96,15 @@ function similarPieceCheck(piece) {
   if (props.isEdit == true || piece.title == null) return true;
 
   var similarPieces = findSimilar(piece);
+
   var similarPieceNames = "";
   similarPieces.forEach((p) => {
-    if (p.composerId == piece.composerId) similarPieceNames += p.title + ", ";
+    if (
+      p.composerId == piece.composerId &&
+      p.movement == p.movement &&
+      piece.work == p.work
+    )
+      similarPieceNames += p.title + ", ";
   });
   if (similarPieceNames.length > 0)
     similarPieceNames = similarPieceNames.slice(0, -2);
@@ -171,12 +171,33 @@ function similarPieceCheck(piece) {
           <v-card-subtitle
             class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
           >
+            Movement (or Section)
+          </v-card-subtitle>
+          <v-textarea
+            v-model="editedPieceData.movement"
+            rows="2"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          ></v-textarea>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Work (Musical, Opera, etc.)
+          </v-card-subtitle>
+          <v-textarea
+            v-model="editedPieceData.work"
+            rows="2"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
+          ></v-textarea>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
             Poetic Translation
           </v-card-subtitle>
           <v-textarea
-            placeholder="lyric translated poetically"
+            placeholder="Lyrics translated poetically"
             rows="3"
-            no-resize
             v-model="editedPieceData.poeticTranslation"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
@@ -187,32 +208,32 @@ function similarPieceCheck(piece) {
             Literal Translation
           </v-card-subtitle>
           <v-textarea
-            placeholder="lyrics translated literally"
-            no-resize
+            placeholder="Lyrics translated literally"
             rows="3"
             v-model="editedPieceData.literalTranslation"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
           ></v-textarea>
 
-          <v-card-subtitle
-            v-if="props.isAdmin"
-            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
-          >
-            Composer
-          </v-card-subtitle>
+          <div v-if="props.isAdmin">
+            <v-card-subtitle
+              class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+            >
+              Composer
+            </v-card-subtitle>
 
-          <v-autocomplete
-            placeholder="Start typing the composer's last name"
-            color="darkBlue"
-            variant="plain"
-            class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
-            v-model="editedPieceData.composerId"
-            :items="composers"
-            item-title="fullName"
-            item-value="id"
-          >
-          </v-autocomplete>
+            <v-autocomplete
+              placeholder="Start typing the composer's name then select a composer"
+              color="darkBlue"
+              variant="plain"
+              class="font-weight-bold text-blue pt-0 mt-0 bg-lightGray flatCardBorder pl-4 pr-2 py-0 my-0 mb-4"
+              v-model="editedPieceData.composerId"
+              :items="composers"
+              item-title="fullName"
+              item-value="id"
+            >
+            </v-autocomplete>
+          </div>
         </v-col>
       </v-row>
       <v-card-actions>
@@ -220,7 +241,7 @@ function similarPieceCheck(piece) {
         <v-btn
           v-if="props.isEdit && props.isAdmin"
           flat
-          class="font-weight-semi-bold mt-0 mr-3 text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-auto text-none text-white flatChipBorder"
           :class="
             props.pieceData.status === 'Disabled' ? 'bg-darkBlue' : 'bg-maroon'
           "
@@ -239,7 +260,7 @@ function similarPieceCheck(piece) {
             props.pieceData.status === 'Pending'
           "
           flat
-          class="font-weight-semi-bold mt-0 mr-4 text-none text-white flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white flatChipBorder"
           :class="
             props.pieceData.status === 'Pending' ? 'bg-darkBlue' : 'bg-maroon'
           "
@@ -249,7 +270,7 @@ function similarPieceCheck(piece) {
         </v-btn>
         <v-btn
           flat
-          class="font-weight-semi-bold mt-0 ml-auto text-none text-white bg-teal flatChipBorder"
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
           @click="props.isEdit ? updatePiece() : addPiece()"
         >
           {{ props.isEdit ? "Save" : "Add" }}

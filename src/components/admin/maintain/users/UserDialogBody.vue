@@ -31,6 +31,7 @@ const { currentRole } = storeToRefs(loginStore);
 const form = ref(null);
 
 const addInstrumentDialog = ref(false);
+const allowFullEdit = ref(false);
 
 function addInstrument() {
   addInstrumentDialog.value = true;
@@ -148,6 +149,9 @@ async function addUser() {
               studentClassification: editedStudentClassification.value,
               studentSemesters: editedStudentSemesters.value,
               title: editedFacultyTitle.value,
+              textStatus: editedUserData.value.textStatus,
+              emailStatus: editedUserData.value.emailStatus,
+              adminEmail: editedUserData.value.adminEmail,
             }).catch((err) => {
               console.log(err);
             });
@@ -309,6 +313,18 @@ async function updateFacultyTitle() {
     });
   }
 }
+// If full edit is allowed, update the user's data
+// async function updateFullData() {
+
+//     await UserRoleDataService.update({
+//       id: editedUserRole.id,
+//       firstName: editedUserData.firstName,
+//       lastName: editedUserData.lastName,
+//       title: editedUserData.email,
+//     }).catch((err) => {
+//       console.log(err);
+//     });
+//   }
 
 async function refreshStudentInstruments() {
   await StudentInstrumentDataService.getStudentInstrumentsForStudentId(
@@ -344,11 +360,16 @@ onMounted(async () => {
     <v-form ref="form" validate-on="input">
       <v-card-title>
         <v-row class="pt-0 mt-0">
-          <v-col
-            cols="auto"
-            class="pt-0 mt-0 text-maroon font-weight-bold text-h4"
-          >
+          <v-col cols="auto" class="auto text-maroon font-weight-bold text-h4">
             {{ props.isEdit ? "Edit" : "Add" }} User
+          </v-col>
+          <v-col>
+            <v-checkbox
+              v-if="props.isEdit && currentRole.role.role == 'Admin'"
+              v-model="allowFullEdit"
+              label="Allow Full Edit "
+              class="ml-6 font-weight-semi-bold text-darkBlue"
+            ></v-checkbox>
           </v-col>
         </v-row>
       </v-card-title>
@@ -385,13 +406,13 @@ onMounted(async () => {
         <v-row :class="props.isEdit ? '' : 'mt-2'">
           <v-col>
             <v-card-subtitle
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >
               First Name
             </v-card-subtitle>
             <v-text-field
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               placeholder="John"
               v-model="editedUserData.firstName"
               variant="plain"
@@ -400,13 +421,13 @@ onMounted(async () => {
             ></v-text-field>
 
             <v-card-subtitle
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >
               Last Name
             </v-card-subtitle>
             <v-text-field
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               placeholder="Doe"
               v-model="editedUserData.lastName"
               variant="plain"
@@ -415,13 +436,13 @@ onMounted(async () => {
             ></v-text-field>
 
             <v-card-subtitle
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
             >
               Email
             </v-card-subtitle>
             <v-text-field
-              v-if="!props.isEdit"
+              v-if="!props.isEdit || allowFullEdit"
               placeholder="john.doe@oc.edu"
               v-model="editedUserData.email"
               variant="plain"
@@ -598,7 +619,7 @@ onMounted(async () => {
             </v-row>
 
             <v-row class="mt-0">
-              <v-col cols="8" class="d-flex pa-0 mt-0">
+              <v-col cols="12" class="d-flex pa-0 mt-0">
                 <v-checkbox
                   v-model="editedUserData.textStatus"
                   label="Text Opt In"
@@ -608,6 +629,12 @@ onMounted(async () => {
                 <v-checkbox
                   v-model="editedUserData.emailStatus"
                   label="Email Opt In"
+                  class="font-weight-semi-bold text-darkBlue mr-5"
+                >
+                </v-checkbox>
+                <v-checkbox
+                  v-model="editedUserData.adminEmail"
+                  label="Admin Email Opt In"
                   class="font-weight-semi-bold text-darkBlue mr-5"
                 >
                 </v-checkbox>
@@ -635,7 +662,7 @@ onMounted(async () => {
               </v-col>
             </v-row>
 
-            <v-card class="bg-lightGray pa-4 pb-0 flatCardBorder">
+            <v-card class="bg-lightGray pa-3 pb-0 flatCardBorder">
               <UserInstrumentCard
                 v-for="studentInstrument of studentRole.studentRole"
                 :key="studentInstrument.id"

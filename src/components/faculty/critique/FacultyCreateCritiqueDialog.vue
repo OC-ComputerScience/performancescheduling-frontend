@@ -3,6 +3,8 @@ import { ref, onMounted } from "vue";
 import { useLoginStore } from "../../../stores/LoginStore.js";
 import { get12HourTimeStringFromString } from "../../../composables/timeFormatter";
 import CritiqueDataService from "../../../services/CritiqueDataService.js";
+import UserRoleDataService from "../../../services/UserRoleDataService.js";
+import StudentInstrumentSignupDataService from "../../../services/StudentInstrumentSignupDataService.js";
 
 const emits = defineEmits(["closeDialogEvent"]);
 
@@ -14,6 +16,35 @@ const studentNames = ref("");
 const selectedStudentPiece = ref({});
 const critique = ref({});
 const errorSnackbar = ref(false);
+const majorName = ref("Several Majors");
+const studentSignups = ref([]);
+const instructorName = ref("");
+const accompanistName = ref("");
+const students = ref([]);
+
+async function getSISData() {
+  await StudentInstrumentSignupDataService.getAllDataByEventSingupId(
+    props.signup.id
+  )
+    .then((response) => {
+      for (let i = 0; i < response.data.length; i++)
+        studentSignups.value.push(response.data[i]);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  instructorName.value =
+    studentSignups.value[0].instructorRoleSignup.user.lastName +
+    ", " +
+    studentSignups.value[0].instructorRoleSignup.user.firstName;
+  accompanistName.value =
+    studentSignups.value[0].accompanistRoleSignup == null
+      ? null
+      : studentSignups.value[0].accompanistRoleSignup.user.lastName +
+        ", " +
+        studentSignups.value[0].accompanistRoleSignup.user.firstName;
+}
 
 function clearCritique() {
   critique.value = {};
@@ -91,6 +122,16 @@ async function saveCritique() {
   return true;
 }
 
+async function getMajor(roleId) {
+  await UserRoleDataService.get(roleId)
+    .then((response) => {
+      majorName.value = response.data.major.name;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
 function hasCritiqueChanged(existingCritique) {
   if (critique.value.length != existingCritique.length) {
     return true;
@@ -143,6 +184,7 @@ function getLevel(studentInstrument) {
   }
 }
 onMounted(async () => {
+  await getSISData();
   critiquesByFaculty.value = props.signup.eventSignupPieces
     .filter((signupPiece) =>
       signupPiece.critiques.some(
@@ -159,7 +201,7 @@ onMounted(async () => {
 
   fillCritique();
 
-  let students = props.signup.studentInstrumentSignups.map(
+  students.value = studentSignups.value.map(
     (stuSignup) =>
       stuSignup.studentInstrument.studentRole.user.lastName +
       ", " +
@@ -172,17 +214,12 @@ onMounted(async () => {
       stuSignup.studentInstrument.privateHours +
       ")"
   );
-
-  if (students.length == 1) {
-    studentNames.value = students[0];
-  } else if (students.length == 2) {
-    //joins all with "and" but no commas
-    studentNames.value = students.join(" and ");
-  } else {
-    //joins all with commas, but last one gets ", and"
-    studentNames.value =
-      students.slice(0, -1).join(", ") + ", and " + students.slice(-1);
+  if (students.value.length == 1) {
+    let studentRoleId =
+      studentSignups.value[0].studentInstrument.studentRole.id;
+    await getMajor(studentRoleId);
   }
+
   eventSignupPieces.value = props.signup.eventSignupPieces;
   eventSignupPieces.value.sort((a, b) => {
     return a.isFirst === b.isFirst ? 0 : a.isFirst > b.isFirst ? -1 : 1;
@@ -214,64 +251,75 @@ onMounted(async () => {
   <v-card class="pa-2 flatCardBorder">
     <v-form ref="form" validate-on="input">
       <v-card-text>
-        <v-row class="mt-1 mb-4">
-          <v-card-title class="font-weight-bold text-maroon text-h4">
-            {{ studentNames }}
-          </v-card-title>
-          <v-spacer></v-spacer>
-          <v-card color="lightMaroon" elevation="0" class="mr-2">
-            <v-card-title>
-              <div class="text-maroon font-weight-bold">
-                {{
-                  get12HourTimeStringFromString(props.signup.startTime) +
-                  "-" +
-                  get12HourTimeStringFromString(props.signup.endTime)
-                }}
-              </div>
-            </v-card-title>
-          </v-card>
+        <v-row class="mt-0 mb-0">
+          <v-col class="d-flex align-center" cols="8">
+            <div
+              v-for="student in students"
+              class="font-weight-bold text-maroon my-0 py-1 text-h4"
+            >
+              {{ student }}
+            </div>
+          </v-col>
+          <v-col class="d-flex justify-end align-center" cols="4">
+            <v-card color="lightMaroon" elevation="0">
+              <v-card-title>
+                <div class="text-maroon font-weight-bold">
+                  {{
+                    get12HourTimeStringFromString(props.signup.startTime) +
+                    "-" +
+                    get12HourTimeStringFromString(props.signup.endTime)
+                  }}
+                </div>
+              </v-card-title>
+            </v-card>
+          </v-col>
         </v-row>
         <v-row class="mt-4">
           <v-col cols="6">
-            <v-row class="font-weight-bold text-black text-h8 ml-1">
-              Instructor:
-              {{
-                props.signup.studentInstrumentSignups[0].instructorRoleSignup
-                  .user.lastName +
-                ", " +
-                props.signup.studentInstrumentSignups[0].instructorRoleSignup
-                  .user.firstName
-              }}
+            <v-row>
+              <p class="font-weight-bold text-black text-h8 ml-4">Major:</p>
+              <p class="ml-1">{{ majorName }}</p>
             </v-row>
-
-            <v-row v-if="props.signup.studentInstrumentSignups[0]
-                  .accompanistRoleSignup != null
-                " class="font-weight-bold text-black pl-0 ml-0 py-0 mt-5 ml-1 text-h8">
-              Accomp:
-              {{
-                props.signup.studentInstrumentSignups[0].accompanistRoleSignup
-                  .user.lastName +
-                ", " +
-                props.signup.studentInstrumentSignups[0].accompanistRoleSignup
-                  .user.firstName
-              }}
+            <v-row class="mt-4">
+              <p class="font-weight-bold text-black text-h8 ml-4">Instructor:</p>
+              <p class="ml-1">{{ instructorName }}</p>
+            </v-row>
+            <v-row
+              v-if="accompanistName != null"
+              class="mt-4"
+            >
+              <p class="font-weight-bold text-black text-h8 ml-4">Accomp:</p>
+              <p class="ml-1">{{ accompanistName }}</p>
             </v-row>
             <v-row class="font-weight-bold text-maroon text-h6 mt-5 ml-1">
               Musical Selection
             </v-row>
-            <v-row class="mt-3">
+            <v-row class="mt-2">
               <v-col cols="11" class="ml-1">
-                <v-list style="height: 280px" class="overflow-y-auto bg-lightBlue">
-                  <v-list-item v-for="(studentPiece, index) in eventSignupPieces" :key="index">
-                    <v-card v-bind:class="{
-                      'bg-blue': selectedStudentPiece.id == studentPiece.id,
-                      'bg-white': selectedStudentPiece.id != studentPiece.id,
-                    }" @click="changeSelectedPiece(studentPiece)">
+                <v-list
+                  style="height: 280px"
+                  class="overflow-y-auto bg-lightBlue"
+                >
+                  <v-list-item
+                    v-for="(studentPiece, index) in eventSignupPieces"
+                    :key="index"
+                  >
+                    <v-card
+                      v-bind:class="{
+                        'bg-blue': selectedStudentPiece.id == studentPiece.id,
+                        'bg-white': selectedStudentPiece.id != studentPiece.id,
+                      }"
+                      @click="changeSelectedPiece(studentPiece)"
+                    >
                       <v-card-text>
-                        <v-row no-gutters class="text-blue font-weight-semi-bold" v-bind:class="{
-                          'text-white':
-                            selectedStudentPiece.id == studentPiece.id,
-                        }">
+                        <v-row
+                          no-gutters
+                          class="text-blue font-weight-semi-bold"
+                          v-bind:class="{
+                            'text-white':
+                              selectedStudentPiece.id == studentPiece.id,
+                          }"
+                        >
                           {{ studentPiece.piece.title }}
                           {{ studentPiece.isFirst ? "(First Piece)" : "" }}
                         </v-row>
@@ -285,20 +333,24 @@ onMounted(async () => {
               </v-col>
             </v-row>
             <div v-if="selectedStudentPiece.piece != undefined">
-              <v-row class="font-weight-bold text-maroon ml-1">
+              <v-row class="font-weight-bold text-maroon ml-1 mt-2">
                 Poetic Translation
               </v-row>
               <v-row>
-                <v-textarea class="text-darkBlue bg-lightBlue ml-4 mr-12"
-                  v-model="selectedStudentPiece.piece.poeticTranslation">
+                <v-textarea
+                  class="text-darkBlue bg-lightBlue ml-4 mr-12"
+                  v-model="selectedStudentPiece.piece.poeticTranslation"
+                >
                 </v-textarea>
               </v-row>
-              <v-row class="font-weight-bold text-maroon ml-1">
+              <v-row class="font-weight-bold text-maroon ml-1 mt-6">
                 Literal Translation
               </v-row>
               <v-row>
-                <v-textarea class="text-darkBlue ml-4 mr-12 bg-lightBlue"
-                  v-model="selectedStudentPiece.piece.literalTranslation">
+                <v-textarea
+                  class="text-darkBlue ml-4 mr-12 bg-lightBlue"
+                  v-model="selectedStudentPiece.piece.literalTranslation"
+                >
                 </v-textarea>
               </v-row>
             </div>
@@ -309,8 +361,11 @@ onMounted(async () => {
                 Critique
               </div>
               <v-spacer></v-spacer>
-              <v-btn flat class="font-weight-semi-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
-                @click="clearCritique()">
+              <v-btn
+                flat
+                class="font-weight-semi-bold mt-0 mr-2 text-none text-white bg-blue flatChipBorder"
+                @click="clearCritique()"
+              >
                 Clear Current Critique
               </v-btn>
             </v-row>
@@ -329,8 +384,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.toneComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.toneComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
 
             <!-- Accuracy -->
             <v-row class="ml-1">
@@ -351,8 +413,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.accuracyComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.accuracyComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Balance -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
@@ -369,8 +438,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.balanceComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.balanceComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Deportment -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
@@ -385,8 +461,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.deportmentComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.deportmentComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Diction -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Diction</p>
@@ -406,8 +489,15 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.dictionComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.dictionComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Interpretation -->
             <v-row class="ml-1">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
@@ -424,23 +514,40 @@ onMounted(async () => {
                 <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.interpretationComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.interpretationComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
             <!-- Technique -->
             <v-row class="ml-1">
-              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">Technique</p>
+              <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
+                Technique
+              </p>
               <p class="text-maroon mt-2 mr-1">
-                (attacks, releases, flexibility, range, resonance, placement, support, agility)
+                (attacks, releases, flexibility, range, resonance, placement,
+                support, agility)
               </p>
               <v-radio-group v-model="critique.techniqueGrade" inline>
                 <v-radio label="Excellent" value="Excellent" color="green">
                 </v-radio>
                 <v-radio label="Good" value="Good" color="blue"> </v-radio>
-                <v-radio label="Poor" value="Poor" color="yellow"> </v-radio>
-                <v-radio label="Bad" value="Bad" color="red"></v-radio>
+                <v-radio label="Fair" value="Fair" color="yellow"> </v-radio>
+                <v-radio label="Poor" value="Poor" color="red"></v-radio>
               </v-radio-group>
             </v-row>
-            <v-text-field v-model="critique.techniqueComment" label="Comment" dense rows="2"></v-text-field>
+            <v-textarea
+              v-model="critique.techniqueComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            ></v-textarea>
             <!-- Overall -->
             <v-row class="ml-1 mb-3">
               <p class="font-weight-semi-bold text-maroon mt-2 mr-1">
@@ -450,25 +557,43 @@ onMounted(async () => {
                 (overall readiness to perform)
               </p>
             </v-row>
-            <v-text-field v-model="critique.overallComment" label="Comment" dense rows="2">
-            </v-text-field>
+            <v-textarea
+              v-model="critique.overallComment"
+              label="Comment"
+              dense
+              rows="2"
+              auto-grow
+              :maxlength="600"
+            >
+            </v-textarea>
           </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn flat class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
-          @click="saveDialog()">
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-teal flatChipBorder"
+          @click="saveDialog()"
+        >
           Save
         </v-btn>
-        <v-btn flat class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
-          @click="closeDialog()">
+        <v-btn
+          flat
+          class="font-weight-semi-bold mt-0 ml-4 text-none text-white bg-red flatChipBorder"
+          @click="closeDialog()"
+        >
           Cancel
         </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
-  <v-snackbar :timeout="2500" color="maroon" rounded="pill" v-model="errorSnackbar">
+  <v-snackbar
+    :timeout="2500"
+    color="maroon"
+    rounded="pill"
+    v-model="errorSnackbar"
+  >
     You must fill the overall comment or clear all fields.
     <template v-slot:actions>
       <v-btn @click="errorSnackbar = false">

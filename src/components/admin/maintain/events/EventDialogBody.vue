@@ -62,7 +62,7 @@ onMounted(async () => {
 });
 
 async function getData() {
-  await EventTypeDataService.getAll("type")
+  await EventTypeDataService.getAll("type", null, "active")
     .then((response) => {
       eventTypes.value = response.data;
     })
@@ -169,44 +169,42 @@ function dateCheck() {
 }
 function timeCheck(time) {
   const pattern = new RegExp("[0-5]?[0-9]:[0-5][0-9][ap]m$");
-  const twelveHourPattern = new RegExp("^(0?[1-9]|1[0-2]):[0-5][0-9][ap]m$")
+  const twelveHourPattern = new RegExp("^(0?[1-9]|1[0-2]):[0-5][0-9][ap]m$");
 
   let isTimeValid;
 
-  if(pattern.test(time)) {
+  if (pattern.test(time)) {
     isTimeValid = true;
-    if(!twelveHourPattern.test(time)){
-      isTimeValid = "Time must be in 12 hour format."
+    if (!twelveHourPattern.test(time)) {
+      isTimeValid = "Time must be in 12 hour format.";
     }
   } else {
-    isTimeValid = "Time must be in the format of 10:30am."
+    isTimeValid = "Time must be in the format of 10:30am.";
   }
 
   return isTimeValid;
 }
 
-function checkEndTimeAfterStart(startTime, endTime){
-  if(startTime?.length > 4 && endTime?.length > 4){
+function checkEndTimeAfterStart(startTime, endTime) {
+  if (startTime?.length > 4 && endTime?.length > 4) {
     let startTime24Hour = get24HourTimeString(startTime);
     let endTime24Hour = get24HourTimeString(endTime);
 
-    if(startTime24Hour.split(':')[0].length < 2){
-      startTime24Hour = '0'+startTime24Hour;
+    if (startTime24Hour.split(":")[0].length < 2) {
+      startTime24Hour = "0" + startTime24Hour;
     }
-    if(endTime24Hour.split(':')[0].length < 2){
-      endTime24Hour = '0'+endTime24Hour;
+    if (endTime24Hour.split(":")[0].length < 2) {
+      endTime24Hour = "0" + endTime24Hour;
     }
     const start = new Date("2000-01-01T" + startTime24Hour);
     const end = new Date("2000-01-01T" + endTime24Hour);
 
-    if(start.getTime() < end.getTime()){
+    if (start.getTime() < end.getTime()) {
       return true;
+    } else {
+      return "End time must be after start time";
     }
-    else{
-      return "End time must be after start time"
-    }
-  }
-  else{
+  } else {
     return false;
   }
 }
@@ -254,11 +252,23 @@ function checkEndTimeAfterStart(startTime, endTime){
           </v-card-subtitle>
 
           <v-text-field
-            placeholder="Wednesday Recital Hearing"
+            placeholder="Spring Recital Hearing"
             v-model="editedEventData.name"
             variant="plain"
             class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
             :rules="[() => !!editedEventData.name || 'This field is required']"
+          ></v-text-field>
+          <v-card-subtitle
+            class="pl-0 pb-2 font-weight-semi-bold text-darkBlue"
+          >
+            Program Name
+          </v-card-subtitle>
+
+          <v-text-field
+            placeholder="Spring Recital"
+            v-model="editedEventData.programName"
+            variant="plain"
+            class="bg-lightGray text-blue font-weight-bold flatCardBorder pl-4 py-0 my-0 mb-4"
           ></v-text-field>
           <v-row>
             <v-col>
@@ -330,7 +340,10 @@ function checkEndTimeAfterStart(startTime, endTime){
                 :rules="[
                   () => !!editedEventData.endTime || 'This field is required',
                   timeCheck(editedEventData.endTime),
-                  checkEndTimeAfterStart(editedEventData.startTime, editedEventData.endTime),
+                  checkEndTimeAfterStart(
+                    editedEventData.startTime,
+                    editedEventData.endTime
+                  ),
                 ]"
               ></v-text-field>
             </v-col>

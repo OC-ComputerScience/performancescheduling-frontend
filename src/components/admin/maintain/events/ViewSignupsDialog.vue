@@ -2,10 +2,7 @@
 import { ref, onBeforeMount } from "vue";
 
 import { formatDate } from "../../../../composables/dateFormatter";
-import {
-  get12HourTimeStringFromString,
-  get24HourTimeString,
-} from "../../../../composables/timeFormatter";
+import { get12HourTimeStringFromString } from "../../../../composables/timeFormatter";
 import {
   generateTimeSlots,
   subtractTimes,
@@ -44,13 +41,18 @@ function sortData() {
       student: [],
     });
   });
-
   var beginIndex = 0;
 
   // Finds the beginning index
   props.availData.forEach((element) => {
     for (var i = 0; i < timeSlots.length; i++) {
-      if (element.startTime == timeSlots[i].time) {
+      if (
+        element.startTime == timeSlots[i].time ||
+        (i < timeSlots.length &&
+          element.startTime > timeSlots[i].time &&
+          element.startTime < timeSlots[i + 1].time) ||
+        i == timeSlots.length - 1
+      ) {
         beginIndex = i;
         break;
       }
@@ -59,6 +61,8 @@ function sortData() {
     // Gets the number of 30 minute time slots that this element is available for
     var numberOfAvailabilities =
       subtractTimes(element.startTime, element.endTime) / 30;
+    // Rounds the number of availabilities to the nearest whole number (add .499 make it round down if it's .5)
+    numberOfAvailabilities = Math.round(numberOfAvailabilities + 0.499);
 
     // If the element's role is a faculty member, add their first and last name to the faculty array
     if (element.userRole.role.role == "Faculty") {
@@ -107,6 +111,7 @@ function sortData() {
 onBeforeMount(() => {
   sortData();
 });
+
 const emits = defineEmits(["closeSignupsDialog"]);
 </script>
 

@@ -9,6 +9,7 @@ import { storeToRefs } from "pinia";
 import ViewSignupsDialog from "../admin/maintain/events/ViewSignupsDialog.vue";
 import EventDataService from "../../services/EventDataService";
 import AvailabilityDataService from "../../services/AvailabilityDataService";
+import EventReport from "../../reports/eventReport.js";
 
 const loginStore = useLoginStore();
 const { currentRole } = storeToRefs(loginStore);
@@ -41,7 +42,12 @@ function openCritique(eventId) {
   router.push({ path: "facultyCreateCritique", query: { eventId: eventId } });
 }
 function okToCritique(eventDate) {
-  if (new Date(eventDate) <= new Date()) return true;
+  let date = new Date().toLocaleDateString().split("/");
+  date[1] = ("0" + date[1]).slice(-2);
+  date[0] = ("0" + date[0]).slice(-2);
+  let today = `${date[2]}-${date[0]}-${date[1]}`;
+
+  if (eventDate <= today) return true;
   else return false;
 }
 async function getDialogData() {
@@ -62,7 +68,16 @@ async function getDialogData() {
     });
   viewSignupsDialog.value = true;
 }
-
+async function generateEventReport() {
+  await EventDataService.getById(props.eventData.id)
+    .then((response) => {
+      studentSignupData.value = response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  EventReport.generateEventReport(props.eventData, studentSignupData.value);
+}
 onMounted(async () => {});
 </script>
 
@@ -79,7 +94,7 @@ onMounted(async () => {});
               </v-card-title>
 
               <v-card-subtitle
-                class="pt-0 mt-0 font-weight-semi-bold text-maroon"
+                class="pt-0 mt-0 font-weight-semi-bold text-darkBlue"
               >
                 {{
                   eventType.instrumentType === "Both"
@@ -155,7 +170,7 @@ onMounted(async () => {});
         "
         flat
         size="small"
-        class="font-weight-semi-bold mr-2 ml-auto bg-blue text-none"
+        class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
         @click="openCritique(eventData.id)"
       >
         Critique
@@ -163,7 +178,15 @@ onMounted(async () => {});
       <v-btn
         flat
         size="small"
-        class="font-weight-bold mt-0 mr-4 text-none text-white bg-blue flatChipBorder"
+        class="font-weight-bold mt-0 mr-1 ml-0 text-none text-white bg-blue flatChipBorder"
+        @click="generateEventReport()"
+      >
+        Event Report
+      </v-btn>
+      <v-btn
+        flat
+        size="small"
+        class="font-weight-bold mt-0 mr-1 ml-0 text-none text-white bg-blue flatChipBorder"
         @click="getDialogData"
       >
         View Signups
@@ -172,19 +195,19 @@ onMounted(async () => {});
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold ml-auto bg-blue text-none"
+        class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
         @click="(addAvailabilityDialog = true), (openAvailabilityDialog = true)"
       >
-        Add availability
+        Add Avail
       </v-btn>
       <!-- Edit Availability Button -->
       <v-btn
         flat
         size="small"
-        class="font-weight-semi-bold mr-2 bg-blue text-none"
+        class="font-weight-semi-bold mr-1 ml-0 bg-blue text-none"
         @click="openAvailabilityDialog = true"
       >
-        Edit availability
+        Edit Avail
       </v-btn>
     </v-card-actions>
   </v-card>

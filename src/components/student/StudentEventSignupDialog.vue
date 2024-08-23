@@ -65,7 +65,7 @@ const snackbar = ref({ show: false, color: "", message: "" });
 
 const onlySemesterPieces = ref(true);
 const disableOnlySemesterPiece = ref(false);
-
+const doubleTime = ref(false);
 async function getData() {
   // due to the watch statements, accompanists must be gotten before student instruments
   await UserRoleDataService.getRolesForRoleId(4, "lastName,firstName")
@@ -228,16 +228,13 @@ function generateTimeslots() {
   timeslots.value = generateTimeSlots(
     props.eventData.startTime,
     props.eventData.endTime,
-    props.eventData.eventType.defaultSlotDuration
+    timeslotLength.value
   );
 
   timeslots.value.forEach((timeslot) => {
     timeslot.existingSignup = hasExistingSignup(
       timeslot.time,
-      addMinsToTime(
-        props.eventData.eventType.defaultSlotDuration,
-        timeslot.time
-      )
+      addMinsToTime(timeslotLength.value, timeslot.time)
     );
   });
   disableTimeslots();
@@ -280,12 +277,17 @@ function getTimeslotLength() {
   } 
   else {
       if (isMusicMajor.value) {
-        timeslotLength.value = 10;
+        timeslotLength.value = props.eventData.eventType.defaultSlotDuration * 2;
       } else {
         timeslotLength.value =
-          selectedStudentInstrument.value.privateHours == 1 ? 5 : 10;
+          selectedStudentInstrument.value.privateHours == 1 
+          ? props.eventData.eventType.defaultSlotDuration 
+          : props.eventData.eventType.defaultSlotDuration * 2;
       }
     }
+    if (doubleTime.value) {
+      timeslotLength.value *= 2;
+  }
 }
 
 function hasExistingSignup(timeslotStart, timeslotEnd) {
@@ -357,7 +359,7 @@ function openDialog() {
   }
 
   if (selectedTimeslot.value == null) {
-    errorMessage.value = "Please select a timeslot.";
+    errorMessage.value = "Please select a time slot.";
     return;
   }
 
@@ -408,7 +410,7 @@ function openDialog() {
       weekday: "long",
       timeZone: "UTC",
     })})
-    \nTimeslot: ${get12HourTimeStringFromString(
+    \nTime Slot: ${get12HourTimeStringFromString(
       selectedTimeslot.value.time
     )} - ${get12HourTimeStringFromString(timeslotEndTime)}
     \nInstrument: ${selectedStudentInstrument.value.instrument.name}`;
@@ -446,7 +448,7 @@ function openDialog() {
         weekday: "long",
         timeZone: "UTC",
       })})
-    \nTimeslot: ${get12HourTimeStringFromString(
+    \nTime Slot: ${get12HourTimeStringFromString(
       selectedTimeslot.value.time
     )} - ${get12HourTimeStringFromString(timeslotEndTime)}
     \nInstrument: ${selectedStudentInstrument.value.instrument.name}
@@ -461,7 +463,7 @@ function openDialog() {
         weekday: "long",
         timeZone: "UTC",
       })})
-    \nTimeslot: ${get12HourTimeStringFromString(
+    \nTime slot: ${get12HourTimeStringFromString(
       selectedTimeslot.value.time
     )} - ${get12HourTimeStringFromString(timeslotEndTime)}
     \nIs already reserved by ${studentsInSignup}`;
@@ -503,7 +505,7 @@ async function requestAdditionalTimeslots(userRole) {
   const data = {
     text: `${loginStore.user.firstName} ${
       loginStore.user.lastName
-    } has requested you create more timeslots for ${props.eventData.name} on
+    } has requested you create more time slots for ${props.eventData.name} on
     ${formatDate(props.eventData.date)} (${new Date(
       props.eventData.date
     ).toLocaleDateString("default", {
@@ -512,7 +514,7 @@ async function requestAdditionalTimeslots(userRole) {
     })})`,
     data: `eventId=${props.eventData.id}`,
     isCompleted: false,
-    userRoleId: userRole.id,
+    userRoleId: userRole != null ? userRole.id : null,
     notificationId: 1,
     from: loginStore.user.email,
   };
@@ -571,7 +573,7 @@ async function confirmSignup() {
     snackbar.value.color = "error";
     snackbar.value.message =
       existingSignup.value == null
-        ? "This timeslot has already been reserved"
+        ? "This time slot has already been reserved"
         : "This group signup is no longer available";
     confimationDialog.value = false;
     return;
@@ -763,6 +765,12 @@ watch(onlySemesterPieces, function () {
   filterStudentPieces();
 });
 
+watch(doubleTime, function () {
+  getTimeslotLength();
+  generateTimeslots();
+  disableTimeslots();
+});
+
 onMounted(async () => {
   await getData();
   eventTypeLabel.value =
@@ -860,32 +868,32 @@ onMounted(async () => {
         </v-row>
         <v-row class="ml-1">
           <v-col cols="6">
-            <v-row class="font-weight-bold text-maroon text-h6">
+            <v-row class="font-weight-bold text-maroon text-h6 mb-1">
               Musical Selection
             </v-row>
             <v-row>
-              <v-col cols="6">
-                <v-btn
-                  class="font-weight-bold text-none"
-                  color="blue"
-                  @click="addStudentPieceDialog = true"
-                >
-                  Add to Repertoire
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-row mt-7>
               <v-row>
-                <v-checkbox
-                  :disabled="disableOnlySemesterPiece"
-                  v-model="onlySemesterPieces"
-                  label="Only show pieces
-              from current semester"
-                  class="text-body-1 font-weight-bold text-darkBlue"
-                ></v-checkbox>
+                <v-col cols="6">
+                  <v-btn
+                    class="font-weight-bold text-none"
+                    color="blue"
+                    @click="addStudentPieceDialog = true"
+                  >
+                    Add to Repertoire
+                  </v-btn>
+                </v-col>
               </v-row>
             </v-row>
-            <v-row class="mt-5">
+            <v-row class="my-0mt-5">
+              <v-checkbox
+                :disabled="disableOnlySemesterPiece"
+                v-model="onlySemesterPieces"
+                label="Only show pieces
+              from current semester"
+                class="my-0 text-body-1 font-weight-bold text-darkBlue"
+              ></v-checkbox>
+            </v-row>
+            <v-row class="mt-0">
               <v-col cols="11" class="pl-0">
                 <v-list
                   style="height: 230px"
@@ -958,15 +966,24 @@ onMounted(async () => {
           </v-col>
           <v-col cols="6">
             <v-row>
-              <div class="font-weight-bold text-h6 text-maroon">
-                Timeslots Available
+              <div class="font-weight-bold text-h6 text-maroon mb-1">
+                Time Slots Available
               </div>
-              <v-card color="lightMaroon" elevation="0" class="ml-2">
-                <v-card-text
-                  class="mt-1 py-0 font-weight-semi-bold text-maroon"
-                >
-                  {{ timeslotLength }} Min Timeslot Length
-                </v-card-text>
+              </v-row>
+                <v-row>
+                  <v-card color="lightMaroon" elevation="0" class="mb-0">
+                    <v-row class="align-center">
+                  <v-card-text
+                    class="ml-3 mt-1 mb-1 font-weight-semi-bold text-maroon"
+                  >
+                    {{ timeslotLength }}-Minute Time Slot Length
+                  </v-card-text>
+                  <v-checkbox
+                    v-model="doubleTime"
+                    label="Double"
+                    class="mr-6 mt-1 mb-1 font-weight-semi-bold text-darkBlue text-body-2 d-flex align-center"
+                  ></v-checkbox>
+                </v-row>
               </v-card>
             </v-row>
             <v-row>
@@ -1121,7 +1138,7 @@ onMounted(async () => {
                   selectedTimeslot.existingSignup == null
                 "
                 v-model="groupSignup"
-                label="Allow other students to signup with you"
+                label="Allow other students to sign up with you"
                 class="text-body-1 font-weight-bold text-darkBlue"
               ></v-checkbox>
             </v-row>
@@ -1225,7 +1242,7 @@ onMounted(async () => {
   <v-dialog v-model="otherSignupDialog" persistent max-width="600px">
     <v-card>
       <v-card-title class="text-h6 font-weight-bold text-maroon">
-        This timeslot is already taken
+        This time slot is already taken
       </v-card-title>
       <v-card-text
         class="text-h8 font-weight-semi-bold text-blue"
@@ -1240,7 +1257,7 @@ onMounted(async () => {
           flat
           size="small"
           class="font-weight-semi-bold ml-auto mr-2 bg-blue text-none"
-          >Request This Timeslot</v-btn
+          >Request This Time Slot</v-btn
         >
         <v-btn
           @click="otherSignupDialog = false"
@@ -1288,6 +1305,7 @@ onMounted(async () => {
               timeSlotRequest && selectedAccompanist != null
                 ? (requestAdditionalTimeslots(selectedInstructor),
                   requestAdditionalTimeslots(selectedAccompanist),
+                  requestAdditionalTimeslots(null),
                   (timeSlotRequest = false))
                 : instructorAvailRequest
                 ? (requestAvailabilityFromUserRole(selectedInstructor),
@@ -1295,8 +1313,7 @@ onMounted(async () => {
                 : accompAvailRequest
                 ? (requestAvailabilityFromUserRole(selectedAccompanist),
                   (accompAvailRequest = false))
-                : (requestAdditionalTimeslots(selectedInstructor),
-                  (timeSlotRequest = false))
+                : (requestAdditionalTimeslots(null), (timeSlotRequest = false))
           "
         >
           Send

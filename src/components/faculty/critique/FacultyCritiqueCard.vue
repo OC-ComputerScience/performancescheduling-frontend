@@ -49,7 +49,7 @@ onMounted(() => {
           <v-card-title
             class="font-weight-bold text-maroon pl-0 ml-0 py-0 my-0 text-h6"
           >
-            {{ "Timeslot" }}
+            {{ "Time Slot" }}
           </v-card-title>
           <v-row>
             <v-card-subtitle
