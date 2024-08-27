@@ -274,19 +274,18 @@ function withinAvailability(timeslotStart, timeslotEnd) {
 function getTimeslotLength() {
   if (props.eventData.eventType.slotType === "Fixed") {
     timeslotLength.value = props.eventData.eventType.defaultSlotDuration;
-  } 
-  else {
-      if (isMusicMajor.value) {
-        timeslotLength.value = props.eventData.eventType.defaultSlotDuration * 2;
-      } else {
-        timeslotLength.value =
-          selectedStudentInstrument.value.privateHours == 1 
-          ? props.eventData.eventType.defaultSlotDuration 
+  } else {
+    if (isMusicMajor.value) {
+      timeslotLength.value = props.eventData.eventType.defaultSlotDuration * 2;
+    } else {
+      timeslotLength.value =
+        selectedStudentInstrument.value.privateHours == 1
+          ? props.eventData.eventType.defaultSlotDuration
           : props.eventData.eventType.defaultSlotDuration * 2;
-      }
     }
-    if (doubleTime.value) {
-      timeslotLength.value *= 2;
+  }
+  if (doubleTime.value) {
+    timeslotLength.value *= 2;
   }
 }
 
@@ -969,10 +968,10 @@ onMounted(async () => {
               <div class="font-weight-bold text-h6 text-maroon mb-1">
                 Time Slots Available
               </div>
-              </v-row>
-                <v-row>
-                  <v-card color="lightMaroon" elevation="0" class="mb-0">
-                    <v-row class="align-center">
+            </v-row>
+            <v-row>
+              <v-card color="lightMaroon" elevation="0" class="mb-0">
+                <v-row class="align-center">
                   <v-card-text
                     class="ml-3 mt-1 mb-1 font-weight-semi-bold text-maroon"
                   >
@@ -1281,6 +1280,7 @@ onMounted(async () => {
         status: 'Active',
       }"
       :student-pieces="studentPieces"
+      :student-role-id="selectedStudentInstrument.studentRole.id"
       @closeAddStudentPieceDialogEvent="addStudentPieceDialog = false"
       @addStudentPieceSuccessEvent="
         (addStudentPieceDialog = false), getStudentPieces()
