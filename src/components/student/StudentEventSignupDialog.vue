@@ -244,10 +244,11 @@ function generateTimeslots() {
 function disableTimeslots() {
   timeslots.value.forEach((timeslot) => {
     const timeslotEnd = addMinsToTime(timeslotLength.value, timeslot.time);
+
     timeslot.isDisabled =
       timeslotEnd >
         addMinsToTime(
-          props.eventData.eventType.defaultSlotDuration,
+          timeslotLength.value,
           timeslots.value[timeslots.value.length - 1].time
         ) ||
       (hasExistingSignup(timeslot.time, timeslotEnd) != undefined &&
