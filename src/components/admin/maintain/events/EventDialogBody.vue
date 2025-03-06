@@ -93,7 +93,10 @@ async function getData() {
       console.log(err);
     });
 
-  await UserDataService.getAllWithRolesAndStudentInstruments("lastName", "ASC")
+  await UserDataService.getActiveWithRolesAndStudentInstruments(
+    "lastName",
+    "ASC"
+  )
     .then((response) => {
       users.value = response.data;
 

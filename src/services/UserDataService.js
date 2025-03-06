@@ -25,7 +25,18 @@ class UserDataService {
     }
     return http.get(url);
   }
-
+  getActiveWithRolesAndStudentInstruments(sortVar = null, ascending = true) {
+    let url = this.baseUrl + "all/roles/studentInstruments/";
+    if (sortVar != null) {
+      url +=
+        "?sortVar=" +
+        sortVar +
+        "&order=" +
+        (ascending ? "ASC" : "DESC") +
+        "&active=true";
+    }
+    return http.get(url);
+  }
   remove(id) {
     return http.delete(this.baseUrl + id);
   }
